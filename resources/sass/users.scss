@@ -1,0 +1,135 @@
+.avatar {
+    width: 96px;
+    height: 96px;
+    max-width: 96px;
+    max-height: 96px;
+    border: 1px solid $gray-700;
+    background-color: $gray-400;
+    color: $dark;
+    border-radius: 100%;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 700;
+    font-size: 38px;
+    line-height: 96px;
+
+    @media (max-width: 576px) {
+        width: 64px;
+        height: 64px;
+        max-width: 64px;
+        max-height: 64px;
+        font-size: 25px;
+        line-height: 64px;
+    }
+}
+
+#users-main-content {
+    font-size: 0.8rem;
+
+    #user-list {
+        .user-banner {
+            width: 10rem;
+            padding: 0.5rem;
+            background-color: $gray-100;
+            border: 1px solid $gray-200;
+            border-radius: 0.5rem;
+            margin: 0 0.5rem 0.5rem 0;
+
+            .avatar-link:hover {
+                text-decoration: none;
+            }
+
+            .avatar {
+                margin-bottom: 0.5rem;
+            }
+
+            p {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.block {
+    .avatar {
+        width: 32px;
+        height: 32px;
+        max-width: 32px;
+        max-height: 32px;
+        font-size: 12px;
+        line-height: 32px;
+        margin-right: 0.2rem;
+    }
+
+    .author-link {
+        margin-bottom: 0.2rem;
+        margin-right: 0.3em;
+    }
+}
+
+.comment-list {
+    .avatar {
+        width: 64px;
+        height: 64px;
+        max-width: 64px;
+        max-height: 64px;
+        font-size: 25px;
+        line-height: 64px;
+    }
+
+    .reply-list {
+        .avatar {
+            width: 48px;
+            height: 48px;
+            max-width: 48px;
+            max-height: 48px;
+            font-size: 20px;
+            line-height: 48px;
+        }
+    }
+}
+
+hr.banner {
+    margin-bottom: 2rem;
+}
+
+.user-profile {
+    margin-bottom: 1rem;
+
+    .profile-header {
+        margin-bottom: 1rem;
+
+        .profile-bio {
+            width: 100%;
+            max-width: 20rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    .avatar {
+        margin-bottom: 0.5rem;
+    }
+
+    .user-stats {
+        margin-bottom: 2rem;
+
+        button {
+            i {
+                opacity: 0.7;
+            }
+        }
+    }
+
+    .profile-footer {
+        width: 100%;
+        max-width: 20rem;
+        margin-left: auto;
+        margin-right: auto;
+
+        div {
+            margin: 0.25rem;
+        }
+    }
+}

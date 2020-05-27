@@ -1,0 +1,45 @@
+$mb-section: 3rem;
+$mb-item: 2rem;
+$mb-normal: 1rem;
+$mb-mini: 0.3rem;
+
+$btn-icon-opacity: 0.7;
+
+$font-size-base: 20px;
+$font-size-standard: 1rem;
+$font-size-mini: 0.8rem;
+
+$font-color-body: $gray-700;
+$font-color-hover: $dark;
+$font-color-light: $gray-400;
+$font-color-white: $white;
+
+$header-size: 600px;
+$header-mini-size: 300px;
+
+$header-bg-color: rgba(0, 0, 0, 0.5);
+$header-bg-image: '/static/uploads/cover-header-default.jpg';
+
+$header-main-height: $header-size - 70;
+$header-mini-main-height: $header-mini-size - 70;
+
+$nav-bg-hover: rgba($indigo, 0.7);
+$nav-bg-active: $indigo;
+
+$border-radius: 1rem;
+$border-radius-mini: 0.5rem;
+
+$avatar-size: 96px;
+$avatar-line-height: $avatar-size * 0.4;
+
+$bg-color-light: $gray-200;
+$bg-color-mid: $gray-400;
+$bg-color-dark: $dark;
+
+$bg-color-light-text: $gray-700;
+$bg-color-mid-text: $dark;
+$bg-color-dark-text: $light;
+
+$border-color-light: $gray-400;
+$border-color-mid: $gray-700;
+$border-color-dark: $gray-200;

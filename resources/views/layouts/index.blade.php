@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="{{ getSiteConfig('slogan') }}">
+        <meta name="keywords" content="writings, poetry, short stories, writers, amateur writers, writerhood, writers hood, poets, hood">
+        <meta name="author" content="Jonathan Estrella">
+        <meta name="generator" content="Writerhood">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>@yield('title') - {{ getSiteConfig('name') }}</title>
+
+        <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">
+        <link rel="preload" href="{{ mix('/static/js/app.js') }}" as="script">
+        <link rel="icon" href="{{ mix('/static/images/favicon.svg') }}" type="image/svg+xml">
+        <link rel="alternate icon" href="{{ mix('/static/images/favicon.png') }}" sizes="32x32" type="image/png">
+        <link rel="stylesheet" href="{{ mix('/static/css/app.css') }}" type="text/css">
+
+        <script src="{{ mix('static/js/manifest.js') }}" defer></script>
+        <script src="{{ mix('static/js/vendor.js') }}" defer></script>
+        <script src="{{ mix('static/js/app.js') }}" defer></script>
+        @yield('scripts')
+    </head>
+
+    <body class="d-flex flex-column overflow-hidden">
+        @include('partials.noscript')
+
+        @yield('header')
+
+        @yield('jumbo-top')
+
+        <main role="main" class="container">
+            <div class="d-flex flex-wrap flex-lg-nowrap">
+                <div class="flex-grow-1">
+                    @yield ('main')
+                </div>
+
+                @yield('sidebar')
+            </div>
+        </main>
+
+        @yield('jumbo-down')
+
+        @yield('footer')
+    </body>
+</html>

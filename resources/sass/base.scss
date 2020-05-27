@@ -1,0 +1,163 @@
+html {
+    font-size: 20px !important;
+}
+
+html,
+body {
+    height: 100%;
+    color: $gray-700;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Oswald", sans-serif;
+    font-weight: 700;
+    color: $gray-900;
+}
+
+a,
+.btn-link {
+    color: $gray-700;
+}
+
+a:hover,
+.btn-link:hover {
+    color: $dark;
+}
+
+.btn-link:hover {
+    text-decoration: none;
+}
+
+hr {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+main {
+    padding-top: 3rem;
+}
+
+.main-content {
+    @media (min-width: 768px) {
+        margin-right: 2rem;
+    }
+}
+
+.main-content,
+.main-pagination,
+.sidebar-toggle,
+.block {
+    margin-bottom: 2rem;
+}
+
+.main-sidebar {
+    .block {
+        .block-title {
+            text-transform: uppercase;
+        }
+
+        .writing-tag,
+        .writing-category {
+            margin-bottom: 0.3rem;
+        }
+    }
+}
+
+.empty {
+    width: 100%;
+    max-width: 25rem;
+    margin: 4rem 0;
+    text-align: center;
+
+    h4 {
+        text-transform: uppercase;
+    }
+
+    .empty-icon {
+        font-size: 8rem;
+        color: $gray-400;
+    }
+}
+
+.collapse.no-collapse-lg {
+    @media (min-width: 992px) {
+        display: block;
+        height: auto !important;
+        visibility: visible;
+    }
+}
+
+.top-links {
+    font-size: 1.5rem;
+    margin-bottom: 3rem;
+    color: $gray-400;
+
+    a {
+        color: $dark;
+        text-decoration: none;
+        margin: 0 0.5rem;
+        display: inline-block;
+        padding: 0.5rem 1.3rem;
+        border-radius: 5px;
+    }
+
+    a:hover {
+        background-color: $gray-100;
+    }
+
+    .active {
+        font-weight: 700;
+        background-color: $gray-200;
+    }
+}
+
+#toggler {
+    i {
+        color: $gray-400;
+    }
+}
+
+.stats {
+    button {
+        @media (max-width: 576px) {
+            margin-bottom: 0.25rem;
+        }
+    }
+}
+
+.btn-counter {
+    background-color: $gray-100 !important;
+    color: $gray-600 !important;
+}
+
+.btn-counter:hover {
+    border: 1px solid $gray-200 !important;
+    color: $gray-700 !important;
+}
+
+.no-script {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    background-color: rgba($white, 0.98);
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+
+    img {
+        margin-bottom: 1rem;
+    }
+}

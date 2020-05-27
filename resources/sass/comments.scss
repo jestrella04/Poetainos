@@ -1,0 +1,103 @@
+.writing-comments {
+    .fa-spinner {
+        opacity: 0.5;
+        margin-bottom: 1rem;
+    }
+
+    #post-comment-form,
+    .reply-form {
+        .form-group {
+            margin-bottom: 0.3rem;
+        }
+    }
+
+    #post-comment + hr {
+        margin: 3rem auto;
+
+        @media (max-width: 576px) {
+            margin: 2rem auto;
+        }
+    }
+
+    h6 {
+        text-transform: uppercase;
+    }
+
+    #load-more {
+        margin-bottom: 1rem;
+    }
+
+    .comment-list {
+        .comment {
+            margin-bottom: 0.5rem;
+            border: 1px solid $gray-300;
+            background-color: $gray-100;
+            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+
+            .comment-author {
+                margin-right: 1rem;
+            }
+
+            .comment-body {
+                .author {
+                    font-size: 0.8rem;
+                    margin-bottom: 0.5rem;
+
+                    span {
+                        margin-right: 1rem;
+
+                        i {
+                            opacity: 0.6;
+                        }
+                    }
+                }
+
+                .message {
+                    margin-bottom: 1rem;
+
+                    .badge {
+                        cursor: pointer;
+                        margin-left: 0.5rem;
+                        opacity: 0.5;
+                    }
+
+                    .badge:hover {
+                        opacity: 0.8;
+                    }
+                }
+            }
+        }
+
+        .reply-list {
+            padding-left: 3rem;
+
+            .reply {
+                margin-bottom: 0.5rem;
+                border: 1px solid $gray-300;
+                background-color: $gray-100;
+                border-radius: 1rem;
+                padding: 0.5rem 1rem;
+
+                .reply-author {
+                    margin-right: 1rem;
+                }
+
+                .reply-body {
+                    .author {
+                        font-size: 0.8rem;
+                        margin-bottom: 0.5rem;
+
+                        span {
+                            margin-right: 1rem;
+
+                            i {
+                                opacity: 0.6;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

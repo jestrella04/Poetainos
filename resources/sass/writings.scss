@@ -1,0 +1,162 @@
+.writing-entry + hr {
+    margin: 3rem auto;
+
+    @media (max-width: 576px) {
+        margin: 2rem auto;
+    }
+}
+
+.writing-entry {
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    .writing-meta {
+        color: $gray-600;
+        text-transform: uppercase;
+
+        i {
+            opacity: 0.7;
+        }
+    }
+
+    .writing-title {
+        text-transform: uppercase;
+
+        a {
+            color: $gray-800;
+            text-decoration: none;
+        }
+
+        a:hover{
+            color: $gray-900;
+            text-decoration: none;
+        }
+    }
+
+    .writing-heading {
+        margin-bottom: 1rem;
+
+        p {
+            span {
+                margin-right: 2rem;
+            }
+        }
+    }
+
+    .writing-cover {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0.3rem;
+        overflow: hidden;
+        margin-bottom: 1rem;
+
+        img {
+            width: 100%;
+            transition: transform .5s, filter .5s ease-in-out;
+        }
+
+        img:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    .writing-author {
+        @media (min-width: 768px) {
+            margin-right: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            margin-bottom: 1rem;
+        }
+    }
+
+    .writing-link {
+        margin-bottom: 1rem;
+
+        .btn {
+            text-align: left;
+            padding-left: 0;
+
+            i {
+                opacity: .5;
+            }
+        }
+
+        .btn:hover {
+            i {
+                opacity: .8;
+            }
+        }
+    }
+
+    .writing-footer {
+        margin-bottom: 2rem;
+
+        p {
+            i {
+                margin-right: 0.6rem;
+            }
+        }
+    }
+
+    .btn-read-more {
+        @media (max-width: 768px) {
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            margin-right: 2rem;
+        }
+    }
+}
+
+#writings-main-content {
+    .user-banner {
+        .avatar {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
+#writing-form-wrapper {
+    h3 {
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+    }
+
+    .alert {
+        width: 90%;
+        max-width: 25rem;
+        margin: 0 auto 2rem;
+        text-align: center;
+
+        p {
+            margin-bottom: 0;
+        }
+    }
+
+    #writing-form {
+        .form-group {
+            display: flex;
+            flex-direction: column;
+
+            @media (min-width: 992px) {
+                flex-direction: row;
+            }
+
+            label,
+            div {
+                display: flexbox;
+            }
+
+            label {
+                width: 100%;
+                max-width: 10rem;
+            }
+
+            div {
+                flex-grow: 1;
+            }
+        }
+    }
+}

@@ -1,0 +1,166 @@
+<?php
+
+namespace App;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+
+class Writing extends Model
+{
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'user_id',
+        'category_id',
+        'type_id',
+        'title',
+        'slug',
+        'text',
+        'extra_info',
+        'aura',
+        'aura_updated_at',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'extra_info' => 'array',
+    ];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    public function path()
+    {
+        return route('writings.show', $this->slug);
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function excerpt()
+    {
+        return substr($this->text, 0, 400);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(Vote::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    public function tagsAsString($delimiter = ',')
+    {
+        $tagsArray = $this->tags
+        ->map(function ($tag) {
+            return $tag->name;
+        })
+        ->toArray();
+
+        return implode($delimiter, $tagsArray);
+    }
+
+    public function shelf()
+    {
+        return $this->belongsToMany(User::class, 'shelves');
+    }
+
+    public function incrementViews()
+    {
+        DB::table($this->getTable())->whereId($this->id)->increment('views');
+    }
+
+    public function updateAura()
+    {
+        // Get the old aura
+        $auraOld = $this->aura;
+
+        // What's the minimun to be featured at home?
+        $auraHome = getSiteConfig('aura.min_at_home');
+
+        // Count user content
+        $upvotes = $this->votes->where('vote', '>', 0)->count();
+        $downvotes = $this->votes->where('vote', 0)->count();
+        $comments = $this->comments->count();
+        $shelf = $this->shelf->count();
+        $views = $this->views;
+
+        // Get points from settings
+        $pointsUpvotes = getSiteConfig('aura.points.writing.upvote');
+        $pointsDownvotes = getSiteConfig('aura.points.writing.downvote');
+        $pointsComments = getSiteConfig('aura.points.writing.comment');
+        $pointsShelf = getSiteConfig('aura.points.writing.shelf');
+        $pointsViews = getSiteConfig('aura.points.writing.views');
+        $basePoints = $pointsUpvotes + $pointsDownvotes + $pointsComments + $pointsShelf + $pointsViews;
+
+        // Calculate points as per settings
+        $pointsUpvotes = $pointsUpvotes * $upvotes;
+        $pointsDownvotes = $pointsDownvotes * $downvotes;
+        $pointsComments = $pointsComments * $comments;
+        $pointsShelf = $pointsShelf * $shelf;
+        $pointsViews = $pointsViews * $views;
+        $totalPoints = $pointsUpvotes + $pointsDownvotes + $pointsComments + $pointsShelf + $pointsViews;
+
+        // Do the math
+        $auraNew = ($totalPoints / $basePoints) * (1 + ($basePoints / 100));
+        $auraNew = number_format($auraNew, 2);
+
+        // Persist to the database
+        if ($auraOld < $auraHome && $auraNew >= $auraHome) {
+            DB::table($this->getTable())->whereId($this->id)->update([
+                'aura' => $auraNew,
+                'aura_updated_at' => Carbon::now(),
+                'home_posted_at' => Carbon::now(),
+            ]);
+        } else {
+            DB::table($this->getTable())->whereId($this->id)->update([
+                'aura' => $auraNew,
+                'aura_updated_at' => Carbon::now()
+            ]);
+        }
+    }
+
+    public function externalLink()
+    {
+        if (! empty($this->extra_info['link'])) {
+            return $this->extra_info['link'];
+        }
+    }
+
+    public function coverPath()
+    {
+        if (! empty($this->extra_info['cover'])) {
+            return '/static/storage/' . $this->extra_info['cover'];
+        }
+    }
+}

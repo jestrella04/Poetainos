@@ -1,0 +1,128 @@
+nav {
+    font-size: 0.8rem;
+}
+
+#side-menu-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9998;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#side-menu {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+    width: 80%;
+    max-width: 15rem;
+    background-color: rgba($dark, .95);
+    font-size: 1rem;
+    padding: 2rem 0;
+
+    .navbar-nav {
+        li {
+            margin: 0.5rem;
+        }
+    }
+
+    .nav-item {
+        a,
+        button {
+            color: $white;
+            padding: 0.5rem 0.5rem 0.5rem 1rem;
+        }
+
+        .nav-link:hover,
+        button:hover {
+            background-color: $indigo;
+            border-radius: 1rem;
+        }
+
+        i {
+            margin-right: 0.8rem;
+        }
+    }
+
+    .nav-item.active {
+        background-color: $indigo;
+        border-radius: 1rem;
+        font-weight: 700;
+
+        a {
+            font-weight: 700;
+        }
+    }
+}
+
+.navbar {
+    .navbar-brand {
+        img {
+            transition: transform .5s, filter .5s ease-in-out;
+            filter: grayscale(90%);
+        }
+    }
+
+    .navbar-brand:hover {
+        img {
+            filter: grayscale(0);
+            transform: scale(1.3);
+        }
+    }
+
+    .navbar-nav {
+        li {
+            margin-left: 1.5rem;
+        }
+    }
+
+    .nav-item {
+        a {
+            color: $white;
+            font-weight: 700;
+        }
+
+        .nav-link:hover {
+            background-color: rgba($indigo, 0.7);
+
+            @media (min-width: 992px) {
+                border-radius: 1rem;
+            }
+        }
+
+        i {
+            margin-right: 0.2rem;
+        }
+
+        .dropdown-menu {
+            a.dropdown-item,
+            button {
+                font-weight: 400;
+                color: $gray-700;
+            }
+
+            a:hover.dropdown-item,
+            button:hover {
+                font-weight: 400;
+                color: $gray-900;
+            }
+        }
+    }
+
+    .nav-item.active {
+        background-color: $indigo;
+        font-weight: 700;
+
+        a {
+            font-weight: 700;
+        }
+
+        @media (min-width: 992px) {
+            border-radius: 1rem;
+        }
+    }
+}

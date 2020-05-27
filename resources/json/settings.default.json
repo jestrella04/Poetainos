@@ -1,0 +1,129 @@
+{
+    "site": {
+        "name": {
+            "type": "string",
+            "value": "Writerhood",
+            "description": "Site name to be displayed across the app."
+        },
+        "slogan": {
+            "type": "string",
+            "value": "The definitive community for amateur writers",
+            "description": "Site slogan to be displayed across the app."
+        },
+        "email": {
+            "type": "string",
+            "value": "noreply@writerhood.host",
+            "description": "Email address sender for outgoing communication."
+        },
+        "enabled": {
+            "type": "bool",
+            "value": true,
+            "description": "Enable or disable the whole site on demand."
+        },
+        "url": {
+            "type": "string",
+            "value": "https://writerhood.host",
+            "description": "Public URL of the site."
+        },
+        "pagination": {
+            "type": "integer",
+            "value": 20,
+            "description": "The number of items per page to be displayed."
+        },
+        "social": {
+            "twitter": {
+                "type": "string",
+                "value": "",
+                "description": "The official Twitter profile of the site."
+            },
+            "instagram": {
+                "type": "string",
+                "value": "",
+                "description": "The official Instagran profile of the site."
+            },
+            "facebook": {
+                "type": "string",
+                "value": "",
+                "description": "The official Facebook profile of the site."
+            },
+            "youtube": {
+                "type": "string",
+                "value": "",
+                "description": "The official Youtube profile of the site."
+            }
+        },
+        "aura": {
+            "min_at_home": {
+                "type": "double",
+                "value": 10,
+                "description": "The minimum aura for a writing to be displayed on homepage."
+            },
+            "points": {
+                "writing": {
+                    "upvote": {
+                        "type": "integer",
+                        "value": 200,
+                        "description": "How many points a writing will earn every time it gets a new upvote."
+                    },
+                    "downvote": {
+                        "type": "integer",
+                        "value": 1,
+                        "description": "How many points a writing will earn every time it gets a new downvote."
+                    },
+                    "comment": {
+                        "type": "integer",
+                        "value": 200,
+                        "description": "How many points a writing will earn every time it gets a new comment."
+                    },
+                    "shelf": {
+                        "type": "integer",
+                        "value": 100,
+                        "description": "How many points a writing will earn every time it is saved to a user shelf."
+                    },
+                    "views": {
+                        "type": "integer",
+                        "value": 10,
+                        "description": "How many points a writing will earn every time it is viewed."
+                    }
+                },
+                "user": {
+                    "writing": {
+                        "type": "integer",
+                        "value": 300,
+                        "description": "How many points a user will earn every time he posts a new writing."
+                    },
+                    "vote": {
+                        "type": "integer",
+                        "value": 10,
+                        "description": "How many points a user will earn every time he posts a new vote for an existing writing."
+                    },
+                    "comment": {
+                        "type": "integer",
+                        "value": 100,
+                        "description": "How many points a user will earn every time he posts a new comment for an existing writing."
+                    },
+                    "shelf": {
+                        "type": "integer",
+                        "value": 10,
+                        "description": "How many points a user will earn every time he saves an existing writing to his shelf."
+                    },
+                    "views": {
+                        "type": "integer",
+                        "value": 1,
+                        "description": "How many points a user will earn every time his profile is viewed."
+                    },
+                    "hood": {
+                        "type": "integer",
+                        "value": 10,
+                        "description": "How many points a user will earn every time he adds another user to his hood."
+                    },
+                    "extended_hood": {
+                        "type": "integer",
+                        "value": 50,
+                        "description": "How many points a user will earn every time he is added to another users hood."
+                    }
+                }
+            }
+        }
+    }
+}
