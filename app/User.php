@@ -52,20 +52,22 @@ class User extends Authenticatable
 
     public function writingsPath()
     {
-        return route('users_writings.show', $this->username);
+        return route('users_writings.index', $this->username);
     }
 
     public function shelfPath()
     {
-        return route('users_shelves.show', $this->username);
+        return route('users_shelves.index', $this->username);
     }
 
     public function avatarPath()
     {
-        $path = '/static/uploads/avatars/' . $this->avatar_path;
+        if (! empty($this->extra_info['avatar'])) {
+            $path = '/static/storage/' . $this->avatar_path;
 
-        if (is_file(public_path($path))) {
-            return $path;
+            if (is_file(public_path($path))) {
+                return $path;
+            }
         }
     }
 
@@ -174,5 +176,23 @@ class User extends Authenticatable
 
         // Persist to the database
         DB::table($this->getTable())->whereId($this->id)->update(['aura' => $aura, 'aura_updated_at' => Carbon::now()]);
+    }
+
+    public function isAdmin()
+    {
+        if (in_array($this->role, ['master', 'admin'])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isModerator()
+    {
+        if (in_array($this->role, ['moderator'])) {
+            return true;
+        }
+
+        return false;
     }
 }

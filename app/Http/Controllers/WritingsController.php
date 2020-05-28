@@ -44,19 +44,6 @@ class WritingsController extends Controller
      */
     public function create()
     {
-        /* $categories = Category::all();
-        $types = Type::all();
-
-        $params = [
-            'title' => __('Post a writing'),
-        ];
-
-        return view('writings.create', [
-            'params' => $params,
-            'categories' => $categories,
-            'types' => $types,
-        ]); */
-
         return $this->edit(new Writing());
     }
 
@@ -115,7 +102,9 @@ class WritingsController extends Controller
     public function edit(Writing $writing)
     {
         // Ensure user has the proper permission
-        $this->authorize('update-writing', $writing);
+        if ($writing->exists) {
+            $this->authorize('update', $writing);
+        }
 
         $categories = Category::all();
         $types = Type::all();
@@ -145,7 +134,9 @@ class WritingsController extends Controller
     public function update(Request $request, Writing $writing)
     {
         // Ensure user has the proper permission
-        $this->authorize('update-writing', $writing);
+        if ($writing->exists) {
+            $this->authorize('update', $writing);
+        }
 
         // Validate user input
         request()->validate([
@@ -218,6 +209,7 @@ class WritingsController extends Controller
      */
     public function destroy(Writing $writing)
     {
-        //
+        $this->authorize('delete', $writing);
+        return $writing->delete();
     }
 }

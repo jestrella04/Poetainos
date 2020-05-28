@@ -100,4 +100,16 @@
             }
         }
     }
+
+    .comments-empty {
+        text-align: center;
+
+        i {
+            color: $gray-200;
+        }
+
+        p:first-child {
+            margin-bottom: 0.5rem;
+        }
+    }
 }

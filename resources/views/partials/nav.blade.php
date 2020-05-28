@@ -31,6 +31,13 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('writings.create') }}">
+                        <i class="fas fa-pen-nib fa-fw"></i>
+                        {{ __('Publish') }}
+                    </a>
+                </li>
+
                 {{-- <li class="nav-item {{ Route::current()->getName() === 'pages' ? 'active' : '' }}">
                     <a class="nav-link" href="/page/about">
                         <i class="fas fa-info-circle fa-fw"></i>
@@ -49,7 +56,6 @@
                             <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>
                             <a class="dropdown-item" href="{{ auth()->user()->writingsPath() }}">{{ __('My writings') }}</a>
                             <a class="dropdown-item" href="{{ auth()->user()->shelfPath() }}">{{ __('My shelf') }}</a>
-                            <a class="dropdown-item" href="{{ route('writings.create') }}">{{ __('Publish a writing') }}</a>
                             <form class="d-inline" method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item">{{ __('Logout') }}</button>
@@ -75,13 +81,6 @@
                         <a class="nav-link" href="{{ auth()->user()->shelfPath() }}">
                             <i class="fas fa-book-reader fa-fw"></i>
                             {{ __('My shelf') }}
-                        </a>
-                    </li>
-
-                    <li class="nav-item d-lg-none">
-                        <a class="nav-link" href="{{ route('writings.create') }}">
-                            <i class="fas fa-pen-nib fa-fw"></i>
-                            {{ __('Publish a writing') }}
                         </a>
                     </li>
 

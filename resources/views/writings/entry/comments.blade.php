@@ -45,9 +45,10 @@
 
         <div id="embed-comments"></div>
     @else
-        <div class="text-center">
-            <p class="">{{ __('Do you like this? Be the first to leave a comment.') }}</p>
-            <i class="fa fa-smile fa-5x"></i>
+        <div class="comments-empty">
+            <p>{{ __('Do you like this writing?') }}</p>
+            <p class="text-muted">{{ __('Be the first to leave a comment.') }}</p>
+            <i class="fas fa-comment fa-5x"></i>
         </div>
     @endif
 </div>

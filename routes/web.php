@@ -21,6 +21,7 @@ Auth::routes();
 
 // Generic
 Route::get('/', 'HomeController@show')->name('home');
+Route::redirect('/home', '/');
 Route::get('/search', 'SearchController@show')->name('search');
 
 // Writings
@@ -31,17 +32,20 @@ Route::get('/writings/random', 'WritingsController@random')->name('writings.rand
 Route::get('/writings/{writing}', 'WritingsController@show')->name('writings.show');
 Route::get('/writings/edit/{writing}', 'WritingsController@edit')->name('writings.edit')->middleware('auth');
 Route::put('/writings/edit/{writing}', 'WritingsController@update')->name('writings.update')->middleware('auth');
+Route::delete('/writings/delete/{writing}', 'WritingsController@destroy')->name('writings.destroy')->middleware('auth');
 
 // Users
 Route::get('/users', 'UsersController@index')->name('users.index');
 Route::get('/users/{user}', 'UsersController@show')->name('users.show');
-Route::get('/users/{user}/writings', 'UsersController@showWritings')->name('users_writings.show');
-Route::get('/users/{user}/shelf', 'UsersController@showShelf')->name('users_shelves.show');
-Route::get('/users/{user}/hood', 'UsersController@showHood')->name('users_hoods.show');
-Route::get('/users/{user}/hood/writings', 'UsersController@showHoodWritings')->name('users_hoods_writings.show');
+Route::get('/users/{user}/writings', 'UsersWritingsController@index')->name('users_writings.index');
+Route::get('/users/{user}/shelf', 'UsersShelvesController@index')->name('users_shelves.index');
+Route::get('/users/{user}/hood', 'UsersHoodsController@index')->name('users_hoods.index');
+Route::get('/users/{user}/hood/writings', 'UsersHoodsWritingsController@index')->name('users_hoods_writings.index');
+Route::get('/users/edit/{user}', 'UsersController@edit')->name('users.edit')->middleware('auth');
+Route::put('/users/edit/{user}', 'UsersController@update')->name('users.update')->middleware('auth');
+Route::delete('/users/delete/{user}', 'UsersController@destroy')->name('users.destroy')->middleware('auth');
 
 //Pages
-Route::get('/pages', 'PagesController@index')->name('pages.index');
 Route::get('/pages/{page}', 'PagesController@show')->name('pages.show');
 
 // Categories

@@ -4,5 +4,6 @@
     "/static/js/manifest.js": "/static/js/manifest.js",
     "/static/js/vendor.js": "/static/js/vendor.js",
     "/static/images/favicon.svg": "/static/images/favicon.svg",
-    "/static/images/favicon.png": "/static/images/favicon.png"
+    "/static/images/favicon.png": "/static/images/favicon.png",
+    "/static/images/cover.jpg": "/static/images/cover.jpg"
 }

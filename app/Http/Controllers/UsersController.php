@@ -82,58 +82,6 @@ class UsersController extends Controller
         ]);
     }
 
-    public function showWritings(User $user)
-    {
-        $sort = request('sort') ?? 'latest';
-
-        $params = [
-            'section' => 'my_writings',
-            'title' => __('Writings') . ' - ' . $user->fullName(),
-            'author' => $user,
-        ];
-
-        if ('latest' === $sort) {
-            $writings = $user->writings()
-            ->orderBy('created_at', 'desc')
-            ->simplePaginate($this->pagination);
-        } elseif ('popular' === $sort) {
-            $writings = $user->writings()
-            ->orderBy('views', 'desc')
-            ->simplePaginate($this->pagination);
-        }
-
-        return view('writings.index', [
-            'writings' => $writings,
-            'params' => $params
-        ]);
-    }
-
-    public function showShelf(User $user)
-    {
-        $sort = request('sort') ?? 'latest';
-
-        $params = [
-            'section' => 'shelf',
-            'title' => __('Shelf') . ' - ' . $user->fullName(),
-            'author' => $user,
-        ];
-
-        if ('latest' === $sort) {
-            $writings = $user->shelf()
-            ->orderBy('created_at', 'desc')
-            ->simplePaginate($this->pagination);
-        } elseif ('popular' === $sort) {
-            $writings = $user->shelf()
-            ->orderBy('views', 'desc')
-            ->simplePaginate($this->pagination);
-        }
-
-        return view('writings.index', [
-            'writings' => $writings,
-            'params' => $params
-        ]);
-    }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -142,7 +90,17 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        $this->authorize('update', $user);
+
+        $params = [
+            'title' => 'Modify profile',
+            'roles' => ['user', 'moderator', 'admin'],
+        ];
+
+        return view('users.edit', [
+            'params' => $params,
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -154,7 +112,7 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $this->authorize('update', $user);
     }
 
     /**
@@ -165,6 +123,7 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $this->authorize('delete', $user);
+        return $user->delete();
     }
 }

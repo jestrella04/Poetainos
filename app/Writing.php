@@ -160,7 +160,11 @@ class Writing extends Model
     public function coverPath()
     {
         if (! empty($this->extra_info['cover'])) {
-            return '/static/storage/' . $this->extra_info['cover'];
+            $path = '/static/storage/' . $this->extra_info['cover'];
+
+            if (is_file(public_path($path))) {
+                return $path;
+            }
         }
     }
 }

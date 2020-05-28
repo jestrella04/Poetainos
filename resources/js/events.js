@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             axios.post(url, params)
             .then(function (response) {
-                postCommentForm.reset();
+                element.reset();
                 commentList.insertAdjacentHTML('beforeend', response.data);
                 postCommentSuccess.classList.remove('d-none');
                 postCommentError.classList.add('d-none');

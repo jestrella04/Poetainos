@@ -29,52 +29,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('update-writing', function(User $user, Writing $writing) {
-            if ($writing->user->is($user) || isAdmin()) {
-                return true;
-            }
-        });
-
-        Gate::define('delete-writing', function(User $user, Writing $writing) {
-            if ($writing->user->is($user) || isAdmin()) {
-                return true;
-            }
-        });
-
-        Gate::define('update-comment', function(User $user, Comment $comment) {
-            if ($comment->user->is($user) || isAdmin() || isModerator()) {
-                return true;
-            }
-        });
-
-        Gate::define('delete-comment', function(User $user, Comment $comment) {
-            if ($comment->user->is($user) || isAdmin() || isModerator()) {
-                return true;
-            }
-        });
-
-        Gate::define('update-reply', function(User $user, Reply $reply) {
-            if ($reply->user->is($user) || isAdmin() || isModerator()) {
-                return true;
-            }
-        });
-
-        Gate::define('delete-reply', function(User $user, Reply $reply) {
-            if ($reply->user->is($user) || isAdmin() || isModerator()) {
-                return true;
-            }
-        });
-
-        Gate::define('update-profile', function(User $user, User $profile) {
-            if ($profile->is($user) || isAdmin()) {
-                return true;
-            }
-        });
-
-        Gate::define('delete-profile', function(User $user, User $profile) {
-            if ($profile->is($user) || isAdmin()) {
-                return true;
-            }
-        });
+        //
     }
 }

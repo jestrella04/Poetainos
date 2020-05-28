@@ -89,19 +89,3 @@ function getRelatedSlugs($table, $slug, $column = 'slug') {
         ->where($column, 'like', $slug . '%')
         ->get();
 }
-
-function isAdmin() {
-    if (in_array(auth()->user()->role, ['master', 'admin'])) {
-        return true;
-    }
-
-    return false;
-}
-
-function isModerator() {
-    if (in_array(auth()->user()->role, ['moderator'])) {
-        return true;
-    }
-
-    return false;
-}
