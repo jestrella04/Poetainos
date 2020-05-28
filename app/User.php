@@ -129,11 +129,6 @@ class User extends Authenticatable
         return $this->hasMany(Vote::class);
     }
 
-    public function role()
-    {
-        return $this->hasOne(Role::class);
-    }
-
     public function incrementViews()
     {
         DB::table($this->getTable())->whereId($this->id)->increment('profile_views');

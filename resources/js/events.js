@@ -75,6 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 parentAlert.classList.add('d-none');
             }
         }
+
+        // Trigger the file chooser
+        if (element.hasAttribute('id') && 'cover-chooser' === element.attributes['id'].value) {
+            event.preventDefault();
+            let fileChooser = document.querySelector(element.attributes['data-target'].value);
+
+            fileChooser.click();
+        }
     });
 
     // Listen to the on submit event on the page and act accordingly
@@ -169,6 +177,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 commentReplyError.textContent = error.response.data.errors.reply[0];
                 commentReplyError.classList.remove('d-none');
             });
+        }
+    });
+
+    // Listen to the on change event on the page and act accordingly
+    document.addEventListener('change', function(event) {
+        let element = event.target;
+
+        // Trigger the cover file validation
+        if (element.hasAttribute('id') && 'cover' === element.attributes['id'].value) {
+            const file = element.files[0];
+            let info = document.querySelector(element.attributes['data-target'].value);
+            let holder = element.parentElement.querySelector('.placeholder');
+
+            holder.classList.add('d-none');
+            info.textContent = file.name + ' [' + parseInt(file.size/1024) + 'kb]';
         }
     });
 });

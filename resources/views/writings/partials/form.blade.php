@@ -145,13 +145,24 @@
 
         <div>
             <input
-                type="file"
-                name="cover"
-                id="file"
-                class="form-control-file"
-                accept="image/png, image/jpeg"
-                placeholder="">
-            <small id="file-error" class="text-danger d-none"></small>
+            type="file"
+            name="cover"
+            id="cover"
+            class="form-control-file d-none"
+            accept="image/png, image/jpeg"
+            data-target="#selected-file"
+            placeholder="">
+
+            <button id="cover-chooser" data-target="#cover">
+                <div class="placeholder">
+                    <p>{{ __('Click here to select a file') }}</p>
+                    {{-- <p>{{ __('You can also drop your desired image file here') }}</p> --}}
+                </div>
+
+                <span id="selected-file"></span>
+            </button>
+
+            <small id="cover-error" class="text-danger d-none"></small>
         </div>
     </div>
 
