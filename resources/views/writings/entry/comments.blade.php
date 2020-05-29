@@ -32,7 +32,7 @@
             </script>
         @endsection
 
-        <h6>{{ __('Comments') }}</h6>
+        <h4 class="all-caps">{{ __('Comments') }}</h4>
 
         <div id="load-more" class="d-none">
             <button class="btn btn-link btn-sm btn-block" data-href="">{{ __('Load older comments') }}</button>

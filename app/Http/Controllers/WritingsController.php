@@ -114,6 +114,7 @@ class WritingsController extends Controller
                 'update' => __('Update writing'),
                 'create' => __('Publish a writing'),
             ],
+            'max_file_size' => getSiteConfig('uploads_max_file_size'),
         ];
 
         return view('writings.edit', [

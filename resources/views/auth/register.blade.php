@@ -10,7 +10,7 @@
     <div id="register" class="d-flex justify-content-center">
         <div class="wrapper">
             <div class="header">
-                <h4>{{ __('Join the hood') }}</h4>
+                <h4 class="all-caps">{{ __('Join the hood') }}</h4>
                 <p class="text-muted">{{ __('Lets create an account for you') }}</p>
             </div>
 

@@ -132,7 +132,7 @@
             @if ($user->writings()->count() > 0)
                 <a href="{{ $user->writingsPath() }}" class="btn btn-dark btn-sm">
                     <i class="fas fa-feather fa-fw"></i>
-                    @if (auth()->user()->is($user))
+                    @if (auth()->check() && auth()->user()->is($user))
                         {{ __('My writings') }}
                     @else
                         {{ __('View writings') }}
@@ -143,7 +143,7 @@
             @if ($user->Shelf()->count() > 0)
                 <a href="{{ $user->shelfPath() }}" class="btn btn-dark btn-sm">
                     <i class="fas fa-book-reader fa-fw"></i>
-                    @if (auth()->user()->is($user))
+                    @if (auth()->check() && auth()->user()->is($user))
                         {{ __('My shelf') }}
                     @else
                         {{ __('View shelf') }}

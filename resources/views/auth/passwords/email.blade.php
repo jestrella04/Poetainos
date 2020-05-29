@@ -16,7 +16,7 @@
             @endif
 
             <div class="header">
-                <h4>{{ __('So you forgot your password') }}</h4>
+                <h4 class="all-caps">{{ __('So you forgot your password') }}</h4>
                 <p class="text-muted">{{ __('No problem, let\'s reset it') }}</p>
             </div>
 

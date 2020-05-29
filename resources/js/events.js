@@ -1,20 +1,12 @@
+import * as fx from './functions';
+
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
     // Enable scrolling on the document
     document.body.classList.remove('overflow-hidden');
 
-    // Copy elements from the top nav to side menu
-    // used on small form factor screens
-    let overlay = document.createElement('div');
-    let sideMenu = document.createElement('div');
-
-    overlay.id = 'side-menu-overlay';
-    sideMenu.id = 'side-menu';
-    overlay.classList.add('d-none');
-    sideMenu.classList.add('d-none');
-
-    document.body.insertAdjacentElement('afterbegin', sideMenu);
-    document.body.insertAdjacentElement('afterbegin', overlay);
+    // Create the side menu for small screens
+    fx.createSideMenu();
 
     // Listen to the on click event on the page and act accordingly
     document.addEventListener('click', function(event) {
@@ -57,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.parentElement.hasAttribute('id') && 'load-more' === element.parentElement.attributes['id'].value) {
             let url = element.attributes['data-href'].value;
 
-            loadComments(url);
+            fx.loadComments(url);
         }
 
         // Show/hide the comment reply form
@@ -93,35 +85,59 @@ document.addEventListener('DOMContentLoaded', () => {
         if ('writing-form' === element.attributes['id'].value) {
             event.preventDefault();
 
+            // Display the wait cursor
+            document.body.classList.add('cursor-wait');
+
+            // Prevent double posting
+            element.querySelector('#submit').disabled = true;
+
+            // Initialize form and helpers
             let params = new FormData(element);
             let url = element.attributes['action'].value;
             let errorAlert = element.querySelector('.alert-danger');
             let successAlert = element.querySelector('.alert-success');
             let successLink = successAlert.querySelector('#writing-success-link');
 
+            // Hide all the error helpers
             element.querySelectorAll('.text-danger').forEach(function(helper) {
                 helper.innerHTML = '';
                 helper.classList.add('d-none');
             });
 
+            // Post the form to the server
             axios.post(url, params)
             .then(function (response) {
-                element.reset();
+                let method = element.elements['_method'] || false;
+
+                // Form posted successfully, let's reset it
+                if (! method) {
+                    element.reset();
+                }
+
+                // Update file helpers
+                element.querySelector('#selected-file').classList.add('d-none');
+                element.querySelector('#selected-error').classList.add('d-none');
+
+                // Update aterts
                 successLink.attributes['href'].value = response.data.url;
                 successAlert.classList.remove('d-none');
                 errorAlert.classList.add('d-none');
             })
             .catch(function (error) {
+                // Oh no, something went wrong
                 let errors = error.response.data.errors;
 
+                // Update alerts
                 successAlert.classList.add('d-none');
                 errorAlert.classList.remove('d-none');
 
+                // Get the error JSON object from server
                 Object.keys(errors).forEach(function(key) {
                     let formHelper = document.querySelector('#' + key + '-error');
 
                     formHelper.innerHTML = '';
 
+                    // Update form error helpers and display then accordingly
                     errors[key].forEach(function(msg) {
                         formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
                         formHelper.classList.remove('d-none');
@@ -129,7 +145,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             })
             .then(function () {
-                document.querySelector('#writing-form-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start'});
+                // Re-enable submit
+                element.querySelector('#submit').disabled = false;
+
+                // Scroll back to the form header
+                document.querySelector('#writing-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end'});
+
+                // Display the standard cursor
+                document.body.classList.remove('cursor-wait');
             });
         }
 
@@ -143,6 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let postCommentSuccess = document.querySelector('#post-comment-success');
             let postCommentError = document.querySelector('#post-comment-error');
 
+            // Display the wait cursor
+            document.body.classList.add('cursor-wait');
+
             axios.post(url, params)
             .then(function (response) {
                 element.reset();
@@ -154,6 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 postCommentError.textContent = error.response.data.errors.comment[0];
                 postCommentSuccess.classList.add('d-none');
                 postCommentError.classList.remove('d-none');
+            })
+            .then(function() {
+                // Display the standard cursor
+                document.body.classList.remove('cursor-wait');
             });
         }
 
@@ -166,6 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let commentReplyList = document.querySelector('#reply-list-' + element.comment_id.value);
             let commentReplyError = document.querySelector('#reply-error-' + element.comment_id.value);
 
+            // Display the wait cursor
+            document.body.classList.add('cursor-wait');
+
             axios.post(url, params)
             .then(function (response) {
                 element.reset();
@@ -176,6 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(function (error) {
                 commentReplyError.textContent = error.response.data.errors.reply[0];
                 commentReplyError.classList.remove('d-none');
+            })
+            .then(function () {
+                // Display the standard cursor
+                document.body.classList.remove('cursor-wait');
             });
         }
     });
@@ -187,11 +224,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trigger the cover file validation
         if (element.hasAttribute('id') && 'cover' === element.attributes['id'].value) {
             const file = element.files[0];
+            const fileSizeKb = parseInt(file.size/1024);
+            const maxFileSizeKb = element.attributes['data-max-size'].value;
             let info = document.querySelector(element.attributes['data-target'].value);
-            let holder = element.parentElement.querySelector('.placeholder');
+            let error = element.parentElement.querySelector('#selected-error');
 
-            holder.classList.add('d-none');
-            info.textContent = file.name + ' [' + parseInt(file.size/1024) + 'kb]';
+            if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb) {
+                info.textContent = file.name + ' [' + fileSizeKb + 'kb]';
+                info.classList.remove('d-none');
+                error.classList.add('d-none');
+            } else {
+                element.value = '';
+                info.textContent = '';
+                info.classList.add('d-none');
+                error.classList.remove('d-none');
+            }
         }
     });
 });

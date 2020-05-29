@@ -10,7 +10,7 @@
     <div id="confirm-password" class="d-flex justify-content-center">
         <div class="wrapper">
             <div class="header">
-                <h4>{{ __('Confirm Password') }}</h4>
+                <h4 class="all-caps">{{ __('Confirm Password') }}</h4>
                 <p class="text-muted">{{ __('Please confirm your password before continuing.') }}</p>
             </div>
 

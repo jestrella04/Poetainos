@@ -9,7 +9,7 @@ nav {
     left: 0;
     z-index: 9998;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba($dark, 0.4);
     cursor: pointer;
 }
 
@@ -21,7 +21,7 @@ nav {
     z-index: 9999;
     width: 80%;
     max-width: 15rem;
-    background-color: rgba($dark, .95);
+    background-color: rgba($dark, .98);
     font-size: 1rem;
     padding: 2rem 0;
 

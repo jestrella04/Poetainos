@@ -13,9 +13,9 @@
 @section('main')
     <div id="writing-form-wrapper" class="main-content">
         @if ($writing->exists)
-            <h3>{{ $params['title']['update'] }}</h3>
+            <h3 class="all-caps">{{ $params['title']['update'] }}</h3>
         @else
-            <h3>{{ $params['title']['create'] }}</h3>
+            <h3 class="all-caps">{{ $params['title']['create'] }}</h3>
         @endif
 
         @include('writings.partials.form')

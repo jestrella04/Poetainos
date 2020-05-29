@@ -151,15 +151,17 @@
             class="form-control-file d-none"
             accept="image/png, image/jpeg"
             data-target="#selected-file"
+            data-max-size="{{ $params['max_file_size'] }}"
             placeholder="">
 
             <button id="cover-chooser" data-target="#cover">
                 <div class="placeholder">
                     <p>{{ __('Click here to select a file') }}</p>
-                    {{-- <p>{{ __('You can also drop your desired image file here') }}</p> --}}
+                    <p class="text-muted">{{ __('Max file size is :size', ['size' => $params['max_file_size'] . 'kb']) }}</p>
                 </div>
 
-                <span id="selected-file"></span>
+                <span id="selected-file" class="file-info d-none"></span>
+                <span id="selected-error" class="file-info d-none text-danger">{{ __('An error ocurred, please select a different file.') }}</span>
             </button>
 
             <small id="cover-error" class="text-danger d-none"></small>
@@ -170,7 +172,7 @@
         <label></label>
 
         <div>
-            <button type="submit" class="btn btn-dark btn-lg btn-block">
+            <button type="submit" id="submit" class="btn btn-dark btn-lg btn-block">
                 @if ($writing->exists)
                     {{ __('Save changes') }}
                 @else

@@ -75,10 +75,6 @@ main {
     margin: 4rem 0;
     text-align: center;
 
-    h4 {
-        text-transform: uppercase;
-    }
-
     .empty-icon {
         font-size: 8rem;
         color: $gray-400;
@@ -160,4 +156,12 @@ main {
     img {
         margin-bottom: 1rem;
     }
+}
+
+.cursor-wait {
+    cursor: wait !important;
+}
+
+.all-caps {
+    text-transform: uppercase;
 }

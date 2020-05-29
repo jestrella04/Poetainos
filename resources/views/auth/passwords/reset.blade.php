@@ -10,7 +10,7 @@
     <div id="reset-password" class="d-flex justify-content-center">
         <div class="wrapper">
             <div class="header">
-                <h4>{{ __('You are almost done') }}</h4>
+                <h4 class="all-caps">{{ __('You are almost done') }}</h4>
                 <p class="text-muted">{{ __('Please set your new password') }}</p>
             </div>
 

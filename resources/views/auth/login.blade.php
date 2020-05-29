@@ -10,7 +10,7 @@
     <div id="login" class="d-flex justify-content-center">
         <div class="wrapper">
             <div class="header">
-                <h4>{{ __('Welcome back to the hood') }}</h4>
+                <h4 class="all-caps">{{ __('Welcome back to the hood') }}</h4>
                 <p class="text-muted">{{ __('Login to your account') }}</p>
             </div>
 

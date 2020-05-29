@@ -1,4 +1,4 @@
 require('./bootstrap');
-require('./functions');
+//require('./functions');
 require('./events');
 require('./backToTopButtom');

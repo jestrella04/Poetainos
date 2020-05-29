@@ -1,4 +1,6 @@
-window.loadComments = function loadComments(url) {
+window.loadComments = loadComments;
+
+export function loadComments(url) {
     let loading = document.querySelector('#loading-comments');
 
     loading.classList.remove('d-none');
@@ -22,4 +24,17 @@ window.loadComments = function loadComments(url) {
             }
         });
     });
+}
+
+export function createSideMenu() {
+    let overlay = document.createElement('div');
+    let sideMenu = document.createElement('div');
+
+    overlay.id = 'side-menu-overlay';
+    sideMenu.id = 'side-menu';
+    overlay.classList.add('d-none');
+    sideMenu.classList.add('d-none');
+
+    document.body.insertAdjacentElement('afterbegin', sideMenu);
+    document.body.insertAdjacentElement('afterbegin', overlay);
 }

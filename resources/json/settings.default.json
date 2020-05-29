@@ -30,6 +30,11 @@
             "value": 20,
             "description": "The number of items per page to be displayed."
         },
+        "uploads_max_file_size": {
+            "type": "integer",
+            "value": 2048,
+            "description": "Maximum filesize allowed for file uploads (measured in kb)."
+        },
         "social": {
             "twitter": {
                 "type": "string",
