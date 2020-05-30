@@ -50,10 +50,17 @@ main {
 }
 
 .main-content,
-.main-pagination,
 .sidebar-toggle,
 .block {
     margin-bottom: 2rem;
+}
+
+.main-content + .main-pagination {
+    margin-top: 3rem;
+}
+
+.main-pagination {
+    margin-bottom: 3rem;
 }
 
 .main-sidebar {
@@ -164,4 +171,21 @@ main {
 
 .all-caps {
     text-transform: uppercase;
+}
+
+.form-wrapper {
+    h3 {
+        margin-bottom: 2rem;
+    }
+
+    .alert {
+        width: 90%;
+        max-width: 25rem;
+        margin: 0 auto 2rem;
+        text-align: center;
+
+        p {
+            margin-bottom: 0;
+        }
+    }
 }

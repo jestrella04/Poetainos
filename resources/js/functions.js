@@ -38,3 +38,49 @@ export function createSideMenu() {
     document.body.insertAdjacentElement('afterbegin', sideMenu);
     document.body.insertAdjacentElement('afterbegin', overlay);
 }
+
+export function readImage(file, callback) {
+    let reader = new FileReader();
+
+    reader.onloadend = function () {
+        callback(reader.result);
+    }
+
+    reader.readAsDataURL(file);
+}
+
+export function previewAvatar(dataUriString) {
+    let avatar = document.querySelector('.avatar-preview');
+
+    avatar.src = dataUriString;
+}
+
+export function isImage(file) {
+    if (file.type.startsWith('image/')){
+        return true;
+    }
+
+    return false;
+}
+
+export function handleForm(form, action) {
+    if ('submit' === action) {
+        // Display the wait cursor
+        document.body.classList.add('cursor-wait');
+
+        // Prevent double posting
+        form.querySelectorAll('#submit').disabled = true;
+
+        // Hide all the error helpers
+        form.querySelectorAll('.text-danger').forEach(function(helper) {
+            helper.innerHTML = '';
+            helper.classList.add('d-none');
+        });
+    } else if ('response' === action) {
+        // Re-enable submit
+        form.querySelectorAll('#submit').disabled = false;
+
+        // Display the standard cursor
+        document.body.classList.remove('cursor-wait');
+    }
+}

@@ -1,7 +1,7 @@
 <div class="user-profile">
     <div class="profile-header text-center">
         @if (! empty($user->avatarPath()))
-            <img class="avatar" src="{{ $user->avatarPath() }}" title="{{ $user->fullName() }}" alt="">
+            <img class="avatar" src="{{ $user->avatarPath() }}" title="{{ $user->fullName() }}" alt="" loading="lazy">
         @else
             <span class="avatar" title="{{ $user->fullName() }}">{{ $user->initials() }}</span>
         @endif

@@ -7,7 +7,7 @@
 @endsection
 
 @section('main')
-    <div id="users-main-content" class="main-content">
+    <div class="main-content">
         @include('users.partials.form')
     </div>
 @endsection

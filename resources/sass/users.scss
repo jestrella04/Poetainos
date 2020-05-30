@@ -13,6 +13,7 @@
     font-weight: 700;
     font-size: 38px;
     line-height: 96px;
+    overflow: hidden;
 
     @media (max-width: 576px) {
         width: 64px;
@@ -24,9 +25,29 @@
     }
 }
 
-#users-main-content {
-    font-size: 0.8rem;
+.avatar-chooser {
+    cursor: pointer;
+    font-size: 1rem !important;
 
+    i {
+        opacity: 0.6;
+        position: relative;
+        right: 64px;
+
+        @media (max-width: 567px) {
+            position: relative;
+            right: 48px;
+        }
+    }
+}
+
+.avatar-chooser:hover {
+    i {
+        opacity: 0.9;
+    }
+}
+
+#users-main-content {
     #user-list {
         .user-banner {
             width: 10rem;
@@ -140,6 +161,14 @@ hr.banner {
     }
 }
 
-.profile-form-wrapper {
-    //
+#profile-form-wrapper {
+    #profile-form {
+        .form-check {
+            font-size: 0.8rem;
+
+            span {
+                vertical-align: middle;
+            }
+        }
+    }
 }

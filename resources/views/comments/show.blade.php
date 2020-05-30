@@ -2,7 +2,7 @@
     <div class="comment-author">
         <a href="{{ $comment->author->path() }}">
             @if (! empty($comment->author->avatarPath()))
-                <img class="avatar" src="{{ $comment->author->avatarPath() }}" title="{{ $comment->author->fullName() }}" alt="">
+                <img class="avatar" src="{{ $comment->author->avatarPath() }}" title="{{ $comment->author->fullName() }}" alt="" loading="lazy">
             @else
                 <span class="avatar" title="{{ $comment->author->fullName() }}" >{{ $comment->author->initials() }}</span>
             @endif

@@ -114,7 +114,6 @@ class WritingsController extends Controller
                 'update' => __('Update writing'),
                 'create' => __('Publish a writing'),
             ],
-            'max_file_size' => getSiteConfig('uploads_max_file_size'),
         ];
 
         return view('writings.edit', [
@@ -141,13 +140,13 @@ class WritingsController extends Controller
 
         // Validate user input
         request()->validate([
-            'title' => 'required|string|min:3|max:150',
+            'title' => 'required|string|min:3|max:100',
             'type' => 'nullable|integer|exists:types,id',
             'category' => 'nullable|integer|exists:categories,id',
             'text' => 'required|string|min:10|max:2000',
-            'tags' => 'nullable|string',
+            'tags' => 'nullable|string|min:3|max:50',
             'link' => 'nullable|url|max:250',
-            'cover' => 'nullable|file|image|max:2048'
+            'cover' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size')
         ]);
 
         // Process the uploaded cover, if any
@@ -161,7 +160,7 @@ class WritingsController extends Controller
             'cover' => $cover ?? '',
         ];
 
-        // Persist to database if validation is successful
+        // Persist to database
         $writing->user_id = auth()->user()->id;
         $writing->category_id = request('category');
         $writing->type_id = request('type');

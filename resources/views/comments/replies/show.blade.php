@@ -2,7 +2,7 @@
     <div class="reply-author">
         <a href="{{ $reply->author->path() }}">
             @if (! empty($reply->author->avatarPath()))
-                <img class="avatar" src="{{ $reply->author->avatarPath() }}" title="{{ $reply->author->fullName() }}" alt="">
+                <img class="avatar" src="{{ $reply->author->avatarPath() }}" title="{{ $reply->author->fullName() }}" alt="" loading="lazy">
             @else
                 <span class="avatar" title="{{ $reply->author->fullName() }}" >{{ $reply->author->initials() }}</span>
             @endif

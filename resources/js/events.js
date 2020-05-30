@@ -12,11 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', function(event) {
         let element = event.target;
 
-        // Was a button clicked?
-        let button = element.closest('button, .btn');
+        // Was a button or file chooser clicked?
+        let bubble = element.closest('button, .btn, .avatar-chooser') || false;
 
-        if (null !== button) {
-            element = button;
+        if (bubble) {
+            element = bubble;
         }
 
         // Scroll to the top of the document
@@ -68,8 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Trigger the file chooser
+        // Trigger the cover chooser
         if (element.hasAttribute('id') && 'cover-chooser' === element.attributes['id'].value) {
+            event.preventDefault();
+            let fileChooser = document.querySelector(element.attributes['data-target'].value);
+
+            fileChooser.click();
+        }
+
+        // Trigger the avatar chooser
+        if (element.classList.contains('avatar-chooser')) {
             event.preventDefault();
             let fileChooser = document.querySelector(element.attributes['data-target'].value);
 
@@ -80,16 +88,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen to the on submit event on the page and act accordingly
     document.addEventListener('submit', function(event) {
         let element = event.target;
+        let id = element.attributes['id'].value;
 
         // Post the writing create/update form
-        if ('writing-form' === element.attributes['id'].value) {
+        if ('writing-form' === id) {
             event.preventDefault();
 
             // Display the wait cursor
             document.body.classList.add('cursor-wait');
 
             // Prevent double posting
-            element.querySelector('#submit').disabled = true;
+            element.querySelectorAll('fieldset').forEach(function(fieldset) {
+                fieldset.disabled = true;
+            });
 
             // Initialize form and helpers
             let params = new FormData(element);
@@ -145,8 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             })
             .then(function () {
-                // Re-enable submit
-                element.querySelector('#submit').disabled = false;
+                // Re-enable form elements
+                element.querySelectorAll('fieldset').forEach(function(fieldset) {
+                    fieldset.disabled = false;
+                });
 
                 // Scroll back to the form header
                 document.querySelector('#writing-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end'});
@@ -156,8 +169,57 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Post the user profile update form
+        if ('profile-form' === id) {
+            event.preventDefault();
+            fx.handleForm(element, 'submit');
+
+            // Initialize form and helpers
+            let params = new FormData(element);
+            let url = element.attributes['action'].value;
+            let errorAlert = element.querySelector('.alert-danger');
+            let successAlert = element.querySelector('.alert-success');
+            let successLink = successAlert.querySelector('#profile-success-link');
+
+            // Post the form to the server
+            axios.post(url, params)
+            .then(function (response) {
+                // Update alerts
+                successLink.attributes['href'].value = response.data.url;
+                successAlert.classList.remove('d-none');
+                errorAlert.classList.add('d-none');
+            })
+            .catch(function (error) {
+                // Oh no, something went wrong
+                let errors = error.response.data.errors;
+
+                // Update alerts
+                successAlert.classList.add('d-none');
+                errorAlert.classList.remove('d-none');
+
+                // Get the error JSON object from server
+                Object.keys(errors).forEach(function(key) {
+                    let formHelper = document.querySelector('#' + key + '-error');
+
+                    formHelper.innerHTML = '';
+
+                    // Update form error helpers and display then accordingly
+                    errors[key].forEach(function(msg) {
+                        formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
+                        formHelper.classList.remove('d-none');
+                    });
+                });
+            })
+            .then(function () {
+                fx.handleForm(element, 'response');
+
+                // Scroll back to the form header
+                document.querySelector('#profile-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end'});
+            });
+        }
+
         // Post the comment form
-        if ('post-comment-form' === element.attributes['id'].value) {
+        if ('post-comment-form' === id) {
             event.preventDefault();
 
             let params = new FormData(element);
@@ -229,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let info = document.querySelector(element.attributes['data-target'].value);
             let error = element.parentElement.querySelector('#selected-error');
 
-            if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb) {
+            if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
                 info.textContent = file.name + ' [' + fileSizeKb + 'kb]';
                 info.classList.remove('d-none');
                 error.classList.add('d-none');
@@ -238,6 +300,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 info.textContent = '';
                 info.classList.add('d-none');
                 error.classList.remove('d-none');
+            }
+        }
+
+        // Trigger the avatar file validation
+        if (element.hasAttribute('id') && 'avatar' === element.attributes['id'].value) {
+            const file = element.files[0];
+            const fileSizeKb = parseInt(file.size/1024);
+            const maxFileSizeKb = element.attributes['data-max-size'].value;
+            let error = document.querySelector('#avatar-error');
+
+            if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
+                fx.readImage(file, fx.previewAvatar);
+                error.classList.add('d-none');
+            } else {
+                element.value = '';
+                fx.previewAvatar('');
+                error.classList.remove('d-none');
+            }
+        }
+
+        // Trigger the avatar delete checkbox validation
+        if (element.hasAttribute('id') && 'avatar-remove' === element.attributes['id'].value) {
+            if (element.checked) {
+                let avatarInput = document.querySelector('#avatar');
+
+                fx.previewAvatar('');
+                avatarInput.value = '';
             }
         }
     });

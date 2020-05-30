@@ -119,45 +119,7 @@
 }
 
 #writing-form-wrapper {
-    h3 {
-        margin-bottom: 2rem;
-    }
-
-    .alert {
-        width: 90%;
-        max-width: 25rem;
-        margin: 0 auto 2rem;
-        text-align: center;
-
-        p {
-            margin-bottom: 0;
-        }
-    }
-
     #writing-form {
-        .form-group {
-            display: flex;
-            flex-direction: column;
-
-            @media (min-width: 992px) {
-                flex-direction: row;
-            }
-
-            label,
-            div {
-                display: flexbox;
-            }
-
-            label {
-                width: 100%;
-                max-width: 10rem;
-            }
-
-            div {
-                flex-grow: 1;
-            }
-        }
-
         #cover-chooser {
             text-align: center;
             padding: 1rem;
@@ -170,9 +132,6 @@
 
             p {
                 margin-bottom: 0;
-            }
-
-            #selected-file {
             }
         }
     }

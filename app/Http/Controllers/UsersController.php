@@ -113,6 +113,62 @@ class UsersController extends Controller
     public function update(Request $request, User $user)
     {
         $this->authorize('update', $user);
+
+        // Validate user input
+        request()->validate([
+            'name' => 'required|string|min:3|max:40',
+            'lastname' => 'required|string|min:3|max:40',
+            'email' => 'required|email|min:3|max:40',
+            'bio' => 'nullable|string|min:3|max:300',
+            'location' => 'nullable|string|min:3|max:40',
+            'occupation' => 'nullable|string|min:3|max:40',
+            'interests' => 'nullable|string|min:3|max:100',
+            'website' => 'nullable|url|max:250',
+            'twitter' => 'nullable|string|min:3|max:40',
+            'instagram' => 'nullable|string|min:3|max:40',
+            'facebook' => 'nullable|string|min:3|max:40',
+            'youtube' => 'nullable|string|min:3|max:40',
+            'avatar' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size'),
+            'avatar-remove' => 'nullable|boolean',
+        ]);
+
+        // Working with avatars
+        $remove = request('avatar-remove') || false;
+        if ($remove) {
+            $avatar = '';
+        } else if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $avatar = $request->file('avatar')->store('public');
+        }
+
+        // Create the extra info array
+        $extraInfo = [
+            'bio' => request('bio') ?? '',
+            'social' => [
+                'twitter' => request('twitter') ?? '',
+                'instagram' => request('instagram') ?? '',
+                'facebook' => request('facebook') ?? '',
+                'youtube' => request('youtube') ?? '',
+            ],
+            'avatar' => $avatar ?? '',
+            'website' => request('website') ?? '',
+            'location' => request('location') ?? '',
+            'interests' => request('interests') ?? '',
+            'occupation' => request('occupation') ?? '',
+        ];
+
+        // Persist to database
+        $user->name = request('name');
+        $user->last_name = request('lastname');
+        $user->email = request('email');
+        $user->extra_info = $extraInfo;
+        $user->save();
+
+        // Set response data
+        $response = $user->toArray();
+        $response['url'] = $user->path();
+
+        // Output the response
+        return $response;
     }
 
     /**

@@ -3,7 +3,7 @@
         <div class="writing-author">
             <a href="{{ $writing->author->path() }}">
                 @if (! empty($writing->author->avatarPath()))
-                    <img class="avatar" src="{{ $writing->author->avatarPath() }}" title="{{ $writing->author->fullName() }}" alt="">
+                    <img class="avatar" src="{{ $writing->author->avatarPath() }}" title="{{ $writing->author->fullName() }}" alt="" loading="lazy">
                 @else
                     <span class="avatar" title="{{ $writing->author->fullName() }}" >{{ $writing->author->initials() }}</span>
                 @endif
@@ -39,6 +39,6 @@
 
 @if (! empty($writing->coverPath()))
     <div class="writing-cover">
-        <img src="{{ $writing->coverPath() }}" alt="">
+        <img src="{{ $writing->coverPath() }}" alt="" loading="lazy">
     </div>
 @endif
