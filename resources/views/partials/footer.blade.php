@@ -27,7 +27,7 @@
         </div>
 
         <div class="copyright">
-            &copy; 2020 <strong><span>{{ getSiteConfig('name') }}</span></strong>.
+            &copy; 2020 <strong>{{ getSiteConfig('name') }}</strong>.
         </div>
     </div>
 

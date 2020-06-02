@@ -8,7 +8,7 @@
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "workspace-start": "cd laradock && docker-compose up -d nginx mysql redis workspace && docker-compose exec workspace bash",
+        "workspace-start": "cd laradock && docker-compose up -d nginx mariadb redis workspace && docker-compose exec workspace bash",
         "workspace-stop": "cd laradock && docker-compose stop"
     },
     "devDependencies": {

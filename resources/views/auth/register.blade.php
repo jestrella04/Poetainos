@@ -7,62 +7,60 @@
 @endsection
 
 @section('main')
-    <div id="register" class="d-flex justify-content-center">
-        <div class="wrapper">
+    <div id="register" class="d-flex justify-content-center login">
+        <div class="form-wrapper">
             <div class="header">
                 <h4 class="all-caps">{{ __('Join the hood') }}</h4>
                 <p class="text-muted">{{ __('Lets create an account for you') }}</p>
             </div>
 
-            <div class="body">
-                <form method="POST" action="{{ route('register') }}">
-                    @csrf
+            <form method="POST" action="{{ route('register') }}">
+                @csrf
 
-                    <div class="form-group">
-                        <input id="username" type="text" class="form-control form-control-lg @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="username" autofocus placeholder="{{ __('Enter your username') }}">
+                <div class="form-group">
+                    <input id="username" type="text" class="form-control form-control-lg @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="username" autofocus placeholder="{{ __('Enter your username') }}">
 
-                        @error('username')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
+                    @error('username')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <input id="email" type="email" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="{{ __('Enter your email') }}">
+
+                    @error('email')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <input id="password" type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="{{ __('Enter your password') }}">
+
+                    @error('password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <input id="password-confirm" type="password" class="form-control form-control-lg" name="password_confirmation" required autocomplete="new-password" placeholder="{{ __('Confirm your password') }}">
+                </div>
+
+                <div class="form-group">
+                    <div class="d-flex flex-wrap">
+                        <button type="submit" class="btn btn-dark btn-block">
+                            {{ __('Create account') }}
+                        </button>
+
+                        <a href="{{ route('login') }}" class="btn btn-success btn-block">{{ __('Login') }}</a>
                     </div>
-
-                    <div class="form-group">
-                        <input id="email" type="email" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="{{ __('Enter your email') }}">
-
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <input id="password" type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="{{ __('Enter your password') }}">
-
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <input id="password-confirm" type="password" class="form-control form-control-lg" name="password_confirmation" required autocomplete="new-password" placeholder="{{ __('Confirm your password') }}">
-                    </div>
-
-                    <div class="form-group">
-                        <div class="d-flex flex-wrap">
-                            <button type="submit" class="btn btn-dark btn-block">
-                                {{ __('Create account') }}
-                            </button>
-
-                            <a href="{{ route('login') }}" class="btn btn-success btn-block">{{ __('Login') }}</a>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection

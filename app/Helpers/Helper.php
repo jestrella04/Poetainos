@@ -1,24 +1,10 @@
 <?php
 
-use App\Category;
-use App\Tag;
-use App\User;
+use App\Comment;
+use App\Reply;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
-function getPopularTags($count = 5) {
-    return Tag::withCount('writings')->orderByDesc('writings_count')->take($count)->get();
-}
-
-function getPopularCategories($count = 5)
-{
-    return Category::withCount('writings')->orderByDesc('writings_count')->take($count)->get();
-}
-
-function getFeaturedAuthors($count = 5) {
-    return User::orderByDesc('aura')->take($count)->get();
-}
 
 function getSiteConfig($path) {
     $path = config('hood.site.' . $path);
@@ -88,4 +74,30 @@ function getRelatedSlugs($table, $slug, $column = 'slug') {
         ->select($column)
         ->where($column, 'like', $slug . '%')
         ->get();
+}
+
+function getWritingCounter($writing) {
+    return [
+        'upvotes' => ReadableHumanNumber($writing->votes->where('vote', '>', 0)->count()),
+        'downvotes' => ReadableHumanNumber($writing->votes->where('vote', 0)->count()),
+        'comments' => ReadableHumanNumber($writing->comments->count()),
+        'replies' => Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count(),
+        'views' => ReadableHumanNumber($writing->views),
+        'shelf' => ReadableHumanNumber($writing->shelf->count()),
+        'aura' => number_format($writing->aura, 2),
+    ];
+}
+
+function getUserCounter($user) {
+    return [
+        'writings' => ReadableHumanNumber($user->writings()->count()),
+        'comments' => ReadableHumanNumber($user->comments()->count()),
+        'replies' => ReadableHumanNumber($user->replies()->count()),
+        'votes' => ReadableHumanNumber($user->votes()->count()),
+        'views' => ReadableHumanNumber($user->profile_views ),
+        'shelf' => ReadableHumanNumber($user->shelf()->count()),
+        'hood' => ReadableHumanNumber($user->hood()->count()),
+        'extendedHood' => ReadableHumanNumber($user->fellowHood($count = true)),
+        'aura' => number_format($user->aura, 2),
+    ];
 }

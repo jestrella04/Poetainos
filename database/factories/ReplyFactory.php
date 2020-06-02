@@ -12,7 +12,6 @@ $factory->define(Reply::class, function (Faker $faker) {
     return [
         'comment_id' => factory(Comment::class),
         'user_id' => factory(User::class),
-        'writing_id' => factory(Writing::class),
         'message' => $faker->paragraph
     ];
 });

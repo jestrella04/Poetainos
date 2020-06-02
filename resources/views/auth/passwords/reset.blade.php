@@ -7,50 +7,48 @@
 @endsection
 
 @section('main')
-    <div id="reset-password" class="d-flex justify-content-center">
-        <div class="wrapper">
+    <div id="reset-password" class="d-flex justify-content-center login">
+        <div class="form-wrapper">
             <div class="header">
                 <h4 class="all-caps">{{ __('You are almost done') }}</h4>
                 <p class="text-muted">{{ __('Please set your new password') }}</p>
             </div>
 
-            <div class="body">
-                <form method="POST" action="{{ route('password.update') }}">
-                    @csrf
+            <form method="POST" action="{{ route('password.update') }}">
+                @csrf
 
-                    <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="token" value="{{ $token }}">
 
-                    <div class="form-group">
-                        <input id="email" type="email" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
+                <div class="form-group">
+                    <input id="email" type="email" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
 
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
+                    @error('email')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
 
-                    <div class="form-group">
-                        <input id="password" type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="{{ __('Enter your password') }}">
+                <div class="form-group">
+                    <input id="password" type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="{{ __('Enter your password') }}">
 
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
+                    @error('password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
 
-                    <div class="form-group">
-                        <input id="password-confirm" type="password" class="form-control form-control-lg" name="password_confirmation" required autocomplete="new-password" placeholder="{{ __('Confirm your password') }}">
-                    </div>
+                <div class="form-group">
+                    <input id="password-confirm" type="password" class="form-control form-control-lg" name="password_confirmation" required autocomplete="new-password" placeholder="{{ __('Confirm your password') }}">
+                </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-dark btn-block">
-                            {{ __('Reset Password') }}
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-dark btn-block">
+                        {{ __('Reset Password') }}
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection

@@ -138,6 +138,7 @@ class UsersController extends Controller
             $avatar = '';
         } else if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             $avatar = $request->file('avatar')->store('public');
+            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize(storage_path('app/' . $avatar));
         }
 
         // Create the extra info array
@@ -149,7 +150,7 @@ class UsersController extends Controller
                 'facebook' => request('facebook') ?? '',
                 'youtube' => request('youtube') ?? '',
             ],
-            'avatar' => $avatar ?? '',
+            'avatar' => $avatar ?? $user->extra_info['avatar'],
             'website' => request('website') ?? '',
             'location' => request('location') ?? '',
             'interests' => request('interests') ?? '',

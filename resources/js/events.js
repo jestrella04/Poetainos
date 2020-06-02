@@ -83,6 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fileChooser.click();
         }
+
+        // Writing actions
+        if (element.classList.contains('btn-counter')) {
+            event.preventDefault();
+        }
     });
 
     // Listen to the on submit event on the page and act accordingly
@@ -93,14 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Post the writing create/update form
         if ('writing-form' === id) {
             event.preventDefault();
-
-            // Display the wait cursor
-            document.body.classList.add('cursor-wait');
-
-            // Prevent double posting
-            element.querySelectorAll('fieldset').forEach(function(fieldset) {
-                fieldset.disabled = true;
-            });
+            fx.handleForm(element, 'submit');
 
             // Initialize form and helpers
             let params = new FormData(element);
@@ -108,12 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let errorAlert = element.querySelector('.alert-danger');
             let successAlert = element.querySelector('.alert-success');
             let successLink = successAlert.querySelector('#writing-success-link');
-
-            // Hide all the error helpers
-            element.querySelectorAll('.text-danger').forEach(function(helper) {
-                helper.innerHTML = '';
-                helper.classList.add('d-none');
-            });
 
             // Post the form to the server
             axios.post(url, params)
@@ -156,16 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             })
             .then(function () {
-                // Re-enable form elements
-                element.querySelectorAll('fieldset').forEach(function(fieldset) {
-                    fieldset.disabled = false;
-                });
+                fx.handleForm(element, 'response');
 
                 // Scroll back to the form header
                 document.querySelector('#writing-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end'});
-
-                // Display the standard cursor
-                document.body.classList.remove('cursor-wait');
             });
         }
 

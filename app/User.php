@@ -139,7 +139,7 @@ class User extends Authenticatable
         // Count user content
         $writings = $this->writings->count();
         $votes = $this->votes->count();
-        $comments = $this->comments->count();
+        $comments = $this->comments->count() + $this->replies->count();
         $shelf = $this->shelf->count();
         $views = $this->profile_views;
         $hood = $this->hood->count();
@@ -189,5 +189,10 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public static function featured($count = 20)
+    {
+        return Self::orderByDesc('aura')->take($count)->get();
     }
 }

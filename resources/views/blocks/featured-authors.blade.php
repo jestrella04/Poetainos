@@ -2,7 +2,7 @@
     <h6 class="block-title">{{ __('Featured Authors') }}</h6>
 
     <div class="block-body">
-        @forelse (getFeaturedAuthors(20) as $author)
+        @forelse (App\User::featured(20) as $author)
         <div class="d-inline-flex d-lg-block author-link">
             <a href="{{ $author->path() }}">
                 <div class="d-inline-flex">
@@ -22,7 +22,7 @@
         </div>
 
         @empty
-            <p class="text-muted">{{ __('Give me the authors!') }}</p>
+            @include('partials.empty-block')
         @endforelse
     </div>
 </div>

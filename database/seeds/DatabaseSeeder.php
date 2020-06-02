@@ -11,6 +11,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UserSeeder::class);
+        $count = 10;
+
+        factory(App\User::class, $count)->create()->each(function ($user) {
+            $user->writings()->save(factory(App\Writing::class)->make());
+            $user->votes()->save(factory(App\Vote::class)->make());
+            $user->comments()->save(factory(App\Comment::class)->make());
+            $user->replies()->save(factory(App\Reply::class)->make());
+        });
+
+        factory(App\Writing::class, $count)->create()->each(function ($writing) {
+            $writing->tags()->save(factory(App\Tag::class)->make());
+        });
+
+        factory(App\Hood::class, $count)->make();
+        factory(App\Shelf::class, $count)->make();
     }
 }

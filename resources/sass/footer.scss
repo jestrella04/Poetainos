@@ -7,17 +7,23 @@
     padding-top: 2rem;
     padding-bottom: 2rem;
 
+    a {
+        color: $light;
+    }
+
+    a:hover {
+        color: $white;
+    }
+
     .social-links {
         font-size: 1.2rem;
 
         a {
             margin: 0 0.25rem;
-            color: $light;
         }
 
         a:hover {
             text-decoration: none;
-            color: $white;
         }
     }
 

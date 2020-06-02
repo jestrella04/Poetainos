@@ -69,7 +69,7 @@ export function handleForm(form, action) {
         document.body.classList.add('cursor-wait');
 
         // Prevent double posting
-        form.querySelectorAll('#submit').disabled = true;
+        form.querySelector('#submit').disabled = true;
 
         // Hide all the error helpers
         form.querySelectorAll('.text-danger').forEach(function(helper) {
@@ -78,7 +78,7 @@ export function handleForm(form, action) {
         });
     } else if ('response' === action) {
         // Re-enable submit
-        form.querySelectorAll('#submit').disabled = false;
+        form.querySelector('#submit').disabled = false;
 
         // Display the standard cursor
         document.body.classList.remove('cursor-wait');

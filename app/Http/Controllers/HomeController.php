@@ -15,7 +15,7 @@ class HomeController extends Controller
         $params = [
             'title' => __('Home'),
             'empty-head' => __('Still doing the math'),
-            'empty-msg' => __('Our algorithm will rank writings based on flags like hits, votes, comments and how many times they are shelved.'),
+            'empty-msg' => __('Our algorithm will rank writings based on factors like hits, votes, comments and how many times they are shelved.'),
             'empty-icon' => 'dove'
         ];
 

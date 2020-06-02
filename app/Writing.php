@@ -111,7 +111,8 @@ class Writing extends Model
         // Count user content
         $upvotes = $this->votes->where('vote', '>', 0)->count();
         $downvotes = $this->votes->where('vote', 0)->count();
-        $comments = $this->comments->count();
+        $replies = Reply::whereIn('comment_id', Comment::where('writing_id', $this->id)->pluck('id')->toArray())->count();
+        $comments = $this->comments->count() + $replies;
         $shelf = $this->shelf->count();
         $views = $this->views;
 

@@ -82,6 +82,10 @@ main {
     margin: 4rem 0;
     text-align: center;
 
+    h4 {
+        margin-bottom: 2rem;
+    }
+
     .empty-icon {
         font-size: 8rem;
         color: $gray-400;
@@ -174,7 +178,12 @@ main {
 }
 
 .form-wrapper {
-    h3 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         margin-bottom: 2rem;
     }
 
@@ -183,9 +192,24 @@ main {
         max-width: 25rem;
         margin: 0 auto 2rem;
         text-align: center;
+        font-size: 0.8rem;
 
         p {
             margin-bottom: 0;
         }
+    }
+}
+
+.login {
+    margin-bottom: 3rem;
+
+    .form-wrapper {
+        width: 100%;
+        max-width: 25rem;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 2rem;
     }
 }

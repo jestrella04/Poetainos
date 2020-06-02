@@ -32,7 +32,7 @@
         },
         "uploads_max_file_size": {
             "type": "integer",
-            "value": 2048,
+            "value": 4096,
             "description": "Maximum filesize allowed for file uploads (measured in kb)."
         },
         "social": {
@@ -77,7 +77,7 @@
                     },
                     "comment": {
                         "type": "integer",
-                        "value": 200,
+                        "value": 100,
                         "description": "How many points a writing will earn every time it gets a new comment."
                     },
                     "shelf": {
@@ -87,7 +87,7 @@
                     },
                     "views": {
                         "type": "integer",
-                        "value": 10,
+                        "value": 1,
                         "description": "How many points a writing will earn every time it is viewed."
                     }
                 },

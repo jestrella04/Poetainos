@@ -90,7 +90,7 @@ class WritingsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function random() {
-        return redirect(Writing::inRandomOrder()->first()->path());
+        return redirect(Writing::inRandomOrder()->firstOrFail()->path());
     }
 
     /**
@@ -152,12 +152,13 @@ class WritingsController extends Controller
         // Process the uploaded cover, if any
         if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
             $cover = $request->file('cover')->store('public');
+            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize(storage_path('app/' . $cover));
         }
 
         // Create the extra info array
         $extraInfo = [
             'link' => request('link') ?? '',
-            'cover' => $cover ?? '',
+            'cover' => $cover ?? $writing->extra_info['cover'],
         ];
 
         // Persist to database

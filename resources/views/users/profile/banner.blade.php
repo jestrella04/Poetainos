@@ -12,8 +12,8 @@
 
         <h6 class="text-truncate">{{ $user->fullName() }}</h6>
 
-        @if (! empty($user->extra_info['bio']))
+        {{-- @if (! empty($user->extra_info['bio']))
             <p>{{ $user->extra_info['bio'] }}</p>
-        @endif
+        @endif --}}
     </a>
 </div>

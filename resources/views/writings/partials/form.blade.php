@@ -183,7 +183,10 @@
 
         <div class="form-group row">
             <div class="offset-sm-2 col-sm-10">
-                <button type="submit" id="submit" class="btn btn-dark btn-lg btn-block">
+                <button
+                    type="submit"
+                    id="submit"
+                    class="btn btn-dark btn-lg btn-block">
                     @if ($writing->exists)
                         {{ __('Save changes') }}
                     @else

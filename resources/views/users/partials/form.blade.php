@@ -276,7 +276,12 @@
 
         <div class="form-group row">
             <div class="offset-sm-3 col-sm-9">
-                <button type="submit" class="btn btn-dark btn-lg btn-block">{{ __('Save changes') }}</button>
+                <button
+                    type="submit"
+                    class="btn btn-dark btn-lg btn-block"
+                    id="submit">
+                    {{ __('Save changes') }}
+                </button>
             </div>
         </div>
     </form>
