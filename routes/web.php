@@ -66,9 +66,9 @@ Route::post('/comments/create', 'CommentsController@store')->name('comments.stor
 Route::get('/comments/{writing}', 'CommentsController@index')->name('comments.index');
 
 // Other user tasks
-Route::post('/votes/create', 'VotesController@store')->name('votes.store')->middleware('auth');
-Route::post('/shelves/create', 'ShelvesController@store')->name('shelves.store')->middleware('auth');
-Route::post('/hoods/create', 'HoodsController@store')->name('hoods.store')->middleware('auth');
+Route::post('/votes/store', 'VotesController@store')->name('votes.store')->middleware('auth');
+Route::post('/shelves/store', 'ShelvesController@store')->name('shelves.store')->middleware('auth');
+Route::post('/hoods/store', 'HoodsController@store')->name('hoods.store')->middleware('auth');
 
 // Debugging SQL queries
 if (env('APP_DEBUG')) {

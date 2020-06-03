@@ -141,11 +141,27 @@ main {
 .btn-counter {
     background-color: $gray-100 !important;
     color: $gray-600 !important;
+    cursor: default !important;
 }
 
-.btn-counter:hover {
+/* .btn-counter:hover {
     border: 1px solid $gray-200 !important;
     color: $gray-700 !important;
+} */
+
+.btn-counter.like,
+.btn-counter.dislike,
+.btn-counter.share,
+.btn-counter.owner {
+    cursor: pointer !important;
+}
+
+.btn-counter.like:not(.voted):hover,
+.btn-counter.dislike:not(.voted):hover,
+.voted {
+    i {
+        color: $danger;
+    }
 }
 
 .no-script {

@@ -61,7 +61,7 @@
                         <span>{{ __('Check if you just want to remove your current avatar') }}</span>
                     </label>
                 </div>
-                </div>
+            </div>
         </div>
 
         <div class="form-group row">
@@ -75,7 +75,8 @@
                     minlength="3"
                     maxlength="40"
                     placeholder=""
-                    required>
+                    required
+                    autofocus>
                 <small id="name-error" class="text-danger d-none"></small>
             </div>
         </div>

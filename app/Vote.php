@@ -24,11 +24,11 @@ class Vote extends Model
 
     public function writing()
     {
-        return $this->hasOne(Writing::class);
+        return $this->belongsTo(Writing::class);
     }
 
     public function user()
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 }

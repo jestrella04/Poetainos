@@ -42,8 +42,6 @@
             <i class="fa fa-spinner fa-5x fa-spin"></i>
             <p>{{ __('Loading comments') }}</p>
         </div>
-
-        <div id="embed-comments"></div>
     @else
         <div class="comments-empty">
             <p>{{ __('Do you like this writing?') }}</p>
@@ -51,4 +49,8 @@
             <i class="fas fa-comment fa-5x"></i>
         </div>
     @endif
+
+    <div id="embed-comments">
+        <div class="comment-list"></div>
+    </div>
 </div>

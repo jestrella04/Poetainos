@@ -22,9 +22,9 @@ class Reply extends Model
      */
     public $timestamps = false;
 
-    public function writing()
+    public function comment()
     {
-        return $this->belongsTo(Writing::class);
+        return $this->belongsTo(Comment::class);
     }
 
     public function author()

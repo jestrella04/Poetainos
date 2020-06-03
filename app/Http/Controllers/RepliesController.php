@@ -46,6 +46,10 @@ class RepliesController extends Controller
             'message' => request('reply')
         ]);
 
+        // Update aura
+        $reply->author->updateAura();
+        $reply->comment->writing->updateAura();
+
         return view('comments.replies.show', [
             'reply' => $reply,
         ])->render();

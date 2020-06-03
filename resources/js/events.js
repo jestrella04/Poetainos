@@ -57,6 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let target = element.attributes['data-target'].value;
             let targetForm = document.querySelector(target);
             targetForm.classList.toggle('d-none');
+
+            if (! targetForm.classList.contains('d-none')) {
+                targetForm.querySelector('.form-control').focus();
+            }
         }
 
         // Hide alerts
@@ -84,9 +88,36 @@ document.addEventListener('DOMContentLoaded', () => {
             fileChooser.click();
         }
 
-        // Writing actions
+        // Voting on a writing
         if (element.classList.contains('btn-counter')) {
             event.preventDefault();
+
+            if (element.hasAttribute('data-target') && element.hasAttribute('data-id') && element.hasAttribute('data-value')) {
+                let url = element.attributes['data-target'].value;
+                let id = element.attributes['data-id'].value;
+                let value = element.attributes['data-value'].value;
+                let params = new FormData();
+
+                params.append('id', id);
+                params.append('value', value);
+
+                axios.post(url, params)
+                .then(function (response) {
+                    let created = response.data.created;
+                    let count = response.data.count;
+
+                    if (created > 0) {
+                        element.classList.add('voted');
+                        element.querySelector('.counter').textContent = count;
+                    }
+                })
+                .catch(function (error) {
+                    //
+                })
+                .then(function () {
+                    //
+                });
+            }
         }
     });
 
@@ -213,6 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let commentList = document.querySelector('#embed-comments .comment-list');
             let postCommentSuccess = document.querySelector('#post-comment-success');
             let postCommentError = document.querySelector('#post-comment-error');
+            let commentsEmpty = document.querySelector('.comments-empty');
 
             // Display the wait cursor
             document.body.classList.add('cursor-wait');
@@ -223,6 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 commentList.insertAdjacentHTML('beforeend', response.data);
                 postCommentSuccess.classList.remove('d-none');
                 postCommentError.classList.add('d-none');
+
+                if (null !== commentsEmpty && '' !== commentsEmpty) {
+                    commentsEmpty.classList.add('d-none');
+                }
             })
             .catch(function (error) {
                 postCommentError.textContent = error.response.data.errors.comment[0];

@@ -25,7 +25,7 @@ class CommentsController extends Controller
 
         return response()->json([
             'next' => $comments->nextPageUrl(),
-            'data' => $html,
+            'comments' => $html,
         ]);
     }
 
@@ -57,6 +57,10 @@ class CommentsController extends Controller
             'writing_id' => request('writing_id'),
             'message' => request('comment')
         ]);
+
+        // Update aura
+        $comment->author->updateAura();
+        $comment->writing->updateAura();
 
         return view('comments.show', [
             'comment' => $comment,

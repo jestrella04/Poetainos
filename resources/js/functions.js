@@ -5,24 +5,26 @@ export function loadComments(url) {
 
     loading.classList.remove('d-none');
 
-    fetch(url).then(function (response) {
-        response.text().then(function (json) {
-            let loadMore = document.querySelector('#load-more button');
-            let embedComments = document.querySelector('#embed-comments');
+    axios.get(url)
+    .then(function (response) {
+        let loadMore = document.querySelector('#load-more button');
+        let embedComments = document.querySelector('#embed-comments .comment-list');
 
-            json = JSON.parse(json);
+        embedComments.insertAdjacentHTML('afterbegin', response.data.comments);
 
-            embedComments.insertAdjacentHTML('afterbegin', json.data);
-            loading.classList.add('d-none');
-
-            if (null !== json.next && '' !== json.next) {
-                loadMore.attributes['data-href'].value = json.next;
-                loadMore.parentElement.classList.remove('d-none');
-            } else {
-                loadMore.attributes['data-href'].value = '';
-                loadMore.parentElement.classList.add('d-none');
-            }
-        });
+        if (null !== response.data.next && '' !== response.data.next) {
+            loadMore.attributes['data-href'].value = response.data.next;
+            loadMore.parentElement.classList.remove('d-none');
+        } else {
+            loadMore.attributes['data-href'].value = '';
+            loadMore.parentElement.classList.add('d-none');
+        }
+    })
+    .catch(function (error) {
+        //
+    })
+    .then(function () {
+        loading.classList.add('d-none');
     });
 }
 

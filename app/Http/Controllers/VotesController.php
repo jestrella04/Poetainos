@@ -36,18 +36,39 @@ class VotesController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'writing_id' => ['required'],
-            'user_id' => ['required', 'min:3'],
-            'vote' => ['required', 'max:1'],
+            'id' => 'required|integer|exists:writings,id',
+            'value' => 'required|integer|max:1',
         ]);
 
-        $vote = Vote::create([
-            'wriring_id' => request('writing_id'),
-            'user_id' => auth()->user()->id,
-            'vote' => request('vote'),
-        ]);
+        $writingId = request('id');
+        $vote = intval(request('value'));
+        $userId = auth()->user()->id;
 
-        return $vote;
+        // Check existence
+        $old = Vote::where('user_id', $userId)->where('writing_id', $writingId)->count();
+
+        if (0 === $old) {
+            $new = Vote::create([
+                'writing_id' => $writingId,
+                'user_id' => $userId,
+                'vote' => $vote,
+            ]);
+
+            // Update aura
+            $new->user->updateAura();
+            $new->writing->updateAura();
+        }
+
+        if (0 === $vote) {
+            $count = ReadableHumanNumber(Vote::where('vote', 0)->where('writing_id', $writingId)->count());
+        } else {
+            $count = ReadableHumanNumber(Vote::where('vote', '>', 0)->where('writing_id', $writingId)->count());
+        }
+
+        return [
+            'created' => $new->id ?? 0,
+            'count' => $count,
+        ];
     }
 
     /**

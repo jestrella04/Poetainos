@@ -76,7 +76,7 @@ class WritingsController extends Controller
 
         // Update Aura
         $writing->updateAura();
-        $writing->author->updateAura();
+        //$writing->author->updateAura();
 
         return view('writings.show', [
             'writing' => $writing,
@@ -193,6 +193,9 @@ class WritingsController extends Controller
 
         // Persist tags
         $writing->tags()->sync($tags);
+
+        // Update user aura
+        $writing->author->updateAura();
 
         // Set response data
         $response = $writing->toArray();
