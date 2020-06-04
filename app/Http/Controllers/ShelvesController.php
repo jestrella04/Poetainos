@@ -41,7 +41,6 @@ class ShelvesController extends Controller
         $count = ReadableHumanNumber(Shelf::where('writing_id', $writingId)->count());
 
         return [
-            'created' => $new->id ?? 0,
             'count' => $count,
         ];
     }

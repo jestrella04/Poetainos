@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Authentication
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 // Generic
 Route::get('/', 'HomeController@show')->name('home');

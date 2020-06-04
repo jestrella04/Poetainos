@@ -23,7 +23,6 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
 			$table->string('password');
-			$table->boolean('password_is_expired')->default(0);
             $table->timestamp('password_updated_at')->nullable();
             $table->rememberToken();
 			$table->unsignedInteger('profile_views')->default(0);

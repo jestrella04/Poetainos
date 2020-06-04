@@ -88,35 +88,65 @@ document.addEventListener('DOMContentLoaded', () => {
             fileChooser.click();
         }
 
-        // Voting on a writing
+        // Counters
         if (element.classList.contains('btn-counter')) {
             event.preventDefault();
 
-            if (element.hasAttribute('data-target') && element.hasAttribute('data-id') && element.hasAttribute('data-value')) {
-                let url = element.attributes['data-target'].value;
-                let id = element.attributes['data-id'].value;
-                let value = element.attributes['data-value'].value;
-                let params = new FormData();
+            // Liking a writing
+            if (element.classList.contains('like')) {
+                if (element.hasAttribute('data-target') && element.hasAttribute('data-id') && element.hasAttribute('data-value')) {
+                    let url = element.attributes['data-target'].value;
+                    let id = element.attributes['data-id'].value;
+                    let value = element.attributes['data-value'].value;
+                    let params = new FormData();
 
-                params.append('id', id);
-                params.append('value', value);
+                    params.append('id', id);
+                    params.append('value', value);
 
-                axios.post(url, params)
-                .then(function (response) {
-                    let created = response.data.created;
-                    let count = response.data.count;
+                    axios.post(url, params)
+                    .then(function (response) {
+                        let created = response.data.created;
+                        let count = response.data.count;
 
-                    if (created > 0) {
-                        element.classList.add('voted');
-                        element.querySelector('.counter').textContent = count;
-                    }
-                })
-                .catch(function (error) {
-                    //
-                })
-                .then(function () {
-                    //
-                });
+                        if (created > 0) {
+                            element.classList.add('voted');
+                            element.querySelector('.counter').textContent = count;
+                        }
+                    })
+                    .catch(function (error) {
+                        //
+                    })
+                    .then(function () {
+                        //
+                    });
+                }
+            }
+
+            // Adding to shelf
+            if (element.classList.contains('shelf')) {
+                if (element.hasAttribute('data-target') && element.hasAttribute('data-id')) {
+                    let url = element.attributes['data-target'].value;
+                    let id = element.attributes['data-id'].value;
+                    let params = new FormData();
+
+                    params.append('id', id);
+
+                    axios.post(url, params)
+                    .then(function (response) {
+                        let count = response.data.count;
+
+                        if (count > 0) {
+                            element.classList.add('shelved');
+                            element.querySelector('.counter').textContent = count;
+                        }
+                    })
+                    .catch(function (error) {
+                        //
+                    })
+                    .then(function () {
+                        //
+                    });
+                }
             }
         }
     });

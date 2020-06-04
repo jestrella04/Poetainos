@@ -78,8 +78,8 @@ function getRelatedSlugs($table, $slug, $column = 'slug') {
 
 function getWritingCounter($writing) {
     return [
-        'upvotes' => ReadableHumanNumber($writing->votes->where('vote', '>', 0)->count()),
-        'downvotes' => ReadableHumanNumber($writing->votes->where('vote', 0)->count()),
+        'likes' => ReadableHumanNumber($writing->votes->where('vote', '>', 0)->count()),
+        //'dislikes' => ReadableHumanNumber($writing->votes->where('vote', 0)->count()),
         'comments' => ReadableHumanNumber($writing->comments->count()),
         'replies' => Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count(),
         'views' => ReadableHumanNumber($writing->views),

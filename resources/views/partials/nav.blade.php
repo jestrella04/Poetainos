@@ -47,9 +47,14 @@
 
                 @auth
                     <li class="nav-item dropdown d-none d-lg-block">
-                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-user fa-fw"></i>
-                            {{ __('User') }}
+                        <a class="nav-link" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (! empty(auth()->user()->avatarPath()))
+                                <img class="avatar" src="{{ auth()->user()->avatarPath() }}" title="{{ auth()->user()->fullName() }}" alt="" loading="lazy">
+                            @else
+                                <span class="avatar" title="{{ auth()->user()->fullName() }}">{{ auth()->user()->initials() }}</span>
+                            @endif
+
+                            {{ __('Hi') }} {{ auth()->user()->firstName() }}
                         </a>
 
                         <div class="dropdown-menu">

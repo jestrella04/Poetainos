@@ -1,6 +1,6 @@
 @php $avatarSrc = $user->avatarPath() ?? '' @endphp
 <div id="profile-form-wrapper" class="form-wrapper">
-    <h3 class="all-caps">{{ __('Update profile') }}</h3>
+    <h3 class="title all-caps">{{ __('Update profile') }}</h3>
 
     <form id="profile-form" action="{{ route('users.update', $user) }}" method="POST">
         @csrf

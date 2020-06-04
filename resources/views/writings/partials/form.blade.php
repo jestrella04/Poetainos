@@ -1,9 +1,11 @@
 <div id="writing-form-wrapper" class="form-wrapper">
-    @if ($writing->exists)
-        <h3 class="all-caps">{{ $params['title']['update'] }}</h3>
-    @else
-        <h3 class="all-caps">{{ $params['title']['create'] }}</h3>
-    @endif
+    <h3 class="title all-caps">
+        @if ($writing->exists)
+            {{ $params['title']['update'] }}
+        @else
+        {{ $params['title']['create'] }}
+        @endif
+    </h3>
 
     @if ($writing->exists)
         @php $update = route('writings.update', $writing) @endphp

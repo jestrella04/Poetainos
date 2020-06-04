@@ -43,12 +43,6 @@ main {
     padding-top: 3rem;
 }
 
-.main-content {
-    @media (min-width: 768px) {
-        margin-right: 2rem;
-    }
-}
-
 .main-content,
 .sidebar-toggle,
 .block {
@@ -64,6 +58,12 @@ main {
 }
 
 .main-sidebar {
+    padding: 0;
+
+    @media (min-width: 992px) {
+        margin-left: 2rem;
+    }
+
     .block {
         .block-title {
             text-transform: uppercase;
@@ -144,23 +144,35 @@ main {
     cursor: default !important;
 }
 
-/* .btn-counter:hover {
-    border: 1px solid $gray-200 !important;
-    color: $gray-700 !important;
-} */
+.btn-counter:focus {
+    box-shadow: none;
+}
 
-.btn-counter.like,
-.btn-counter.dislike,
-.btn-counter.share,
-.btn-counter.owner {
+.btn-counter.click {
     cursor: pointer !important;
+}
+
+.btn-counter.click:hover {
+    i {
+        color: $gray-700;
+    }
+}
+
+.btn-counter.click:focus {
+    box-shadow: 0 0 0 0.2rem rgba($gray-400, 0.25);
 }
 
 .btn-counter.like:not(.voted):hover,
 .btn-counter.dislike:not(.voted):hover,
 .voted {
     i {
-        color: $danger;
+        color: $danger !important;
+    }
+}
+
+.shelved {
+    i {
+        color: $indigo !important;
     }
 }
 
@@ -194,12 +206,7 @@ main {
 }
 
 .form-wrapper {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
+    .title {
         margin-bottom: 2rem;
     }
 

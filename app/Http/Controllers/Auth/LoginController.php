@@ -36,7 +36,6 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
-        $this->redirectTo = route('home');
     }
 
     public function username()
@@ -44,18 +43,7 @@ class LoginController extends Controller
         return 'username';
     }
 
-    /* public function redirectTo() {
-        $current = url()->current();
-        $previous = url()->previous();
-
-        if ($previous !== $current) {
-            session(['redirect_after_login' => $previous]);
-        }
-
-        if (session()->get('redirect_after_login')) {
-            return session()->get('redirect_after_login');
-        } else {
-            return route('home');
-        }
-    } */
+    protected function redirectTo() {
+        return route('home');
+    }
 }

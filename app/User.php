@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password',
+        'username', 'email', 'password', 'password_updated_at',
     ];
 
     /**
@@ -69,6 +69,15 @@ class User extends Authenticatable
                 return $path;
             }
         }
+    }
+
+    public function firstName()
+    {
+        if (! empty($this->name)) {
+            return $this->name;
+        }
+
+        return $this->username;
     }
 
     public function fullName()

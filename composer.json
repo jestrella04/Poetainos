@@ -13,6 +13,7 @@
         "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "^7.0",
+        "laravel/socialite": "^4.4",
         "laravel/tinker": "^2.0",
         "raggitech/laravel-readable": "^1.0",
         "spatie/laravel-image-optimizer": "^1.6"

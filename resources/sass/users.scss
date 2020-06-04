@@ -15,14 +15,14 @@
     line-height: 96px;
     overflow: hidden;
 
-    @media (max-width: 576px) {
+    /* @media (max-width: 576px) {
         width: 64px;
         height: 64px;
         max-width: 64px;
         max-height: 64px;
         font-size: 25px;
         line-height: 64px;
-    }
+    } */
 }
 
 .avatar-chooser {
@@ -69,6 +69,18 @@
                 margin-bottom: 0;
             }
         }
+    }
+}
+
+.navbar {
+    .avatar {
+        width: 22px;
+        height: 22px;
+        max-width: 22px;
+        max-height: 22px;
+        font-size: 8px;
+        line-height: 22px;
+        margin-right: 0.2rem;
     }
 }
 
@@ -135,12 +147,6 @@ hr.banner {
 
     .user-stats {
         margin-bottom: 2rem;
-
-        button {
-            i {
-                opacity: 0.7;
-            }
-        }
     }
 
     .profile-footer {

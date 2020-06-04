@@ -1,6 +1,6 @@
 <div class="writing-heading">
-    <div class="d-flex flex-wrap flex-lg-nowrap justify-content-center">
-        <div class="writing-author">
+    <div class="d-flex flex-column flex-md-row justify-content-center">
+        <div class="writing-author align-self-center">
             <a href="{{ $writing->author->path() }}">
                 @if (! empty($writing->author->avatarPath()))
                     <img class="avatar" src="{{ $writing->author->avatarPath() }}" title="{{ $writing->author->fullName() }}" alt="" loading="lazy">
