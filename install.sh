@@ -1,7 +1,7 @@
 #!/bin/bash
-php artisan down
 composer install --optimize-autoloader --no-dev
-yarn run production
+php artisan down
+yarnpkg run production
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
