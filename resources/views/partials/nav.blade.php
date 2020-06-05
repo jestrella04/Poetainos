@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="/">
-            <img src="/static/images/favicon.png" width="32" height="32" alt="logo">
+            <img src="{{ mix('/static/images/logo-32.png') }}" width="32" height="32" alt="logo">
         </a>
 
         <button id="toggler" class="navbar-toggler" type="button" data-target="#header-navbar" aria-label="Toggle navigation">
