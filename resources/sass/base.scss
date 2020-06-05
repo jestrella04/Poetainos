@@ -61,7 +61,7 @@ main {
     padding: 0;
 
     @media (min-width: 992px) {
-        margin-left: 2rem;
+        margin-left: 3rem;
     }
 
     .block {
@@ -144,6 +144,11 @@ main {
     cursor: default !important;
 }
 
+.dropdown-counter .dropdown-item,
+.dropdown-counter .dropdown-item i {
+    color: $gray-600 !important;
+}
+
 .btn-counter:focus {
     box-shadow: none;
 }
@@ -152,9 +157,10 @@ main {
     cursor: pointer !important;
 }
 
-.btn-counter.click:hover {
+.btn-counter.click:hover,
+.dropdown-counter .dropdown-item:hover {
     i {
-        color: $gray-700;
+        color: $gray-700 !important;
     }
 }
 

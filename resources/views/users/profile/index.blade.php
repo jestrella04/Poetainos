@@ -56,7 +56,7 @@
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ $user->extra_info['website'] }}">
+                    <a href="{{ $user->extra_info['website'] }}" target="_blank">
                         {{ $user->extra_info['website'] }}
                     </a>
                 </dd>
@@ -69,7 +69,7 @@
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['twitter'], 'twitter') }}">
+                    <a href="{{ getSocialLink($user->extra_info['social']['twitter'], 'twitter') }}" target="_blank">
                         {{ $user->extra_info['social']['twitter'] }}
                     </a>
                 </dd>
@@ -82,7 +82,7 @@
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['instagram'], 'instagram') }}">
+                    <a href="{{ getSocialLink($user->extra_info['social']['instagram'], 'instagram') }}" target="_blank">
                         {{ $user->extra_info['social']['instagram'] }}
                     </a>
                 </dd>
@@ -95,7 +95,7 @@
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['facebook'], 'facebook') }}">
+                    <a href="{{ getSocialLink($user->extra_info['social']['facebook'], 'facebook') }}" target="_blank">
                         {{ $user->extra_info['social']['facebook'] }}
                     </a>
                 </dd>
@@ -108,8 +108,21 @@
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['youtube'], 'youtube') }}">
+                    <a href="{{ getSocialLink($user->extra_info['social']['youtube'], 'youtube') }}" target="_blank">
                         {{ $user->extra_info['social']['youtube'] }}
+                    </a>
+                </dd>
+            @endif
+
+            @if (! empty($user->extra_info['social']['goodreads']))
+                <dt class="col-sm-3">
+                    <i class="fab fa-fw fa-goodreads-g"></i>
+                    {{ __('Goodreads') }}:
+                </dt>
+
+                <dd class="col-sm-9">
+                    <a href="{{ getSocialLink($user->extra_info['social']['goodreads'], 'goodreads') }}" target="_blank">
+                        {{ $user->extra_info['social']['goodreads'] }}
                     </a>
                 </dd>
             @endif

@@ -36,6 +36,10 @@ function getSocialLink($user, $network) {
             $url = 'https://youtube.com/user/' . $user;
             break;
 
+        case 'goodreads':
+            $url = 'https://www.goodreads.com/' . $user;
+            break;
+
         default:
             $url = $user;
             break;

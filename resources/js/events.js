@@ -8,8 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create the side menu for small screens
     fx.createSideMenu();
 
+    // Hide Whatsapp sharer on Desktop
+    if (!fx.isMobile()) {
+        document.querySelectorAll('.whatsapp-link').forEach(function (link) {
+            link.classList.add('d-none');
+        })
+    }
+
     // Listen to the on click event on the page and act accordingly
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         let element = event.target;
 
         // Was a button or file chooser clicked?
@@ -21,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Scroll to the top of the document
         if (element.hasAttribute('id') && 'back-to-top' === element.attributes['id'].value) {
-            document.querySelector('.header').scrollIntoView({ behavior: 'smooth', block: 'end'});
+            document.querySelector('.header').scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
         // Display the side menu on small screens
@@ -58,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let targetForm = document.querySelector(target);
             targetForm.classList.toggle('d-none');
 
-            if (! targetForm.classList.contains('d-none')) {
+            if (!targetForm.classList.contains('d-none')) {
                 targetForm.querySelector('.form-control').focus();
             }
         }
@@ -104,21 +111,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     params.append('value', value);
 
                     axios.post(url, params)
-                    .then(function (response) {
-                        let created = response.data.created;
-                        let count = response.data.count;
+                        .then(function (response) {
+                            let created = response.data.created;
+                            let count = response.data.count;
 
-                        if (created > 0) {
-                            element.classList.add('voted');
-                            element.querySelector('.counter').textContent = count;
-                        }
-                    })
-                    .catch(function (error) {
-                        //
-                    })
-                    .then(function () {
-                        //
-                    });
+                            if (created > 0) {
+                                element.classList.add('voted');
+                                element.querySelector('.counter').textContent = count;
+                            }
+                        })
+                        .catch(function (error) {
+                            //
+                        })
+                        .then(function () {
+                            //
+                        });
                 }
             }
 
@@ -132,27 +139,59 @@ document.addEventListener('DOMContentLoaded', () => {
                     params.append('id', id);
 
                     axios.post(url, params)
-                    .then(function (response) {
-                        let count = response.data.count;
+                        .then(function (response) {
+                            let count = response.data.count;
 
-                        if (count > 0) {
-                            element.classList.add('shelved');
-                            element.querySelector('.counter').textContent = count;
-                        }
-                    })
-                    .catch(function (error) {
-                        //
-                    })
-                    .then(function () {
-                        //
-                    });
+                            if (count > 0) {
+                                element.classList.add('shelved');
+                                element.querySelector('.counter').textContent = count;
+                            }
+                        })
+                        .catch(function (error) {
+                            //
+                        })
+                        .then(function () {
+                            //
+                        });
                 }
+            }
+
+            // Share button
+            if (element.classList.contains('share')) {
+                // Check if Share API is supported
+                if (navigator.share) {
+                    navigator.share({
+                        title: element.attributes['data-title'].value,
+                        url: element.attributes['data-url'].value
+                    });
+                } else {
+                    element.setAttribute('data-toggle', 'dropdown');
+                    element.click();
+                }
+            }
+        }
+
+        // Share links
+        if (element.classList.contains('share-link')) {
+            event.preventDefault();
+
+            let url = element.attributes['href'].value;
+
+            if (element.classList.contains('copy-to-clipboard-link')) {
+                navigator.clipboard.writeText(url).then(function () {
+                    /* success */
+                }, function () {
+                    /* failure */
+                });
+            } else {
+                let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=500,left=100,top=100';
+                let sharer = open(url, 'sharer', params);
             }
         }
     });
 
     // Listen to the on submit event on the page and act accordingly
-    document.addEventListener('submit', function(event) {
+    document.addEventListener('submit', function (event) {
         let element = event.target;
         let id = element.attributes['id'].value;
 
@@ -170,50 +209,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Post the form to the server
             axios.post(url, params)
-            .then(function (response) {
-                let method = element.elements['_method'] || false;
+                .then(function (response) {
+                    let method = element.elements['_method'] || false;
 
-                // Form posted successfully, let's reset it
-                if (! method) {
-                    element.reset();
-                }
+                    // Form posted successfully, let's reset it
+                    if (!method) {
+                        element.reset();
+                    }
 
-                // Update file helpers
-                element.querySelector('#selected-file').classList.add('d-none');
-                element.querySelector('#selected-error').classList.add('d-none');
+                    // Update file helpers
+                    element.querySelector('#selected-file').classList.add('d-none');
+                    element.querySelector('#selected-error').classList.add('d-none');
 
-                // Update aterts
-                successLink.attributes['href'].value = response.data.url;
-                successAlert.classList.remove('d-none');
-                errorAlert.classList.add('d-none');
-            })
-            .catch(function (error) {
-                // Oh no, something went wrong
-                let errors = error.response.data.errors;
+                    // Update aterts
+                    successLink.attributes['href'].value = response.data.url;
+                    successAlert.classList.remove('d-none');
+                    errorAlert.classList.add('d-none');
+                })
+                .catch(function (error) {
+                    // Oh no, something went wrong
+                    let errors = error.response.data.errors;
 
-                // Update alerts
-                successAlert.classList.add('d-none');
-                errorAlert.classList.remove('d-none');
+                    // Update alerts
+                    successAlert.classList.add('d-none');
+                    errorAlert.classList.remove('d-none');
 
-                // Get the error JSON object from server
-                Object.keys(errors).forEach(function(key) {
-                    let formHelper = document.querySelector('#' + key + '-error');
+                    // Get the error JSON object from server
+                    Object.keys(errors).forEach(function (key) {
+                        let formHelper = document.querySelector('#' + key + '-error');
 
-                    formHelper.innerHTML = '';
+                        formHelper.innerHTML = '';
 
-                    // Update form error helpers and display then accordingly
-                    errors[key].forEach(function(msg) {
-                        formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
-                        formHelper.classList.remove('d-none');
+                        // Update form error helpers and display then accordingly
+                        errors[key].forEach(function (msg) {
+                            formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
+                            formHelper.classList.remove('d-none');
+                        });
                     });
-                });
-            })
-            .then(function () {
-                fx.handleForm(element, 'response');
+                })
+                .then(function () {
+                    fx.handleForm(element, 'response');
 
-                // Scroll back to the form header
-                document.querySelector('#writing-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end'});
-            });
+                    // Scroll back to the form header
+                    document.querySelector('#writing-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end' });
+                });
         }
 
         // Post the user profile update form
@@ -230,39 +269,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Post the form to the server
             axios.post(url, params)
-            .then(function (response) {
-                // Update alerts
-                successLink.attributes['href'].value = response.data.url;
-                successAlert.classList.remove('d-none');
-                errorAlert.classList.add('d-none');
-            })
-            .catch(function (error) {
-                // Oh no, something went wrong
-                let errors = error.response.data.errors;
+                .then(function (response) {
+                    // Update alerts
+                    successLink.attributes['href'].value = response.data.url;
+                    successAlert.classList.remove('d-none');
+                    errorAlert.classList.add('d-none');
+                })
+                .catch(function (error) {
+                    // Oh no, something went wrong
+                    let errors = error.response.data.errors;
 
-                // Update alerts
-                successAlert.classList.add('d-none');
-                errorAlert.classList.remove('d-none');
+                    // Update alerts
+                    successAlert.classList.add('d-none');
+                    errorAlert.classList.remove('d-none');
 
-                // Get the error JSON object from server
-                Object.keys(errors).forEach(function(key) {
-                    let formHelper = document.querySelector('#' + key + '-error');
+                    // Get the error JSON object from server
+                    Object.keys(errors).forEach(function (key) {
+                        let formHelper = document.querySelector('#' + key + '-error');
 
-                    formHelper.innerHTML = '';
+                        formHelper.innerHTML = '';
 
-                    // Update form error helpers and display then accordingly
-                    errors[key].forEach(function(msg) {
-                        formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
-                        formHelper.classList.remove('d-none');
+                        // Update form error helpers and display then accordingly
+                        errors[key].forEach(function (msg) {
+                            formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
+                            formHelper.classList.remove('d-none');
+                        });
                     });
-                });
-            })
-            .then(function () {
-                fx.handleForm(element, 'response');
+                })
+                .then(function () {
+                    fx.handleForm(element, 'response');
 
-                // Scroll back to the form header
-                document.querySelector('#profile-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end'});
-            });
+                    // Scroll back to the form header
+                    document.querySelector('#profile-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end' });
+                });
         }
 
         // Post the comment form
@@ -280,25 +319,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('cursor-wait');
 
             axios.post(url, params)
-            .then(function (response) {
-                element.reset();
-                commentList.insertAdjacentHTML('beforeend', response.data);
-                postCommentSuccess.classList.remove('d-none');
-                postCommentError.classList.add('d-none');
+                .then(function (response) {
+                    element.reset();
+                    commentList.insertAdjacentHTML('beforeend', response.data);
+                    postCommentSuccess.classList.remove('d-none');
+                    postCommentError.classList.add('d-none');
 
-                if (null !== commentsEmpty && '' !== commentsEmpty) {
-                    commentsEmpty.classList.add('d-none');
-                }
-            })
-            .catch(function (error) {
-                postCommentError.textContent = error.response.data.errors.comment[0];
-                postCommentSuccess.classList.add('d-none');
-                postCommentError.classList.remove('d-none');
-            })
-            .then(function() {
-                // Display the standard cursor
-                document.body.classList.remove('cursor-wait');
-            });
+                    if (null !== commentsEmpty && '' !== commentsEmpty) {
+                        commentsEmpty.classList.add('d-none');
+                    }
+                })
+                .catch(function (error) {
+                    postCommentError.textContent = error.response.data.errors.comment[0];
+                    postCommentSuccess.classList.add('d-none');
+                    postCommentError.classList.remove('d-none');
+                })
+                .then(function () {
+                    // Display the standard cursor
+                    document.body.classList.remove('cursor-wait');
+                });
         }
 
         // Post the comment reply form
@@ -314,31 +353,31 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('cursor-wait');
 
             axios.post(url, params)
-            .then(function (response) {
-                element.reset();
-                commentReplyList.insertAdjacentHTML('beforeend', response.data);
-                element.classList.add('d-none');
-                commentReplyError.classList.add('d-none');
-            })
-            .catch(function (error) {
-                commentReplyError.textContent = error.response.data.errors.reply[0];
-                commentReplyError.classList.remove('d-none');
-            })
-            .then(function () {
-                // Display the standard cursor
-                document.body.classList.remove('cursor-wait');
-            });
+                .then(function (response) {
+                    element.reset();
+                    commentReplyList.insertAdjacentHTML('beforeend', response.data);
+                    element.classList.add('d-none');
+                    commentReplyError.classList.add('d-none');
+                })
+                .catch(function (error) {
+                    commentReplyError.textContent = error.response.data.errors.reply[0];
+                    commentReplyError.classList.remove('d-none');
+                })
+                .then(function () {
+                    // Display the standard cursor
+                    document.body.classList.remove('cursor-wait');
+                });
         }
     });
 
     // Listen to the on change event on the page and act accordingly
-    document.addEventListener('change', function(event) {
+    document.addEventListener('change', function (event) {
         let element = event.target;
 
         // Trigger the cover file validation
         if (element.hasAttribute('id') && 'cover' === element.attributes['id'].value) {
             const file = element.files[0];
-            const fileSizeKb = parseInt(file.size/1024);
+            const fileSizeKb = parseInt(file.size / 1024);
             const maxFileSizeKb = element.attributes['data-max-size'].value;
             let info = document.querySelector(element.attributes['data-target'].value);
             let error = element.parentElement.querySelector('#selected-error');
@@ -358,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trigger the avatar file validation
         if (element.hasAttribute('id') && 'avatar' === element.attributes['id'].value) {
             const file = element.files[0];
-            const fileSizeKb = parseInt(file.size/1024);
+            const fileSizeKb = parseInt(file.size / 1024);
             const maxFileSizeKb = element.attributes['data-max-size'].value;
             let error = document.querySelector('#avatar-error');
 

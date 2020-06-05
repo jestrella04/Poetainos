@@ -276,6 +276,22 @@
         </div>
 
         <div class="form-group row">
+            <label for="goodreads" class="col-sm-3 col-form-label">{{ __('Goodreads') }}:</label>
+            <div class="col-sm-9">
+                <input
+                    type="text"
+                    class="form-control"
+                    name="goodreads"
+                    id="goodreads"
+                    value="{{ @old('goodreads', $user->extra_info['social']['goodreads']) }}"
+                    minlength="3"
+                    maxlength="40"
+                    placeholder="">
+                <small id="goodreads-error" class="text-danger d-none"></small>
+            </div>
+        </div>
+
+        <div class="form-group row">
             <div class="offset-sm-3 col-sm-9">
                 <button
                     type="submit"

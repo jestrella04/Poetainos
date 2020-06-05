@@ -13,9 +13,17 @@
 
         <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">
         <link rel="preload" href="{{ mix('/static/js/app.js') }}" as="script">
-        <link rel="icon" href="{{ mix('/static/images/favicon.svg') }}" type="image/svg+xml">
-        <link rel="alternate icon" href="{{ mix('/static/images/favicon.png') }}" sizes="32x32" type="image/png">
+        <link rel="icon" href="{{ mix('/static/images/logo.svg') }}" type="image/svg+xml">
+        <link rel="alternate icon" href="{{ mix('/static/images/logo-32.png') }}" sizes="32x32" type="image/png">
         <link rel="stylesheet" href="{{ mix('/static/css/app.css') }}" type="text/css">
+
+        {{-- PWA Support --}}
+        <meta name="theme-color" content="#2F3BA2" />
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-title" content="{{ getSiteConfig('name') }}">
+        <link rel="apple-touch-icon" href="{{ mix('/static/images/logo.svg') }}">
+        <link rel="manifest" href="{{ mix('/static/json/pwa-manifest.json') }}">
 
         <script src="{{ mix('static/js/manifest.js') }}" defer></script>
         <script src="{{ mix('static/js/vendor.js') }}" defer></script>

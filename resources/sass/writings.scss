@@ -45,9 +45,11 @@
 
     .writing-cover {
         width: 100%;
-        max-width: 100%;
+        max-width: 1080px;
         border-radius: 0.3rem;
         overflow: hidden;
+        margin-right: auto;
+        margin-left: auto;
         margin-bottom: 1rem;
 
         img {

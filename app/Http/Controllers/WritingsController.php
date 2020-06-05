@@ -7,6 +7,8 @@ use App\Tag;
 use App\Type;
 use App\Writing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
 
 class WritingsController extends Controller
 {
@@ -151,8 +153,18 @@ class WritingsController extends Controller
 
         // Process the uploaded cover, if any
         if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
+            // Persist the image
             $cover = $request->file('cover')->store('public');
-            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize(storage_path('app/' . $cover));
+            $coverRealPath = storage_path('app/' . $cover);
+
+            // Scale the image
+            Image::make($coverRealPath)->resize(1080, null, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            })->save();
+
+            // Optimize the image
+            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize($coverRealPath);
         }
 
         // Create the extra info array

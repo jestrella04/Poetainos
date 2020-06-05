@@ -72,23 +72,44 @@
         <span class="counter">{{ $count['aura'] }}</span>
     </button>
 
-    <button class="btn btn-sm btn-counter click share" title="{{ __('Share') }}">
-        <i class="fa fa-share-alt fa-fw"></i>
-    </button>
+    <div class="dropdown dropdown-counter d-inline">
+        <button
+            class="btn btn-sm btn-counter click share"
+            title="{{ __('Share') }}"
+            role="button"
+            id="dropdown-share"
+            data-url="{{ $writing->path() }}"
+            data-title="{{ $writing->title }}"
+            aria-haspopup="true"
+            aria-expanded="false">
+            <i class="fa fa-share-alt fa-fw"></i>
+        </button>
+
+        <div class="dropdown-menu" aria-labelledby="dropdown-share">
+            @foreach ($writing->shareLinks() as $serviceName => $serviceData)
+                <a class="dropdown-item {{ $serviceData['class'] }}"
+                    href="{{ $serviceData['url'] }}"
+                    rel="noopener">
+                    <i class="{{ $serviceData['icon']}}"></i>
+                    {{ ucfirst($serviceName) }}
+                </a>
+            @endforeach
+        </div>
+    </div>
 
     @if (auth()->check() && (auth()->user()->can('update', $writing) || auth()->user()->can('delete', $writing)))
-        <div class="dropdown d-inline">
+        <div class="dropdown dropdown-counter d-inline">
             <button
                 class="btn btn-sm btn-counter click owner"
                 role="button"
-                id="dropdownMenuLink"
+                id="dropdownM-owner"
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
                 <i class="fas fa-ellipsis-v fa-fw"></i>
             </button>
 
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <div class="dropdown-menu" aria-labelledby="dropdown-owner">
                 @can('update', $writing)
                     <a class="dropdown-item" href="{{ route('writings.update', $writing) }}">{{ __('Edit') }}</a>
                 @endcan

@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 // Authentication
 Auth::routes(['verify' => true]);
 
+// Social Authentication
+Route::get('/login/{service}/redirect', 'SocialAuthController@redirectToProvider');
+Route::get('/login/{service}/callback', 'SocialAuthController@handleProviderCallback');
+
 // Generic
 Route::get('/', 'HomeController@show')->name('home');
 Route::redirect('/home', '/');

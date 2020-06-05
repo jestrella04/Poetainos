@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
 
 class UsersController extends Controller
 {
@@ -128,17 +129,29 @@ class UsersController extends Controller
             'instagram' => 'nullable|string|min:3|max:40',
             'facebook' => 'nullable|string|min:3|max:40',
             'youtube' => 'nullable|string|min:3|max:40',
+            'goodreads' => 'nullable|string|min:3|max:40',
             'avatar' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size'),
             'avatar-remove' => 'nullable|boolean',
         ]);
 
         // Working with avatars
         $remove = request('avatar-remove') || false;
+
         if ($remove) {
             $avatar = '';
         } else if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            // Persist the image
             $avatar = $request->file('avatar')->store('public');
-            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize(storage_path('app/' . $avatar));
+            $avatarRealPath = storage_path('app/' . $avatar);
+
+            // Scale the image
+            Image::make($avatarRealPath)->resize(128, null, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            })->save();
+
+            // Optimize the image
+            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize($avatarRealPath);
         }
 
         // Create the extra info array
@@ -149,6 +162,7 @@ class UsersController extends Controller
                 'instagram' => request('instagram') ?? '',
                 'facebook' => request('facebook') ?? '',
                 'youtube' => request('youtube') ?? '',
+                'goodreads' => request('goodreads') ?? '',
             ],
             'avatar' => $avatar ?? $user->extra_info['avatar'],
             'website' => request('website') ?? '',
