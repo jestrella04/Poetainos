@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir public/static
 composer install --optimize-autoloader --no-dev
 php artisan down
 yarnpkg run production
