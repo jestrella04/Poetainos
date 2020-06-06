@@ -110,6 +110,7 @@
                     minlength="3"
                     maxlength="40"
                     placeholder=""
+                    pattern="[A-Za-z][0-9]"
                     disabled>
                 <small id="username-error" class="text-danger d-none"></small>
             </div>
@@ -222,6 +223,7 @@
                     value="{{ @old('twitter', $user->extra_info['social']['twitter']) }}"
                     minlength="3"
                     maxlength="40"
+                    pattern="[A-Za-z][0-9]"
                     placeholder="">
                 <small id="twitter-error" class="text-danger d-none"></small>
             </div>
@@ -238,6 +240,7 @@
                     value="{{ @old('instagram', $user->extra_info['social']['instagram']) }}"
                     minlength="3"
                     maxlength="40"
+                    pattern="[A-Za-z][0-9]"
                     placeholder="">
                 <small id="instagram-error" class="text-danger d-none"></small>
             </div>
@@ -254,6 +257,7 @@
                     value="{{ @old('facebook', $user->extra_info['social']['facebook']) }}"
                     minlength="3"
                     maxlength="40"
+                    pattern="[A-Za-z][0-9]"
                     placeholder="">
                 <small id="facebook-error" class="text-danger d-none"></small>
             </div>
@@ -270,6 +274,7 @@
                     value="{{ @old('youtube', $user->extra_info['social']['youtube']) }}"
                     minlength="3"
                     maxlength="40"
+                    pattern="[A-Za-z][0-9]"
                     placeholder="">
                 <small id="youtube-error" class="text-danger d-none"></small>
             </div>
@@ -286,6 +291,7 @@
                     value="{{ @old('goodreads', $user->extra_info['social']['goodreads']) }}"
                     minlength="3"
                     maxlength="40"
+                    pattern="[A-Za-z][0-9]"
                     placeholder="">
                 <small id="goodreads-error" class="text-danger d-none"></small>
             </div>

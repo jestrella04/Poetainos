@@ -52,7 +52,9 @@
                         {{ __('Login') }}
                     </button>
 
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-block">{{ __('Register') }}</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-block">
+                        {{ __('Create account') }}
+                    </a>
                 </div>
 
                 @if (Route::has('password.request'))

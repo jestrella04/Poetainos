@@ -15,11 +15,6 @@
             "value": "noreply@writerhood.host",
             "description": "Email address sender for outgoing communication."
         },
-        "enabled": {
-            "type": "bool",
-            "value": true,
-            "description": "Enable or disable the whole site on demand."
-        },
         "url": {
             "type": "string",
             "value": "https://writerhood.host",
