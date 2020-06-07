@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use App\Setting;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Getting App settings from database
         try {
             if (Schema::hasTable('settings')) {
                 config([
@@ -33,6 +36,15 @@ class AppServiceProvider extends ServiceProvider
             }
         } catch (\Throwable $th) {
             //throw $th;
+        }
+
+        // Debugging SQL queries
+        if (env('APP_DEBUG')) {
+            DB::listen(function($sql) {
+                Log::info($sql->sql);
+                Log::info($sql->bindings);
+                Log::info($sql->time);
+            });
         }
     }
 }

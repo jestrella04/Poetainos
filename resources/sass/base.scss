@@ -241,4 +241,33 @@ main {
         text-align: center;
         margin-bottom: 2rem;
     }
+
+    .info {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .email-confirmed {
+        margin-top: 1rem;
+    }
+}
+
+.action-links {
+    text-align: center;
+
+    a {
+        padding: 0.2rem;
+
+        i {
+            opacity: 0.8;
+        }
+
+        i:hover {
+            opacity: 1;
+        }
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
 }

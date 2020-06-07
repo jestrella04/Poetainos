@@ -73,28 +73,11 @@
                     id="name"
                     value="{{ @old('name', $user->name) }}"
                     minlength="3"
-                    maxlength="40"
+                    maxlength="60"
                     placeholder=""
                     required
                     autofocus>
                 <small id="name-error" class="text-danger d-none"></small>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="lastname" class="col-sm-3 col-form-label">{{ __('Last Name') }}:</label>
-            <div class="col-sm-9">
-                <input
-                    type="text"
-                    class="form-control"
-                    name="lastname"
-                    id="lastname"
-                    value="{{ @old('lastname', $user->last_name) }}"
-                    minlength="3"
-                    maxlength="40"
-                    placeholder=""
-                    required>
-                <small id="lastname-error" class="text-danger d-none"></small>
             </div>
         </div>
 
@@ -110,7 +93,7 @@
                     minlength="3"
                     maxlength="40"
                     placeholder=""
-                    pattern="[A-Za-z][0-9]"
+                    pattern="[A-Za-z0-9]+"
                     disabled>
                 <small id="username-error" class="text-danger d-none"></small>
             </div>
@@ -223,7 +206,7 @@
                     value="{{ @old('twitter', $user->extra_info['social']['twitter']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z][0-9]"
+                    pattern="[A-Za-z0-9]+"
                     placeholder="">
                 <small id="twitter-error" class="text-danger d-none"></small>
             </div>
@@ -240,7 +223,7 @@
                     value="{{ @old('instagram', $user->extra_info['social']['instagram']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z][0-9]"
+                    pattern="[A-Za-z0-9]+"
                     placeholder="">
                 <small id="instagram-error" class="text-danger d-none"></small>
             </div>
@@ -257,7 +240,7 @@
                     value="{{ @old('facebook', $user->extra_info['social']['facebook']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z][0-9]"
+                    pattern="[A-Za-z0-9]+"
                     placeholder="">
                 <small id="facebook-error" class="text-danger d-none"></small>
             </div>
@@ -274,7 +257,7 @@
                     value="{{ @old('youtube', $user->extra_info['social']['youtube']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z][0-9]"
+                    pattern="[A-Za-z0-9]+"
                     placeholder="">
                 <small id="youtube-error" class="text-danger d-none"></small>
             </div>
@@ -291,7 +274,7 @@
                     value="{{ @old('goodreads', $user->extra_info['social']['goodreads']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z][0-9]"
+                    pattern="[A-Za-z0-9]+"
                     placeholder="">
                 <small id="goodreads-error" class="text-danger d-none"></small>
             </div>

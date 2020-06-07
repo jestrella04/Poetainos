@@ -117,8 +117,7 @@ class UsersController extends Controller
 
         // Validate user input
         request()->validate([
-            'name' => 'required|string|min:3|max:40',
-            'lastname' => 'required|string|min:3|max:40',
+            'name' => 'required|string|min:3|max:60',
             'email' => 'required|email|min:3|max:40',
             'bio' => 'nullable|string|min:3|max:300',
             'location' => 'nullable|string|min:3|max:40',
@@ -173,7 +172,6 @@ class UsersController extends Controller
 
         // Persist to database
         $user->name = request('name');
-        $user->last_name = request('lastname');
         $user->email = request('email');
         $user->extra_info = $extraInfo;
         $user->save();

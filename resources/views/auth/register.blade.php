@@ -11,7 +11,7 @@
         <div class="form-wrapper">
             <div class="header">
                 <h4 class="all-caps">{{ __('Join the hood') }}</h4>
-                <p class="text-muted">{{ __('Lets create an account for you') }}</p>
+                <p class="text-muted">{{ __('Creating an account is fast and easy') }}</p>
             </div>
 
             <form method="POST" action="{{ route('register') }}">
@@ -25,7 +25,7 @@
                         required
                         autocomplete="username"
                         autofocus
-                        pattern="[A-Za-z][0-9]"
+                        pattern="[A-Za-z0-9]+"
                         placeholder="{{ __('Enter your username') }}">
 
                     @error('username')

@@ -1,8 +1,8 @@
 #!/bin/bash
 mkdir public/static
 git pull
-composer install --optimize-autoloader --no-dev
 php artisan down
+composer install --optimize-autoloader --no-dev
 yarnpkg run production
 php artisan config:cache
 php artisan route:cache

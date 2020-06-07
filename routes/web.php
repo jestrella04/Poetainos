@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,8 +14,43 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Authentication
+/* Authentication routes */
+
 Auth::routes(['verify' => true]);
+
+/* Administration */
+Route::get('admin', 'AdminController@index')->name('admin.index');
+Route::get('admin/types', 'AdminController@types')->name('admin.types');
+Route::get('admin/categories', 'AdminController@categories')->name('admin.categories');
+Route::get('admin/pages', 'AdminController@pages')->name('admin.pages');
+Route::get('admin/users', 'AdminController@users')->name('admin.users');
+
+/* Non public routes */
+
+Route::middleware(['verified'])->group(function () {
+    // Writings
+    Route::get('/writings/create', 'WritingsController@create')->name('writings.create');
+    Route::post('/writings/create', 'WritingsController@store')->name('writings.store');
+    Route::get('/writings/edit/{writing}', 'WritingsController@edit')->name('writings.edit');
+    Route::put('/writings/edit/{writing}', 'WritingsController@update')->name('writings.update');
+    Route::delete('/writings/delete/{writing}', 'WritingsController@destroy')->name('writings.destroy');
+
+    // Users
+    Route::get('/users/edit/{user}', 'UsersController@edit')->name('users.edit');
+    Route::put('/users/edit/{user}', 'UsersController@update')->name('users.update');
+    Route::delete('/users/delete/{user}', 'UsersController@destroy')->name('users.destroy');
+
+    // Comments and replies
+    Route::post('/replies/create', 'RepliesController@store')->name('replies.store');
+    Route::post('/comments/create', 'CommentsController@store')->name('comments.store');
+
+    // Other user tasks
+    Route::post('/votes/store', 'VotesController@store')->name('votes.store');
+    Route::post('/shelves/store', 'ShelvesController@store')->name('shelves.store');
+    Route::post('/hoods/store', 'HoodsController@store')->name('hoods.store');
+});
+
+/* Public routes */
 
 // Social Authentication
 Route::get('/login/{service}/redirect', 'SocialAuthController@redirectToProvider');
@@ -30,13 +63,8 @@ Route::get('/search', 'SearchController@show')->name('search');
 
 // Writings
 Route::get('/writings', 'WritingsController@index')->name('writings.index');
-Route::get('/writings/create', 'WritingsController@create')->name('writings.create')->middleware('auth');
-Route::post('/writings/create', 'WritingsController@store')->name('writings.store')->middleware('auth');
 Route::get('/writings/random', 'WritingsController@random')->name('writings.random');
 Route::get('/writings/{writing}', 'WritingsController@show')->name('writings.show');
-Route::get('/writings/edit/{writing}', 'WritingsController@edit')->name('writings.edit')->middleware('auth');
-Route::put('/writings/edit/{writing}', 'WritingsController@update')->name('writings.update')->middleware('auth');
-Route::delete('/writings/delete/{writing}', 'WritingsController@destroy')->name('writings.destroy')->middleware('auth');
 
 // Users
 Route::get('/users', 'UsersController@index')->name('users.index');
@@ -45,11 +73,8 @@ Route::get('/users/{user}/writings', 'UsersWritingsController@index')->name('use
 Route::get('/users/{user}/shelf', 'UsersShelvesController@index')->name('users_shelves.index');
 Route::get('/users/{user}/hood', 'UsersHoodsController@index')->name('users_hoods.index');
 Route::get('/users/{user}/hood/writings', 'UsersHoodsWritingsController@index')->name('users_hoods_writings.index');
-Route::get('/users/edit/{user}', 'UsersController@edit')->name('users.edit')->middleware('auth');
-Route::put('/users/edit/{user}', 'UsersController@update')->name('users.update')->middleware('auth');
-Route::delete('/users/delete/{user}', 'UsersController@destroy')->name('users.destroy')->middleware('auth');
 
-//Pages
+// Pages
 Route::get('/pages/{page}', 'PagesController@show')->name('pages.show');
 
 // Categories
@@ -65,20 +90,4 @@ Route::get('/tags', 'TagsController@index')->name('tags.index');
 Route::get('/tags/{tag}', 'TagsController@show')->name('tags.show');
 
 // Comments and replies
-Route::post('/replies/create', 'RepliesController@store')->name('replies.store')->middleware('auth');
-Route::post('/comments/create', 'CommentsController@store')->name('comments.store')->middleware('auth');
 Route::get('/comments/{writing}', 'CommentsController@index')->name('comments.index');
-
-// Other user tasks
-Route::post('/votes/store', 'VotesController@store')->name('votes.store')->middleware('auth');
-Route::post('/shelves/store', 'ShelvesController@store')->name('shelves.store')->middleware('auth');
-Route::post('/hoods/store', 'HoodsController@store')->name('hoods.store')->middleware('auth');
-
-// Debugging SQL queries
-if (env('APP_DEBUG')) {
-    DB::listen(function($sql) {
-        Log::info($sql->sql);
-        Log::info($sql->bindings);
-        Log::info($sql->time);
-    });
-}

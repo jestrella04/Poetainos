@@ -16,15 +16,23 @@
             @endif
 
             <div class="header">
-                <h4 class="all-caps">{{ __('Verify your email address') }}</h4>
+                <h4 class="all-caps">{{ __('You are almost done') }}</h4>
+                <p class="lead">{{ __('Please verify your email address') }}</p>
+            </div>
+
+            <div class="info">
+                {{ __('Before proceeding, please check your email for a verification link.') }}
+                {{ __('If you did not receive the email') }}...
             </div>
 
             <form method="POST" action="{{ route('verification.resend') }}">
                 @csrf
-                {{ __('Before proceeding, please check your email for a verification link.') }}
-                {{ __('If you did not receive the email') }},
-                <button type="submit" class="btn btn-link p-0 m-0 align-baseline">{{ __('click here to request another') }}</button>.
+                <button type="submit" class="btn btn-dark btn-lg btn-block">{{ __('Request another') }}</button>
             </form>
+
+            <a href="{{ route('home') }}" class="btn btn-link btn-block email-confirmed">
+                <small>{{ __('Already confirmed? Continue to the homepage') }}.</small>
+            </a>
         </div>
     </div>
 @endsection
