@@ -8,14 +8,14 @@
                 <div class="d-inline-flex">
                     <div>
                         @if (! empty($author->avatarPath()))
-                            <img class="avatar" src="{{ $author->avatarPath() }}" title="{{ $author->fullName() }}" alt="" loading="lazy">
+                            <img class="avatar" src="{{ $author->avatarPath() }}" title="{{ $author->getName() }}" alt="" loading="lazy">
                         @else
-                            <span class="avatar" title="{{ $author->fullName() }}">{{ $author->initials() }}</span>
+                            <span class="avatar" title="{{ $author->getName() }}">{{ $author->initials() }}</span>
                         @endif
                     </div>
 
                     <div>
-                        <span>{{ $author->fullName() }}</span>
+                        <span>{{ $author->getName() }}</span>
                     </div>
                 </div>
             </a>

@@ -1,9 +1,9 @@
 @extends('admin.index')
 
 @section('admin-main-content')
-    <div id="types-admin" class="admin-section">
+    <div id="users-admin" class="admin-section">
         <div class="top-section">
-            <h3 class="all-caps">{{ __('Types') }}</h3>
+            <h3 class="all-caps">{{ __('Users') }}</h3>
 
             <div class="d-flex flex-nowrap">
                 <div class="filter-box flex-grow-1">
@@ -14,51 +14,58 @@
                 </div>
 
                 <div class="buttons">
-                    <button id="btn-create-type"
+                    <button id="btn-create-user"
                         class="btn btn-primary btn-create"
                         type="button"
-                        title="{{ __('Create new type') }}"
+                        title="{{ __('Create new user') }}"
                         data-toggle="modal"
-                        data-target="#type-form-wrapper"
-                        aria-expanded="false">
+                        data-target="#user-form-wrapper"
+                        aria-expanded="false"
+                        disabled>
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        @include('admin.forms.type')
+        @include('admin.forms.user')
 
-        @if ($types->count() > 0)
+        @if ($users->count() > 0)
             <div class="table-responsive">
                 <table class="table table-sm table-hover">
                     <thead>
                         <tr>
                             <th scope="col">{{ __('Id') }}</th>
+                            <th scope="col">{{ __('Role') }}</th>
+                            <th scope="col">{{ __('Username') }}</th>
                             <th scope="col">{{ __('Name') }}</th>
                             <th scope="col">{{ __('Writings') }}</th>
-                            <th scope="col">{{ __('Created at') }}</th>
+                            <th scope="col">{{ __('Registered') }}</th>
+                            <th scope="col">{{ __('Verified') }}</th>
                             <th scope="col">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
 
                     <tbody class="filter-table">
-                        @foreach ($types as $type)
+                        @foreach ($users as $user)
                             <tr>
-                                <th scope="row">{{ $type->id }}</th>
-                                <td>{{ $type->name }}</td>
-                                <td>{{ $type->writings()->count() }}</td>
-                                <td>{{ $type->created_at }}</td>
+                                <th scope="row">{{ $user->id }}</th>
+                                <td>{{ ucfirst($user->role) }}</td>
+                                <td>{{ $user->username }}</td>
+                                <td>{{ $user->getName() }}</td>
+                                <td>{{ $user->writings()->count() }}</td>
+                                <td>{{ $user->created_at }}</td>
+                                <td>{{ $user->email_verified_at }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('types.show', $type) }}">
+                                    <a href="{{ route('users.show', $user) }}">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                <a href="{{ route('types.show', $type) }}">
+                                <a href="{{ route('users.show', $user) }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="{{ route('types.show', $type) }}">
+                                    <a href="{{ route('users.show', $user) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>
@@ -72,5 +79,5 @@
         @endif
     </div>
 
-    {{ $types->withQueryString()->links() }}
+    {{ $users->withQueryString()->links() }}
 @endsection

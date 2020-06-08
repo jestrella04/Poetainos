@@ -13,7 +13,7 @@ class UsersShelvesController extends Controller
 
         $params = [
             'section' => 'shelf',
-            'title' => __('Shelf') . ' - ' . $user->fullName(),
+            'title' => __('Shelf') . ' - ' . $user->getName(),
             'author' => $user,
         ];
 

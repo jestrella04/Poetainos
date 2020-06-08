@@ -1,5 +1,15 @@
 <aside class="col-lg-2 admin-sidebar">
-    <div id="admin-sidebar-main" class="">
+    <div class="admin-sidebar-toggle d-block d-lg-none">
+        <a class="btn btn-dark btn-block rounded-0"
+            data-toggle="collapse"
+            href="#admin-sidebar-main"
+            role="button"
+            aria-label="{{ __('Toggle sidebar') }}">
+            <i class="fa fa-chevron-down"></i>
+        </a>
+    </div>
+
+    <div id="admin-sidebar-main" class="collapse no-collapse-lg">
         <ul class="list-unstyled">
             <li class="brand">
                 <a href="{{ route('home') }}" class="stretched-link" title="{{ __('Return to the homepage') }}">
@@ -8,8 +18,15 @@
             </li>
 
             <li>
+                <a href="{{ route('admin.index') }}" class="stretched-link">
+                    <i class="fas fa-fw fa-home"></i>
+                    {{ __('Summary') }}
+                </a>
+            </li>
+
+            <li>
                 <a href="{{ route('admin.settings') }}" class="stretched-link">
-                    <i class="fas fa-fw fa-box"></i>
+                    <i class="fas fa-fw fa-cogs"></i>
                     {{ __('Settings') }}
                 </a>
             </li>
@@ -25,6 +42,13 @@
                 <a href="{{ route('admin.categories') }}" class="stretched-link">
                     <i class="fas fa-fw fa-archive"></i>
                     {{ __('Categories') }}
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.tags') }}" class="stretched-link">
+                    <i class="fas fa-fw fa-hashtag"></i>
+                    {{ __('Tags') }}
                 </a>
             </li>
 

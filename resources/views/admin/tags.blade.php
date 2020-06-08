@@ -1,9 +1,9 @@
 @extends('admin.index')
 
 @section('admin-main-content')
-    <div id="types-admin" class="admin-section">
+    <div id="tags-admin" class="admin-section">
         <div class="top-section">
-            <h3 class="all-caps">{{ __('Types') }}</h3>
+            <h3 class="all-caps">{{ __('Tags') }}</h3>
 
             <div class="d-flex flex-nowrap">
                 <div class="filter-box flex-grow-1">
@@ -14,51 +14,52 @@
                 </div>
 
                 <div class="buttons">
-                    <button id="btn-create-type"
+                    <button id="btn-create-tag"
                         class="btn btn-primary btn-create"
                         type="button"
-                        title="{{ __('Create new type') }}"
+                        title="{{ __('Create new tag') }}"
                         data-toggle="modal"
-                        data-target="#type-form-wrapper"
-                        aria-expanded="false">
+                        data-target="#tag-form-wrapper"
+                        aria-expanded="false"
+                        disabled>
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        @include('admin.forms.type')
+        {{-- @include('admin.forms.tag') --}}
 
-        @if ($types->count() > 0)
+        @if ($tags->count() > 0)
             <div class="table-responsive">
                 <table class="table table-sm table-hover">
                     <thead>
                         <tr>
                             <th scope="col">{{ __('Id') }}</th>
                             <th scope="col">{{ __('Name') }}</th>
+                            <th scope="col">{{ __('Slug') }}</th>
                             <th scope="col">{{ __('Writings') }}</th>
-                            <th scope="col">{{ __('Created at') }}</th>
                             <th scope="col">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
 
                     <tbody class="filter-table">
-                        @foreach ($types as $type)
+                        @foreach ($tags as $tag)
                             <tr>
-                                <th scope="row">{{ $type->id }}</th>
-                                <td>{{ $type->name }}</td>
-                                <td>{{ $type->writings()->count() }}</td>
-                                <td>{{ $type->created_at }}</td>
+                                <th scope="row">{{ $tag->id }}</th>
+                                <td>{{ $tag->name }}</td>
+                                <td>{{ $tag->slug }}</td>
+                                <td>{{ $tag->writings()->count() }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('types.show', $type) }}">
+                                    <a href="{{ route('tags.show', $tag) }}">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                <a href="{{ route('types.show', $type) }}">
+                                <a href="{{ route('tags.show', $tag) }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="{{ route('types.show', $type) }}">
+                                    <a href="{{ route('tags.show', $tag) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>
@@ -72,5 +73,5 @@
         @endif
     </div>
 
-    {{ $types->withQueryString()->links() }}
+    {{ $tags->withQueryString()->links() }}
 @endsection

@@ -15,18 +15,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 /* Authentication routes */
-
 Auth::routes(['verify' => true]);
 
 /* Administration */
-Route::get('admin', 'AdminController@index')->name('admin.index');
-Route::get('admin/types', 'AdminController@types')->name('admin.types');
-Route::get('admin/categories', 'AdminController@categories')->name('admin.categories');
-Route::get('admin/pages', 'AdminController@pages')->name('admin.pages');
-Route::get('admin/users', 'AdminController@users')->name('admin.users');
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', 'AdminController@index')->name('index');
+    Route::get('settings', 'AdminController@settings')->name('settings');
+    Route::get('types', 'AdminController@types')->name('types');
+    Route::get('categories', 'AdminController@categories')->name('categories');
+    Route::get('tags', 'AdminController@tags')->name('tags');
+    Route::get('pages', 'AdminController@pages')->name('pages');
+    Route::get('users', 'AdminController@users')->name('users');
+});
 
 /* Non public routes */
-
 Route::middleware(['verified'])->group(function () {
     // Writings
     Route::get('/writings/create', 'WritingsController@create')->name('writings.create');

@@ -13,7 +13,7 @@ class UsersWritingsController extends Controller
 
         $params = [
             'section' => 'my_writings',
-            'title' => __('Writings') . ' - ' . $user->fullName(),
+            'title' => __('Writings') . ' - ' . $user->getName(),
             'author' => $user,
         ];
 

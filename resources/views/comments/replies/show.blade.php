@@ -2,9 +2,9 @@
     <div class="reply-author">
         <a href="{{ $reply->author->path() }}">
             @if (! empty($reply->author->avatarPath()))
-                <img class="avatar" src="{{ $reply->author->avatarPath() }}" title="{{ $reply->author->fullName() }}" alt="" loading="lazy">
+                <img class="avatar" src="{{ $reply->author->avatarPath() }}" title="{{ $reply->author->name }}" alt="" loading="lazy">
             @else
-                <span class="avatar" title="{{ $reply->author->fullName() }}" >{{ $reply->author->initials() }}</span>
+                <span class="avatar" title="{{ $reply->author->name }}" >{{ $reply->author->initials() }}</span>
             @endif
         </a>
     </div>
@@ -19,7 +19,7 @@
             <span>
                 <i class="fa fa-user"></i>
                 {{ __('by') }}
-                {{ $reply->author->fullName() }}
+                {{ $reply->author->name }}
             </span>
         </div>
 

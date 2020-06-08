@@ -43,7 +43,7 @@ main {
     padding-top: 3rem;
 }
 
-.main-content,
+.main-content:not(#admin-main-content),
 .sidebar-toggle,
 .block {
     margin-bottom: 2rem;
@@ -253,8 +253,6 @@ main {
 }
 
 .action-links {
-    text-align: center;
-
     a {
         padding: 0.2rem;
 

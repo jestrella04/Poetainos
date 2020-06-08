@@ -68,7 +68,7 @@ class UsersController extends Controller
     {
         $params = [
             'single_entry' => true,
-            'title' => $user->fullName(),
+            'title' => $user->getName(),
         ];
 
         // Increment writing views

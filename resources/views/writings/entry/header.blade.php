@@ -3,9 +3,9 @@
         <div class="writing-author align-self-center">
             <a href="{{ $writing->author->path() }}">
                 @if (! empty($writing->author->avatarPath()))
-                    <img class="avatar" src="{{ $writing->author->avatarPath() }}" title="{{ $writing->author->fullName() }}" alt="" loading="lazy">
+                    <img class="avatar" src="{{ $writing->author->avatarPath() }}" title="{{ $writing->author->name }}" alt="" loading="lazy">
                 @else
-                    <span class="avatar" title="{{ $writing->author->fullName() }}" >{{ $writing->author->initials() }}</span>
+                    <span class="avatar" title="{{ $writing->author->name }}" >{{ $writing->author->initials() }}</span>
                 @endif
             </a>
         </div>
@@ -21,7 +21,7 @@
                     <small>
                         <i class="fas fa-user fa-fw"></i>
                         {{ __('by') }}
-                        {{ $writing->author->fullName() }}
+                        {{ $writing->author->name }}
                     </small>
                 </h6>
 

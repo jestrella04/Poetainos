@@ -10,6 +10,15 @@
 
         <div id="header-navbar" class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
+                @if (auth()->check() && auth()->user()->isAdmin())
+                    <li class="nav-item d-lg-none">
+                        <a class="nav-link" href="{{ route('admin.index') }}">
+                            <i class="fas fa-cogs fa-fw"></i>
+                            {{ __('Administration') }}
+                        </a>
+                    </li>
+                @endif
+
                 <li class="nav-item {{ Route::current()->getName() === 'users.index' ? 'active' : '' }}">
                     <a class="nav-link " href="{{ route('users.index') }}">
                         <i class="fas fa-users fa-fw"></i>
@@ -49,15 +58,18 @@
                     <li class="nav-item dropdown d-none d-lg-block">
                         <a class="nav-link" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if (! empty(auth()->user()->avatarPath()))
-                                <img class="avatar" src="{{ auth()->user()->avatarPath() }}" title="{{ auth()->user()->fullName() }}" alt="" loading="lazy">
+                                <img class="avatar" src="{{ auth()->user()->avatarPath() }}" title="{{ auth()->user()->getName() }}" alt="" loading="lazy">
                             @else
-                                <span class="avatar" title="{{ auth()->user()->fullName() }}">{{ auth()->user()->initials() }}</span>
+                                <span class="avatar" title="{{ auth()->user()->getName() }}">{{ auth()->user()->initials() }}</span>
                             @endif
 
                             {{ __('Hi') }} {{ auth()->user()->firstName() }}
                         </a>
 
                         <div class="dropdown-menu">
+                            @if (auth()->user()->isAdmin())
+                                <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
+                            @endif
                             <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>
                             <a class="dropdown-item" href="{{ auth()->user()->writingsPath() }}">{{ __('My writings') }}</a>
                             <a class="dropdown-item" href="{{ auth()->user()->shelfPath() }}">{{ __('My shelf') }}</a>

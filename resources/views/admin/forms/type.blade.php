@@ -1,8 +1,8 @@
-<div id="category-form-wrapper" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
+<div id="type-form-wrapper" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title all-caps">{{ __('Create new category') }}</h5>
+                <h5 class="modal-title all-caps">{{ __('Create new type') }}</h5>
 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -10,7 +10,7 @@
             </div>
 
             <div class="modal-body">
-                <form id="category-form" action="{{-- {{ route('categories.show') }} --}}" method="POST">
+                <form id="type-form" action="{{-- {{ route('categories.show') }} --}}" method="POST">
                     @csrf
 
                     <div class="form-group row">
@@ -51,7 +51,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">{{ __('Cancel') }}</button>
-                <button type="submit" class="btn btn-primary" form="category-form">{{ __('Save') }}</button>
+                <button type="submit" class="btn btn-primary" form="type-form">{{ __('Save') }}</button>
             </div>
         </div>
     </div>

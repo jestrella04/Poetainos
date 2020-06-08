@@ -6,8 +6,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-function getSiteConfig($path) {
-    $path = config('hood.site.' . $path);
+function getSiteConfig($path = '') {
+    if (! empty($path)) {
+        $path = config('writerhood.' . $path);
+    } else {
+        $path = config('writerhood');
+    }
 
     if (is_array($path) && Arr::exists($path, 'value')) {
         return $path['value'];

@@ -30,8 +30,10 @@ class AppServiceProvider extends ServiceProvider
         // Getting App settings from database
         try {
             if (Schema::hasTable('settings')) {
+                $settings = Setting::where('name', 'site')->first()->pluck('data');
+
                 config([
-                    'hood' => Setting::get(['data'])->first()->data
+                    'writerhood' => $settings[0]
                 ]);
             }
         } catch (\Throwable $th) {

@@ -1,12 +1,12 @@
 <div class="user-profile">
     <div class="profile-header text-center">
         @if (! empty($user->avatarPath()))
-            <img class="avatar" src="{{ $user->avatarPath() }}" title="{{ $user->fullName() }}" alt="" loading="lazy">
+            <img class="avatar" src="{{ $user->avatarPath() }}" title="{{ $user->getName() }}" alt="" loading="lazy">
         @else
-            <span class="avatar" title="{{ $user->fullName() }}">{{ $user->initials() }}</span>
+            <span class="avatar" title="{{ $user->getName() }}">{{ $user->initials() }}</span>
         @endif
 
-        <h4 class="align-self-center">{{ $user->fullName() }}</h4>
+        <h4 class="align-self-center">{{ $user->getName() }}</h4>
 
         @if (! empty($user->extra_info['bio']))
             <div class="profile-bio">{{ $user->extra_info['bio'] }}</div>

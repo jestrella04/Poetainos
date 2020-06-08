@@ -71,7 +71,7 @@
                     class="form-control"
                     name="name"
                     id="name"
-                    value="{{ @old('name', $user->name) }}"
+                    value="{{ @old('name', $user->getName()) }}"
                     minlength="3"
                     maxlength="60"
                     placeholder=""
