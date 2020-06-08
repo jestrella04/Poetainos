@@ -55,7 +55,7 @@ Route::middleware(['verified'])->group(function () {
 /* Public routes */
 
 // Social Authentication
-Route::get('/login/{service}/redirect', 'SocialAuthController@redirectToProvider');
+Route::get('/login/{service}', 'SocialAuthController@redirectToProvider')->name('social.login');
 Route::get('/login/{service}/callback', 'SocialAuthController@handleProviderCallback');
 
 // Generic

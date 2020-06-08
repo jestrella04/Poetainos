@@ -14,6 +14,10 @@
                 <p class="text-muted">{{ __('Welcome back to the hood') }}</p>
             </div>
 
+            <div class="social">
+                @include('partials.socialite')
+            </div>
+
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 

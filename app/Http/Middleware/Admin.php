@@ -16,7 +16,7 @@ class Admin
     public function handle($request, Closure $next)
     {
         if (! $request->user()->isAdmin()) {
-            return redirect('login');
+            return redirect(route('login'));
         }
 
         return $next($request);

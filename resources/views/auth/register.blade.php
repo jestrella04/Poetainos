@@ -14,6 +14,10 @@
                 <p class="text-muted">{{ __('Creating an account is fast and easy') }}</p>
             </div>
 
+            <div class="social">
+                @include('partials.socialite')
+            </div>
+
             <form method="POST" action="{{ route('register') }}">
                 @csrf
 
