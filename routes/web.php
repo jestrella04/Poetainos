@@ -54,7 +54,10 @@ Route::middleware(['verified'])->group(function () {
 
 /* Public routes */
 
-// Social Authentication
+// PWA manifest
+Route::get('/static/json/pwa-manifest.json', 'ResourcesController@pwaManifest')->name('pwa.manifest');
+
+// Social authentication
 Route::get('/login/{service}', 'SocialAuthController@redirectToProvider')->name('social.login');
 Route::get('/login/{service}/callback', 'SocialAuthController@handleProviderCallback');
 

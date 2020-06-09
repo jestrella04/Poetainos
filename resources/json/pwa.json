@@ -1,6 +1,6 @@
 {
-    "name": "Writerhood",
-    "short_name": "Writerhood",
+    "name": "{{name}}",
+    "short_name": "{{name}}",
     "icons": [
         {
             "src": "/static/images/logo.svg",

@@ -154,7 +154,7 @@ class WritingsController extends Controller
         // Process the uploaded cover, if any
         if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
             // Persist the image
-            $cover = $request->file('cover')->store('public');
+            $cover = $request->file('cover')->store('covers');
             $coverRealPath = storage_path('app/' . $cover);
 
             // Scale the image
@@ -180,7 +180,7 @@ class WritingsController extends Controller
         $writing->title = request('title');
 
         if (! $writing->exists) {
-            $writing->slug = createSlug('writings', $writing->title);
+            $writing->slug = slugify('writings', $writing->title);
         }
 
         $writing->text = request('text');
@@ -196,7 +196,7 @@ class WritingsController extends Controller
             foreach ($rawTags as $rawTag) {
                 $tag = Tag::firstOrCreate(
                     ['name' => $rawTag],
-                    ['slug' => createSlug('tags', $rawTag)]
+                    ['slug' => slugify('tags', $rawTag)]
                 );
 
                 $tags[] = $tag->id;

@@ -140,7 +140,7 @@ class UsersController extends Controller
             $avatar = '';
         } else if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             // Persist the image
-            $avatar = $request->file('avatar')->store('public');
+            $avatar = $request->file('avatar')->store('avatars');
             $avatarRealPath = storage_path('app/' . $avatar);
 
             // Scale the image

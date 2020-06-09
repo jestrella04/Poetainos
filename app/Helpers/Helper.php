@@ -52,13 +52,13 @@ function getSocialLink($user, $network) {
     return $url;
 }
 
-function createSlug($table, $title, $column = 'slug') {
+function slugify($table, $title, $column = 'slug', $separator = '-') {
     // Normalize the title
-    $slug = Str::of($title)->slug('-');
+    $slug = Str::of($title)->slug($separator);
 
     // Get any slug that could possibly be related.
     // This cuts the queries down by doing it once.
-    $allSlugs = getRelatedSlugs($table, $slug);
+    $allSlugs = getRelatedIdentifiers($table, $slug, $column);
 
     // If we haven't used it before then we are all good.
     if (! $allSlugs->contains($column, $slug)){
@@ -67,7 +67,7 @@ function createSlug($table, $title, $column = 'slug') {
 
     // Just append numbers like a savage until we find one not used.
     for ($i = 1; $i <= 10; $i++) {
-        $newSlug = $slug . '-' . $i;
+        $newSlug = $slug . $separator . $i;
 
         if (! $allSlugs->contains($column, $newSlug)) {
             return $newSlug;
@@ -77,7 +77,7 @@ function createSlug($table, $title, $column = 'slug') {
     throw new \Exception('Can not create a unique slug');
 }
 
-function getRelatedSlugs($table, $slug, $column = 'slug') {
+function getRelatedIdentifiers($table, $slug, $column) {
     return DB::table($table)
         ->select($column)
         ->where($column, 'like', $slug . '%')
