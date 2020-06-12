@@ -21,7 +21,7 @@
                     <small>
                         <i class="fas fa-user fa-fw"></i>
                         {{ __('by') }}
-                        {{ $writing->author->name }}
+                        {{ $writing->author->getName() }}
                     </small>
                 </h6>
 
