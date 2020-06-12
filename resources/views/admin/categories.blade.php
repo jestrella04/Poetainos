@@ -19,7 +19,7 @@
                         type="button"
                         title="{{ __('Create new category') }}"
                         data-toggle="modal"
-                        data-target="#category-form-wrapper"
+                        data-target="#admin-categories-form-wrapper"
                         aria-expanded="false">
                         <i class="fas fa-plus"></i>
                     </button>

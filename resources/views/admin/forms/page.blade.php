@@ -1,4 +1,4 @@
-<div id="page-form-wrapper" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
+<div id="admin-pages-form-wrapper" class="modal fade form-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,8 +10,31 @@
             </div>
 
             <div class="modal-body">
-                <form id="page-form" action="{{-- {{ route('categories.show') }} --}}" method="POST">
+                <form id="admin-pages-form" action="{{ route('admin.pages.update') }}" method="POST">
                     @csrf
+                    @method('put')
+
+                    <input type="hidden" name="id" value="-1">
+
+                    <div class="alert alert-success d-none" role="alert">
+                        <button type="button" class="close">
+                            <span class="alert-link">&times;</span>
+                        </button>
+
+                        <h6 class="alert-heading">
+                            {{ __('Changes saved successfully') }}
+                        </h6>
+                    </div>
+
+                    <div class="alert alert-danger d-none" role="alert">
+                        <button type="button" class="close">
+                            <span class="danger-link">&times;</span>
+                        </button>
+
+                        <h6 class="alert-heading">
+                            {{ __('It looks like something went wrong') }}
+                        </h6>
+                    </div>
 
                     <div class="form-group row">
                         <label for="title" class="col-sm-2 col-form-label">{{ __('Title') }}</label>
@@ -43,15 +66,15 @@
                                 minlength="10"
                                 maxlength="5000"
                                 required></textarea>
-                            <small id="description-error" class="text-danger d-none"></small>
+                            <small id="text-error" class="text-danger d-none"></small>
                         </div>
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">{{ __('Cancel') }}</button>
-                <button type="submit" class="btn btn-primary" form="page-form">{{ __('Save') }}</button>
+                <button type="reset" id="reset" class="btn btn-danger" form="admin-pages-form">{{ __('Reset') }}</button>
+                <button type="submit" id="submit" class="btn btn-primary" form="admin-pages-form">{{ __('Save') }}</button>
             </div>
         </div>
     </div>

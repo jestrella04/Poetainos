@@ -19,7 +19,7 @@
                         type="button"
                         title="{{ __('Create new type') }}"
                         data-toggle="modal"
-                        data-target="#type-form-wrapper"
+                        data-target="#admin-types-form-wrapper"
                         aria-expanded="false">
                         <i class="fas fa-plus"></i>
                     </button>

@@ -19,7 +19,7 @@
                         type="button"
                         title="{{ __('Create new page') }}"
                         data-toggle="modal"
-                        data-target="#page-form-wrapper"
+                        data-target="#admin-pages-form-wrapper"
                         aria-expanded="false">
                         <i class="fas fa-plus"></i>
                     </button>
@@ -35,9 +35,7 @@
                     <thead>
                         <tr>
                             <th scope="col">{{ __('Id') }}</th>
-                            <th scope="col">{{ __('Name') }}</th>
-                            <th scope="col">{{ __('Slug') }}</th>
-                            <th scope="col">{{ __('Writings') }}</th>
+                            <th scope="col">{{ __('Title') }}</th>
                             <th scope="col">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
@@ -46,9 +44,7 @@
                         @foreach ($pages as $page)
                             <tr>
                                 <th scope="row">{{ $page->id }}</th>
-                                <td>{{ $page->name }}</td>
-                                <td>{{ $page->slug }}</td>
-                                <td>{{ $page->writings()->count() }}</td>
+                                <td>{{ $page->title }}</td>
                                 <td class="action-links">
                                     <a href="{{ route('pages.show', $page) }}">
                                         <i class="fas fa-fw fa-eye"></i>

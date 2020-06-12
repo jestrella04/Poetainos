@@ -180,7 +180,7 @@ class WritingsController extends Controller
         $writing->title = request('title');
 
         if (! $writing->exists) {
-            $writing->slug = slugify('writings', $writing->title);
+            $writing->slug = slugify($writing->getTable(), $writing->title);
         }
 
         $writing->text = request('text');

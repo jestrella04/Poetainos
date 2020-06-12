@@ -26,6 +26,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('tags', 'AdminController@tags')->name('tags');
     Route::get('pages', 'AdminController@pages')->name('pages');
     Route::get('users', 'AdminController@users')->name('users');
+
+    Route::put('settings/update', 'SettingsController@update')->name('settings.update');
+    Route::put('types/update', 'TypesController@update')->name('types.update');
+    Route::put('categories/update', 'CategoriesController@update')->name('categories.update');
+    Route::put('tags/update', 'TagsController@update')->name('tags.update');
+    Route::put('pages/update', 'PagesController@update')->name('pages.update');
 });
 
 /* Non public routes */

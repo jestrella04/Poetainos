@@ -37,7 +37,6 @@
                         <tr>
                             <th scope="col">{{ __('Id') }}</th>
                             <th scope="col">{{ __('Name') }}</th>
-                            <th scope="col">{{ __('Slug') }}</th>
                             <th scope="col">{{ __('Writings') }}</th>
                             <th scope="col">{{ __('Actions') }}</th>
                         </tr>
@@ -48,7 +47,6 @@
                             <tr>
                                 <th scope="row">{{ $tag->id }}</th>
                                 <td>{{ $tag->name }}</td>
-                                <td>{{ $tag->slug }}</td>
                                 <td>{{ $tag->writings()->count() }}</td>
                                 <td class="action-links">
                                     <a href="{{ route('tags.show', $tag) }}">

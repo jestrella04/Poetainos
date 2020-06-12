@@ -20,16 +20,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.header')
     const backButton = document.querySelector('#back-to-top')
 
-    const handler = () => raf(() => {
-        if (headerIsInViewport(header)) {
-            backButton.classList.add('d-none')
-        } else {
-            backButton.classList.remove('d-none')
-        }
-    })
+    if (null != header && null != backButton) {
+        const handler = () => raf(() => {
+            if (headerIsInViewport(header)) {
+                backButton.classList.add('d-none')
+            } else {
+                backButton.classList.remove('d-none')
+            }
+        })
 
-    handler()
-    window.addEventListener('scroll', handler)
+        handler()
+        window.addEventListener('scroll', handler)
+    }
 });
 
 const raf =

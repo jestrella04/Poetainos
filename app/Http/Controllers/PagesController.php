@@ -69,7 +69,31 @@ class PagesController extends Controller
      */
     public function update(Request $request, Page $page)
     {
-        //
+        // Validate user input
+        request()->validate([
+            'id' => 'required|integer',
+            'title' => 'required|string|unique:types,name|min:3|max:40',
+            'text' => 'required|string|min:100',
+        ]);
+
+        // Get type model
+        $page = Page::where('id', request('id'))->firstOrNew();
+
+        // Update accordingly
+        $page->title = request('title');
+        $page->text = request('text');
+
+        if (! $page->exists) {
+            $action = 'create';
+            $page->slug = slugify($page->getTable(), request('title'));
+        }
+
+        $page->save();
+
+        return [
+            'action' => $action ?? 'update',
+            'id' => $page->id,
+        ];
     }
 
     /**

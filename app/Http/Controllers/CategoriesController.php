@@ -89,7 +89,31 @@ class CategoriesController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        // Validate user input
+        request()->validate([
+            'id' => 'required|integer',
+            'title' => 'required|string|unique:categories,name|min:3|max:40',
+            'description' => 'required|string|min:3|max:255',
+        ]);
+
+        // Get category model
+        $category = Category::where('id', request('id'))->firstOrNew();
+
+        // Update accordingly
+        $category->name = request('title');
+        $category->description = request('description');
+
+        if (! $category->exists) {
+            $action = 'create';
+            $category->slug = slugify($category->getTable(), request('title'));
+        }
+
+        $category->save();
+
+        return [
+            'action' => $action ?? 'update',
+            'id' => $category->id,
+        ];
     }
 
     /**

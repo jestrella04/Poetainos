@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let method = element.elements['_method'] || false;
 
                     // Form posted successfully, let's reset it
-                    if (!method) {
+                    if (! method) {
                         element.reset();
                     }
 
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     element.querySelector('#selected-file').classList.add('d-none');
                     element.querySelector('#selected-error').classList.add('d-none');
 
-                    // Update aterts
+                    // Update alerts
                     successLink.attributes['href'].value = response.data.url;
                     successAlert.classList.remove('d-none');
                     errorAlert.classList.add('d-none');
@@ -234,18 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     successAlert.classList.add('d-none');
                     errorAlert.classList.remove('d-none');
 
-                    // Get the error JSON object from server
-                    Object.keys(errors).forEach(function (key) {
-                        let formHelper = document.querySelector('#' + key + '-error');
-
-                        formHelper.innerHTML = '';
-
-                        // Update form error helpers and display then accordingly
-                        errors[key].forEach(function (msg) {
-                            formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
-                            formHelper.classList.remove('d-none');
-                        });
-                    });
+                    // Handle the error messages
+                    fx.handleFormErrors(errors);
                 })
                 .then(function () {
                     fx.handleForm(element, 'response');
@@ -283,18 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     successAlert.classList.add('d-none');
                     errorAlert.classList.remove('d-none');
 
-                    // Get the error JSON object from server
-                    Object.keys(errors).forEach(function (key) {
-                        let formHelper = document.querySelector('#' + key + '-error');
-
-                        formHelper.innerHTML = '';
-
-                        // Update form error helpers and display then accordingly
-                        errors[key].forEach(function (msg) {
-                            formHelper.innerHTML = formHelper.innerHTML + msg + '<br>';
-                            formHelper.classList.remove('d-none');
-                        });
-                    });
+                    // Handle the error messages
+                    fx.handleFormErrors(errors);
                 })
                 .then(function () {
                     fx.handleForm(element, 'response');
@@ -366,6 +346,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(function () {
                     // Display the standard cursor
                     document.body.classList.remove('cursor-wait');
+                });
+        }
+
+        let adminForms = ['admin-settings-form', 'admin-types-form', 'admin-categories-form', 'admin-pages-form'];
+
+        // Save data from admin panel
+        if (adminForms.includes(id)) {
+            event.preventDefault();
+            fx.handleForm(element, 'submit');
+
+            // Initialize form and helpers
+            let params = new FormData(element);
+            let url = element.attributes['action'].value;
+            let errorAlert = element.querySelector('.alert-danger');
+            let successAlert = element.querySelector('.alert-success');
+
+            // Post the form to the server
+            axios.post(url, params)
+                .then(function (response) {
+                    // Reset form
+                    if ('create' === response.data.action) {
+                        element.reset.click();
+                    }
+
+                    // Update alerts
+                    successAlert.classList.remove('d-none');
+                    errorAlert.classList.add('d-none');
+                })
+                .catch(function (error) {
+                    // Oh no, something went wrong
+                    let errors = error.response.data.errors;
+
+                    // Update alerts
+                    successAlert.classList.add('d-none');
+                    errorAlert.classList.remove('d-none');
+
+                    // Handle the error messages
+                    fx.handleFormErrors(errors);
+                })
+                .then(function () {
+                    fx.handleForm(element, 'response');
                 });
         }
     });
