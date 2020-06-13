@@ -12,7 +12,11 @@
     <div id="admin-sidebar-main" class="collapse no-collapse-lg">
         <ul class="list-unstyled">
             <li class="brand">
-                <a href="{{ route('home') }}" class="stretched-link" title="{{ __('Return to the homepage') }}">
+                <a href="{{ route('home') }}"
+                    class="stretched-link"
+                    title="{{ __('Return to the homepage') }}"
+                    data-toggle="tooltip"
+                    data-placement="right">
                     <img src="{{ mix('/static/images/logo-32.png') }}" width="32" height="32" alt="logo">
                 </a>
             </li>

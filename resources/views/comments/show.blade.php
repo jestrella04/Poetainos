@@ -1,10 +1,13 @@
 <div class="comment d-flex justify-content-center">
     <div class="comment-author">
-        <a href="{{ $comment->author->path() }}">
+        <a href="{{ $comment->author->path() }}"
+            title="{{ __('View profile') }}"
+            data-toggle="tooltip"
+            data-placement="top">
             @if (! empty($comment->author->avatarPath()))
-                <img class="avatar" src="{{ $comment->author->avatarPath() }}" title="{{ $comment->author->name }}" alt="" loading="lazy">
+                <img class="avatar" src="{{ $comment->author->avatarPath() }}" alt="" loading="lazy">
             @else
-                <span class="avatar" title="{{ $comment->author->name }}" >{{ $comment->author->initials() }}</span>
+                <span class="avatar">{{ $comment->author->initials() }}</span>
             @endif
         </a>
     </div>
@@ -19,7 +22,7 @@
             <span>
                 <i class="fa fa-user"></i>
                 {{ __('by') }}
-                {{ $comment->author->name }}
+                {{ $comment->author->getName() }}
             </span>
         </div>
 

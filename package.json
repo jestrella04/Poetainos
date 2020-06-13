@@ -8,14 +8,15 @@
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "workspace-start": "cd laradock && docker-compose up -d nginx mariadb redis workspace && docker-compose exec workspace bash",
+        "workspace-start": "cd laradock && docker-compose up -d nginx mariadb workspace && docker-compose exec workspace bash",
         "workspace-stop": "cd laradock && docker-compose stop"
     },
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.13.0",
         "axios": "^0.19",
         "bootstrap": "^4.0.0",
-        "jquery": "^3.2",
+        "bootstrap.native": "^3.0.5",
+        "cross-env": "^7.0.2",
         "laravel-mix": "^5.0.1",
         "lodash": "^4.17.13",
         "popper.js": "^1.12",
@@ -24,7 +25,5 @@
         "sass-loader": "^8.0.0",
         "vue-template-compiler": "^2.6.11"
     },
-    "dependencies": {
-        "cross-env": "^7.0.2"
-    }
+    "dependencies": {}
 }

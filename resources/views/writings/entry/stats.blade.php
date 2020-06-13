@@ -9,7 +9,8 @@
 @endphp
 
 <div class="stats writing-stats">
-    <button class="btn btn-sm btn-counter @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
+    <button
+    class="btn btn-sm btn-counter @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
         @if (auth()->check() && $voted > 0)
         title="{{ __('Liked it') }}"
         @elseif (auth()->check() && null === $voted)
@@ -19,6 +20,8 @@
         @endif
         @if (auth()->check() && empty($vote))
         data-target="{{ route('votes.store') }}"
+        data-toggle="tooltip"
+        data-placement="top"
         data-id="{{ $writing->id }}"
         data-value="1"
         @endif>
@@ -34,6 +37,8 @@
         @endif
         @if (auth()->check() && empty($vote))
         data-target="{{ route('votes.store') }}"
+        data-toggle="tooltip"
+        data-placement="top"
         data-id="{{ $writing->id }}"
         data-value="0"
         @endif>
@@ -41,17 +46,26 @@
         <span class="counter">{{ $count['downvotes'] }}</span>
     </button> --}}
 
-    <button class="btn btn-sm btn-counter" title="{{ __('Comments') }}">
+    <button
+        class="btn btn-sm btn-counter"
+        title="{{ __('Comments') }}"
+        data-toggle="tooltip"
+        data-placement="top">
         <i class="fa fa-comment fa-fw"></i>
         <span class="counter">{{ $count['comments'] + $count['replies'] }}</span>
     </button>
 
-    <button class="btn btn-sm btn-counter" title="{{ __('Views') }}">
+    <button
+        class="btn btn-sm btn-counter"
+        title="{{ __('Views') }}"
+        data-toggle="tooltip"
+        data-placement="top">
         <i class="fa fa-eye fa-fw"></i>
         <span class="counter">{{ $count['views'] }}</span>
     </button>
 
-    <button class="btn btn-sm btn-counter @auth {{ 'click shelf' }} @endauth @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
+    <button
+        class="btn btn-sm btn-counter @auth {{ 'click shelf' }} @endauth @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
         @if (auth()->check() && $shelved === $writing->id)
         title="{{ __('On my shelf') }}"
         @elseif (auth()->check() && null === $shelved)
@@ -62,12 +76,18 @@
         @if (auth()->check())
         data-target="{{ route('shelves.store') }}"
         data-id="{{ $writing->id }}"
+        data-toggle="tooltip"
+        data-placement="top"
         @endif>
         <i class="fa fa-book-reader fa-fw"></i>
         <span class="counter">{{ $count['shelf'] }}</span>
     </button>
 
-    <button class="btn btn-sm btn-counter" title="{{ __('Aura') }}">
+    <button
+        class="btn btn-sm btn-counter"
+        title="{{ __('Aura') }}"
+        data-toggle="tooltip"
+        data-placement="top">
         <i class="fa fa-dove fa-fw"></i>
         <span class="counter">{{ $count['aura'] }}</span>
     </button>
@@ -79,7 +99,9 @@
             role="button"
             id="dropdown-share"
             data-url="{{ $writing->path() }}"
-            data-title="{{ $writing->title }}"
+            data-writing-title="{{ $writing->title }}"
+            data-toggle="tooltip"
+            data-placement="top"
             aria-haspopup="true"
             aria-expanded="false">
             <i class="fa fa-share-alt fa-fw"></i>
@@ -104,6 +126,8 @@
                 role="button"
                 id="dropdownM-owner"
                 data-toggle="dropdown"
+                data-toggle="tooltip"
+                data-placement="top"
                 aria-haspopup="true"
                 aria-expanded="false">
                 <i class="fas fa-ellipsis-v fa-fw"></i>

@@ -53,11 +53,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                <a href="{{ route('tags.show', $tag) }}">
+                                    <a href="#" class="admin-edit tags-edit">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="{{ route('tags.show', $tag) }}">
+                                    <a href="#" class="admin-delete tags-delete">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

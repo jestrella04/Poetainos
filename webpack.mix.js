@@ -23,8 +23,7 @@ mix.js('resources/js/app.js', 'public/static/js')
     .copy('resources/images/cover.jpg', 'public/static/images/cover.jpg')
     .copyDirectory('node_modules/@fortawesome/fontawesome-free/webfonts', 'public/static/webfonts').options({
         processCssUrls: false
-    })
-    .extract(['jquery']);
+    });
 
 if (mix.inProduction()) {
     mix.version();

@@ -50,11 +50,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                <a href="{{ route('pages.show', $page) }}">
+                                    <a href="#" class="admin-edit pages-edit">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="{{ route('pages.show', $page) }}">
+                                    <a href="#" class="admin-delete pages-delete">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

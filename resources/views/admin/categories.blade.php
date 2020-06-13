@@ -54,11 +54,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                <a href="{{ route('categories.show', $category) }}">
+                                    <a href="#" class="admin-edit category-edit">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="{{ route('categories.show', $category) }}">
+                                    <a href="#" class="admin-delete category-delete">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

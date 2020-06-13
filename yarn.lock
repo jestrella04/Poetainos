@@ -1355,6 +1355,14 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
+bootstrap.native@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/bootstrap.native/-/bootstrap.native-3.0.5.tgz#3ca8e9e6eee2b28cf250c39d66f191274f47a87d"
+  integrity sha512-UIF2Eow5KWGxS0Z3S+rjOytI1d8yEG5ai/BaVDoeuhLHbK8Sp7N+4LVHE2EctTAD6sgdWnrMtwPa7FU7V1WdVg==
+  dependencies:
+    minifill "^0.0.7"
+    shorter-js "^0.0.5"
+
 bootstrap@^4.0.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.5.0.tgz#97d9dbcb5a8972f8722c9962483543b907d9b9ec"
@@ -3889,11 +3897,6 @@ jest-worker@^25.4.0:
     merge-stream "^2.0.0"
     supports-color "^7.0.0"
 
-jquery@^3.2:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.1.tgz#d7b4d08e1bfdb86ad2f1a3d039ea17304717abb5"
-  integrity sha512-XwIBPqcMn57FxfT+Go5pzySnm4KWkT1Tv7gjrpT1srtf8Weynl6R273VJ5GjkRb51IzMp5nbaPjJXMWeju2MKg==
-
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -4330,6 +4333,11 @@ mimic-fn@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
+
+minifill@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/minifill/-/minifill-0.0.7.tgz#8f7ee2d1668ea2c4b5c21998844faf94d0b96249"
+  integrity sha512-McycJWq1B0Pp3ThukCeOxPXX3VoNIqOpbDVOto7JrdjYg9nwwYKRDKk1HvyX1Smz/uqjB536kQfTmIPIlnWGEg==
 
 minimalistic-assert@^1.0.0, minimalistic-assert@^1.0.1:
   version "1.0.1"
@@ -6012,6 +6020,11 @@ shellwords@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
   integrity sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
+
+shorter-js@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/shorter-js/-/shorter-js-0.0.5.tgz#83be0a1f895e1e8424723d4601675f31e07a5a4d"
+  integrity sha512-Pe9LmjAKqHr+/GuVVNO4+4hSpL/MrryquTj1ZlxnYDYgApgBKH4yJXm7gyiD60/S3McIm+r5ksm7U8rKQ5w+3Q==
 
 signal-exit@^3.0.0:
   version "3.0.3"

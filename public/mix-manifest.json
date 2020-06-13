@@ -1,8 +1,6 @@
 {
     "/static/js/app.js": "/static/js/app.js",
     "/static/css/app.css": "/static/css/app.css",
-    "/static/js/manifest.js": "/static/js/manifest.js",
-    "/static/js/vendor.js": "/static/js/vendor.js",
     "/static/images/logo.svg": "/static/images/logo.svg",
     "/static/images/logo-32.png": "/static/images/logo-32.png",
     "/static/images/logo-144.png": "/static/images/logo-144.png",

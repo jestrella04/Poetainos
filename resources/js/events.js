@@ -1,4 +1,5 @@
 import * as fx from './functions';
+import BSN from "bootstrap.native";
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
@@ -161,12 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Check if Share API is supported
                 if (navigator.share) {
                     navigator.share({
-                        title: element.attributes['data-title'].value,
+                        title: element.attributes['data-writing-title'].value,
                         url: element.attributes['data-url'].value
                     });
                 } else {
-                    element.setAttribute('data-toggle', 'dropdown');
-                    element.click();
+                    new BSN.Dropdown(element).toggle();
                 }
             }
         }
@@ -178,11 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let url = element.attributes['href'].value;
 
             if (element.classList.contains('copy-to-clipboard-link')) {
-                navigator.clipboard.writeText(url).then(function () {
-                    /* success */
-                }, function () {
-                    /* failure */
-                });
+                navigator.clipboard.writeText(url);
             } else {
                 let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=500,left=100,top=100';
                 let sharer = open(url, 'sharer', params);

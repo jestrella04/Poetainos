@@ -61,11 +61,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                <a href="{{ route('users.show', $user) }}">
+                                    <a href="#" class="admin-edit users-edit">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="{{ route('users.show', $user) }}">
+                                    <a href="#" class="admin-delete users-delete">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

@@ -25,8 +25,6 @@
         <link rel="apple-touch-icon" href="{{ mix('/static/images/logo.svg') }}">
         <link rel="manifest" href="{{ route('pwa.manifest') }}">
 
-        <script src="{{ mix('/static/js/manifest.js') }}" defer></script>
-        <script src="{{ mix('/static/js/vendor.js') }}" defer></script>
         <script src="{{ mix('/static/js/app.js') }}" defer></script>
         @yield('scripts')
     </head>

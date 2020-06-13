@@ -54,11 +54,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                <a href="{{ route('types.show', $type) }}">
+                                    <a href="#" class="admin-edit types-edit">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="{{ route('types.show', $type) }}">
+                                    <a href="#" class="admin-delete types-delete">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

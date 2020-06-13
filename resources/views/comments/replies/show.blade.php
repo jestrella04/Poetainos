@@ -1,10 +1,13 @@
 <div class="reply d-flex justify-content-center">
     <div class="reply-author">
-        <a href="{{ $reply->author->path() }}">
+        <a href="{{ $reply->author->path() }}"
+            title="{{ __('View profile') }}"
+            data-toggle="tooltip"
+            data-placement="top">
             @if (! empty($reply->author->avatarPath()))
-                <img class="avatar" src="{{ $reply->author->avatarPath() }}" title="{{ $reply->author->name }}" alt="" loading="lazy">
+                <img class="avatar" src="{{ $reply->author->avatarPath() }}" title="{{ $reply->author->getName() }}" alt="" loading="lazy">
             @else
-                <span class="avatar" title="{{ $reply->author->name }}" >{{ $reply->author->initials() }}</span>
+                <span class="avatar" title="{{ $reply->author->getName() }}" >{{ $reply->author->initials() }}</span>
             @endif
         </a>
     </div>
@@ -19,7 +22,7 @@
             <span>
                 <i class="fa fa-user"></i>
                 {{ __('by') }}
-                {{ $reply->author->name }}
+                {{ $reply->author->getName() }}
             </span>
         </div>
 
