@@ -10,7 +10,7 @@
             @foreach ($counters as $counter=>$count)
                 <div class="admin-counter">
                     <h3>{{ $count }}</h3>
-                    <span>{{ $counter }}</span>
+                    <span>{{ ucfirst(__($counter)) }}</span>
                 </div>
             @endforeach
         </div>
