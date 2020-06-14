@@ -124,12 +124,6 @@ main {
     }
 }
 
-#toggler {
-    i {
-        color: $gray-400;
-    }
-}
-
 .stats {
     button {
         @media (max-width: 576px) {

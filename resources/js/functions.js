@@ -35,7 +35,6 @@ export function createSideMenu() {
     overlay.id = 'side-menu-overlay';
     sideMenu.id = 'side-menu';
     overlay.classList.add('d-none');
-    sideMenu.classList.add('d-none');
 
     document.body.insertAdjacentElement('afterbegin', sideMenu);
     document.body.insertAdjacentElement('afterbegin', overlay);
@@ -111,3 +110,11 @@ export function isMobile() {
 
     return check;
 };
+
+export function resetAdminFormCreate(form) {
+    form.id.value = '-1';
+    if ('object' === typeof(form.name)) form.name.value = '';
+    if ('object' === typeof(form.description)) form.description.value = '';
+    if ('object' === typeof(form.title)) form.title.value = '';
+    if ('object' === typeof(form.text)) form.text.value = '';
+}

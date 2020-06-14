@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Page;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PagesController extends Controller
 {
@@ -67,17 +68,17 @@ class PagesController extends Controller
      * @param  \App\Page  $page
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Page $page)
+    public function update(Request $request)
     {
+        // Get type model
+        $page = Page::where('id', request('id'))->firstOrNew();
+
         // Validate user input
         request()->validate([
             'id' => 'required|integer',
-            'title' => 'required|string|unique:types,name|min:3|max:40',
+            'title' => ['required', 'string', Rule::unique('App\Page')->ignore($page), 'min:3', 'max:40'],
             'text' => 'required|string|min:100',
         ]);
-
-        // Get type model
-        $page = Page::where('id', request('id'))->firstOrNew();
 
         // Update accordingly
         $page->title = request('title');

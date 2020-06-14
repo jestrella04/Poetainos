@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Type;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TypesController extends Controller
 {
@@ -69,23 +70,23 @@ class TypesController extends Controller
      */
     public function update(Request $request)
     {
-        // Validate user input
-        request()->validate([
-            'id' => 'required|integer',
-            'title' => 'required|string|unique:types,name|min:3|max:40',
-            'description' => 'required|string|min:3|max:255',
-        ]);
-
         // Get type model
         $type = Type::where('id', request('id'))->firstOrNew();
 
+        // Validate user input
+        request()->validate([
+            'id' => 'required|integer',
+            'name' => ['required', 'string', Rule::unique('App\Type')->ignore($type), 'min:3', 'max:40'],
+            'description' => 'required|string|min:3|max:255',
+        ]);
+
         // Update accordingly
-        $type->name = request('title');
+        $type->name = request('name');
         $type->description = request('description');
 
         if (! $type->exists) {
             $action = 'create';
-            $type->slug = slugify($type->getTable(), request('title'));
+            $type->slug = slugify($type->getTable(), request('name'));
         }
 
         $type->save();

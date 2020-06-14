@@ -4,9 +4,11 @@
             <img src="{{ mix('/static/images/logo-32.png') }}" width="32" height="32" alt="logo">
         </a>
 
-        <button id="toggler" class="navbar-toggler" type="button" data-target="#header-navbar" aria-label="Toggle navigation">
-            <i class="fa fa-bars"></i>
-        </button>
+        <div class="toggler-wrapper">
+            <label id="toggler" class="navbar-toggler" data-source="#header-navbar">
+                <i class="fa fa-bars"></i>
+            </label>
+        </div>
 
         <div id="header-navbar" class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">

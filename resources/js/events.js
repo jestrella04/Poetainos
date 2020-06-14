@@ -10,10 +10,43 @@ document.addEventListener('DOMContentLoaded', () => {
     fx.createSideMenu();
 
     // Hide Whatsapp sharer on Desktop
-    if (!fx.isMobile()) {
+    if (! fx.isMobile()) {
         document.querySelectorAll('.whatsapp-link').forEach(function (link) {
             link.classList.add('d-none');
         })
+    }
+
+    // Working with admin modal forms
+    let modalForm = document.querySelector('.form-wrapper');
+
+    if (null !== modalForm && modalForm.classList.contains('modal')) {
+        let targetForm = modalForm.querySelector('form');
+
+        // Focus the first form element with autofocus attribute
+        modalForm.addEventListener('shown.bs.modal', function () {
+            let autofocus = modalForm.querySelector("[autofocus]");
+
+            if (null !== focus) {
+                autofocus.focus();
+            }
+        });
+
+        // Do some cleaning when the modal is closed
+        modalForm.addEventListener('hidden.bs.modal', function () {
+            // Hide alerts
+            modalForm.querySelectorAll('.alert').forEach(function(alert) {
+                alert.classList.add('d-none');
+            });
+
+            // Reset form to default empty values
+            fx.resetAdminFormCreate(targetForm);
+
+            // Hide all the error helpers
+            targetForm.querySelectorAll('.text-danger').forEach(function (helper) {
+                helper.innerHTML = '';
+                helper.classList.add('d-none');
+            });
+        });
     }
 
     // Listen to the on click event on the page and act accordingly
@@ -21,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let element = event.target;
 
         // Was a button or file chooser clicked?
-        let bubble = element.closest('button, .btn, .avatar-chooser') || false;
+        let bubble = element.closest('a, label, button, .btn, .avatar-chooser') || false;
 
         if (bubble) {
             element = bubble;
@@ -32,25 +65,24 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.header').scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
-        // Display the side menu on small screens
+        // Populate and/or show the side menu
         if (element.hasAttribute('id') && 'toggler' === element.attributes['id'].value) {
-            let targetNav = document.querySelector(element.attributes['data-target'].value);
+            let sourceNav = document.querySelector(element.attributes['data-source'].value);
             let sideNav = document.querySelector('#side-menu');
 
             if ('' == sideNav.innerHTML) {
-                sideNav.innerHTML = targetNav.innerHTML;
+                sideNav.innerHTML = sourceNav.innerHTML;
             }
 
             document.querySelector('#side-menu-overlay').classList.toggle('d-none');
-            sideNav.classList.toggle('d-none');
-            document.body.classList.add('overflow-hidden');
+            sideNav.classList.toggle('show');
+            element.querySelector('i').classList.toggle('fa-times');
+            document.body.classList.toggle('overflow-hidden');
         }
 
         // Hide the side menu when clicking off bounds
         if (element.hasAttribute('id') && 'side-menu-overlay' === element.attributes['id'].value) {
-            document.querySelector('#side-menu').classList.toggle('d-none');
-            document.querySelector('#side-menu-overlay').classList.toggle('d-none');
-            document.body.classList.remove('overflow-hidden');
+            document.querySelector('#toggler').click();
         }
 
         // Dynamically load comments for a writing
@@ -183,6 +215,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=500,left=100,top=100';
                 let sharer = open(url, 'sharer', params);
             }
+        }
+
+        // Admin edit link
+        if (element.classList.contains('admin-edit')) {
+            event.preventDefault();
+
+            let targetModal = document.querySelector(element.attributes['data-target-modal'].value);
+            let targetForm = document.querySelector(element.attributes['data-target-form'].value);
+            let targetData = JSON.parse(element.attributes['data-target-form-data'].value);
+
+            if (element.classList.contains('types-edit') || element.classList.contains('categories-edit')) {
+                targetForm.id.value = targetData.id;
+                targetForm.name.value = targetData.name;
+                targetForm.description.value = targetData.description;
+            }
+
+            if (element.classList.contains('pages-edit')) {
+                targetForm.id.value = targetData.id;
+                targetForm.title.value = targetData.title;
+                targetForm.text.value = targetData.text;
+            }
+
+            new BSN.Modal(targetModal, {
+                'backdrop': 'static'
+            }).show();
         }
     });
 

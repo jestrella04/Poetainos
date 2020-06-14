@@ -50,7 +50,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                    <a href="#" class="admin-edit pages-edit">
+                                    <a href="#"
+                                        class="admin-edit pages-edit"
+                                        data-target-modal="#admin-pages-form-wrapper"
+                                        data-target-form="#admin-pages-form"
+                                        data-target-form-data="{{ $page->toJson() }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 

@@ -111,7 +111,7 @@
 
             <div class="col-sm-10">
                 <textarea
-                    class="form-control"
+                    class="form-control visual-editor"
                     name="text"
                     id="text"
                     rows="15"

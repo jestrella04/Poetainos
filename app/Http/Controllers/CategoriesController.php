@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Writing;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CategoriesController extends Controller
 {
@@ -89,23 +90,23 @@ class CategoriesController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        // Validate user input
-        request()->validate([
-            'id' => 'required|integer',
-            'title' => 'required|string|unique:categories,name|min:3|max:40',
-            'description' => 'required|string|min:3|max:255',
-        ]);
-
         // Get category model
         $category = Category::where('id', request('id'))->firstOrNew();
 
+        // Validate user input
+        request()->validate([
+            'id' => 'required|integer',
+            'name' => ['required', 'string', Rule::unique('App\Category')->ignore($category), 'min:3', 'max:40'],
+            'description' => 'required|string|min:3|max:255',
+        ]);
+
         // Update accordingly
-        $category->name = request('title');
+        $category->name = request('name');
         $category->description = request('description');
 
         if (! $category->exists) {
             $action = 'create';
-            $category->slug = slugify($category->getTable(), request('title'));
+            $category->slug = slugify($category->getTable(), request('name'));
         }
 
         $category->save();

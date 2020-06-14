@@ -31,7 +31,9 @@
         </div>
     </div>
 
-    <button id="back-to-top" class="btn btn-dark btn-sm d-none">
-        <i class="fas fa-chevron-up fa-fw"></i>
-    </button>
+    <div id="back-to-top-wrapper" class="fade-out">
+        <button id="back-to-top" class="btn btn-dark btn-sm">
+            <i class="fas fa-chevron-up fa-fw"></i>
+        </button>
+    </div>
 </footer>

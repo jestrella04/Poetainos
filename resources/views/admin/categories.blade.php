@@ -54,7 +54,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                    <a href="#" class="admin-edit category-edit">
+                                    <a href="#"
+                                        class="admin-edit categories-edit"
+                                        data-target-modal="#admin-categories-form-wrapper"
+                                        data-target-form="#admin-categories-form"
+                                        data-target-form-data="{{ $category->toJson() }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 

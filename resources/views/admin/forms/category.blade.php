@@ -37,20 +37,21 @@
                     </div>
 
                     <div class="form-group row">
-                        <label for="title" class="col-sm-2 col-form-label">{{ __('Title') }}</label>
+                        <label for="title" class="col-sm-2 col-form-label">{{ __('Name') }}</label>
 
                         <div class="col-sm-10">
                             <input
                                 type="text"
-                                name="title"
-                                id="title"
+                                name="name"
+                                id="name"
                                 class="form-control"
                                 value=""
                                 minlength="3"
                                 maxlength="40"
                                 placeholder=""
-                                required>
-                            <small id="title-error" class="text-danger d-none"></small>
+                                required
+                                autofocus>
+                            <small id="name-error" class="text-danger d-none"></small>
                         </div>
                     </div>
 
