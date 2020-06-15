@@ -34,11 +34,11 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-dark btn-block">
+                    <button type="submit" class="btn btn-dark btn-lg btn-block">
                         {{ __('Send recovery link') }}
                     </button>
 
-                    <a href="{{ route('login') }}" class="btn btn-success btn-block">{{ __('Login') }}</a>
+                    <a href="{{ route('login') }}" class="btn btn-success btn-lg btn-block">{{ __('Login') }}</a>
                 </div>
             </form>
         </div>

@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-dark btn-block">
+                    <button type="submit" class="btn btn-dark btn-lg btn-block">
                         {{ __('Confirm Password') }}
                     </button>
 
