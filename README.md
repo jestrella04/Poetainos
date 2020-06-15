@@ -52,7 +52,6 @@
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
-  * [Deployment](#deployment)
 * [Usage](#usage)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
@@ -80,22 +79,41 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-To keep things clear and straight to the point, this instructions assumes you are familiar with Git, Composer, Yarn and Webpack and that you have already installed them on your machine. The installation and update scripts relies on these technologies and will fail if not already installed on your system.
+To keep things clear and straight to the point, this instructions assumes you are familiar with Git, Composer, Yarn and Webpack and that you have already installed them on your machine.
 
 ### Installation
  
-1. Run the installer (will clone repo, run composer and yarn to install all dependencies)
+1. Clone the repo
 
 ```sh
-sh ./install.sh
+git clone https://github.com/jestrella04/Writerhood.git
 ```
 
-### Deployment
+2. Install PHP dependencies
+```sh
+composer install
+```
 
-1. Run the deploy script (will pull changes from repo, run composer and yarn in production mode to install production only dependencies)
+2. Install NPM modules
+```sh
+yarn install
+```
+
+2. Compile assets
+```sh
+yarn run dev
+```
+### Serve the project
+
+There are several ways that you can serve the project so that you can access it via your favorite web browser. After you set your .env file up, you can either...
 
 ```sh
-sh ./deploy.sh
+php artisan serve
+```
+Or, assuming you prefer Laradock, we got you covered. There are a couple of handy `workspace-start` and `workspace-stop` commands declared so that you can call them with Yarn. For example:
+
+```sh
+yarn run workspace-start
 ```
 
 <!-- USAGE EXAMPLES -->
