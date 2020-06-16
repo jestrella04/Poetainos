@@ -1,5 +1,7 @@
 <div class="block">
-    <h6 class="block-title">{{ __('Search') }}</h6>
+    <div class="block-title">
+        {{ __('Search') }}
+    </div>
 
     <div class="block-body">
         <div class="input-group mb-2">

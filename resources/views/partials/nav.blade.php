@@ -42,7 +42,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item {{ Route::current()->getName() === 'writings.create' ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('writings.create') }}">
                         <i class="fas fa-pen-nib fa-fw"></i>
                         {{ __('Publish') }}

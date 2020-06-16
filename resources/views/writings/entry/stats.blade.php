@@ -130,7 +130,7 @@
                 data-placement="top"
                 aria-haspopup="true"
                 aria-expanded="false">
-                <i class="fas fa-ellipsis-v fa-fw"></i>
+                <i class="fas fa-cog fa-fw"></i>
             </button>
 
             <div class="dropdown-menu" aria-labelledby="dropdown-owner">

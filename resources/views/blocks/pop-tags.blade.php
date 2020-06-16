@@ -1,5 +1,7 @@
 <div class="block">
-    <h6 class="block-title">{{ __('Popular Tags') }}</h6>
+    <div class="block-title">
+        {{ __('Popular Tags') }}
+    </div>
 
     <div class="block-body">
         @forelse (App\Tag::popular(20) as $tag)

@@ -129,7 +129,7 @@
     "Please confirm your password before continuing.": "Por favor confirma tu contraseña antes de continuar.",
     "Enter your password": "Introduce tu contraseña",
     "Forgot Your Password?": "¿Olvidaste tu contraseña?",
-    "Reset Password": "Restarurar Contraseña",
+    "Reset Password": "Restaurar Contraseña",
     "You are almost done": "Estás casi listo",
     "Please set your new password": "Por favor establece tu nueva contraseña",
     "Confirm your password": "Confirma tu contraseña",
@@ -137,7 +137,7 @@
     "So you forgot your password": "Así que olvidaste tu contraseña",
     "No problem, let's reset it": "No hay problema, vamos a restaurarla",
     "Enter your email address": "Introduce tu correo",
-    "Send recovery link": "Enviar enlace de recuperación",
+    "Reset password": "Restaurar contraseña",
     "Create Account": "Crear Cuenta",
     "Join the hood": "Únete a la cofradía",
     "Creating an account is fast and easy": "Crear una cuenta es fácil y rápido",
@@ -156,5 +156,9 @@
     "Request another": "Solicita otro",
     "Already confirmed? Continue to the homepage": "¿Ya lo confirmaste? Continúa a la portada",
     "Reply": "Responder",
-    "Post Reply": "Enviar Respuesta"
+    "Post Reply": "Enviar Respuesta",
+    "Follow us on Twitter": "Síguenos en Twitter",
+    "Join us on Facebook": "Únetenos en Facebook",
+    "Follow us on Instagram": "Síguenos en Instagram",
+    "Join us on Youtube": "Únetenos en Youtube"
 }

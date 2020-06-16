@@ -10,7 +10,8 @@
     <div id="writings-main-content" class="main-content">
         @if (isset($params['section']) && 'shelf' === $params['section'] && isset($params['author']))
             @include('users.profile.banner')
-            <p class="lead text-muted text-center">
+
+            <p class="lead text-muted subtitle">
                 @if (auth()->check() && auth()->user()->is($params['author']))
                     {{ __('My shelf') }}
                 @else

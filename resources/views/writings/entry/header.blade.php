@@ -15,7 +15,7 @@
 
         <div class="flex-fill">
             <div class="d-flex flex-column">
-                <h6 class="writing-meta">
+                <div class="writing-meta">
                     <small class="mr-2">
                         <i class="fas fa-calendar fa-fw"></i>
                         {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
@@ -26,7 +26,7 @@
                         {{ __('by') }}
                         {{ $writing->author->getName() }}
                     </small>
-                </h6>
+                </div>
 
                 <h3 class="writing-title">
                     @if ( $params['single_entry'] ?? false )

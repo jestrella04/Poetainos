@@ -1,5 +1,7 @@
 <div class="block">
-    <h6 class="block-title">{{ __('Featured Authors') }}</h6>
+    <div class="block-title">
+        {{ __('Featured Authors') }}
+    </div>
 
     <div class="block-body">
         @forelse (App\User::featured(20) as $author)

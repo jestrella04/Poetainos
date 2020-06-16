@@ -35,6 +35,7 @@ nav {
 
         a,
         button {
+            text-transform: capitalize !important;
             color: $white;
             padding: 1rem;
         }
@@ -103,6 +104,7 @@ nav {
             font-weight: 700;
         }
 
+        .nav-link:active,
         .nav-link:hover {
             background-color: rgba($indigo, 0.7);
 
@@ -118,18 +120,17 @@ nav {
         .dropdown-menu {
             a.dropdown-item,
             button {
+                text-transform: capitalize !important;
                 font-weight: 400;
                 color: $gray-700;
             }
 
             a:hover.dropdown-item,
-            button:hover {
-                font-weight: 400;
-                color: $gray-900;
-            }
-
+            a:active.dropdown-item,
             button:hover,
             button:active {
+                font-weight: 400;
+                color: $gray-900;
                 background-color: transparent;
             }
         }

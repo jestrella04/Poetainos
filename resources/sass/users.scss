@@ -14,15 +14,6 @@
     font-size: 38px;
     line-height: 96px;
     overflow: hidden;
-
-    /* @media (max-width: 576px) {
-        width: 64px;
-        height: 64px;
-        max-width: 64px;
-        max-height: 64px;
-        font-size: 25px;
-        line-height: 64px;
-    } */
 }
 
 .avatar-chooser {
@@ -67,6 +58,10 @@
 
             p {
                 margin-bottom: 0;
+            }
+
+            .user-name {
+                font-weight: 700;
             }
         }
     }
@@ -132,6 +127,12 @@ hr.banner {
 
     .profile-header {
         margin-bottom: 1rem;
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+        }
 
         .profile-bio {
             width: 100%;

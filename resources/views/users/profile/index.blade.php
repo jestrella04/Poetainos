@@ -6,7 +6,9 @@
             <span class="avatar" title="{{ $user->getName() }}">{{ $user->initials() }}</span>
         @endif
 
-        <h4 class="align-self-center">{{ $user->getName() }}</h4>
+        <div class="user-name align-self-center">
+            {{ $user->getName() }}
+        </div>
 
         @if (! empty($user->extra_info['bio']))
             <div class="profile-bio">{{ $user->extra_info['bio'] }}</div>

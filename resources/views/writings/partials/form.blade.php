@@ -46,7 +46,7 @@
         </div>
 
         <div class="form-group row">
-            <label for="title" class="col-sm-2 col-form-label">{{ __('Title') }}</label>
+            <label for="title" class="col-sm-2 col-form-label">{{ __('Title') }}:</label>
 
             <div class="col-sm-10">
                 <input
@@ -66,7 +66,7 @@
 
         @if ($types->count() > 0)
             <div class="form-group row">
-                <label for="type" class="col-sm-2 col-form-label">{{ __('Type') }}</label>
+                <label for="type" class="col-sm-2 col-form-label">{{ __('Type') }}:</label>
 
                 <div class="col-sm-10">
                     <select
@@ -87,7 +87,7 @@
 
         @if ($categories->count() > 0)
             <div class="form-group row">
-                <label for="category" class="col-sm-2 col-form-label">{{ __('Category') }}</label>
+                <label for="category" class="col-sm-2 col-form-label">{{ __('Category') }}:</label>
 
                 <div class="col-sm-10">
                     <select
@@ -107,7 +107,7 @@
         @endif
 
         <div class="form-group row">
-            <label for="text" class="col-sm-2 col-form-label">{{ __('Text') }}</label>
+            <label for="text" class="col-sm-2 col-form-label">{{ __('Text') }}:</label>
 
             <div class="col-sm-10">
                 <textarea
@@ -123,7 +123,7 @@
         </div>
 
         <div class="form-group row">
-            <label for="tags" class="col-sm-2 col-form-label">{{ __('Tags') }}</label>
+            <label for="tags" class="col-sm-2 col-form-label">{{ __('Tags') }}:</label>
 
             <div class="col-sm-10">
                 <input
@@ -140,7 +140,7 @@
         </div>
 
         <div class="form-group row">
-            <label for="link" class="col-sm-2 col-form-label">{{ __('Link') }}</label>
+            <label for="link" class="col-sm-2 col-form-label">{{ __('Link') }}:</label>
 
             <div class="col-sm-10">
                 <input
@@ -157,7 +157,7 @@
         </div>
 
         <div class="form-group row">
-            <label for="cover" class="col-sm-2 col-form-label">{{ __('Cover') }}</label>
+            <label for="cover" class="col-sm-2 col-form-label">{{ __('Cover') }}:</label>
 
             <div class="col-sm-10">
                 <input
