@@ -102,6 +102,8 @@
     }
 
     .btn-read-more {
+        text-transform: capitalize;
+
         @media (max-width: 768px) {
             margin-bottom: 1rem;
         }

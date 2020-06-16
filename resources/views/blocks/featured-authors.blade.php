@@ -6,14 +6,10 @@
     <div class="block-body">
         @forelse (App\User::featured(20) as $author)
         <div class="d-inline-flex d-lg-block author-link">
-            <a href="{{ $author->path() }}">
+            <a href="{{ $author->path() }}" title="{{ __('View profile') }}" data-toggle="tooltip">
                 <div class="d-inline-flex">
                     <div>
-                        @if (! empty($author->avatarPath()))
-                            <img class="avatar" src="{{ $author->avatarPath() }}" title="{{ $author->getName() }}" alt="" loading="lazy">
-                        @else
-                            <span class="avatar" title="{{ $author->getName() }}">{{ $author->initials() }}</span>
-                        @endif
+                        {!! getUserAvatar($author) !!}
                     </div>
 
                     <div>

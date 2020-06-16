@@ -1,14 +1,7 @@
 <div class="comment d-flex justify-content-center">
     <div class="comment-author">
-        <a href="{{ $comment->author->path() }}"
-            title="{{ __('View profile') }}"
-            data-toggle="tooltip"
-            data-placement="top">
-            @if (! empty($comment->author->avatarPath()))
-                <img class="avatar" src="{{ $comment->author->avatarPath() }}" alt="" loading="lazy">
-            @else
-                <span class="avatar">{{ $comment->author->initials() }}</span>
-            @endif
+        <a href="{{ $comment->author->path() }}" title="{{ __('View profile') }}" data-toggle="tooltip">
+            {!! getUserAvatar($comment->author) !!}
         </a>
     </div>
 

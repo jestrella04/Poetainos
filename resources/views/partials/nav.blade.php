@@ -5,7 +5,7 @@
         </a>
 
         <div class="toggler-wrapper">
-            <label id="toggler" class="navbar-toggler" data-source="#header-navbar">
+            <label id="toggler" class="navbar-toggler" data-source="#header-navbar" aria-label="{{ __('Toggle sidebar') }}">
                 <i class="fa fa-bars"></i>
             </label>
         </div>
@@ -59,11 +59,7 @@
                 @auth
                     <li class="nav-item dropdown d-none d-lg-block">
                         <a class="nav-link" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @if (! empty(auth()->user()->avatarPath()))
-                                <img class="avatar" src="{{ auth()->user()->avatarPath() }}" title="{{ auth()->user()->getName() }}" alt="" loading="lazy">
-                            @else
-                                <span class="avatar" title="{{ auth()->user()->getName() }}">{{ auth()->user()->initials() }}</span>
-                            @endif
+                            {!! getUserAvatar(auth()->user()) !!}
 
                             {{ __('Hi') }} {{ auth()->user()->firstName() }}
                         </a>

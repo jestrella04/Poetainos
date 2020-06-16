@@ -1,10 +1,6 @@
 <div class="user-profile">
     <div class="profile-header text-center">
-        @if (! empty($user->avatarPath()))
-            <img class="avatar" src="{{ $user->avatarPath() }}" title="{{ $user->getName() }}" alt="" loading="lazy">
-        @else
-            <span class="avatar" title="{{ $user->getName() }}">{{ $user->initials() }}</span>
-        @endif
+        {!! getUserAvatar($user) !!}
 
         <div class="user-name align-self-center">
             {{ $user->getName() }}

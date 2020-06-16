@@ -4,7 +4,7 @@
 
         <div class="header-mini-main d-flex flex-column">
             <div class="header-welcome">
-                <h2>{{ getSiteConfig('name') }}</h2>
+                <h1>{{ getSiteConfig('name') }}</h1>
             </div>
 
             <div class="flex-shrink-0">

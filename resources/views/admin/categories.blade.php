@@ -7,14 +7,16 @@
 
             <div class="d-flex flex-nowrap">
                 <div class="filter-box flex-grow-1">
-                    <input type="text"
+                    <input
+                        type="text"
                         class="filter-box-input form-control"
                         data-target=".filter-table"
                         placeholder="{{ __('Filter by') }}...">
                 </div>
 
                 <div class="buttons">
-                    <button id="btn-create-category"
+                    <button
+                        id="btn-create-category"
                         class="btn btn-primary btn-create"
                         type="button"
                         title="{{ __('Create new category') }}"

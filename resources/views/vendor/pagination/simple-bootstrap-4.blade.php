@@ -7,7 +7,8 @@
                     <a class="btn btn-dark disabled"
                         title="{{ __('Previous') }}"
                         data-toggle="tooltip"
-                        data-placement="top">
+                        data-placement="top"
+                        aria-label="{{ __('Previous') }}">
                         <i class="fa fa-chevron-left fa-fw"></i>
                     </a>
                 @else
@@ -15,7 +16,8 @@
                         href="{{ $paginator->previousPageUrl() }}"
                         title="{{ __('Previous') }}"
                         data-toggle="tooltip"
-                        data-placement="top">
+                        data-placement="top"
+                        aria-label="{{ __('Previous') }}">
                         <i class="fa fa-chevron-left fa-fw"></i>
                     </a>
                 @endif
@@ -30,7 +32,8 @@
                         href="{{ $paginator->nextPageUrl() }}"
                         title="{{ __('Next') }}"
                         data-toggle="tooltip"
-                        data-placement="top">
+                        data-placement="top"
+                        aria-label="{{ __('Next') }}">
                         <i class="fa fa-chevron-right fa-fw"></i>
                     </a>
                 @else
@@ -38,7 +41,8 @@
                         href="{{ $paginator->nextPageUrl() }}"
                         title="{{ __('Next') }}"
                         data-toggle="tooltip"
-                        data-placement="top">
+                        data-placement="top"
+                        aria-label="{{ __('Next') }}">
                         <i class="fa fa-chevron-right fa-fw"></i>
                     </a>
                 @endif

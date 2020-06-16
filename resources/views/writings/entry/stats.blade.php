@@ -10,7 +10,7 @@
 
 <div class="stats writing-stats">
     <button
-    class="btn btn-sm btn-counter @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
+        class="btn btn-sm btn-counter @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
         @if (auth()->check() && $voted > 0)
         title="{{ __('Liked it') }}"
         @elseif (auth()->check() && null === $voted)
@@ -20,11 +20,11 @@
         @endif
         @if (auth()->check() && empty($vote))
         data-target="{{ route('votes.store') }}"
-        data-toggle="tooltip"
-        data-placement="top"
         data-id="{{ $writing->id }}"
         data-value="1"
-        @endif>
+        @endif
+        data-toggle="tooltip"
+        data-placement="top">
         <i class="fa fa-heart fa-fw"></i>
         <span class="counter">{{ $count['likes'] }}</span>
     </button>
@@ -76,9 +76,9 @@
         @if (auth()->check())
         data-target="{{ route('shelves.store') }}"
         data-id="{{ $writing->id }}"
+        @endif
         data-toggle="tooltip"
-        data-placement="top"
-        @endif>
+        data-placement="top">
         <i class="fa fa-book-reader fa-fw"></i>
         <span class="counter">{{ $count['shelf'] }}</span>
     </button>

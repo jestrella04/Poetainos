@@ -2,6 +2,7 @@
 
 use App\Comment;
 use App\Reply;
+use App\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -108,4 +109,12 @@ function getUserCounter($user) {
         'extendedHood' => ReadableHumanNumber($user->fellowHood($count = true)),
         'aura' => number_format($user->aura, 2),
     ];
+}
+
+function getUserAvatar(User $user) {
+    if (! empty($user->avatarPath())) {
+        return '<img class="avatar" src="'. e($user->avatarPath()) .'" alt="'. e($user->getName()) .'" loading="lazy">' . PHP_EOL;
+    } else {
+        return '<span class="avatar" title="'. e($user->getName()) .'">'. e($user->initials()) .'</span>' . PHP_EOL;
+    }
 }

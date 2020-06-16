@@ -44,7 +44,13 @@
     </div>
 
     <div id="back-to-top-wrapper" class="fade-out">
-        <button id="back-to-top" class="btn btn-dark btn-sm">
+        <button
+            id="back-to-top"
+            class="btn btn-dark btn-sm"
+            title="{{ __('Back to top') }}"
+            data-toggle="tooltip"
+            data-placement="left"
+            aria-label="{{ __('Back to top') }}">
             <i class="fas fa-chevron-up fa-fw"></i>
         </button>
     </div>
