@@ -79,17 +79,19 @@ nav {
     }
 
     #toggler {
-        position: absolute;
-        right: 1rem;
-        top: 1rem;
-        transition: all 0.3s;
+        position: relative;
+        transition: all 0.5s;
         box-sizing: border-box;
-        cursor: pointer;
         z-index: 9999;
+        background-color: transparent;
 
         i {
             color: $light;
         }
+    }
+
+    #toggler.rotate {
+        transform: rotate(180deg);
     }
 
     .navbar-nav {

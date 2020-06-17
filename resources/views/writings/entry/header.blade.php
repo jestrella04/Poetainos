@@ -1,7 +1,7 @@
 <div class="writing-heading">
     <div class="d-flex flex-column flex-md-row justify-content-center">
         <div class="writing-author align-self-center">
-            <a href="{{ $writing->author->path() }}" title="{{ __('View profile') }}" data-toggle="tooltip">
+            <a href="{{ $writing->author->path() }}">
                 {!! getUserAvatar($writing->author) !!}
             </a>
         </div>

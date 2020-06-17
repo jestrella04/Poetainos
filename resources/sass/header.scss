@@ -14,6 +14,8 @@
     max-height: 600px;
 
     h1 {
+        color: $light;
+
         @media (min-width: 768px) {
             font-size: 4rem;
             margin-bottom: 1.5rem;
@@ -43,10 +45,6 @@
         text-align: center;
         text-shadow: 2px 2px $gray-700;
         padding: 0 0.5rem;
-
-        h1, h2 {
-            color: $light;
-        }
     }
 }
 

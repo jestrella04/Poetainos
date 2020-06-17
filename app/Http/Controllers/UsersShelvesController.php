@@ -15,6 +15,9 @@ class UsersShelvesController extends Controller
             'section' => 'shelf',
             'title' => __('Shelf') . ' - ' . $user->getName(),
             'author' => $user,
+            'empty-head' => __('This shelf is empty'),
+            'empty-msg' => __('We\'re afraid that :name has not added any writings to the shelf yet.', ['name' => $user->firstName()]),
+            'empty-icon' => 'user-clock'
         ];
 
         if ('latest' === $sort) {

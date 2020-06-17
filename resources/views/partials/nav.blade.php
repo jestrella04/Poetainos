@@ -5,9 +5,9 @@
         </a>
 
         <div class="toggler-wrapper">
-            <label id="toggler" class="navbar-toggler" data-source="#header-navbar" aria-label="{{ __('Toggle sidebar') }}">
+            <button id="toggler" class="navbar-toggler" data-source="#header-navbar" aria-label="{{ __('Toggle sidebar') }}">
                 <i class="fa fa-bars"></i>
-            </label>
+            </button>
         </div>
 
         <div id="header-navbar" class="collapse navbar-collapse">

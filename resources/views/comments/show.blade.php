@@ -1,6 +1,6 @@
 <div class="comment d-flex justify-content-center">
     <div class="comment-author">
-        <a href="{{ $comment->author->path() }}" title="{{ __('View profile') }}" data-toggle="tooltip">
+        <a href="{{ $comment->author->path() }}">
             {!! getUserAvatar($comment->author) !!}
         </a>
     </div>

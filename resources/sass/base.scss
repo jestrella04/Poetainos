@@ -37,7 +37,7 @@ hr {
     margin-right: auto;
 }
 
-main {
+.main-wrapper {
     padding-top: 3rem;
 }
 
@@ -80,11 +80,14 @@ main {
 .empty {
     width: 100%;
     max-width: 25rem;
-    margin: 4rem 0;
+    margin: 4rem auto;
     text-align: center;
 
-    h4 {
-        margin-bottom: 2rem;
+    .title {
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-transform: uppercase;
     }
 
     .empty-icon {

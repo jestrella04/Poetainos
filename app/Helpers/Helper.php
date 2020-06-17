@@ -115,6 +115,6 @@ function getUserAvatar(User $user) {
     if (! empty($user->avatarPath())) {
         return '<img class="avatar" src="'. e($user->avatarPath()) .'" alt="'. e($user->getName()) .'" loading="lazy">' . PHP_EOL;
     } else {
-        return '<span class="avatar" title="'. e($user->getName()) .'">'. e($user->initials()) .'</span>' . PHP_EOL;
+        return '<span class="avatar">'. e($user->initials()) .'</span>' . PHP_EOL;
     }
 }

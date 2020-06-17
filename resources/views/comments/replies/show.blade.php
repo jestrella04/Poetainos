@@ -1,6 +1,6 @@
 <div class="reply d-flex justify-content-center">
     <div class="reply-author">
-        <a href="{{ $reply->author->path() }}" title="{{ __('View profile') }}" data-toggle="tooltip">
+        <a href="{{ $reply->author->path() }}">
             {!! getUserAvatar($reply->author) !!}
         </a>
     </div>

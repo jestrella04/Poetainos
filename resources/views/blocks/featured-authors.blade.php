@@ -6,7 +6,7 @@
     <div class="block-body">
         @forelse (App\User::featured(20) as $author)
         <div class="d-inline-flex d-lg-block author-link">
-            <a href="{{ $author->path() }}" title="{{ __('View profile') }}" data-toggle="tooltip">
+            <a href="{{ $author->path() }}">
                 <div class="d-inline-flex">
                     <div>
                         {!! getUserAvatar($author) !!}

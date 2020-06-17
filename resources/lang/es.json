@@ -16,7 +16,7 @@
     "Comments": "Comentarios",
     "Load older comments": "Cargar antiguos comentarios",
     "Loading comments": "Cargando comentarios",
-    "Do you like this writing?": "Te gusta este texto?",
+    "Do you like this writing?": "¿Te gusta este texto?",
     "Be the first to leave a comment.": "Se el primero en dejar un comentario.",
     "View profile": "Ver perfil",
     "by": "por",
@@ -160,5 +160,10 @@
     "Follow us on Twitter": "Síguenos en Twitter",
     "Join us on Facebook": "Únetenos en Facebook",
     "Follow us on Instagram": "Síguenos en Instagram",
-    "Join us on Youtube": "Únetenos en Youtube"
+    "Join us on Youtube": "Únetenos en Youtube",
+    "This shelf is empty": "Este estante está vacío",
+    "We're afraid that :name has not added any writings to the shelf yet.": "Creemos que :name todavía no ha agregago un texto a su estante.",
+    "So sorry to tell you that :name has not yet published a writing.": "Lamentamos informarte que :name todavía no ha publicado un texto.",
+    "Where did the muses go?": "¿Adónde se fueron las musas?",
+    "Back to top": "Regresar arriba"
 }

@@ -25,5 +25,7 @@
         "sass-loader": "^8.0.0",
         "vue-template-compiler": "^2.6.11"
     },
-    "dependencies": {}
+    "dependencies": {
+        "micromodal": "^0.4.6"
+    }
 }

@@ -1,5 +1,6 @@
 import * as fx from './functions';
 import BSN from "bootstrap.native";
+import MicroModal from "micromodal";
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
@@ -77,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#side-menu-overlay').classList.toggle('d-none');
             sideNav.classList.toggle('show');
             element.querySelector('i').classList.toggle('fa-times');
+            element.classList.toggle('rotate');
             document.body.classList.toggle('overflow-hidden');
         }
 

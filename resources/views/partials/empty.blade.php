@@ -1,7 +1,7 @@
 <div class="empty">
-    <h4 class="text-muted">
+    <div class="title text-muted">
         @yield('empty-head', __('Nothing to display here'))
-    </h4>
+    </div>
 
     <p class="text-muted">
         @yield('empty-msg', __('Come back soon, new content is added frequently'))
