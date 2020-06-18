@@ -30,6 +30,7 @@
         </div>
 
         @include('admin.forms.category')
+        @include('partials.delete-modal')
 
         @if ($categories->count() > 0)
             <div class="table-responsive">
@@ -64,7 +65,9 @@
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="#" class="admin-delete category-delete">
+                                    <a href="#delete-modal"
+                                        class="admin-delete category-delete"
+                                        data-target="{{ route('admin.categories.destroy', $category) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

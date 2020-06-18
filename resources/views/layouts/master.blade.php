@@ -31,6 +31,7 @@
 
     <body class="d-flex flex-column overflow-hidden">
         @include('partials.noscript')
+        @include('partials.toast')
 
         @yield('header')
 

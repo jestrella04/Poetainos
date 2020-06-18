@@ -135,7 +135,7 @@
 
             <div class="dropdown-menu" aria-labelledby="dropdown-owner">
                 @can('update', $writing)
-                    <a class="dropdown-item" href="{{ route('writings.update', $writing) }}">{{ __('Edit') }}</a>
+                    <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">{{ __('Edit') }}</a>
                 @endcan
 
                 @can('delete', $writing)

@@ -14,7 +14,7 @@
                 <p class="text-muted">{{ __('Please set your new password') }}</p>
             </div>
 
-            <form method="POST" action="{{ route('password.update') }}">
+            <form method="POST" action="{{ route('password.edit') }}">
                 @csrf
 
                 <input type="hidden" name="token" value="{{ $token }}">

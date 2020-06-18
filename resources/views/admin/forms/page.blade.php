@@ -10,7 +10,7 @@
             </div>
 
             <div class="modal-body">
-                <form id="admin-pages-form" action="{{ route('admin.pages.update') }}" method="POST">
+                <form id="admin-pages-form" action="{{ route('admin.pages.edit') }}" method="POST">
                     @csrf
                     @method('put')
 

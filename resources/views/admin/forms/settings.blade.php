@@ -1,4 +1,4 @@
-<form id="admin-settings-form" action="{{ route('admin.settings.update') }}" method="POST">
+<form id="admin-settings-form" action="{{ route('admin.settings.edit') }}" method="POST">
     @csrf
     @method('put')
 

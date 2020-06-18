@@ -8,7 +8,7 @@
     </h3>
 
     @if ($writing->exists)
-        @php $update = route('writings.update', $writing) @endphp
+        @php $update = route('writings.edit', $writing) @endphp
     @endif
 
     <form id="writing-form" action="{{ $update ?? route('writings.store') }}" method="post">

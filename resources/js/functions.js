@@ -118,3 +118,8 @@ export function resetAdminFormCreate(form) {
     if ('object' === typeof(form.title)) form.title.value = '';
     if ('object' === typeof(form.text)) form.text.value = '';
 }
+
+export function showToast(toast, toastInit, unhide) {
+    toast.querySelector(unhide).classList.remove('d-none');
+    toastInit.show();
+}

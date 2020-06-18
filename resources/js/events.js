@@ -1,6 +1,5 @@
 import * as fx from './functions';
 import BSN from "bootstrap.native";
-import MicroModal from "micromodal";
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
@@ -49,6 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // Initialize toast
+    let toast = document.querySelector('#main-toast');
+    let toastInit = new BSN.Toast('#main-toast', {
+        'delay': 10000
+    });
+
+    toast.addEventListener('hidden.bs.toast', function(event){
+        toast.querySelectorAll('.toast-body span')
+        .forEach(function(span) {
+            span.classList.add('d-none');
+        });
+    }, false);
 
     // Listen to the on click event on the page and act accordingly
     document.addEventListener('click', function (event) {
@@ -242,6 +254,38 @@ document.addEventListener('DOMContentLoaded', () => {
             new BSN.Modal(targetModal, {
                 'backdrop': 'static'
             }).show();
+        }
+
+        // Deleting a record (confirmation prompt)
+        if (element.classList.contains('admin-delete')) {
+            let targetModal = element.attributes['href'].value;
+            let btnDelete = document.querySelector('#btn-modal-delete');
+
+            btnDelete.attributes['data-delete-url'].value = element.attributes['data-target'].value;
+
+            new BSN.Modal(targetModal, {
+                'backdrop': 'static'
+            }).show();
+        }
+
+        // Deleting a record
+        if (element.hasAttribute('id') && 'btn-modal-delete') {
+            let url = element.attributes['data-delete-url'].value;
+            let params = new FormData();
+
+            params.append('_method', 'delete');
+
+            // Post the form to the server
+            axios.post(url, params)
+                .then(function (response) {
+                    fx.showToast(toast, toastInit, '.delete-success');
+                })
+                .catch(function (error) {
+                    fx.showToast(toast, toastInit, '.save-error');
+                })
+                .then(function () {
+                    //
+                });
         }
     });
 

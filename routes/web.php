@@ -27,11 +27,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('pages', 'AdminController@pages')->name('pages');
     Route::get('users', 'AdminController@users')->name('users');
 
-    Route::put('settings/update', 'SettingsController@update')->name('settings.update');
-    Route::put('types/update', 'TypesController@update')->name('types.update');
-    Route::put('categories/update', 'CategoriesController@update')->name('categories.update');
-    Route::put('tags/update', 'TagsController@update')->name('tags.update');
-    Route::put('pages/update', 'PagesController@update')->name('pages.update');
+    Route::put('settings/edit', 'SettingsController@update')->name('settings.edit');
+    Route::put('types/edit', 'TypesController@update')->name('types.edit');
+    Route::put('categories/edit', 'CategoriesController@update')->name('categories.edit');
+    Route::put('tags/edit', 'TagsController@update')->name('tags.edit');
+    Route::put('pages/edit', 'PagesController@update')->name('pages.edit');
+
+    Route::delete('types/delete/{type}', 'TypesController@destroy')->name('types.destroy');
+    Route::delete('categories/delete/{category}', 'CategoriesController@destroy')->name('categories.destroy');
+    Route::delete('tags/delete/{tag}', 'TagsController@destroy')->name('tags.destroy');
+    Route::delete('pages/delete/{page}', 'PagesController@destroy')->name('pages.destroy');
 });
 
 /* Non public routes */
@@ -40,12 +45,12 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/writings/create', 'WritingsController@create')->name('writings.create');
     Route::post('/writings/create', 'WritingsController@store')->name('writings.store');
     Route::get('/writings/edit/{writing}', 'WritingsController@edit')->name('writings.edit');
-    Route::put('/writings/edit/{writing}', 'WritingsController@update')->name('writings.update');
+    Route::put('/writings/edit/{writing}', 'WritingsController@update')->name('writings.edit');
     Route::delete('/writings/delete/{writing}', 'WritingsController@destroy')->name('writings.destroy');
 
     // Users
     Route::get('/users/edit/{user}', 'UsersController@edit')->name('users.edit');
-    Route::put('/users/edit/{user}', 'UsersController@update')->name('users.update');
+    Route::put('/users/edit/{user}', 'UsersController@update')->name('users.edit');
     Route::delete('/users/delete/{user}', 'UsersController@destroy')->name('users.destroy');
 
     // Comments and replies

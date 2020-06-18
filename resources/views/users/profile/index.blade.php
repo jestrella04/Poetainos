@@ -134,7 +134,7 @@
     <div class="profile-footer">
         <div class="actions">
             @can('update', $user)
-                <a href="{{ route('users.update', $user) }}" class="btn btn-dark btn-sm">
+                <a href="{{ route('users.edit', $user) }}" class="btn btn-dark btn-sm">
                     <i class="fas fa-user-edit fa-fw"></i>
                     {{ __('Update profile') }}
                 </a>
