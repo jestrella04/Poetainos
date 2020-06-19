@@ -1,52 +1,71 @@
-.toast {
+.toast-wrapper {
     position: fixed;
+    min-height: 200px;
     top: 3rem;
     right: 3rem;
-    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4);
-    width: 15rem;
-    cursor: pointer;
-    color: $white !important;
-    z-index: 9999;
-    opacity: 1;
+    width: 20rem;
+    max-width: 20rem;
 
-    .toast-header {
-        background-color: transparent;
-        color: $white;
-        border-bottom: 1px solid rgba($light, .05);
+    .toast-group {
+        position: relative;
+        z-index: 9999;
 
-        img {
-            margin-right: 0.5rem;
+        .toast {
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4);
+            color: $white !important;
+
+            .toast-header {
+                background-color: transparent;
+                color: $white;
+                border-bottom: 1px solid rgba($light, .05);
+
+                img {
+                    margin-right: 0.5rem;
+                }
+
+                button {
+                    color: $white;
+                }
+            }
         }
 
-        button {
-            color: $white;
+        .toast.default {
+            background: linear-gradient(180deg, darken($indigo, 20%) 0%, $indigo 100%);
+            border: 1px solid $indigo;
+
+            .toast-header {
+                border-bottom: 1px solid rgba($indigo, .25);
+            }
+
+            a {
+                color: $white;
+            }
         }
-    }
-}
 
-.toast.default {
-    background: linear-gradient(180deg, lighten($indigo, 20%) 0%, $indigo 100%);
-    border: 1px solid $indigo;
+        .toast.success {
+            background: linear-gradient(180deg, darken($success, 20%) 0%, $success 100%);
+            border: 1px solid $success;
 
-    .toast-header {
-        border-bottom: 1px solid rgba($indigo, .25);
-    }
-}
+            .toast-header {
+                border-bottom: 1px solid rgba($success, .25);
+            }
 
-.toast.success {
-    background: linear-gradient(180deg, lighten($success, 20%) 0%, $success 100%);
-    border: 1px solid $success;
+            a {
+                color: $white;
+            }
+        }
 
-    .toast-header {
-        border-bottom: 1px solid rgba($success, .25);
-    }
-}
+        .toast.danger {
+            background: linear-gradient(180deg, darken($danger, 20%) 0%, $danger 100%);
+            border: 1px solid $danger;
 
-.toast.danger {
-    background: linear-gradient(180deg, lighten($danger, 20%) 0%, $danger 100%);
-    border: 1px solid $danger;
+            .toast-header {
+                border-bottom: 1px solid rgba($danger, .25);
+            }
 
-    .toast-header {
-        border-bottom: 1px solid rgba($danger, .25);
+            a {
+                color: $white;
+            }
+        }
     }
 }

@@ -30,6 +30,7 @@ class SocialAuthController extends Controller
     {
         // Get user data from the external service
         $social = Socialite::driver($service)->user();
+        $exists = User::where('email', $social->getEmail())->exists();
 
         // Check if user already exists
         // If not, one will be created
@@ -64,6 +65,15 @@ class SocialAuthController extends Controller
 
         // Redirect user
         Auth::login($user);
+        if ($exists) {
+            $message = __('Welcome back to the hood, we missed you!');
+        } else {
+            $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
+            $message .= __('You have now unleashed full access to the site.');
+            $message .= __('Go ahead and vote, comment, reply, find the muses and publish a writing.');
+        }
+
+        request()->session()->flash('flash', $message);
         return redirect(route('home'));
     }
 }

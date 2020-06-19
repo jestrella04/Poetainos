@@ -1,3 +1,5 @@
+import BSN from "bootstrap.native";
+
 window.loadComments = loadComments;
 
 export function loadComments(url) {
@@ -119,7 +121,20 @@ export function resetAdminFormCreate(form) {
     if ('object' === typeof(form.text)) form.text.value = '';
 }
 
-export function showToast(toast, toastInit, unhide) {
-    toast.querySelector(unhide).classList.remove('d-none');
-    toastInit.show();
+export function showToast(options = {}) {
+    let theme = options.theme || 'default';
+    let selector = options.selector || '.toast.reuse';
+    let message = options.message || '';
+    let toast = new BSN.Toast(selector, {
+        'delay': 10000
+    });
+
+    document.querySelector(selector).classList.remove('success', 'danger');
+    document.querySelector(selector).classList.add(theme);
+
+    if ('' !== message) {
+        document.querySelector(selector + ' .toast-body').innerHTML = message;
+    }
+
+    toast.show();
 }

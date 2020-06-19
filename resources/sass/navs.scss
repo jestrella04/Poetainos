@@ -7,7 +7,7 @@ nav {
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: 9998;
+    z-index: 9997;
     width: 100%;
     background-color: rgba($dark, 0.5);
     cursor: pointer;
@@ -82,7 +82,7 @@ nav {
         position: relative;
         transition: all 0.5s;
         box-sizing: border-box;
-        z-index: 9999;
+        z-index: 9998;
         background-color: transparent;
 
         i {

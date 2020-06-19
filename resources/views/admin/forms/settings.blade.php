@@ -2,26 +2,6 @@
     @csrf
     @method('put')
 
-    <div class="alert alert-success d-none" role="alert">
-        <button type="button" class="close">
-            <span class="alert-link">&times;</span>
-        </button>
-
-        <h6 class="alert-heading">
-            {{ __('Changes saved successfully') }}
-        </h6>
-    </div>
-
-    <div class="alert alert-danger d-none" role="alert">
-        <button type="button" class="close">
-            <span class="danger-link">&times;</span>
-        </button>
-
-        <h6 class="alert-heading">
-            {{ __('It looks like something went wrong') }}
-        </h6>
-    </div>
-
     <div class="form-group">
         <label for="json" class="col-form-label text-primary">
             <small>

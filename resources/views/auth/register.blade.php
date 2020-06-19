@@ -1,6 +1,6 @@
 @extends('layouts.index')
 
-@section('title', __('Create Account'))
+@section('title', __('Create account'))
 
 @section('header')
     @include('partials.header')

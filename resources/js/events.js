@@ -1,5 +1,4 @@
 import * as fx from './functions';
-import BSN from "bootstrap.native";
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,13 +49,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize toast
-    let toast = document.querySelector('#main-toast');
-    let toastInit = new BSN.Toast('#main-toast', {
-        'delay': 10000
-    });
+    let toastFlashSelector = '.toast:not(.reuse)';
+    let toastFlash = document.querySelector(toastFlashSelector);
 
-    toast.addEventListener('hidden.bs.toast', function(event){
-        toast.querySelectorAll('.toast-body span')
+    if (null !== toastFlash) {
+        fx.showToast({
+            'selector': toastFlashSelector
+        });
+    }
+
+    /* document.querySelector('#okok').addEventListener('click', function() {
+        fx.showToast({
+            'message': 'Toast is looking good.'
+        });
+    }); */
+
+    // Reset toast look/info when closed
+    document.querySelector('.toast.reuse').addEventListener('hidden.bs.toast', function(event){
+        // Set default look & feel
+        this.classList.remove('success', 'danger');
+        this.classList.add('default');
+
+        // Hide all messages
+        this.querySelectorAll('.toast-body span')
         .forEach(function(span) {
             span.classList.add('d-none');
         });
@@ -269,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Deleting a record
-        if (element.hasAttribute('id') && 'btn-modal-delete') {
+        if (element.hasAttribute('id') && 'btn-modal-delete' === element.attributes['id'].value) {
             let url = element.attributes['data-delete-url'].value;
             let params = new FormData();
 
@@ -278,10 +293,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Post the form to the server
             axios.post(url, params)
                 .then(function (response) {
-                    fx.showToast(toast, toastInit, '.delete-success');
+                    fx.showToast(toastInit, {
+                        'message': 'msg-delete-success',
+                        'theme': 'success'
+                    });
                 })
                 .catch(function (error) {
-                    fx.showToast(toast, toastInit, '.save-error');
+                    fx.showToast(toastInit, {
+                        'message': 'msg-save-error',
+                        'theme': 'danger'
+                    });
                 })
                 .then(function () {
                     //

@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -71,6 +72,14 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'password_updated_at' => Carbon::now(),
         ]);
+    }
+
+    protected function registered(Request $request, $user)
+    {
+        $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
+        $message .= __('You have now unleashed full access to the site.');
+        $message .= __('Go ahead and vote, comment, reply, find the muses and publish a writing.');
+        $request->session()->flash('flash', $message);
     }
 
     protected function redirectTo() {
