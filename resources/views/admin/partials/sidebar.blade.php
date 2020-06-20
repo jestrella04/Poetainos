@@ -1,74 +1,59 @@
-<aside class="col-lg-2 admin-sidebar">
-    <div class="admin-sidebar-toggle d-block d-lg-none">
-        <a class="btn btn-dark btn-block rounded-0"
-            data-toggle="collapse"
-            href="#admin-sidebar-main"
-            role="button"
-            aria-label="{{ __('Toggle sidebar') }}">
-            <i class="fa fa-chevron-down"></i>
-        </a>
-    </div>
+<aside id="admin-side-menu" class="side-menu">
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}">
+                <i class="fas fa-fw fa-feather-alt"></i>
+                {{ __('Home') }}
+            </a>
+        </li>
 
-    <div id="admin-sidebar-main" class="collapse no-collapse-lg">
-        <ul class="list-unstyled">
-            <li class="brand">
-                <a href="{{ route('home') }}"
-                    class="stretched-link"
-                    title="{{ __('Return to the homepage') }}"
-                    data-toggle="tooltip"
-                    data-placement="right">
-                    <img src="{{ mix('/static/images/logo-32.png') }}" width="32" height="32" alt="logo">
-                </a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.index') }}">
+                <i class="fas fa-fw fa-home"></i>
+                {{ __('Summary') }}
+            </a>
+        </li>
 
-            <li>
-                <a href="{{ route('admin.index') }}" class="stretched-link">
-                    <i class="fas fa-fw fa-home"></i>
-                    {{ __('Summary') }}
-                </a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.settings') }}">
+                <i class="fas fa-fw fa-cogs"></i>
+                {{ __('Settings') }}
+            </a>
+        </li>
 
-            <li>
-                <a href="{{ route('admin.settings') }}" class="stretched-link">
-                    <i class="fas fa-fw fa-cogs"></i>
-                    {{ __('Settings') }}
-                </a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.types') }}">
+                <i class="fas fa-fw fa-box"></i>
+                {{ __('Types') }}
+            </a>
+        </li>
 
-            <li>
-                <a href="{{ route('admin.types') }}" class="stretched-link">
-                    <i class="fas fa-fw fa-box"></i>
-                    {{ __('Types') }}
-                </a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.categories') }}">
+                <i class="fas fa-fw fa-archive"></i>
+                {{ __('Categories') }}
+            </a>
+        </li>
 
-            <li>
-                <a href="{{ route('admin.categories') }}" class="stretched-link">
-                    <i class="fas fa-fw fa-archive"></i>
-                    {{ __('Categories') }}
-                </a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.tags') }}">
+                <i class="fas fa-fw fa-hashtag"></i>
+                {{ __('Tags') }}
+            </a>
+        </li>
 
-            <li>
-                <a href="{{ route('admin.tags') }}" class="stretched-link">
-                    <i class="fas fa-fw fa-hashtag"></i>
-                    {{ __('Tags') }}
-                </a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.pages') }}">
+                <i class="far fa-fw fa-file"></i>
+                {{ __('Pages') }}
+            </a>
+        </li>
 
-            <li>
-                <a href="{{ route('admin.pages') }}" class="stretched-link">
-                    <i class="far fa-fw fa-file"></i>
-                    {{ __('Pages') }}
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ route('admin.users') }}" class="stretched-link">
-                    <i class="fas fa-fw fa-users"></i>
-                    {{ __('Users') }}
-                </a>
-            </li>
-        </ul>
-    </div>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.users') }}">
+                <i class="fas fa-fw fa-users"></i>
+                {{ __('Users') }}
+            </a>
+        </li>
+    </ul>
 </aside>

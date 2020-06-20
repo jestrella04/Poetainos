@@ -135,7 +135,7 @@ class CategoriesController extends Controller
         $category->delete();
 
         return [
-            'message' => __('Category deleted successfully.')
+            'message' => __('Category deleted successfully')
         ];
     }
 }

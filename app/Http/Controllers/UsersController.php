@@ -196,7 +196,7 @@ class UsersController extends Controller
         $user->delete();
 
         return [
-            'message' => __('User deleted successfully.')
+            'message' => __('User deleted successfully')
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
@@ -38,6 +39,14 @@ class VerificationController extends Controller
         $this->middleware('auth');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
+    }
+
+    public function verfied(Request $request)
+    {
+        $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
+        $message .= __('You have now unlocked full access to the site.');
+        $message .= __('Go ahead and vote, comment, reply, find the muses and publish your writings.');
+        $request->session()->flash('flash', $message);
     }
 
     public function redirectTo() {

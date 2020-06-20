@@ -10,8 +10,8 @@
     <div id="login" class="d-flex justify-content-center login">
         <div class="form-wrapper">
             <div class="header">
-                <h4 class="all-caps">{{ __('Long time no see you') }}</h4>
-                <p class="text-muted">{{ __('Welcome back to the hood') }}</p>
+                <h4 class="all-caps">{{ __('Login to the hood') }}</h4>
+                <p class="text-muted">{{ __('Long time no see you') }}</p>
             </div>
 
             <div class="social">

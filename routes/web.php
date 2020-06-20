@@ -37,6 +37,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('categories/delete/{category}', 'CategoriesController@destroy')->name('categories.destroy');
     Route::delete('tags/delete/{tag}', 'TagsController@destroy')->name('tags.destroy');
     Route::delete('pages/delete/{page}', 'PagesController@destroy')->name('pages.destroy');
+    Route::delete('users/delete/{user}', 'UsersController@destroy')->name('users.destroy');
 });
 
 /* Non public routes */

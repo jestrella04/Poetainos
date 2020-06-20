@@ -115,7 +115,7 @@ class PagesController extends Controller
         $page->delete();
 
         return [
-            'message' => __('Page deleted successfully.')
+            'message' => __('Page deleted successfully')
         ];
     }
 }

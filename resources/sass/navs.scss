@@ -2,67 +2,6 @@ nav {
     font-size: 0.8rem;
 }
 
-#side-menu-overlay {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 9997;
-    width: 100%;
-    background-color: rgba($dark, 0.5);
-    cursor: pointer;
-}
-
-#side-menu {
-    height: 100%;
-    overflow: scroll;
-    position: fixed;
-    left: 0;
-    z-index: 9999;
-    width: 15rem;
-    background: linear-gradient(180deg, $dark 0%, $indigo 100%);
-    font-size: 1rem;
-    padding: 2rem 0;
-    transform: translateX(-15rem);
-    transition: transform 250ms ease-in-out;
-
-    .nav-item:first-child {
-        border-top: 1px solid rgba($light, .05);
-    }
-
-    .nav-item {
-        border-bottom: 1px solid rgba($light, .05);
-
-        a,
-        button {
-            text-transform: capitalize !important;
-            color: $white;
-            padding: 1rem;
-        }
-
-        button:hover,
-        button:active {
-            background-color: transparent;
-        }
-
-        i {
-            margin-right: 0.8rem;
-        }
-    }
-
-    .nav-item.active {
-        font-weight: 700;
-
-        a {
-            font-weight: 700;
-        }
-    }
-}
-
-#side-menu.show {
-    transform: translateX(0) !important;
-}
-
 .navbar {
     .navbar-brand {
         img {
@@ -148,6 +87,20 @@ nav {
 
         @media (min-width: 992px) {
             border-radius: 1rem;
+        }
+    }
+}
+
+.admin-main-wrapper {
+    margin-top: 1rem;
+
+    nav {
+        position: absolute;
+        top: 1rem;
+        right: 2rem;
+
+        @media (min-width: 992px) {
+            display: none;
         }
     }
 }

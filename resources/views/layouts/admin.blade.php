@@ -1,13 +1,13 @@
 @extends('layouts.master')
 
 @section('main-container')
-    <main role="main" class="container-fluid admin-container">
+    <div class="container-fluid admin-main-wrapper">
         <div class="d-flex flex-wrap flex-lg-nowrap">
             @yield('admin-sidebar')
 
-            <div class="flex-grow-1">
+            <main role="main" class="flex-grow-1">
                 @yield ('main')
-            </div>
+            </main>
         </div>
-    </main>
+    </div>
 @endsection

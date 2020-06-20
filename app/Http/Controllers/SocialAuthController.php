@@ -69,8 +69,8 @@ class SocialAuthController extends Controller
             $message = __('Welcome back to the hood, we missed you!');
         } else {
             $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
-            $message .= __('You have now unleashed full access to the site.');
-            $message .= __('Go ahead and vote, comment, reply, find the muses and publish a writing.');
+            $message .= __('You have now unlocked full access to the site.');
+            $message .= __('Go ahead and vote, comment, reply, find the muses and publish your writings.');
         }
 
         request()->session()->flash('flash', $message);

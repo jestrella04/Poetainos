@@ -29,6 +29,7 @@
         </div>
 
         @include('admin.forms.user')
+        @include('partials.delete-modal')
 
         @if ($users->count() > 0)
             <div class="table-responsive">
@@ -52,20 +53,23 @@
                                 <th scope="row">{{ $user->id }}</th>
                                 <td>{{ ucfirst($user->role) }}</td>
                                 <td>{{ $user->username }}</td>
-                                <td>{{ $user->getName() }}</td>
+                                <td>{{ $user->name }}</td>
                                 <td>{{ $user->writings()->count() }}</td>
                                 <td>{{ $user->created_at }}</td>
                                 <td>{{ $user->email_verified_at }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('users.show', $user) }}">
+                                    <a href="{{ route('users.show', $user) }}"
+                                        class="btn">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                    <a href="#" class="admin-edit">
+                                    <a href="#" class="admin-edit btn">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="#" class="admin-delete">
+                                    <a href="#delete-modal"
+                                        class="admin-delete btn"
+                                        data-target="{{ route('admin.users.destroy', $user) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

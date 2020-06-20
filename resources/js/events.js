@@ -65,10 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }); */
 
+    // Listen to to the toast show event and act accordingly
     document.querySelector('.toast').addEventListener('show.bs.toast', function(event){
         this.closest('.toast-wrapper').classList.add('show');
     }, false);
 
+    // Listen to the toast hidden event and act accordingly
     document.querySelector('.toast').addEventListener('hidden.bs.toast', function(event){
         this.closest('.toast-wrapper').classList.remove('show');
     }, false);
@@ -82,6 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove last message
         this.querySelector('.toast-body').innerHTML = '';
     }, false);
+
+    // Listen to the window resize event and act accordingly
+    window.addEventListener('resize', function () {
+        document.querySelector('#side-menu-overlay').classList.add('d-none');
+        document.querySelector('#toggler i').classList.remove('fa-times');
+        document.querySelectorAll('.side-menu').forEach(function (aside) {
+            aside.classList.remove('show');
+        });
+    });
 
     // Listen to the on click event on the page and act accordingly
     document.addEventListener('click', function (event) {
@@ -101,15 +112,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Populate and/or show the side menu
         if (element.hasAttribute('id') && 'toggler' === element.attributes['id'].value) {
-            let sourceNav = document.querySelector(element.attributes['data-source'].value);
-            let sideNav = document.querySelector('#side-menu');
+            let targetNav = document.querySelector(element.attributes['data-target'].value);
+            let dataSource = null;
+            let sourceNav = null;
 
-            if ('' == sideNav.innerHTML) {
-                sideNav.innerHTML = sourceNav.innerHTML;
+            if (element.hasAttribute('data-source')) {
+                dataSource = element.attributes['data-source'].value;
+            }
+
+            if (null !== dataSource) {
+                sourceNav = document.querySelector(dataSource);
+            }
+
+            if (null !== sourceNav && '' === targetNav.innerHTML) {
+                targetNav.innerHTML = sourceNav.innerHTML;
             }
 
             document.querySelector('#side-menu-overlay').classList.toggle('d-none');
-            sideNav.classList.toggle('show');
+            targetNav.classList.toggle('show');
             element.querySelector('i').classList.toggle('fa-times');
             element.classList.toggle('rotate');
             document.body.classList.toggle('overflow-hidden');

@@ -6,7 +6,7 @@
                 <input type="hidden" name="writing_id" value="{{ $writing->id }}">
 
                 <div class="form-group">
-                    <small id="post-comment-success" class="form-text d-none text-success">{{ __('Comment posted successfully.') }}</small>
+                    <small id="post-comment-success" class="form-text d-none text-success">{{ __('Comment posted successfully') }}</small>
                     <small id="post-comment-error" class="form-text d-none text-danger"></small>
                     <textarea name="comment" class="form-control" placeholder="{{ __('Leave your comment here') }}" maxlength="300" required></textarea>
                 </div>

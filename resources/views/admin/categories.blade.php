@@ -53,12 +53,13 @@
                                 <td>{{ $category->writings()->count() }}</td>
                                 <td>{{ $category->created_at }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('categories.show', $category) }}">
+                                    <a href="{{ route('categories.show', $category) }}"
+                                        class="btn">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
                                     <a href="#"
-                                        class="admin-edit"
+                                        class="admin-edit btn"
                                         data-target-modal="#admin-categories-form-wrapper"
                                         data-target-model="category"
                                         data-target-form="#admin-categories-form"
@@ -67,7 +68,7 @@
                                     </a>
 
                                     <a href="#delete-modal"
-                                        class="admin-delete"
+                                        class="admin-delete btn"
                                         data-target="{{ route('admin.categories.destroy', $category) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>

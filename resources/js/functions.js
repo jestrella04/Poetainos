@@ -35,8 +35,9 @@ export function createSideMenu() {
     let sideMenu = document.createElement('div');
 
     overlay.id = 'side-menu-overlay';
-    sideMenu.id = 'side-menu';
+    sideMenu.id = 'user-side-menu';
     overlay.classList.add('d-none');
+    sideMenu.classList.add('side-menu');
 
     document.body.insertAdjacentElement('afterbegin', sideMenu);
     document.body.insertAdjacentElement('afterbegin', overlay);

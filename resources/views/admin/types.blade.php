@@ -51,12 +51,13 @@
                                 <td>{{ $type->writings()->count() }}</td>
                                 <td>{{ $type->created_at }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('types.show', $type) }}">
+                                    <a href="{{ route('types.show', $type) }}"
+                                        class="btn">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
                                     <a href="#"
-                                        class="admin-edit"
+                                        class="admin-edit btn"
                                         data-target-modal="#admin-types-form-wrapper"
                                         data-target-model="type"
                                         data-target-form="#admin-types-form"
@@ -65,7 +66,7 @@
                                     </a>
 
                                     <a href="#delete-modal"
-                                        class="admin-delete"
+                                        class="admin-delete btn"
                                         data-target="{{ route('admin.types.destroy', $type) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>

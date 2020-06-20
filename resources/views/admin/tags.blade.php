@@ -50,16 +50,18 @@
                                 <td>{{ $tag->name }}</td>
                                 <td>{{ $tag->writings()->count() }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('tags.show', $tag) }}">
+                                    <a href="{{ route('tags.show', $tag) }}"
+                                        class="btn">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                    <a href="#" class="admin-edit" disabled>
+                                    <a href="#"
+                                        class="admin-edit btn" disabled>
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
                                     <a href="#delete-modal"
-                                        class="admin-delete"
+                                        class="admin-delete btn"
                                         data-target="{{ route('admin.tags.destroy', $tag) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>

@@ -115,7 +115,7 @@ class TypesController extends Controller
         $type->delete();
 
         return [
-            'message' => __('Type deleted successfully.')
+            'message' => __('Type deleted successfully')
         ];
     }
 }

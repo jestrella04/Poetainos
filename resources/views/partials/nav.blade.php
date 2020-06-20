@@ -5,7 +5,12 @@
         </a>
 
         <div class="toggler-wrapper">
-            <button id="toggler" class="navbar-toggler" data-source="#header-navbar" aria-label="{{ __('Toggle sidebar') }}">
+            <button
+                id="toggler"
+                class="navbar-toggler"
+                data-source="#header-navbar"
+                data-target="#user-side-menu"
+                aria-label="{{ __('Toggle sidebar') }}">
                 <i class="fa fa-bars"></i>
             </button>
         </div>

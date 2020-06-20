@@ -47,12 +47,13 @@
                                 <th scope="row">{{ $page->id }}</th>
                                 <td>{{ $page->title }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('pages.show', $page) }}">
+                                    <a href="{{ route('pages.show', $page) }}"
+                                        class="btn">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
                                     <a href="#"
-                                        class="admin-edit"
+                                        class="admin-edit btn"
                                         data-target-modal="#admin-pages-form-wrapper"
                                         data-target-model="page"
                                         data-target-form="#admin-pages-form"
@@ -61,7 +62,7 @@
                                     </a>
 
                                     <a href="#delete-modal"
-                                        class="admin-delete"
+                                        class="admin-delete btn"
                                         data-target="{{ route('admin.pages.destroy', $page) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>

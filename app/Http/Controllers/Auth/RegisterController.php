@@ -74,14 +74,6 @@ class RegisterController extends Controller
         ]);
     }
 
-    protected function registered(Request $request, $user)
-    {
-        $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
-        $message .= __('You have now unleashed full access to the site.');
-        $message .= __('Go ahead and vote, comment, reply, find the muses and publish a writing.');
-        $request->session()->flash('flash', $message);
-    }
-
     protected function redirectTo() {
         return route('verification.notice');
     }
