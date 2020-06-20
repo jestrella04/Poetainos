@@ -1,8 +1,11 @@
 <div id="admin-categories-form-wrapper" class="modal fade form-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title all-caps">{{ __('Create new category') }}</h5>
+                <h5 class="modal-title all-caps">
+                    <span class="create">{{ __('New category') }}</span>
+                    <span class="update d-none">{{ __('Edit category') }}</span>
+                </h5>
 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -16,39 +19,34 @@
 
                     <input type="hidden" name="id" value="-1">
 
-                    <div class="form-group row">
-                        <label for="title" class="col-sm-2 col-form-label">{{ __('Name') }}</label>
+                    <div class="form-group">
+                        <label for="title" class="col-form-label">{{ __('Name') }}:</label>
 
-                        <div class="col-sm-10">
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                class="form-control"
-                                value=""
-                                minlength="3"
-                                maxlength="40"
-                                placeholder=""
-                                required
-                                autofocus>
-                            <small id="name-error" class="text-danger d-none"></small>
-                        </div>
+                        <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            class="form-control"
+                            value=""
+                            minlength="3"
+                            maxlength="40"
+                            placeholder=""
+                            required>
+                        <small id="name-error" class="text-danger d-none"></small>
                     </div>
 
-                    <div class="form-group row">
-                        <label for="description" class="col-sm-2 col-form-label">{{ __('Description') }}</label>
+                    <div class="form-group">
+                        <label for="description" class="col-form-label">{{ __('Description') }}:</label>
 
-                        <div class="col-sm-10">
-                            <textarea
-                                class="form-control"
-                                name="description"
-                                id="description"
-                                rows="3"
-                                minlength="3"
-                                maxlength="255"
-                                required></textarea>
-                            <small id="description-error" class="text-danger d-none"></small>
-                        </div>
+                        <textarea
+                            class="form-control"
+                            name="description"
+                            id="description"
+                            rows="3"
+                            minlength="3"
+                            maxlength="255"
+                            required></textarea>
+                        <small id="description-error" class="text-danger d-none"></small>
                     </div>
                 </form>
             </div>

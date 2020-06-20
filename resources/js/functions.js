@@ -121,6 +121,10 @@ export function resetAdminFormCreate(form) {
     if ('object' === typeof(form.text)) form.text.value = '';
 }
 
+export function showModal(targetModal, options = {}) {
+    new BSN.Modal(targetModal, options).show();
+}
+
 export function showToast(options = {}) {
     let theme = options.theme || 'default';
     let selector = options.selector || '.toast.reuse';

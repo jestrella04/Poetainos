@@ -28,6 +28,7 @@
         </div>
 
         @include('admin.forms.type')
+        @include('partials.delete-modal')
 
         @if ($types->count() > 0)
             <div class="table-responsive">
@@ -55,14 +56,17 @@
                                     </a>
 
                                     <a href="#"
-                                        class="admin-edit types-edit"
+                                        class="admin-edit"
                                         data-target-modal="#admin-types-form-wrapper"
+                                        data-target-model="type"
                                         data-target-form="#admin-types-form"
                                         data-target-form-data="{{ $type->toJson() }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="#" class="admin-delete types-delete">
+                                    <a href="#delete-modal"
+                                        class="admin-delete"
+                                        data-target="{{ route('admin.types.destroy', $type) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

@@ -28,6 +28,7 @@
         </div>
 
         @include('admin.forms.page')
+        @include('partials.delete-modal')
 
         @if ($pages->count() > 0)
             <div class="table-responsive">
@@ -51,14 +52,17 @@
                                     </a>
 
                                     <a href="#"
-                                        class="admin-edit pages-edit"
+                                        class="admin-edit"
                                         data-target-modal="#admin-pages-form-wrapper"
+                                        data-target-model="page"
                                         data-target-form="#admin-pages-form"
                                         data-target-form-data="{{ $page->toJson() }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="#" class="admin-delete pages-delete">
+                                    <a href="#delete-modal"
+                                        class="admin-delete"
+                                        data-target="{{ route('admin.pages.destroy', $page) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

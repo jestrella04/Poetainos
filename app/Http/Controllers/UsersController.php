@@ -94,7 +94,7 @@ class UsersController extends Controller
         $this->authorize('update', $user);
 
         $params = [
-            'title' => 'Modify profile',
+            'title' => __('Update profile'),
             'roles' => ['user', 'moderator', 'admin'],
         ];
 
@@ -193,6 +193,10 @@ class UsersController extends Controller
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
-        return $user->delete();
+        $user->delete();
+
+        return [
+            'message' => __('User deleted successfully.')
+        ];
     }
 }

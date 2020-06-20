@@ -75,8 +75,7 @@
                     minlength="3"
                     maxlength="60"
                     placeholder=""
-                    required
-                    autofocus>
+                    required>
                 <small id="name-error" class="text-danger d-none"></small>
             </div>
         </div>

@@ -81,7 +81,11 @@ class SettingsController extends Controller
         $setting->data = json_decode(request('json'));
         $setting->save();
 
-        return 1;
+        $message = __('Settings saved successfully');
+
+        return [
+            'message' => $message
+        ];
     }
 
     /**

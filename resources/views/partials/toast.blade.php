@@ -1,5 +1,5 @@
 <div class="toast-wrapper" aria-live="polite" aria-atomic="true">
-    <div class="toast-group">
+    <div class="toasts">
         @if ($message = session('flash'))
             <div class="toast default" role="status" aria-live="polite" aria-atomic="true">
                 <div class="toast-header">

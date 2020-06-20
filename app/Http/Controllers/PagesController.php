@@ -91,7 +91,14 @@ class PagesController extends Controller
 
         $page->save();
 
+        if (isset($action) && 'create' === $action) {
+            $message = __('Page created successfully');
+        } else {
+            $message = __('Page updated successfully');
+        }
+
         return [
+            'message' => $message,
             'action' => $action ?? 'update',
             'id' => $page->id,
         ];
@@ -105,6 +112,10 @@ class PagesController extends Controller
      */
     public function destroy(Page $page)
     {
-        //
+        $page->delete();
+
+        return [
+            'message' => __('Page deleted successfully.')
+        ];
     }
 }

@@ -58,15 +58,16 @@
                                     </a>
 
                                     <a href="#"
-                                        class="admin-edit categories-edit"
+                                        class="admin-edit"
                                         data-target-modal="#admin-categories-form-wrapper"
+                                        data-target-model="category"
                                         data-target-form="#admin-categories-form"
                                         data-target-form-data="{{ $category->toJson() }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
                                     <a href="#delete-modal"
-                                        class="admin-delete category-delete"
+                                        class="admin-delete"
                                         data-target="{{ route('admin.categories.destroy', $category) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>

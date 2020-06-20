@@ -29,6 +29,7 @@
         </div>
 
         {{-- @include('admin.forms.tag') --}}
+        @include('partials.delete-modal')
 
         @if ($tags->count() > 0)
             <div class="table-responsive">
@@ -53,11 +54,13 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                    <a href="#" class="admin-edit tags-edit">
+                                    <a href="#" class="admin-edit" disabled>
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="#" class="admin-delete tags-delete">
+                                    <a href="#delete-modal"
+                                        class="admin-delete"
+                                        data-target="{{ route('admin.tags.destroy', $tag) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

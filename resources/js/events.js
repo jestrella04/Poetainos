@@ -20,22 +20,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (null !== modalForm && modalForm.classList.contains('modal')) {
         let targetForm = modalForm.querySelector('form');
+        let modalTitleElement = modalForm.querySelector('.modal-title');
 
-        // Focus the first form element with autofocus attribute
-        modalForm.addEventListener('shown.bs.modal', function () {
-            let autofocus = modalForm.querySelector("[autofocus]");
+        // Change title if updating
+        modalForm.addEventListener('show.bs.modal', function (event) {
+            let relatedTarget = event.relatedTarget;
 
-            if (null !== focus) {
-                autofocus.focus();
+            if (null === relatedTarget) {
+                modalTitleElement.querySelector('.create').classList.add('d-none');
+                modalTitleElement.querySelector('.update').classList.remove('d-none');
             }
         });
 
         // Do some cleaning when the modal is closed
         modalForm.addEventListener('hidden.bs.modal', function () {
-            // Hide alerts
-            modalForm.querySelectorAll('.alert').forEach(function(alert) {
-                alert.classList.add('d-none');
-            });
+            // Reset title
+            modalTitleElement.querySelector('.create').classList.remove('d-none');
+            modalTitleElement.querySelector('.update').classList.add('d-none');
 
             // Reset form to default empty values
             fx.resetAdminFormCreate(targetForm);
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize toast
+    // Initialize flash messages toast
     let toastFlashSelector = '.toast:not(.reuse)';
     let toastFlash = document.querySelector(toastFlashSelector);
 
@@ -64,24 +65,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }); */
 
+    document.querySelector('.toast').addEventListener('show.bs.toast', function(event){
+        this.closest('.toast-wrapper').classList.add('show');
+    }, false);
+
+    document.querySelector('.toast').addEventListener('hidden.bs.toast', function(event){
+        this.closest('.toast-wrapper').classList.remove('show');
+    }, false);
+
     // Reset toast look/info when closed
     document.querySelector('.toast.reuse').addEventListener('hidden.bs.toast', function(event){
         // Set default look & feel
         this.classList.remove('success', 'danger');
         this.classList.add('default');
 
-        // Hide all messages
-        this.querySelectorAll('.toast-body span')
-        .forEach(function(span) {
-            span.classList.add('d-none');
-        });
+        // Remove last message
+        this.querySelector('.toast-body').innerHTML = '';
     }, false);
 
     // Listen to the on click event on the page and act accordingly
     document.addEventListener('click', function (event) {
         let element = event.target;
 
-        // Was a button or file chooser clicked?
+        // Bubble up click event on certain elements
         let bubble = element.closest('a, label, button, .btn, .avatar-chooser') || false;
 
         if (bubble) {
@@ -251,24 +257,26 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             let targetModal = document.querySelector(element.attributes['data-target-modal'].value);
+            let targetModel = element.attributes['data-target-model'].value;
             let targetForm = document.querySelector(element.attributes['data-target-form'].value);
             let targetData = JSON.parse(element.attributes['data-target-form-data'].value);
 
-            if (element.classList.contains('types-edit') || element.classList.contains('categories-edit')) {
+            console.log(targetModel);
+            if ('type' === targetModel || 'category' === targetModel) {
                 targetForm.id.value = targetData.id;
                 targetForm.name.value = targetData.name;
                 targetForm.description.value = targetData.description;
             }
 
-            if (element.classList.contains('pages-edit')) {
+            if ('page' === targetModel) {
                 targetForm.id.value = targetData.id;
                 targetForm.title.value = targetData.title;
                 targetForm.text.value = targetData.text;
             }
 
-            new BSN.Modal(targetModal, {
+            fx.showModal(targetModal, {
                 'backdrop': 'static'
-            }).show();
+            });
         }
 
         // Deleting a record (confirmation prompt)
@@ -278,9 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             btnDelete.attributes['data-delete-url'].value = element.attributes['data-target'].value;
 
-            new BSN.Modal(targetModal, {
+            fx.showModal(targetModal, {
                 'backdrop': 'static'
-            }).show();
+            });
         }
 
         // Deleting a record
@@ -293,13 +301,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Post the form to the server
             axios.post(url, params)
                 .then(function (response) {
-                    fx.showToast(toastInit, {
-                        'message': 'msg-delete-success',
+                    fx.showToast({
+                        'message': response.data.message,
                         'theme': 'success'
                     });
                 })
                 .catch(function (error) {
-                    fx.showToast(toastInit, {
+                    fx.showToast({
                         'message': 'msg-save-error',
                         'theme': 'danger'
                     });
@@ -479,8 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initialize form and helpers
             let params = new FormData(element);
             let url = element.attributes['action'].value;
-            let errorAlert = element.querySelector('.alert-danger');
-            let successAlert = element.querySelector('.alert-success');
 
             // Post the form to the server
             axios.post(url, params)
@@ -490,20 +496,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         element.reset.click();
                     }
 
-                    // Update alerts
-                    successAlert.classList.remove('d-none');
-                    errorAlert.classList.add('d-none');
+                    fx.showToast({
+                        'message': response.data.message,
+                        'theme': 'success'
+                    });
                 })
                 .catch(function (error) {
                     // Oh no, something went wrong
                     let errors = error.response.data.errors;
 
-                    // Update alerts
-                    successAlert.classList.add('d-none');
-                    errorAlert.classList.remove('d-none');
-
                     // Handle the error messages
                     fx.handleFormErrors(errors);
+
+                    fx.showToast({
+                        'message': error.response.data.message,
+                        'theme': 'danger'
+                    });
                 })
                 .then(function () {
                     fx.handleForm(element, 'response');

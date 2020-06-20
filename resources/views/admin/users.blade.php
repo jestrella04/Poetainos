@@ -61,11 +61,11 @@
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                    <a href="#" class="admin-edit users-edit">
+                                    <a href="#" class="admin-edit">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
-                                    <a href="#" class="admin-delete users-delete">
+                                    <a href="#" class="admin-delete">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

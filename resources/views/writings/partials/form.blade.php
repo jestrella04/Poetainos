@@ -58,8 +58,7 @@
                     minlength="3"
                     maxlength="100"
                     placeholder=""
-                    required
-                    autofocus>
+                    required>
                 <small id="title-error" class="text-danger d-none"></small>
             </div>
         </div>

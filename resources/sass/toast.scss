@@ -1,14 +1,19 @@
+.toast-wrapper.show {
+    display: block;
+    z-index: 99999;
+}
+
 .toast-wrapper {
     position: fixed;
-    min-height: 200px;
-    top: 3rem;
-    right: 3rem;
-    width: 20rem;
-    max-width: 20rem;
+    top: 3.5rem;
+    width: 100%;
+    display: none;
 
-    .toast-group {
+    .toasts {
         position: relative;
-        z-index: 9999;
+        width: 70%;
+        max-width: 20rem;
+        margin: 0 auto;
 
         .toast {
             box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4);

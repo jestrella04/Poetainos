@@ -111,7 +111,14 @@ class CategoriesController extends Controller
 
         $category->save();
 
+        if (isset($action) && 'create' === $action) {
+            $message = __('Category created successfully');
+        } else {
+            $message = __('Category updated successfully');
+        }
+
         return [
+            'message' => $message,
             'action' => $action ?? 'update',
             'id' => $category->id,
         ];
@@ -125,6 +132,10 @@ class CategoriesController extends Controller
      */
     public function destroy(Category $category)
     {
-        return $category->delete();
+        $category->delete();
+
+        return [
+            'message' => __('Category deleted successfully.')
+        ];
     }
 }

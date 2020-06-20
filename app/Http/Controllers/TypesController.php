@@ -91,7 +91,14 @@ class TypesController extends Controller
 
         $type->save();
 
+        if (isset($action) && 'create' === $action) {
+            $message = __('Type created successfully');
+        } else {
+            $message = __('Type updated successfully');
+        }
+
         return [
+            'message' => $message,
             'action' => $action ?? 'update',
             'id' => $type->id,
         ];
@@ -105,6 +112,10 @@ class TypesController extends Controller
      */
     public function destroy(Type $type)
     {
-        //
+        $type->delete();
+
+        return [
+            'message' => __('Type deleted successfully.')
+        ];
     }
 }

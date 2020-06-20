@@ -28,7 +28,6 @@
                         name="username" value="{{ old('username') }}"
                         required
                         autocomplete="username"
-                        autofocus
                         pattern="[A-Za-z0-9]+"
                         placeholder="{{ __('Enter your username') }}">
 

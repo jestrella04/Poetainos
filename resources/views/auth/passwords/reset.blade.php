@@ -20,7 +20,14 @@
                 <input type="hidden" name="token" value="{{ $token }}">
 
                 <div class="form-group">
-                    <input id="email" type="email" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
+                    <input
+                        id="email"
+                        type="email"
+                        class="form-control form-control-lg @error('email') is-invalid @enderror"
+                        name="email"
+                        value="{{ $email ?? old('email') }}"
+                        required
+                        autocomplete="email">
 
                     @error('email')
                         <span class="invalid-feedback" role="alert">
@@ -30,7 +37,14 @@
                 </div>
 
                 <div class="form-group">
-                    <input id="password" type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="{{ __('Enter your password') }}">
+                    <input
+                        id="password"
+                        type="password"
+                        class="form-control form-control-lg @error('password') is-invalid @enderror"
+                        name="password"
+                        required
+                        autocomplete="new-password"
+                        placeholder="{{ __('Enter your password') }}">
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -40,7 +54,14 @@
                 </div>
 
                 <div class="form-group">
-                    <input id="password-confirm" type="password" class="form-control form-control-lg" name="password_confirmation" required autocomplete="new-password" placeholder="{{ __('Confirm your password') }}">
+                    <input
+                        id="password-confirm"
+                        type="password"
+                        class="form-control form-control-lg"
+                        name="password_confirmation"
+                        required
+                        autocomplete="new-password"
+                        placeholder="{{ __('Confirm your password') }}">
                 </div>
 
                 <div class="form-group">
