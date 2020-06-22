@@ -178,6 +178,7 @@ class UsersController extends Controller
 
         // Set response data
         $response = $user->toArray();
+        $response['message'] = __('Your profile was successfully updated');
         $response['url'] = $user->path();
 
         // Output the response

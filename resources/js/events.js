@@ -1,4 +1,5 @@
 import * as fx from './functions';
+import BSN from "bootstrap.native";
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }); */
 
-    // Listen to to the toast show event and act accordingly
+    // Listen to the toast show event and act accordingly
     document.querySelector('.toast').addEventListener('show.bs.toast', function(event){
         this.closest('.toast-wrapper').classList.add('show');
     }, false);
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen to the window resize event and act accordingly
     window.addEventListener('resize', function () {
+        document.body.classList.remove('overflow-hidden');
         document.querySelector('#side-menu-overlay').classList.add('d-none');
         document.querySelector('#toggler i').classList.remove('fa-times');
         document.querySelectorAll('.side-menu').forEach(function (aside) {
@@ -155,15 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!targetForm.classList.contains('d-none')) {
                 targetForm.querySelector('.form-control').focus();
-            }
-        }
-
-        // Hide alerts
-        if (element.classList.contains('close')) {
-            let parentAlert = element.closest('.alert');
-
-            if (null !== parentAlert) {
-                parentAlert.classList.add('d-none');
             }
         }
 
@@ -300,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Deleting a record (confirmation prompt)
-        if (element.classList.contains('admin-delete')) {
+        if (element.classList.contains('admin-content-delete') || element.classList.contains('user-content-delete')) {
             let targetModal = element.attributes['href'].value;
             let btnDelete = document.querySelector('#btn-modal-delete');
 
@@ -351,9 +344,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initialize form and helpers
             let params = new FormData(element);
             let url = element.attributes['action'].value;
-            let errorAlert = element.querySelector('.alert-danger');
-            let successAlert = element.querySelector('.alert-success');
-            let successLink = successAlert.querySelector('#writing-success-link');
 
             // Post the form to the server
             axios.post(url, params)
@@ -369,21 +359,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     element.querySelector('#selected-file').classList.add('d-none');
                     element.querySelector('#selected-error').classList.add('d-none');
 
-                    // Update alerts
-                    successLink.attributes['href'].value = response.data.url;
-                    successAlert.classList.remove('d-none');
-                    errorAlert.classList.add('d-none');
+                    // Show toast
+                    fx.showToast({
+                        'theme': 'success',
+                        'message': response.data.message
+                    });
                 })
                 .catch(function (error) {
                     // Oh no, something went wrong
                     let errors = error.response.data.errors;
 
-                    // Update alerts
-                    successAlert.classList.add('d-none');
-                    errorAlert.classList.remove('d-none');
-
                     // Handle the error messages
                     fx.handleFormErrors(errors);
+
+                    // Show toast
+                    fx.showToast({
+                        'theme': 'danger',
+                        'message': error.response.data.message
+                    });
                 })
                 .then(function () {
                     fx.handleForm(element, 'response');
@@ -401,28 +394,28 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initialize form and helpers
             let params = new FormData(element);
             let url = element.attributes['action'].value;
-            let errorAlert = element.querySelector('.alert-danger');
-            let successAlert = element.querySelector('.alert-success');
-            let successLink = successAlert.querySelector('#profile-success-link');
 
             // Post the form to the server
             axios.post(url, params)
                 .then(function (response) {
-                    // Update alerts
-                    successLink.attributes['href'].value = response.data.url;
-                    successAlert.classList.remove('d-none');
-                    errorAlert.classList.add('d-none');
+                    // Show toast
+                    fx.showToast({
+                        'message': response.data.message,
+                        'theme': 'success'
+                    });
                 })
                 .catch(function (error) {
                     // Oh no, something went wrong
                     let errors = error.response.data.errors;
 
-                    // Update alerts
-                    successAlert.classList.add('d-none');
-                    errorAlert.classList.remove('d-none');
-
                     // Handle the error messages
                     fx.handleFormErrors(errors);
+
+                    // Show toast
+                    fx.showToast({
+                        'message': error.response.data.message,
+                        'theme': 'danger'
+                    });
                 })
                 .then(function () {
                     fx.handleForm(element, 'response');

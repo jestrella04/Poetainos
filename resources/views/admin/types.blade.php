@@ -66,7 +66,7 @@
                                     </a>
 
                                     <a href="#delete-modal"
-                                        class="admin-delete btn"
+                                        class="admin-content-delete btn"
                                         data-target="{{ route('admin.types.destroy', $type) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>

@@ -18,33 +18,6 @@
             @method('put')
         @endif
 
-        <div class="alert alert-success d-none" role="alert">
-            <button type="button" class="close">
-                <span class="alert-link">&times;</span>
-            </button>
-
-            <h6 class="alert-heading">
-                @if ($writing->exists)
-                    {{ __('Your writing was successfully updated') }}
-                @else
-                    {{ __('Your writing was successfully posted') }}
-                @endif
-            </h6>
-
-            <p>
-                <a href="#" id="writing-success-link" class="alert-link">{{ __('Take a look for yourself') }}</a>
-            </p>
-        </div>
-
-        <div class="alert alert-danger d-none" role="alert">
-            <button type="button" class="close">
-                <span class="danger-link">&times;</span>
-            </button>
-
-            <h6 class="alert-heading">{{ __('It looks like something went wrong') }}</h6>
-            <p>{{ __('Please review the information below') }}</p>
-        </div>
-
         <div class="form-group row">
             <label for="title" class="col-sm-2 col-form-label">{{ __('Title') }}:</label>
 

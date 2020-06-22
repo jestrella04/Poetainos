@@ -7,29 +7,6 @@
 
         @method('put')
 
-        <div class="alert alert-success d-none" role="alert">
-            <button type="button" class="close">
-                <span class="alert-link">&times;</span>
-            </button>
-
-            <h6 class="alert-heading">
-                {{ __('Your profile was successfully updated') }}
-            </h6>
-
-            <p>
-                <a href="#" id="profile-success-link" class="alert-link">{{ __('Take a look for yourself') }}</a>
-            </p>
-        </div>
-
-        <div class="alert alert-danger d-none" role="alert">
-            <button type="button" class="close">
-                <span class="danger-link">&times;</span>
-            </button>
-
-            <h6 class="alert-heading">{{ __('It looks like something went wrong') }}</h6>
-            <p>{{ __('Please review the information below') }}</p>
-        </div>
-
         <div class="form-group text-center">
             <span class="avatar-chooser" data-target="#avatar">
                 <img src="{{ $avatarSrc }}" alt="" class="avatar avatar-preview">

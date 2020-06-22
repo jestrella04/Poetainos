@@ -139,7 +139,11 @@
                 @endcan
 
                 @can('delete', $writing)
-                    <a class="dropdown-item disabled" href="#">{{ __('Delete') }}</a>
+                    <a href="#"
+                        class="dropdown-item user-content-delete"
+                        data-target="{{ route('writings.destroy', $writing) }}">
+                        {{ __('Delete') }}
+                    </a>
                 @endcan
             </div>
         </div>

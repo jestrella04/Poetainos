@@ -138,6 +138,7 @@ class WritingsController extends Controller
         // Ensure user has the proper permission
         if ($writing->exists) {
             $this->authorize('update', $writing);
+            $action = 'update';
         }
 
         // Validate user input
@@ -209,9 +210,21 @@ class WritingsController extends Controller
         // Update user aura
         $writing->author->updateAura();
 
+        // Set response message
+        if (isset($action) && 'update' === $action) {
+            $message = __('Your writing was successfully updated.');
+        } else {
+            $message = __('Your writing was successfully posted.');
+        }
+
+        // Apend link
+        $message .= ' <a href="{url}">' . __('Take a look for yourself') . '</a>';
+
         // Set response data
         $response = $writing->toArray();
         $response['url'] = $writing->path();
+        $response['message'] = str_replace('{url}', $writing->path(), $message);
+        $response['action'] = $action ?? 'create';
 
         // Output the response
         return $response;
@@ -226,6 +239,10 @@ class WritingsController extends Controller
     public function destroy(Writing $writing)
     {
         $this->authorize('delete', $writing);
-        return $writing->delete();
+        $writing->delete();
+
+        return [
+            'message' => __('Writing deleted successfully')
+        ];
     }
 }
