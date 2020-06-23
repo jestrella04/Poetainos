@@ -60,6 +60,12 @@ class AdminController extends Controller
         ]);
     }
 
+    public function writings() {
+        return view('admin.writings', [
+            'writings' => Writing::simplePaginate($this->pagination),
+        ]);
+    }
+
     public function pages() {
         return view('admin.pages', [
             'pages' => Page::simplePaginate($this->pagination),

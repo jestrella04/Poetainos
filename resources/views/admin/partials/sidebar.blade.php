@@ -55,5 +55,12 @@
                 {{ __('Users') }}
             </a>
         </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.writings') }}">
+                <i class="fas fa-fw fa-feather"></i>
+                {{ __('Writings') }}
+            </a>
+        </li>
     </ul>
 </aside>

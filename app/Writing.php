@@ -56,7 +56,7 @@ class Writing extends Model
 
     public function type()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Type::class);
     }
 
     public function excerpt()

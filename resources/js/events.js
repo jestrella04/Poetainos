@@ -296,8 +296,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.classList.contains('admin-content-delete') || element.classList.contains('user-content-delete')) {
             let targetModal = element.attributes['href'].value;
             let btnDelete = document.querySelector('#btn-modal-delete');
+            let warningDelete = document.querySelector('#content-delete-warning');
 
-            btnDelete.attributes['data-delete-url'].value = element.attributes['data-target'].value;
+            if (null !== warningDelete && element.hasAttribute('data-warning')) {
+                warningDelete.innerHTML = element.attributes['data-warning'].value;
+                warningDelete.parentElement.classList.remove('d-none');
+            }
+
+            if (null !== btnDelete && element.hasAttribute('data-target')) {
+                btnDelete.attributes['data-delete-url'].value = element.attributes['data-target'].value;
+            }
 
             fx.showModal(targetModal, {
                 'backdrop': 'static'

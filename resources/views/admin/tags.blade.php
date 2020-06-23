@@ -62,7 +62,8 @@
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.tags.destroy', $tag) }}">
+                                        data-target="{{ route('admin.tags.destroy', $tag) }}"
+                                        data-warning="{{ __('Deleting a tag will not delete associated writings') }}.">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

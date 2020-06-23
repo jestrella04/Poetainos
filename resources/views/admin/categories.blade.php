@@ -69,7 +69,8 @@
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.categories.destroy', $category) }}">
+                                        data-target="{{ route('admin.categories.destroy', $category) }}"
+                                        data-warning="{{ __('Deleting a category will not delete associated writings') }}.">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

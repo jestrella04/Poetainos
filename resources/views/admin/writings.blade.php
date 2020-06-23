@@ -1,9 +1,9 @@
 @extends('admin.index')
 
 @section('admin-main-content')
-    <div id="users-admin" class="admin-section">
+    <div id="writings-admin" class="admin-section">
         <div class="top-section">
-            <h3 class="all-caps">{{ __('Users') }}</h3>
+            <h3 class="all-caps">{{ __('Writings') }}</h3>
 
             <div class="d-flex flex-nowrap">
                 <div class="filter-box flex-grow-1">
@@ -14,62 +14,58 @@
                 </div>
 
                 <div class="buttons">
-                    <button id="btn-create-user"
+                    <a href="{{ route('writings.create') }}"
+                        id="btn-create-writing"
                         class="btn btn-primary btn-create"
-                        type="button"
-                        title="{{ __('Create new user') }}"
-                        data-toggle="modal"
-                        data-target="#user-form-wrapper"
-                        aria-expanded="false"
-                        disabled>
+                        title="{{ __('Create new writing') }}">
                         <i class="fas fa-plus"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
 
         @include('partials.delete-modal')
 
-        @if ($users->count() > 0)
+        @if ($writings->count() > 0)
             <div class="table-responsive">
                 <table class="table table-sm table-hover">
                     <thead>
                         <tr>
                             <th scope="col">{{ __('Id') }}</th>
-                            <th scope="col">{{ __('Role') }}</th>
-                            <th scope="col">{{ __('Username') }}</th>
-                            <th scope="col">{{ __('Name') }}</th>
-                            <th scope="col">{{ __('Writings') }}</th>
-                            <th scope="col">{{ __('Registered') }}</th>
-                            <th scope="col">{{ __('Verified') }}</th>
+                            <th scope="col">{{ __('Title') }}</th>
+                            <th scope="col">{{ __('Category') }}</th>
+                            <th scope="col">{{ __('Type') }}</th>
+                            <th scope="col">{{ __('Author') }}</th>
+                            <th scope="col">{{ __('Aura') }}</th>
+                            <th scope="col">{{ __('Created') }}</th>
                             <th scope="col">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
 
                     <tbody class="filter-table">
-                        @foreach ($users as $user)
+                        @foreach ($writings as $writing)
                             <tr>
-                                <th scope="row">{{ $user->id }}</th>
-                                <td>{{ ucfirst($user->role) }}</td>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->writings()->count() }}</td>
-                                <td>{{ $user->created_at }}</td>
-                                <td>{{ $user->email_verified_at }}</td>
+                                <th scope="row">{{ $writing->id }}</th>
+                                <td>{{ $writing->title }}</td>
+                                <td>{{ $writing->category->name ?? '' }}</td>
+                                <td>{{ $writing->type->name ?? '' }}</td>
+                                <td>{{ $writing->author->getName() }}</td>
+                                <td>{{ $writing->aura }}</td>
+                                <td>{{ $writing->created_at }}</td>
                                 <td class="action-links">
-                                    <a href="{{ route('users.show', $user) }}"
+                                    <a href="{{ route('writings.show', $writing) }}"
                                         class="btn">
                                         <i class="fas fa-fw fa-eye"></i>
                                     </a>
 
-                                    <a href="{{ route('users.edit', $user) }}" class="btn">
+                                    <a href="{{ route('writings.edit', $writing) }}" class="btn">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.users.destroy', $user) }}"
-                                        data-warning="{{ __('Deleting a user will also delete all writings, votes, shelf, comments and replies tied to that user') }}.">
+                                        data-target="{{ route('admin.users.destroy', $writing) }}"
+                                        data-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>
@@ -83,5 +79,5 @@
         @endif
     </div>
 
-    {{ $users->withQueryString()->links() }}
+    {{ $writings->withQueryString()->links() }}
 @endsection

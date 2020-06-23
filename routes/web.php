@@ -26,6 +26,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('tags', 'AdminController@tags')->name('tags');
     Route::get('pages', 'AdminController@pages')->name('pages');
     Route::get('users', 'AdminController@users')->name('users');
+    Route::get('writings', 'AdminController@writings')->name('writings');
 
     Route::put('settings/edit', 'SettingsController@update')->name('settings.edit');
     Route::put('types/edit', 'TypesController@update')->name('types.edit');
@@ -95,15 +96,15 @@ Route::get('/users/{user}/hood/writings', 'UsersHoodsWritingsController@index')-
 Route::get('/pages/{page}', 'PagesController@show')->name('pages.show');
 
 // Categories
-Route::get('/categories', 'CategoriesController@index')->name('categories.index');
+//Route::get('/categories', 'CategoriesController@index')->name('categories.index');
 Route::get('/categories/{category}', 'CategoriesController@show')->name('categories.show');
 
 // Types
-Route::get('/types', 'TypesController@index')->name('types.index');
+//Route::get('/types', 'TypesController@index')->name('types.index');
 Route::get('/types/{type}', 'TypesController@show')->name('types.show');
 
 // Tags
-Route::get('/tags', 'TagsController@index')->name('tags.index');
+//Route::get('/tags', 'TagsController@index')->name('tags.index');
 Route::get('/tags/{tag}', 'TagsController@show')->name('tags.show');
 
 // Comments and replies
