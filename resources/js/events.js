@@ -60,12 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* document.querySelector('#okok').addEventListener('click', function() {
-        fx.showToast({
-            'message': 'Toast is looking good.'
-        });
-    }); */
-
     // Listen to the toast show event and act accordingly
     document.querySelector('.toast').addEventListener('show.bs.toast', function(event){
         this.closest('.toast-wrapper').classList.add('show');
@@ -342,7 +336,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen to the on submit event on the page and act accordingly
     document.addEventListener('submit', function (event) {
         let element = event.target;
-        let id = element.attributes['id'].value;
+        let id = '';
+
+        if (element.hasAttribute('id')) {
+            id = element.attributes['id'].value;
+        }
+
 
         // Post the writing create/update form
         if ('writing-form' === id) {

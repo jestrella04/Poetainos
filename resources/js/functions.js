@@ -130,12 +130,14 @@ export function showToast(options = {}) {
     let theme = options.theme || 'default';
     let selector = options.selector || '.toast.reuse';
     let message = options.message || '';
+    let delay = options.delay || '6000';
+    let toastNode = document.querySelector(selector);
     let toast = new BSN.Toast(selector, {
-        'delay': 10000
+        'delay': delay
     });
 
-    document.querySelector(selector).classList.remove('success', 'danger');
-    document.querySelector(selector).classList.add(theme);
+    toastNode.classList.remove('success', 'danger');
+    toastNode.classList.add(theme);
 
     if ('' !== message) {
         document.querySelector(selector + ' .toast-body').innerHTML = message;

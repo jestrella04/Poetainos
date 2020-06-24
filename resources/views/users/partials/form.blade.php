@@ -258,6 +258,36 @@
 
         <div class="form-group row">
             <div class="offset-sm-3 col-sm-9">
+                <a class="btn btn-link btn-sm btn-block mb-1"
+                    data-toggle="collapse"
+                    href="#user-profile-delete"
+                    role="button"
+                    aria-expanded="false"
+                    aria-controls="user-profile-delete">
+                    {{ __('Delete account?') }}
+                </a>
+
+                <div class="collapse" id="user-profile-delete">
+                    <div class="card card-body">
+                        <p>
+                            {{ __('We\'re sorry to see you go') }}.
+                            {{ __('Please be aware that when you delete your account all related content will also be removed') }},
+                            {{ __('including but not limited to: writings, comments and replies, likes, shelved items, etc.') }}
+                        </p>
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger btn-block"
+                            form="user-delete-form">
+                            {{ __('Delete account') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="offset-sm-3 col-sm-9">
                 <button
                     type="submit"
                     class="btn btn-dark btn-lg btn-block"
@@ -266,5 +296,11 @@
                 </button>
             </div>
         </div>
+    </form>
+
+    <form id="user-delete-form" class="d-inline" method="POST" action="{{ route('users.destroy', $user) }}">
+        @csrf
+
+        @method('delete')
     </form>
 </div>

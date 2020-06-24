@@ -28,7 +28,7 @@
                         name="username" value="{{ old('username') }}"
                         required
                         autocomplete="username"
-                        pattern="[A-Za-z0-9]+"
+                        pattern="[-._A-Za-z0-9]+"
                         placeholder="{{ __('Enter your username') }}">
 
                     @error('username')
@@ -62,13 +62,20 @@
                         name="password"
                         required
                         autocomplete="new-password"
+                        pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
                         placeholder="{{ __('Enter your password') }}">
 
-                    @error('password')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
+                        @error('password')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+
+                        <small class="form-text text-muted">
+                            Your password must be at least 8 characters long,
+                            must contain at least one upper case letter, one lower case letter and one number,
+                            must contain at least one special character but cannot contain spaces or emojis.
+                        </small>
                 </div>
 
                 <div class="form-group">
@@ -78,6 +85,7 @@
                         name="password_confirmation"
                         required
                         autocomplete="new-password"
+                        pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
                         placeholder="{{ __('Confirm your password') }}">
                 </div>
 

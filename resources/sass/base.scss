@@ -167,14 +167,14 @@ hr {
     box-shadow: 0 0 0 0.2rem rgba($gray-400, 0.25);
 }
 
-.btn-counter.like:not(.voted):hover,
-.btn-counter.dislike:not(.voted):hover,
+.btn-counter.like:hover,
 .voted {
     i {
         color: $danger !important;
     }
 }
 
+.btn-counter.shelf:hover,
 .shelved {
     i {
         color: $indigo !important;

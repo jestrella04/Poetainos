@@ -24,12 +24,14 @@
     }
 
     .comment-list {
+        max-width: 100%;
+
         .comment {
             margin-bottom: 0.5rem;
             border: 1px solid $gray-300;
             background-color: $gray-100;
-            border-radius: 1rem;
-            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
 
             .comment-author {
                 margin-right: 1rem;
@@ -51,8 +53,6 @@
                 }
 
                 .message {
-                    margin-bottom: 1rem;
-
                     .badge {
                         cursor: pointer;
                         margin-left: 0.5rem;
@@ -73,8 +73,8 @@
                 margin-bottom: 0.5rem;
                 border: 1px solid $gray-300;
                 background-color: $gray-100;
-                border-radius: 1rem;
-                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                padding: 0.5rem;
 
                 .reply-author {
                     margin-right: 1rem;
