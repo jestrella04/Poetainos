@@ -21,10 +21,11 @@ class DatabaseSeeder extends Seeder
         });
 
         factory(App\Writing::class, $count)->create()->each(function ($writing) {
+            $writing->categories()->save(factory(App\Category::class)->make());
             $writing->tags()->save(factory(App\Tag::class)->make());
         });
 
-        factory(App\Hood::class, $count)->make();
-        factory(App\Shelf::class, $count)->make();
+        //factory(App\Hood::class, $count)->make();
+        //factory(App\Shelf::class, $count)->make();
     }
 }

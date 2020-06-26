@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use phpDocumentor\Reflection\Types\Self_;
 
 class Category extends Model
 {
@@ -19,7 +18,7 @@ class Category extends Model
 
     public function writings()
     {
-        return $this->hasMany(Writing::class);
+        return $this->belongsToMany(Writing::class);
     }
 
     public static function popular($count = 20)

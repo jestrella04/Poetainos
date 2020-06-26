@@ -49,14 +49,9 @@ class Writing extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function category()
+    public function categories()
     {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function type()
-    {
-        return $this->belongsTo(Type::class);
+        return $this->belongsToMany(Category::class);
     }
 
     public function excerpt()

@@ -1,6 +1,14 @@
 import * as fx from './functions';
 import BSN from "bootstrap.native";
 
+// Wait for the page to be fully loaded
+window.addEventListener('load', () => {
+    // Display the flash messages toast
+    fx.showToast({
+        'selector': '#toast-flash',
+    });
+})
+
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
     // Enable scrolling on the document
@@ -24,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let modalTitleElement = modalForm.querySelector('.modal-title');
 
         // Change title if updating
-        modalForm.addEventListener('show.bs.modal', function (event) {
+        modalForm.addEventListener('show.bs.modal', (event) => {
             let relatedTarget = event.relatedTarget;
 
             if (null === relatedTarget) {
@@ -50,34 +58,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize flash messages toast
-    let toastFlashSelector = '.toast:not(.reuse)';
-    let toastFlash = document.querySelector(toastFlashSelector);
-
-    if (null !== toastFlash) {
-        fx.showToast({
-            'selector': toastFlashSelector
-        });
-    }
-
     // Listen to the toast show event and act accordingly
-    document.querySelector('.toast').addEventListener('show.bs.toast', function(event){
-        this.closest('.toast-wrapper').classList.add('show');
+    document.querySelector('.toast').addEventListener('show.bs.toast', (event) => {
+        event.target.closest('.toast-wrapper').classList.add('show');
     }, false);
 
     // Listen to the toast hidden event and act accordingly
-    document.querySelector('.toast').addEventListener('hidden.bs.toast', function(event){
-        this.closest('.toast-wrapper').classList.remove('show');
+    document.querySelector('.toast').addEventListener('hidden.bs.toast', (event) => {
+        event.target.closest('.toast-wrapper').classList.remove('show');
     }, false);
 
     // Reset toast look/info when closed
-    document.querySelector('.toast.reuse').addEventListener('hidden.bs.toast', function(event){
+    document.querySelector('#toast-reuse').addEventListener('hidden.bs.toast', (event) => {
         // Set default look & feel
-        this.classList.remove('success', 'danger');
-        this.classList.add('default');
+        event.target.classList.remove('success', 'danger');
 
         // Remove last message
-        this.querySelector('.toast-body').innerHTML = '';
+        event.target.querySelector('.toast-body').innerHTML = '';
     }, false);
 
     // Listen to the window resize event and act accordingly
@@ -91,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Listen to the on click event on the page and act accordingly
-    document.addEventListener('click', function (event) {
+    document.addEventListener('click', (event) => {
         let element = event.target;
 
         // Bubble up click event on certain elements
@@ -334,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Listen to the on submit event on the page and act accordingly
-    document.addEventListener('submit', function (event) {
+    document.addEventListener('submit', (event) => {
         let element = event.target;
         let id = '';
 
@@ -540,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Listen to the on change event on the page and act accordingly
-    document.addEventListener('change', function (event) {
+    document.addEventListener('change', (event) => {
         let element = event.target;
 
         // Trigger the cover file validation

@@ -15,8 +15,8 @@ class CreateShelvesTable extends Migration
 	{
 		Schema::create('shelves', function(Blueprint $table)
 		{
-			$table->unsignedInteger('user_id');
-			$table->unsignedInteger('writing_id');
+			$table->unsignedBigInteger('user_id');
+			$table->unsignedBigInteger('writing_id');
             $table->primary(['user_id','writing_id']);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');

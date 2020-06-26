@@ -127,21 +127,29 @@ export function showModal(targetModal, options = {}) {
 }
 
 export function showToast(options = {}) {
-    let theme = options.theme || 'default';
-    let selector = options.selector || '.toast.reuse';
+    let delay = options.delay || 6000;
+    let theme = options.theme || null;
+    let selector = options.selector || '#toast-reuse';
     let message = options.message || '';
-    let delay = options.delay || '6000';
-    let toastNode = document.querySelector(selector);
-    let toast = new BSN.Toast(selector, {
-        'delay': delay
-    });
+    let toast = document.querySelector(selector);
 
-    toastNode.classList.remove('success', 'danger');
-    toastNode.classList.add(theme);
+    // Check if toast exists in the DOM
+    if (null !== toast) {
+        // Reset theming
+        toast.classList.remove('success', 'danger');
 
-    if ('' !== message) {
-        document.querySelector(selector + ' .toast-body').innerHTML = message;
+        if (null !== theme) {
+            toast.classList.add(theme);
+        }
+
+        // Replace message, if provided
+        if ('' !== message) {
+            toast.querySelector('.toast-body').innerHTML = message;
+        }
+
+        // Display toast
+        new BSN.Toast(selector, {
+            'delay': delay
+        }).show();
     }
-
-    toast.show();
 }

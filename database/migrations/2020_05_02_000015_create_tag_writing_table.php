@@ -15,8 +15,8 @@ class CreateTagWritingTable extends Migration
 	{
 		Schema::create('tag_writing', function(Blueprint $table)
 		{
-			$table->unsignedInteger('writing_id');
-			$table->unsignedInteger('tag_id');
+			$table->unsignedBigInteger('writing_id');
+			$table->unsignedBigInteger('tag_id');
             $table->primary(['writing_id','tag_id']);
 
             $table->foreign('tag_id')->references('id')->on('tags')->onDelete('CASCADE');

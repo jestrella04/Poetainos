@@ -1,7 +1,7 @@
 <div class="toast-wrapper" aria-live="polite" aria-atomic="true">
     <div class="toasts">
         @if ($message = session('flash'))
-            <div class="toast default" role="status" aria-live="polite" aria-atomic="true">
+            <div id="toast-flash" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <img src="{{ mix('/static/images/logo-32.png') }}" width="20" height="20" alt="">
                     <strong class="mr-auto">{{ getSiteConfig('name')}}</strong>
@@ -17,7 +17,7 @@
             </div>
         @endif
 
-        <div class="toast default reuse" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="toast-reuse" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <img src="{{ mix('/static/images/logo-32.png') }}" width="20" height="20" alt="">
                 <strong class="mr-auto">{{ getSiteConfig('name')}}</strong>

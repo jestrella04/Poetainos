@@ -15,8 +15,8 @@ class CreateHoodsTable extends Migration
 	{
 		Schema::create('hoods', function(Blueprint $table)
 		{
-			$table->unsignedInteger('user_id');
-			$table->unsignedInteger('fellow_user_id');
+			$table->unsignedBigInteger('user_id');
+			$table->unsignedBigInteger('fellow_user_id');
             $table->primary(['user_id','fellow_user_id']);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');

@@ -1,14 +1,7 @@
 <div class="writing-footer">
-    @if (! empty($writing->type))
-        <div class="footer-item">
-            <i class="fas fa-box fa-fw" title="{{ __('Type') }}"></i>
-            <a href="{{ $writing->type->path() }}" class="badge badge-light d-title">{{ $writing->type->name }}</a>
-        </div>
-    @endif
-
     @if (! empty($writing->category))
         <div class="footer-item">
-            <i class="fas fa-archive fa-fw" title="{{ __('Category') }}"></i>
+            <i class="fas fa-folder-open fa-fw" title="{{ __('Category') }}"></i>
             <a href="{{ $writing->category->path() }}" class="badge badge-light d-title">{{ $writing->category->name }}</a>
         </div>
     @endif

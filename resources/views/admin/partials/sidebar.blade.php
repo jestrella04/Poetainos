@@ -22,15 +22,8 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.types') }}">
-                <i class="fas fa-fw fa-box"></i>
-                {{ __('Types') }}
-            </a>
-        </li>
-
-        <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.categories') }}">
-                <i class="fas fa-fw fa-archive"></i>
+                <i class="fas fa-fw fa-folder-open"></i>
                 {{ __('Categories') }}
             </a>
         </li>

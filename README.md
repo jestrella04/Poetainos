@@ -161,7 +161,8 @@ Project Link: [https://github.com/jestrella04/Writerhood](https://github.com/jes
 * [Native Javascript for Bootstrap](https://thednp.github.io/bootstrap.native/)
 * [Laravel Image Optimizer](https://github.com/spatie/laravel-image-optimizer)
 * [Laravel Readable](https://github.com/RaggiTech/laravel-readable)
-* [Translatable String Exporter for Laravel ](https://github.com/kkomelin/laravel-translatable-string-exporter)
+* [Translatable String Exporter for Laravel](https://github.com/kkomelin/laravel-translatable-string-exporter)
+* [laravel-adjacency-list](https://github.com/staudenmeir/laravel-adjacency-list)
 * [Intervention Image](http://image.intervention.io/)
 * [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 

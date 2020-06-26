@@ -109,7 +109,6 @@ class WritingsController extends Controller
         }
 
         $categories = Category::all();
-        $types = Type::all();
 
         $params = [
             'title' => [
@@ -121,7 +120,6 @@ class WritingsController extends Controller
         return view('writings.edit', [
             'params' => $params,
             'categories' => $categories,
-            'types' => $types,
             'writing' => $writing,
         ]);
     }

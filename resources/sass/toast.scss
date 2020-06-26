@@ -16,13 +16,15 @@
         margin: 0 auto;
 
         .toast {
+            background: linear-gradient(180deg, darken($indigo, 20%) 0%, $indigo 100%);
+            border: 1px solid $indigo;
             box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4);
             color: $white !important;
 
             .toast-header {
                 background-color: transparent;
                 color: $white;
-                border-bottom: 1px solid rgba($light, .05);
+                border-bottom: 1px solid rgba($indigo, .25);
 
                 img {
                     margin-right: 0.5rem;
@@ -31,15 +33,6 @@
                 button {
                     color: $white;
                 }
-            }
-        }
-
-        .toast.default {
-            background: linear-gradient(180deg, darken($indigo, 20%) 0%, $indigo 100%);
-            border: 1px solid $indigo;
-
-            .toast-header {
-                border-bottom: 1px solid rgba($indigo, .25);
             }
 
             a {

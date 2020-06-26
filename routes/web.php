@@ -21,7 +21,6 @@ Auth::routes(['verify' => true]);
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', 'AdminController@index')->name('index');
     Route::get('settings', 'AdminController@settings')->name('settings');
-    Route::get('types', 'AdminController@types')->name('types');
     Route::get('categories', 'AdminController@categories')->name('categories');
     Route::get('tags', 'AdminController@tags')->name('tags');
     Route::get('pages', 'AdminController@pages')->name('pages');
@@ -29,12 +28,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('writings', 'AdminController@writings')->name('writings');
 
     Route::put('settings/edit', 'SettingsController@update')->name('settings.edit');
-    Route::put('types/edit', 'TypesController@update')->name('types.edit');
     Route::put('categories/edit', 'CategoriesController@update')->name('categories.edit');
     Route::put('tags/edit', 'TagsController@update')->name('tags.edit');
     Route::put('pages/edit', 'PagesController@update')->name('pages.edit');
 
-    Route::delete('types/delete/{type}', 'TypesController@destroy')->name('types.destroy');
     Route::delete('categories/delete/{category}', 'CategoriesController@destroy')->name('categories.destroy');
     Route::delete('tags/delete/{tag}', 'TagsController@destroy')->name('tags.destroy');
     Route::delete('pages/delete/{page}', 'PagesController@destroy')->name('pages.destroy');
@@ -98,10 +95,6 @@ Route::get('/pages/{page}', 'PagesController@show')->name('pages.show');
 // Categories
 //Route::get('/categories', 'CategoriesController@index')->name('categories.index');
 Route::get('/categories/{category}', 'CategoriesController@show')->name('categories.show');
-
-// Types
-//Route::get('/types', 'TypesController@index')->name('types.index');
-Route::get('/types/{type}', 'TypesController@show')->name('types.show');
 
 // Tags
 //Route::get('/tags', 'TagsController@index')->name('tags.index');

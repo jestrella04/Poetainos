@@ -36,27 +36,6 @@
             </div>
         </div>
 
-        @if ($types->count() > 0)
-            <div class="form-group row">
-                <label for="type" class="col-sm-2 col-form-label">{{ __('Type') }}:</label>
-
-                <div class="col-sm-10">
-                    <select
-                        name="type"
-                        id="type"
-                        class="form-control custom-select"
-                        required>
-                        <option value="">{{ __('Click to select') }}</option>
-                        @foreach ($types as $type)
-                            <option value="{{ $type->id }}" @if ($type->id === $writing->type_id) {{ 'selected' }} @endif>{{ $type->name }}</option>
-                        @endforeach
-                    </select>
-
-                    <small id="type-error" class="text-danger d-none"></small>
-                </div>
-            </div>
-        @endif
-
         @if ($categories->count() > 0)
             <div class="form-group row">
                 <label for="category" class="col-sm-2 col-form-label">{{ __('Category') }}:</label>

@@ -9,15 +9,15 @@
         <div class="flex-fill">
             <div class="d-flex flex-column">
                 <div class="writing-meta">
-                    <small class="mr-2">
-                        <i class="fas fa-calendar fa-fw"></i>
-                        {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
-                    </small>
-
                     <small>
                         <i class="fas fa-user fa-fw"></i>
                         {{ __('by') }}
                         {{ $writing->author->getName() }}
+                    </small>
+
+                    <small>
+                        <i class="fas fa-calendar fa-fw"></i>
+                        {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
                     </small>
                 </div>
 

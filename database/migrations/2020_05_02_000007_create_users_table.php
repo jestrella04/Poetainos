@@ -15,7 +15,7 @@ class CreateUsersTable extends Migration
 	{
 		Schema::create('users', function(Blueprint $table)
 		{
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('username')->unique();
             $table->enum('role', ['master', 'admin', 'moderator', 'user'])->default('user');
 			$table->string('name')->nullable();
@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
 			$table->string('password');
             $table->timestamp('password_updated_at')->nullable();
             $table->rememberToken();
-			$table->unsignedInteger('profile_views')->default(0);
+			$table->unsignedBigInteger('profile_views')->default(0);
 			$table->boolean('is_enabled')->default(1);
 			$table->timestamps();
 			$table->double('aura')->unsigned()->default(0);

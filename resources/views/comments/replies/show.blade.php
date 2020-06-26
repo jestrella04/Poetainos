@@ -7,16 +7,16 @@
 
     <div class="reply-body flex-grow-1">
         <div class="author">
-            <span>
-                <i class="fa fa-calendar"></i>
-                {{ Carbon\Carbon::parse($reply->created_at)->diffForHumans() }}
-            </span>
-
-            <span>
+            <small>
                 <i class="fa fa-user"></i>
                 {{ __('by') }}
                 {{ $reply->author->getName() }}
-            </span>
+            </small>
+
+            <small>
+                <i class="fa fa-calendar"></i>
+                {{ Carbon\Carbon::parse($reply->created_at)->diffForHumans() }}
+            </small>
         </div>
 
         <div class="message">{{ $reply->message }}</div>
