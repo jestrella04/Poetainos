@@ -1,6 +1,10 @@
 @extends('layouts.master')
 
-@section('main-container')
+@section('body')
+    @yield('header')
+
+    @yield('jumbo-top')
+
     <div class="container main-wrapper">
         <div class="d-flex flex-wrap flex-lg-nowrap">
             <main role="main" class="flex-grow-1">
@@ -10,4 +14,8 @@
             @yield('sidebar')
         </div>
     </div>
+
+    @yield('jumbo-down')
+
+    @yield('footer')
 @endsection

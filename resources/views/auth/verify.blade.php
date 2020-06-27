@@ -1,13 +1,9 @@
-@extends('layouts.index')
+@extends('layouts.login')
 
 @section('title', __('Verify Account'))
 
-@section('header')
-    @include('partials.header')
-@endsection
-
 @section('main')
-    <div id="register" class="d-flex justify-content-center login">
+    <div id="register" class="login">
         <div class="form-wrapper">
             @if (session('resent'))
                 <div class="alert alert-success" role="alert">
@@ -21,13 +17,14 @@
             </div>
 
             <div class="info">
-                {{ __('Before proceeding, please check your email for a verification link.') }}
-                {{ __('If you did not receive the email') }}...
+                {{ __('Before proceeding, please check your email for the verification link that was sent to you') }}.
+                {{ __('You may need to also check your Spam folder') }}.
+                {{ __('If for some reason you did not receive the email you can request another one clicking the below button') }}.
             </div>
 
             <form method="POST" action="{{ route('verification.resend') }}">
                 @csrf
-                <button type="submit" class="btn btn-dark btn-lg btn-block">{{ __('Request another') }}</button>
+                <button type="submit" class="btn btn-dark btn-lg btn-block">{{ __('Request verification') }}</button>
             </form>
 
             <a href="{{ route('home') }}" class="btn btn-link btn-block email-confirmed">
@@ -35,8 +32,4 @@
             </a>
         </div>
     </div>
-@endsection
-
-@section('footer')
-    @include('partials.footer')
 @endsection

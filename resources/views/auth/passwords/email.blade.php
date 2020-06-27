@@ -1,13 +1,9 @@
-@extends('layouts.index')
+@extends('layouts.login')
 
 @section('title', __('Password Recovery'))
 
-@section('header')
-    @include('partials.header')
-@endsection
-
 @section('main')
-    <div id="email-password" class="d-flex justify-content-center login">
+    <div id="email-password" class="login">
         <div class="form-wrapper">
             @if (session('status'))
                 <div class="alert alert-success" role="alert">
@@ -50,8 +46,4 @@
             </form>
         </div>
     </div>
-@endsection
-
-@section('footer')
-    @include('partials.footer')
 @endsection

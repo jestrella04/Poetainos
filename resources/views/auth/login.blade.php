@@ -1,13 +1,9 @@
-@extends('layouts.index')
+@extends('layouts.login')
 
 @section('title', __('Login'))
 
-@section('header')
-    @include('partials.header')
-@endsection
-
 @section('main')
-    <div id="login" class="d-flex justify-content-center login">
+    <div id="login" class="login">
         <div class="form-wrapper">
             <div class="header">
                 <h4 class="all-caps">{{ __('Login to the hood') }}</h4>
@@ -87,8 +83,4 @@
             </form>
         </div>
     </div>
-@endsection
-
-@section('footer')
-    @include('partials.footer')
 @endsection

@@ -33,14 +33,6 @@
         @include('partials.noscript')
         @include('partials.toast')
 
-        @yield('header')
-
-        @yield('jumbo-top')
-
-        @yield('main-container')
-
-        @yield('jumbo-down')
-
-        @yield('footer')
+        @yield('body')
     </body>
 </html>

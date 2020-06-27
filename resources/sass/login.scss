@@ -1,0 +1,89 @@
+.login-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+
+    .logo,
+    .login {
+        width: 100%;
+        padding: 1rem 2rem;
+
+        @media (min-width: 992px) {
+            width: 50%;
+            min-height: 100vh;
+        }
+    }
+
+    .logo {
+        background: linear-gradient(180deg, $dark 0%, $indigo 100%);
+        text-align: center;
+
+        div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            @media (min-width: 992px) {
+                height: 100%;
+            }
+
+            a {
+                color: $white;
+
+                h1 {
+                    @media (max-width: 992px) {
+                        font-size: 2rem;
+                        margin-bottom: 0;
+                    }
+                }
+            }
+
+            a:hover {
+                color: $light;
+            }
+        }
+    }
+
+    .login {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 25rem;
+
+            form {
+                .btn {
+                    text-transform: capitalize;
+                }
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .email-confirmed {
+            margin-top: 1rem;
+        }
+
+        .social {
+            text-align: center;
+            margin-bottom: 1.5rem;
+
+            .btn {
+                width: 42px !important;
+                height: 42px !important;
+                font-size: 24px !important;
+                padding: 4px !important;
+                border-radius: 100% !important;
+            }
+        }
+    }
+}
