@@ -41,7 +41,7 @@ class VerificationController extends Controller
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 
-    public function verfied(Request $request)
+    public function verified(Request $request)
     {
         $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
         $message .= __('You have now unlocked full access to the site.');
