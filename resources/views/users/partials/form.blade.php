@@ -270,7 +270,7 @@
                 <div class="collapse" id="user-profile-delete">
                     <div class="card card-body">
                         <p>
-                            {{ __('We\'re sorry to see you go') }}.
+                            {{ __("We're sorry to see you go") }}.
                             {{ __('Please be aware that when you delete your account all related content will also be removed') }},
                             {{ __('including but not limited to: writings, comments and replies, likes, shelved items, etc.') }}
                         </p>

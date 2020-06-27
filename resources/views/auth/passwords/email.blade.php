@@ -13,7 +13,7 @@
 
             <div class="header">
                 <h4 class="all-caps">{{ __('So you forgot your password') }}</h4>
-                <p class="text-muted">{{ __('No problem, let\'s reset it') }}</p>
+                <p class="text-muted">{{ __("No problem, let's reset it") }}</p>
             </div>
 
             <form method="POST" action="{{ route('password.email') }}">

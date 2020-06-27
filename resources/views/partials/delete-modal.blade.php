@@ -34,7 +34,7 @@
                     class="btn btn-primary"
                     data-dismiss="modal"
                     data-delete-url="">
-                    {{ __('Yes, I\'m sure') }}
+                    {{ __("Yes, I'm sure") }}
                 </button>
             </div>
         </div>

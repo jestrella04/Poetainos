@@ -328,6 +328,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     //
                 });
         }
+
+        // Showing Popovers on register screen
+        if (element.classList.contains('toggle-popover-register')) {
+            let helpText = element.parentElement.querySelector('.help').innerHTML;
+
+            new BSN.Popover(element, {
+                delay: 100,
+                trigger: 'focus',
+                placement: 'top',
+                content: helpText,
+            }).show();
+        }
     });
 
     // Listen to the on submit event on the page and act accordingly

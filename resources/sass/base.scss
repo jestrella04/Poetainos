@@ -239,3 +239,16 @@ hr {
 .d-title {
     text-transform: capitalize;
 }
+
+.popover {
+    color: $white;
+    background: rgba($indigo, 0.9);
+
+    .arrow {
+        visibility: hidden;
+    }
+
+    .popover-body {
+        color: $white;
+    }
+}
