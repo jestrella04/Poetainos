@@ -35,6 +35,23 @@
                         <small id="name-error" class="text-danger d-none"></small>
                     </div>
 
+                    @if ($categories->count() > 0)
+                        <div class="form-group">
+                            <label for="parent" class="col-form-label">{{ __('Parent') }}:</label>
+
+                            <select
+                                name="parent"
+                                id="parent"
+                                class="form-control custom-select">
+                                <option value="">{{ __('None') }}</option>
+                                @foreach (App\Category::tree()->breadthFirst()->get() as $category)
+                                    <option value="{{ $category->id }}">{{ ucfirst($category->name) }}</option>
+                                @endforeach
+                            </select>
+                            <small id="categories-error" class="text-danger d-none"></small>
+                        </div>
+                    @endif
+
                     <div class="form-group">
                         <label for="description" class="col-form-label">{{ __('Description') }}:</label>
 

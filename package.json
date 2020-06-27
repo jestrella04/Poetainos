@@ -25,5 +25,7 @@
         "sass-loader": "^8.0.0",
         "vue-template-compiler": "^2.6.11"
     },
-    "dependencies": {}
+    "dependencies": {
+        "slim-select": "^1.26.0"
+    }
 }

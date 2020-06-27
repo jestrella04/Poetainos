@@ -108,7 +108,7 @@ class WritingsController extends Controller
             $this->authorize('update', $writing);
         }
 
-        $categories = Category::all();
+        $categories = Category::tree()->breadthFirst()->get();
 
         $params = [
             'title' => [
@@ -143,7 +143,7 @@ class WritingsController extends Controller
         request()->validate([
             'title' => 'required|string|min:3|max:100',
             'type' => 'nullable|integer|exists:types,id',
-            'category' => 'nullable|integer|exists:categories,id',
+            'categories' => 'nullable|array|exists:categories,id',
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|string|min:3|max:50',
             'link' => 'nullable|url|max:250',
@@ -174,8 +174,6 @@ class WritingsController extends Controller
 
         // Persist to database
         $writing->user_id = auth()->user()->id;
-        $writing->category_id = request('category');
-        $writing->type_id = request('type');
         $writing->title = request('title');
 
         if (! $writing->exists) {
@@ -186,6 +184,7 @@ class WritingsController extends Controller
         $writing->extra_info = $extraInfo;
         $writing->save();
 
+        $categories = request('categories');
         $tags = [];
 
         // Let's grab the entered tags
@@ -201,6 +200,9 @@ class WritingsController extends Controller
                 $tags[] = $tag->id;
             }
         }
+
+        // Persist categories
+        $writing->categories()->sync($categories);
 
         // Persist tags
         $writing->tags()->sync($tags);

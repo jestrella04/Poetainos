@@ -1,8 +1,10 @@
 <div class="writing-footer">
-    @if (! empty($writing->category))
+    @if (! empty($writing->categories))
         <div class="footer-item">
-            <i class="fas fa-folder-open fa-fw" title="{{ __('Category') }}"></i>
-            <a href="{{ $writing->category->path() }}" class="badge badge-light d-title">{{ $writing->category->name }}</a>
+            <i class="fas fa-folder-open fa-fw" title="{{ __('Categories') }}"></i>
+            @foreach ( $writing->categories as $category )
+                <a href="{{ $category->path() }}" class="badge badge-light d-title">{{ $category->name }}</a>
+            @endforeach
         </div>
     @endif
 

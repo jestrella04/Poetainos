@@ -38,21 +38,22 @@
 
         @if ($categories->count() > 0)
             <div class="form-group row">
-                <label for="category" class="col-sm-2 col-form-label">{{ __('Category') }}:</label>
+                <label for="categories" class="col-sm-2 col-form-label">{{ __('Categories') }}:</label>
 
                 <div class="col-sm-10">
                     <select
-                        name="category"
-                        id="category"
-                        class="form-control custom-select"
+                        name="categories[]"
+                        id="categories"
+                        class="form-control slim-select"
+                        multiple
                         required>
-                        <option value="">{{ __('Click to select') }}</option>
+                        <option value="" data-placeholder="true">{{ __('Click to select') }}</option>
                         @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" @if ($category->id === $writing->category_id) {{ 'selected' }} @endif>{{ $category->name }}</option>
+                            <option value="{{ $category->id }}" @if (Arr::has($writing->categories, $category->id)) {{ 'selected' }} @endif>{{ $category->name }}</option>
                         @endforeach
                     </select>
 
-                    <small id="category-error" class="text-danger d-none"></small>
+                    <small id="categories-error" class="text-danger d-none"></small>
                 </div>
             </div>
         @endif

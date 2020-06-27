@@ -6043,6 +6043,11 @@ slash@^1.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
   integrity sha1-xB8vbDn8FtHNF61LXYlhFK5HDVU=
 
+slim-select@^1.26.0:
+  version "1.26.0"
+  resolved "https://registry.yarnpkg.com/slim-select/-/slim-select-1.26.0.tgz#c00afc7ab9bfbd885f67585eb059c30b0b847afe"
+  integrity sha512-yCdxZNFTnEPcvXcatiwZKRPoLyMOtTppiA4LFrONFI7LqO/WlRyxCAL/Ks/nlXVdp0/Z/3V0QHZcaT9DmXuBhw==
+
 snapdragon-node@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/snapdragon-node/-/snapdragon-node-2.1.1.tgz#6c175f86ff14bdb0724563e8f3c1b021a286853b"

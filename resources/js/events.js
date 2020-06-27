@@ -1,5 +1,6 @@
 import * as fx from './functions';
 import BSN from "bootstrap.native";
+import SlimSelect from 'slim-select'
 
 // Wait for the page to be fully loaded
 window.addEventListener('load', () => {
@@ -24,9 +25,24 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    // Working with admin modal forms
+    // Set element where to initialize Slim Select
+    let slimSelector = document.querySelector('.slim-select');
+
+    // Initialize Slim Select
+    if(null !== slimSelector) {
+        new SlimSelect({
+            select: slimSelector,
+            showSearch: false,
+            closeOnSelect: false,
+            allowDeselectOption: true,
+            deselectLabel: '<i class="fas fa-times-circle"></i>',
+        });
+    }
+
+    // Set what modal element should be displayed
     let modalForm = document.querySelector('.form-wrapper');
 
+    // Working with admin modal forms
     if (null !== modalForm && modalForm.classList.contains('modal')) {
         let targetForm = modalForm.querySelector('form');
         let modalTitleElement = modalForm.querySelector('.modal-title');
@@ -266,9 +282,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let targetData = JSON.parse(element.attributes['data-target-form-data'].value);
 
             console.log(targetModel);
-            if ('type' === targetModel || 'category' === targetModel) {
+            if ('category' === targetModel) {
                 targetForm.id.value = targetData.id;
                 targetForm.name.value = targetData.name;
+                targetForm.parent.value = targetData.parent_id;
                 targetForm.description.value = targetData.description;
             }
 

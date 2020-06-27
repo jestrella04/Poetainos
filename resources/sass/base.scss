@@ -252,3 +252,30 @@ hr {
         color: $white;
     }
 }
+
+.ss-main {
+    .ss-multi-selected {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background-color: transparent;
+        margin: 0;
+        margin-top: -4px;
+
+        .ss-add {
+            margin: 9px 5px 0 5px;
+        }
+
+        .ss-values {
+            .ss-value {
+                font-size: 0.8rem;
+                background-color: $indigo;
+                padding: 0.2rem 0.6rem;
+            }
+        }
+
+        .ss-content {
+            margin: 0.6rem -0.7rem !important;
+        }
+    }
+}

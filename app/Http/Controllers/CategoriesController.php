@@ -97,11 +97,13 @@ class CategoriesController extends Controller
         request()->validate([
             'id' => 'required|integer',
             'name' => ['required', 'string', Rule::unique('App\Category')->ignore($category), 'min:3', 'max:40'],
+            'parent' => 'nullable|integer|exists:categories,id',
             'description' => 'required|string|min:3|max:255',
         ]);
 
         // Update accordingly
         $category->name = request('name');
+        $category->parent_id = request('parent');
         $category->description = request('description');
 
         if (! $category->exists) {
