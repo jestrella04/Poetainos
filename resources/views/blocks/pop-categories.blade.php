@@ -5,7 +5,12 @@
 
     <div class="block-body">
         @forelse (App\Category::popular(20) as $category)
-            <a href="{{ $category->path() }}" class="btn btn-outline-dark btn-sm writing-category d-title">{{ $category->name }}</a>
+            @if ($category->writings_count > 0)
+                <a href="{{ $category->path() }}" class="btn btn-outline-dark btn-sm writing-category d-title">
+                    <span>{{ $category->name }}</span>
+                    <span>({{ $category->writings_count }})</span>
+                </a>
+            @endif
         @empty
             @include('partials.empty-block')
         @endforelse

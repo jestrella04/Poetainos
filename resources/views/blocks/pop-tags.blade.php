@@ -5,7 +5,12 @@
 
     <div class="block-body">
         @forelse (App\Tag::popular(20) as $tag)
-            <a href="{{ $tag->path() }}" class="btn btn-outline-dark btn-sm writing-tag d-title">{{ $tag->name }}</a>
+            @if ($tag->writings_count > 0)
+                <a href="{{ $tag->path() }}" class="btn btn-outline-dark btn-sm writing-tag d-title">
+                    <span>{{ $tag->name }}</span>
+                    <span>({{ $tag->writings_count }})</span>
+                </a>
+            @endif
         @empty
             @include('partials.empty-block')
         @endforelse
