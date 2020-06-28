@@ -17,12 +17,30 @@ class AdminController extends Controller
     public function index() {
         return view('admin.summary', [
             'counters' => [
-                'users' => ReadableHumanNumber(User::all()->count()),
-                'writings' => ReadableHumanNumber(Writing::all()->count()),
-                'comments' => ReadableHumanNumber(Comment::all()->count() + Reply::all()->count()),
-                'categories' => ReadableHumanNumber(Category::all()->count()),
-                'tags' => ReadableHumanNumber(Tag::all()->count()),
-                'votes' => ReadableHumanNumber(Vote::all()->count()),
+                'users' => [
+                    'title' => __('Users'),
+                    'count' => ReadableHumanNumber(User::all()->count()),
+                ],
+                'writings' => [
+                    'title' => __('Writings'),
+                    'count' => ReadableHumanNumber(Writing::all()->count()),
+                ],
+                'comments' => [
+                    'title' => __('Comments'),
+                    'count' => ReadableHumanNumber(Comment::all()->count() + Reply::all()->count()),
+                ],
+                'categories' => [
+                    'title' => __('Categories'),
+                    'count' => ReadableHumanNumber(Category::all()->count()),
+                ],
+                'tags' => [
+                    'title' => __('Tags'),
+                    'count' => ReadableHumanNumber(Tag::all()->count()),
+                ],
+                'likes' => [
+                    'title' => __('Likes'),
+                    'count' => ReadableHumanNumber(Vote::all()->count()),
+                ],
             ]
         ]);
     }
