@@ -49,7 +49,10 @@
                         required>
                         <option value="" data-placeholder="true">{{ __('Click to select') }}</option>
                         @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" @if (Arr::has($writing->categories, $category->id)) {{ 'selected' }} @endif>{{ $category->name }}</option>
+                            <option value="{{ $category->id }}"
+                            @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif>
+                            {{ $category->name }}
+                            </option>
                         @endforeach
                     </select>
 

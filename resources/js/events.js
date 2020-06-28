@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize Slim Select
     if(null !== slimSelector) {
-        new SlimSelect({
+        var slimSelect = new SlimSelect({
             select: slimSelector,
             showSearch: false,
             closeOnSelect: false,
@@ -368,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
             id = element.attributes['id'].value;
         }
 
-
         // Post the writing create/update form
         if ('writing-form' === id) {
             event.preventDefault();
@@ -386,6 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Form posted successfully, let's reset it
                     if (! method) {
                         element.reset();
+                        slimSelect.set([]);
                     }
 
                     // Update file helpers
