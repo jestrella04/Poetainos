@@ -64,7 +64,7 @@
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.users.destroy', $writing) }}"
+                                        data-target="{{ route('admin.writings.destroy', $writing) }}"
                                         data-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>

@@ -11,8 +11,8 @@
 
             <div class="modal-body">
                 <p class="confirm-msg">
-                    {{ __('This action is irreversible.') }}
                     {{ __('Are you sure you want to permanent delete this item?') }}
+                    {{ __('This action is irreversible.') }}
                 </p>
 
                 <div class="alert alert-warning alert-delete d-none">
@@ -33,7 +33,8 @@
                     type="button"
                     class="btn btn-primary"
                     data-dismiss="modal"
-                    data-delete-url="">
+                    data-delete-url=""
+                    data-redirect-url="">
                     {{ __("Yes, I'm sure") }}
                 </button>
             </div>

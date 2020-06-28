@@ -134,17 +134,7 @@
             </button>
 
             <div class="dropdown-menu" aria-labelledby="dropdown-owner">
-                @can('update', $writing)
-                    <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">{{ __('Edit') }}</a>
-                @endcan
-
-                @can('delete', $writing)
-                    <a href="#"
-                        class="dropdown-item user-content-delete"
-                        data-target="{{ route('writings.destroy', $writing) }}">
-                        {{ __('Delete') }}
-                    </a>
-                @endcan
+                <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">{{ __('Edit / Delete') }}</a>
             </div>
         </div>
     @endif

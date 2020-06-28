@@ -139,6 +139,20 @@
             </div>
         </div>
 
+        @if ($writing->exists && auth()->user()->can('delete', $writing))
+        <div class="form-group row">
+            <div class="offset-sm-2 col-sm-10">
+                <a href="#delete-modal"
+                    class="user-content-delete btn btn-link btn-sm btn-block text-danger"
+                    data-target="{{ route('writings.destroy', $writing) }}"
+                    data-redirect="{{ route('home') }}"
+                    data-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
+                    {{ __('Delete this writing?') }}
+                </a>
+            </div>
+        </div>
+        @endif
+
         <div class="form-group row">
             <div class="offset-sm-2 col-sm-10">
                 <button
@@ -155,3 +169,7 @@
         </div>
     </form>
 </div>
+
+@if ($writing->exists && auth()->user()->can('delete', $writing))
+    @include('partials.delete-modal')
+@endif

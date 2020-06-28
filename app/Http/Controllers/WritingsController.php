@@ -241,6 +241,10 @@ class WritingsController extends Controller
         $this->authorize('delete', $writing);
         $writing->delete();
 
+        if (request('redirect')) {
+            request()->session()->flash('flash', __('Writing deleted successfully'));
+        }
+
         return [
             'message' => __('Writing deleted successfully')
         ];

@@ -315,6 +315,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnDelete.attributes['data-delete-url'].value = element.attributes['data-target'].value;
             }
 
+            if (null !== btnDelete && element.hasAttribute('data-redirect')) {
+                btnDelete.attributes['data-redirect-url'].value = element.attributes['data-redirect'].value;
+            }
+
             fx.showModal(targetModal, {
                 'backdrop': 'static'
             });
@@ -323,21 +327,30 @@ document.addEventListener('DOMContentLoaded', () => {
         // Deleting a record
         if (element.hasAttribute('id') && 'btn-modal-delete' === element.attributes['id'].value) {
             let url = element.attributes['data-delete-url'].value;
+            let redirect = element.attributes['data-redirect-url'].value;
             let params = new FormData();
 
             params.append('_method', 'delete');
 
+            if (null !== redirect && '' !== redirect) {
+                params.append('redirect', true);
+            }
+
             // Post the form to the server
             axios.post(url, params)
                 .then(function (response) {
-                    fx.showToast({
-                        'message': response.data.message,
-                        'theme': 'success'
-                    });
+                    if (null !== redirect && '' !== redirect) {
+                        location.assign(redirect);
+                    } else {
+                        fx.showToast({
+                            'message': response.data.message,
+                            'theme': 'success'
+                        });
+                    }
                 })
                 .catch(function (error) {
                     fx.showToast({
-                        'message': 'msg-save-error',
+                        'message': error.response.data.message,
                         'theme': 'danger'
                     });
                 })
