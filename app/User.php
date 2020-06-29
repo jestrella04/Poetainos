@@ -96,6 +96,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return strtoupper(substr($this->username, 0, 1));
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     public function writings()
     {
         return $this->hasMany(Writing::class);
@@ -201,15 +206,5 @@ class User extends Authenticatable implements MustVerifyEmail
     public static function featured($count = 20)
     {
         return Self::orderByDesc('aura')->take($count)->get();
-    }
-
-    public function getRoles()
-    {
-        return [
-            'master',
-            'admin',
-            'moderator',
-            'user'
-        ];
     }
 }

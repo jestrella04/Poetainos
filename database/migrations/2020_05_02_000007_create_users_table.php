@@ -17,7 +17,7 @@ class CreateUsersTable extends Migration
 		{
             $table->bigIncrements('id');
             $table->string('username')->unique();
-            $table->enum('role', ['master', 'admin', 'moderator', 'user'])->default('user');
+            $table->unsignedBigInteger('role_id');
 			$table->string('name')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -30,6 +30,8 @@ class CreateUsersTable extends Migration
 			$table->double('aura')->unsigned()->default(0);
             $table->timestamp('aura_updated_at')->nullable();
             $table->json('extra_info')->nullable();
+
+            $table->foreign('role_id')->references('id')->on('roles');
 		});
 	}
 

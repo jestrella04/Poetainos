@@ -5,7 +5,6 @@
 use App\Comment;
 use App\Reply;
 use App\User;
-use App\Writing;
 use Faker\Generator as Faker;
 
 $factory->define(Reply::class, function (Faker $faker) {
