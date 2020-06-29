@@ -202,4 +202,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return Self::orderByDesc('aura')->take($count)->get();
     }
+
+    public function getRoles()
+    {
+        return [
+            'master',
+            'admin',
+            'moderator',
+            'user'
+        ];
+    }
 }

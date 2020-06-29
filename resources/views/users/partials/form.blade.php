@@ -41,6 +41,24 @@
             </div>
         </div>
 
+        {{-- @if (auth()->user()->isAdmin())
+            <div class="form-group row">
+                <label for="name" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
+                <div class="col-sm-9">
+                    <input type="text"
+                        class="form-control"
+                        name="name"
+                        id="name"
+                        value="{{ @old('name', $user->getName()) }}"
+                        minlength="3"
+                        maxlength="60"
+                        placeholder=""
+                        required>
+                    <small id="name-error" class="text-danger d-none"></small>
+                </div>
+            </div>
+        @endif --}}
+
         <div class="form-group row">
             <label for="name" class="col-sm-3 col-form-label">{{ __('Name') }}:</label>
             <div class="col-sm-9">
