@@ -48,5 +48,8 @@ class AppServiceProvider extends ServiceProvider
                 Log::info($sql->time);
             });
         }
+
+        // Loading project's custom language strings
+        $this->loadJSONTranslationsFrom(resource_path('lang/Writerhood'));
     }
 }
