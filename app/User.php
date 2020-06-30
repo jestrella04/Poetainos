@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -187,17 +188,16 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isAdmin()
     {
-        if (in_array($this->role, ['master', 'admin'])) {
-            return true;
-        }
+        if (!empty($this->role->extra_info)) {
+            $permissions = $this->role->extra_info['permissions'];
 
-        return false;
-    }
+            $admin = Arr::first($permissions, function ($value, $key) {
+                return 'admin' === $value['permission']['name'];
+            })['permission'];
 
-    public function isModerator()
-    {
-        if (in_array($this->role, ['moderator'])) {
-            return true;
+            if ($admin['enabled']) {
+                return true;
+            }
         }
 
         return false;

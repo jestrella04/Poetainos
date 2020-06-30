@@ -1,0 +1,22 @@
+{
+    "permissions": [
+        "admin",
+        "update_writing",
+        "delete_writing",
+        "create_comment",
+        "update_comment",
+        "delete_comment",
+        "update_user",
+        "delete_user",
+        "create_category",
+        "update_category",
+        "delete_category",
+        "create_page",
+        "update_page",
+        "delete_page",
+        "create_role",
+        "update_role",
+        "delete_role",
+        "update_settings"
+    ]
+}

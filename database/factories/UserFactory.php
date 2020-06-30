@@ -22,6 +22,5 @@ $factory->define(User::class, function (Faker $faker) {
         'username' => $faker->unique()->userName,
         'email' => $faker->unique()->safeEmail,
         'password' => '$2y$10$Qh9yxR9v6OfLQU5Lw61hQOLVvdegUt7WxG9/HXGVvxZB2Wd.Si.aK', // password
-        'role_id' => factory(Role::class),
     ];
 });
