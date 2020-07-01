@@ -1,10 +1,10 @@
 {
     "name": {
-        "value": "Writerhood",
+        "value": "{{site_name}}",
         "description": "Site name to be displayed across the app."
     },
     "slogan": {
-        "value": "The definitive community for amateur writers",
+        "value": "{{site.slogan}}",
         "description": "Site slogan to be displayed across the app."
     },
     "pagination": {

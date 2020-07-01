@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        {{-- @if (auth()->user()->isAdmin())
+        {{-- @if (auth()->user()->role->isAllowed('admin'))
             <div class="form-group row">
                 <label for="name" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
                 <div class="col-sm-9">

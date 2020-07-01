@@ -18,7 +18,7 @@ class UserPolicy
      */
     public function update(User $user, User $model)
     {
-        if ($model->is($user) || $user->isAdmin()) {
+        if ($model->is($user) || $user->role->isAllowed('admin')) {
             return true;
         }
     }
@@ -32,7 +32,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model)
     {
-        if ($model->is($user) || $user->isAdmin()) {
+        if ($model->is($user) || $user->role->isAllowed('admin')) {
             return true;
         }
     }

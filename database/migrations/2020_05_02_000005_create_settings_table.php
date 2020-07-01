@@ -19,13 +19,6 @@ class CreateSettingsTable extends Migration
             $table->string('name')->unique();
             $table->json('data');
         });
-
-        // Default JSON settings
-        $site = file_get_contents(base_path('resources/json/settings.default.json'));
-
-        DB::table('settings')->insert([
-            ['name' => 'site', 'data' => $site],
-        ]);
     }
 
     /**

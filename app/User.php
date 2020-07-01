@@ -186,23 +186,6 @@ class User extends Authenticatable implements MustVerifyEmail
         DB::table($this->getTable())->whereId($this->id)->update(['aura' => $aura, 'aura_updated_at' => Carbon::now()]);
     }
 
-    public function isAdmin()
-    {
-        if (!empty($this->role->extra_info)) {
-            $permissions = $this->role->extra_info['permissions'];
-
-            $admin = Arr::first($permissions, function ($value, $key) {
-                return 'admin' === $value['permission']['name'];
-            })['permission'];
-
-            if ($admin['enabled']) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public static function featured($count = 20)
     {
         return Self::orderByDesc('aura')->take($count)->get();
