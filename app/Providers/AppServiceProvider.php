@@ -5,9 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use App\Setting;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,20 +28,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Getting App settings from database
-        try {
-            if (Schema::hasTable('settings')) {
-                $settings = Setting::where('name', 'site')->first()->pluck('data');
+        // Check the app is not running in CLI mode
+        if (! App::runningInConsole()) {
+            // Getting App settings from database
+            try {
+                if (Schema::hasTable('settings')) {
+                    $settings = Setting::where('name', 'site')->first()->pluck('data');
 
-                config([
-                    'writerhood' => $settings[0]
-                ]);
-            }
-        } catch (\Throwable $th) {
-            $route = $this->app->request->getRequestUri();
+                    config([
+                        'writerhood' => $settings[0]
+                    ]);
+                }
+            } catch (\Throwable $th) {
+                $route = $this->app->request->getRequestUri();
 
-            if ('/init' !== substr($route, 0, 5)) {
-                abort(403);
+                if ('/init' !== substr($route, 0, 5)) {
+                    abort(403);
+                }
             }
         }
 
