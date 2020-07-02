@@ -68,7 +68,7 @@ Route::middleware(['verified'])->group(function () {
 // Installation
 Route::get('/init', 'InitController@show')->name('init.show');
 Route::post('/init', 'InitController@init')->name('init.init');
-Route::get('/init/success', 'InitController@success')->name('init.succeess');
+Route::get('/init/success', 'InitController@success')->name('init.success');
 
 // PWA manifest
 Route::get('/static/json/pwa-manifest.json', 'ResourcesController@pwaManifest')->name('pwa.manifest');

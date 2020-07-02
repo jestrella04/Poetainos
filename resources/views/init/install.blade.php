@@ -12,13 +12,14 @@
                     border: 1px solid #e3e3e3;
                     background-color: #ededed">
             <div class="logo text-center mb-4">
-                <img src="{{ mix('/static/images/logo.svg') }}" width="96" height="96" alt="{{ getSiteConfig('name') }}">
+                <img src="{{ mix('/static/images/logo.svg') }}" width="96" height="96">
                 <h1>{{ env('APP_NAME') }}</h1>
                 <p class="lead">Database Initialization</p>
+
                 <small>
                     You are only asked for the most basic and required information here.
-                    After the process is completed you will be taken to the admin panel,
-                    where you can further customize settings to your needs.
+                    After the process is completed you will have the choice to be taken
+                    to the admin panel, where you can further customize settings to your needs.
                 </small>
             </div>
 

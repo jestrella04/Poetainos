@@ -19,7 +19,11 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password', 'password_updated_at',
+        'username',
+        'role_id',
+        'email',
+        'password',
+        'password_updated_at',
     ];
 
     /**
@@ -189,5 +193,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public static function featured($count = 20)
     {
         return Self::orderByDesc('aura')->take($count)->get();
+    }
+
+    public function isAllowed($task)
+    {
+        if (null !== ($this->role())) {
+            $this->task = $task;
+
+            $allowed = Arr::first($this->role->permissions(), function ($value, $key) {
+                return $this->task === $value['name'];
+            });
+
+            if ($allowed['enabled']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

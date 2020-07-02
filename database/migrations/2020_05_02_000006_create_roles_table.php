@@ -18,8 +18,8 @@ class CreateRolesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name')->unique();
 			$table->string('description')->nullable();
-			$table->timestamps();
             $table->json('extra_info')->nullable();
+            $table->timestamps();
         });
 	}
 

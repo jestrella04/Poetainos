@@ -18,6 +18,7 @@ class CreateSettingsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name')->unique();
             $table->json('data');
+            $table->timestamps();
         });
     }
 

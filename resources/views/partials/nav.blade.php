@@ -17,7 +17,7 @@
 
         <div id="header-navbar" class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
-                @if (auth()->check() && auth()->user()->role->isAllowed('admin'))
+                @if (auth()->check() && auth()->user()->isAllowed('admin'))
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('admin.index') }}">
                             <i class="fas fa-cogs fa-fw"></i>
@@ -70,7 +70,7 @@
                         </a>
 
                         <div class="dropdown-menu">
-                            @if (auth()->user()->role->isAllowed('admin'))
+                            @if (auth()->user()->isAllowed('admin'))
                                 <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
                             @endif
                             <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>

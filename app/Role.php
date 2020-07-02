@@ -8,6 +8,17 @@ use Illuminate\Support\Arr;
 class Role extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'description',
+        'extra_info',
+    ];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
@@ -18,26 +29,14 @@ class Role extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class);
     }
 
     public function permissions()
     {
-        return $this->extra_info['permissions'];
-    }
+        $extra_info = $this->extra_info;
+        $permissions = $extra_info['permissions'];
 
-    public function isAllowed($task)
-    {
-        $this->task = $task;
-
-        $allowed = Arr::first($this->permissions(), function ($value, $key) {
-            return $this->task === $value['permission']['name'];
-        })['permission'];
-
-        if ($allowed['enabled']) {
-            return true;
-        } else {
-            return false;
-        }
+        return $permissions;
     }
 }

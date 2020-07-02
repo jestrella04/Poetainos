@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Role;
+use App\Setting;
+use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class InitController extends Controller
@@ -19,50 +22,62 @@ class InitController extends Controller
             'admin_password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'],
         ]);
 
-        // Default JSON settings
+        // Create default JSON settings
         $site = file_get_contents(base_path('resources/json/settings.default.json'));
         $site = str_replace('{{site_name}}', request('site_name'), $site);
         $site = str_replace('{{site_slogan}}', request('site_slogan'), $site);
 
-        DB::table('settings')->insert([
-            ['name' => 'site', 'data' => $site],
+        Setting::create([
+            'name' => 'site',
+            'data' => json_decode($site),
         ]);
 
         // Create default master role
-        $extra_info = [];
+        $extra_info = ['permissions' => []];
         $permissions = json_decode(file_get_contents(base_path('resources/json/roles_permissions.json')));
         $permissions = $permissions->permissions;
 
         foreach($permissions as $permission) {
-            $extra_info[]['permission'] = [
+            $extra_info['permissions'][] = [
                 'name' => $permission,
                 'enabled' => true
             ];
         }
 
-        $roleId = DB::table('roles')->insertGetId([
-            [
-                'name' => 'master',
-                'description' => 'Master role with all privileges enabled by default',
-                'extra_info' => '{ "permissions": ' . json_encode($extra_info) . ' }'
-            ],
+        $role = Role::create([
+            'name' => 'master',
+            'description' => 'Master role with all privileges enabled by default',
+            'extra_info' => $extra_info,
         ]);
 
-        //
-        $userId = DB::table('users')->insertGetId([
-            [
-                'username' => request('admin_username'),
-                'role_id' => $roleId,
-                'email' => request('admin_email'),
-                'password' => Hash::make(request('admin_password')),
-            ],
+        $user = User::create([
+            'username' => request('admin_username'),
+            'role_id' => $role->id,
+            'email' => request('admin_email'),
+            'password' => Hash::make(request('admin_password')),
         ]);
 
-        redirect(route(('init.success')));
+        // Authenticate admin user
+        Auth::login($user);
+
+        // Set flash message
+        request()->session()->flash('init', true);
+
+        // Redirect to the init success page
+        return redirect(route(('init.success')));
     }
 
     public function show()
     {
         return view('init.install');
+    }
+
+    public function success()
+    {
+        if (session('init')) {
+            return view('init.success');
+        }
+
+        abort(404);
     }
 }

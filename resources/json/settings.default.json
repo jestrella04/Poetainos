@@ -4,7 +4,7 @@
         "description": "Site name to be displayed across the app."
     },
     "slogan": {
-        "value": "{{site.slogan}}",
+        "value": "{{site_slogan}}",
         "description": "Site slogan to be displayed across the app."
     },
     "pagination": {

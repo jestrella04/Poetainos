@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Setting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,7 +38,11 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
         } catch (\Throwable $th) {
-            //throw $th;
+            $route = $this->app->request->getRequestUri();
+
+            if ('/init' !== substr($route, 0, 5)) {
+                abort(403);
+            }
         }
 
         // Debugging SQL queries

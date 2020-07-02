@@ -21,11 +21,11 @@ class CreateWritingsTable extends Migration
 			$table->string('slug')->unique();
 			$table->text('text');
 			$table->unsignedBigInteger('views')->default(0);
-			$table->timestamps();
-			$table->double('aura')->unsigned()->default(0);
+            $table->double('aura')->unsigned()->default(0);
+            $table->json('extra_info')->nullable();
+            $table->timestamps();
             $table->timestamp('aura_updated_at')->nullable();
             $table->timestamp('home_posted_at')->nullable();
-            $table->json('extra_info')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
 		});

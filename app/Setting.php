@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-     /**
-     * Indicates if the model should be timestamped.
+    /**
+     * The attributes that are mass assignable.
      *
-     * @var bool
+     * @var array
      */
-    public $timestamps = false;
+    protected $fillable = [
+        'name',
+        'data',
+    ];
 
     /**
      * The attributes that should be cast to native types.

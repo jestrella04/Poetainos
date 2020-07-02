@@ -19,7 +19,7 @@ class WritingPolicy
      */
     public function update(User $user, Writing $writing)
     {
-        if ($writing->author->is($user) || $user->role->isAllowed('admin')) {
+        if ($writing->author->is($user) || $user->isAllowed('admin')) {
             return true;
         }
     }
@@ -33,7 +33,7 @@ class WritingPolicy
      */
     public function delete(User $user, Writing $writing)
     {
-        if ($writing->author->is($user) || $user->role->isAllowed('admin')) {
+        if ($writing->author->is($user) || $user->isAllowed('admin')) {
             return true;
         }
     }

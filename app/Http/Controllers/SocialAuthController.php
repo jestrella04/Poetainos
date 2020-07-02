@@ -63,8 +63,10 @@ class SocialAuthController extends Controller
             $user->save();
         }
 
-        // Redirect user
+        // Authenticate user
         Auth::login($user);
+
+        // Set flash message content
         if ($exists) {
             $message = __('Welcome back to the hood, we missed you!');
         } else {
@@ -73,7 +75,10 @@ class SocialAuthController extends Controller
             $message .= __('Go ahead and vote, comment, reply, find the muses and publish your writings.');
         }
 
+        // Set flash message
         request()->session()->flash('flash', $message);
+
+        // Redirect user
         return redirect(route('home'));
     }
 }
