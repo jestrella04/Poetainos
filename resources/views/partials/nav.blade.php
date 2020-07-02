@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
-            <img src="{{ mix('/static/images/logo-32.png') }}" width="32" height="32" alt="{{ getSiteConfig('name') }}">
+            <img src="{{ mix('/static/images/logo.svg') }}" width="32" height="32" alt="{{ getSiteConfig('name') }}">
         </a>
 
         <div class="toggler-wrapper">

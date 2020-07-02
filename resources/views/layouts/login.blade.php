@@ -5,7 +5,7 @@
         <div class="logo">
             <div>
                 <a href="{{ route('home') }}">
-                    <img src="{{ mix('/static/images/logo-64.png') }}" width="64" height="64" alt="{{ getSiteConfig('name') }}">
+                    <img src="{{ mix('/static/images/logo.svg') }}" width="64" height="64" alt="{{ getSiteConfig('name') }}">
                     <h1>{{ getSiteConfig('name') }}</h1>
                 </a>
             </div>
