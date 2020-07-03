@@ -41,23 +41,24 @@
             </div>
         </div>
 
-        {{-- @if (auth()->user()->isAllowed('admin'))
+        @if (auth()->user()->isAllowed('admin'))
             <div class="form-group row">
-                <label for="name" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
+                <label for="role" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
                 <div class="col-sm-9">
-                    <input type="text"
-                        class="form-control"
-                        name="name"
-                        id="name"
-                        value="{{ @old('name', $user->getName()) }}"
-                        minlength="3"
-                        maxlength="60"
-                        placeholder=""
-                        required>
+                    <div class="form-group">
+                      <select class="form-control" name="role" id="role">
+                        <option value="null">User</option>
+                        @foreach (App\Role::all() as $role)
+                            <option value="{{ $role->id }}" @if ($user->role_id === $role->id) {{ 'selected' }} @endif>
+                                {{ $role->name }}
+                            </option>
+                        @endforeach
+                      </select>
+                    </div>
                     <small id="name-error" class="text-danger d-none"></small>
                 </div>
             </div>
-        @endif --}}
+        @endif
 
         <div class="form-group row">
             <label for="name" class="col-sm-3 col-form-label">{{ __('Name') }}:</label>
@@ -66,7 +67,7 @@
                     class="form-control"
                     name="name"
                     id="name"
-                    value="{{ @old('name', $user->getName()) }}"
+                    value="{{ @old('name', $user->name) }}"
                     minlength="3"
                     maxlength="60"
                     placeholder=""

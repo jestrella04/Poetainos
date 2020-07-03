@@ -139,7 +139,7 @@ hr {
 
 .btn-counter {
     background-color: $gray-100 !important;
-    color: $gray-600 !important;
+    //color: $gray-600 !important;
     cursor: default !important;
 }
 
@@ -158,8 +158,9 @@ hr {
 
 .btn-counter.click:hover,
 .dropdown-counter .dropdown-item:hover {
+    background-color: $gray-200 !important;
     i {
-        color: $gray-700 !important;
+        //color: $gray-700 !important;
     }
 }
 
@@ -276,6 +277,22 @@ hr {
 
         .ss-content {
             margin: 0.6rem -0.7rem !important;
+        }
+    }
+}
+
+.offline-wrapper {
+    text-align: center;
+
+    #offline {
+        margin: 2rem auto;
+        width: 90%;
+        max-width: 25rem;
+        border-radius: 0.6rem;
+        padding: 1rem 2rem;
+
+        i {
+            opacity: 0.6;
         }
     }
 }

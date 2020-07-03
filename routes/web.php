@@ -79,6 +79,7 @@ Route::get('/login/{service}/callback', 'SocialAuthController@handleProviderCall
 
 // Generic
 Route::get('/', 'HomeController@show')->name('home');
+Route::get('/offline', 'HomeController@offline')->name('offline');
 Route::redirect('/home', '/');
 Route::get('/search', 'SearchController@show')->name('search');
 

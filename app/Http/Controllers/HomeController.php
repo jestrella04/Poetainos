@@ -24,4 +24,13 @@ class HomeController extends Controller
             'params' => $params
         ]);
     }
+
+    public function offline()
+    {
+        return view('offline.index', [
+            'params' => [
+                'title' => __('Offline')
+            ]
+        ]);
+    }
 }

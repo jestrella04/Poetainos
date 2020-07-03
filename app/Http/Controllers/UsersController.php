@@ -117,6 +117,7 @@ class UsersController extends Controller
 
         // Validate user input
         request()->validate([
+            'role' => 'nullable|integer|exists:roles,id',
             'name' => 'required|string|min:3|max:60',
             'email' => 'required|email|min:3|max:40',
             'bio' => 'nullable|string|min:3|max:300',
@@ -171,6 +172,7 @@ class UsersController extends Controller
         ];
 
         // Persist to database
+        $user->role_id = request('role');
         $user->name = request('name');
         $user->email = request('email');
         $user->extra_info = $extraInfo;

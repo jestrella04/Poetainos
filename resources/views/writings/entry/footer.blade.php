@@ -1,5 +1,5 @@
 <div class="writing-footer">
-    @if (! empty($writing->categories))
+    @if (count($writing->categories) > 0)
         <div class="footer-item">
             <i class="fas fa-folder-open fa-fw" title="{{ __('Categories') }}"></i>
             @foreach ( $writing->categories as $category )

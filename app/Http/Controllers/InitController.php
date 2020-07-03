@@ -69,7 +69,11 @@ class InitController extends Controller
 
     public function show()
     {
-        return view('init.install');
+        if (null === Setting::where('name', 'site')->first()) {
+            return view('init.install');
+        }
+
+        abort(404);
     }
 
     public function success()

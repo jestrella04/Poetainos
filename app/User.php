@@ -197,7 +197,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isAllowed($task)
     {
-        if (null !== ($this->role())) {
+        if (null !== ($this->role)) {
             $this->task = $task;
 
             $allowed = Arr::first($this->role->permissions(), function ($value, $key) {

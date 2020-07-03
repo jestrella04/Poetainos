@@ -142,7 +142,6 @@ class WritingsController extends Controller
         // Validate user input
         request()->validate([
             'title' => 'required|string|min:3|max:100',
-            'type' => 'nullable|integer|exists:types,id',
             'categories' => 'nullable|array|exists:categories,id',
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|string|min:3|max:50',

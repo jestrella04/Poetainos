@@ -398,7 +398,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Form posted successfully, let's reset it
                     if (! method) {
                         element.reset();
-                        slimSelect.set([]);
+
+                        if (null !== slimSelect && undefined !== slimSelect) {
+                            slimSelect.set([]);
+                        }
                     }
 
                     // Update file helpers
