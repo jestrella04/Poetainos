@@ -1,6 +1,6 @@
 @php $avatarSrc = $user->avatarPath() ?? '' @endphp
 <div id="profile-form-wrapper" class="form-wrapper">
-    <h3 class="title all-caps">{{ __('Update profile') }}</h3>
+    <h2 class="title all-caps">{{ __('Update profile') }}</h2>
 
     <form id="profile-form" action="{{ route('users.edit', $user) }}" method="POST">
         @csrf
@@ -46,7 +46,7 @@
                 <label for="role" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
                 <div class="col-sm-9">
                     <div class="form-group">
-                      <select class="form-control" name="role" id="role">
+                      <select class="form-control custom-select" name="role" id="role">
                         <option value="null">User</option>
                         @foreach (App\Role::all() as $role)
                             <option value="{{ $role->id }}" @if ($user->role_id === $role->id) {{ 'selected' }} @endif>

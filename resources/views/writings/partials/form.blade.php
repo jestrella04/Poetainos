@@ -1,11 +1,11 @@
 <div id="writing-form-wrapper" class="form-wrapper">
-    <h3 class="title all-caps">
+    <h2 class="title all-caps">
         @if ($writing->exists)
             {{ $params['title']['update'] }}
         @else
         {{ $params['title']['create'] }}
         @endif
-    </h3>
+    </h2>
 
     @if ($writing->exists)
         @php $update = route('writings.edit', $writing) @endphp
@@ -127,8 +127,11 @@
 
                 <button id="cover-chooser" data-target="#cover">
                     <div class="placeholder">
-                        <p>{{ __('Click here to select a file') }}</p>
-                        <p class="text-muted">{{ __('Max file size is :size', ['size' => getSiteConfig('uploads_max_file_size') . 'kb']) }}</p>
+                        <p>
+                            <strong>{{ __('Click here to select a file') }}</strong>
+                        </p>
+
+                        <p>{{ __('Max file size is :size', ['size' => getSiteConfig('uploads_max_file_size') . 'kb']) }}</p>
                     </div>
 
                     <span id="selected-file" class="file-info d-none"></span>

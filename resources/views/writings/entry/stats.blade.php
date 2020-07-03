@@ -102,6 +102,7 @@
             data-writing-title="{{ $writing->title }}"
             data-toggle="tooltip"
             data-placement="top"
+            aria-label="{{ __('Share') }}"
             aria-haspopup="true"
             aria-expanded="false">
             <i class="fa fa-share-alt fa-fw"></i>
@@ -128,6 +129,7 @@
                 data-toggle="dropdown"
                 data-toggle="tooltip"
                 data-placement="top"
+                aria-label="{{ __('Edit / Delete') }}"
                 aria-haspopup="true"
                 aria-expanded="false">
                 <i class="fas fa-cog fa-fw"></i>
