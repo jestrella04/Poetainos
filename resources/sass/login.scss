@@ -30,7 +30,14 @@
                 color: $white;
 
                 img {
+                    width: 64px;
+                    height: 64px;
                     margin-bottom: $wh-m-lg;
+
+                    @media (min-width: 992px) {
+                        width: 128px;
+                        height: 128px;
+                    }
                 }
 
                 h1 {

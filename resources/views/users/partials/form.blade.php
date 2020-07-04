@@ -45,16 +45,14 @@
             <div class="form-group row">
                 <label for="role" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
                 <div class="col-sm-9">
-                    <div class="form-group">
-                      <select class="form-control custom-select" name="role" id="role">
+                    <select class="form-control custom-select" name="role" id="role">
                         <option value="null">User</option>
                         @foreach (App\Role::all() as $role)
                             <option value="{{ $role->id }}" @if ($user->role_id === $role->id) {{ 'selected' }} @endif>
                                 {{ $role->name }}
                             </option>
                         @endforeach
-                      </select>
-                    </div>
+                    </select>
                     <small id="name-error" class="text-danger d-none"></small>
                 </div>
             </div>
@@ -309,7 +307,7 @@
             <div class="offset-sm-3 col-sm-9">
                 <button
                     type="submit"
-                    class="btn btn-dark btn-lg btn-block"
+                    class="btn btn-primary btn-lg btn-block"
                     id="submit">
                     {{ __('Save changes') }}
                 </button>

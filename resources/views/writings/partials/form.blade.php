@@ -161,7 +161,7 @@
                 <button
                     type="submit"
                     id="submit"
-                    class="btn btn-dark btn-lg btn-block">
+                    class="btn btn-primary btn-lg btn-block">
                     @if ($writing->exists)
                         {{ __('Save changes') }}
                     @else

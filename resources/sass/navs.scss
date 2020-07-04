@@ -38,7 +38,7 @@ nav {
 
     .navbar-nav {
         li:not(:first-child) {
-            margin-left: $wh-m-xl;
+            margin-left: $wh-m-lg;
         }
     }
 
@@ -48,8 +48,6 @@ nav {
         .nav-link {
             color: $white;
             font-weight: 700;
-            padding-left: 0;
-            padding-right: 0;
         }
 
         i {
@@ -59,23 +57,12 @@ nav {
         .dropdown-menu {
             a.dropdown-item,
             button {
+                border-radius: 0;
                 text-transform: capitalize !important;
-                font-weight: 400;
-                color: $gray-700;
-            }
-
-            a:hover.dropdown-item,
-            a:active.dropdown-item,
-            button:hover,
-            button:active {
-                font-weight: 400;
-                color: $gray-900;
-                background-color: transparent;
             }
         }
     }
 
-    .nav-item:active,
     .nav-item:hover,
     .nav-item.active {
         border-bottom: 0.15rem solid $primary;

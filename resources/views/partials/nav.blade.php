@@ -78,7 +78,7 @@
                             <a class="dropdown-item" href="{{ auth()->user()->shelfPath() }}">{{ __('My shelf') }}</a>
                             <form class="d-inline" method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="dropdown-item">{{ __('Logout') }}</button>
+                                <button type="submit" class="btn dropdown-item">{{ __('Logout') }}</button>
                             </form>
                         </div>
                     </li>

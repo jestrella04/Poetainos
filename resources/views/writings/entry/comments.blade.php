@@ -15,11 +15,10 @@
                         placeholder="{{ __('Leave your comment here') }}"
                         aria-label="{{ __('Leave your comment here') }}"
                         maxlength="300"
-                        required>
-                    </textarea>
+                        required></textarea>
                 </div>
 
-                <button class="btn btn-dark btn-sm btn-block">{{ __('Post Comment') }}</button>
+                <button class="btn btn-primary btn-block">{{ __('Post Comment') }}</button>
             </form>
         @else
             <div class="text-center">

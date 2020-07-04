@@ -24,7 +24,7 @@
 
             <form method="POST" action="{{ route('verification.resend') }}">
                 @csrf
-                <button type="submit" class="btn btn-dark btn-lg btn-block">{{ __('Request verification') }}</button>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">{{ __('Request verification') }}</button>
             </form>
 
             <a href="{{ route('home') }}" class="btn btn-link btn-block email-confirmed">

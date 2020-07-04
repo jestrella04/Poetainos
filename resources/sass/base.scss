@@ -141,11 +141,6 @@ hr {
     cursor: default !important;
 }
 
-.dropdown-counter .dropdown-item,
-.dropdown-counter .dropdown-item i {
-    color: $gray-700 !important;
-}
-
 .btn-counter:focus {
     box-shadow: 0 0 0 0.2rem rgba($gray-400, 0.25);
 }
@@ -154,8 +149,7 @@ hr {
     cursor: pointer !important;
 }
 
-.btn-counter.click:hover,
-.dropdown-item:hover {
+.btn-counter.click:hover {
     background-color: $gray-200 !important;
 }
 

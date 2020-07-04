@@ -23,7 +23,7 @@
             {{ $comment->message }}
 
             @auth
-                <span class="badge badge-dark badge-reply" data-target="#reply-form-{{ $comment->id }}">
+                <span class="badge badge-primary badge-reply" data-target="#reply-form-{{ $comment->id }}">
                     {{ __('Reply') }}
                 </span>
             @endauth
@@ -44,11 +44,10 @@
                         placeholder="{{ __('Leave your reply here') }}"
                         aria-label="{{ __('Leave your reply here') }}"
                         maxlength="300"
-                        required>
-                    </textarea>
+                        required></textarea>
                 </div>
 
-                <button class="btn btn-dark btn-sm btn-block">{{ __('Post Reply') }}</button>
+                <button class="btn btn-primary btn-block">{{ __('Post Reply') }}</button>
             </form>
         @endauth
     </div>

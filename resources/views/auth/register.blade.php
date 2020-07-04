@@ -108,11 +108,11 @@
 
                 <div class="form-group">
                     <div class="d-flex flex-wrap">
-                        <button type="submit" class="btn btn-dark btn-lg btn-block">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">
                             {{ __('Create account') }}
                         </button>
 
-                        <a href="{{ route('login') }}" class="btn btn-success btn-lg btn-block">{{ __('Login') }}</a>
+                        <a href="{{ route('login') }}" class="btn btn-dark btn-lg btn-block">{{ __('Login') }}</a>
                     </div>
                 </div>
             </form>

@@ -64,11 +64,11 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-dark btn-lg btn-block">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
                         {{ __('Login') }}
                     </button>
 
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg btn-block">
+                    <a href="{{ route('register') }}" class="btn btn-dark btn-lg btn-block">
                         {{ __('Create account') }}
                     </a>
                 </div>
