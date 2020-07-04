@@ -90,7 +90,7 @@
     }
 
     .writing-footer {
-        margin-bottom: $wh-m-sm;
+        margin-bottom: $wh-m-lg;
 
         .footer-item {
             i {
@@ -106,7 +106,7 @@
         }
 
         .footer-item:not(:last-child) {
-            margin-bottom: $wh-m-md;
+            margin-bottom: $wh-m-sm;
         }
     }
 
