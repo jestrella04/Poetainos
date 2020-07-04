@@ -9,6 +9,6 @@ php artisan route:cache
 php artisan view:cache
 php artisan optimize
 php artisan cache:clear
-php artisan migrate
+php artisan migrate --force
 yarnpkg run production
 php artisan up
