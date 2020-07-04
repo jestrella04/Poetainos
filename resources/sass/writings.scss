@@ -41,9 +41,13 @@
         }
     }
 
-    .writing-cover {
+    .writing-cover,
+    .writing-cover img {
         width: 100%;
         max-width: 1080px;
+    }
+
+    .writing-cover {
         border-radius: 0.3rem;
         overflow: hidden;
         margin-right: auto;
@@ -51,7 +55,6 @@
         margin-bottom: $wh-m-lg;
 
         img {
-            width: 100%;
             transition: transform .5s, filter .5s ease-in-out;
         }
 
