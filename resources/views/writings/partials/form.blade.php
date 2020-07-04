@@ -103,7 +103,7 @@
                     name="link"
                     id="link"
                     class="form-control"
-                    value="{{ old('link', $writing->extra_info['link']) }}"
+                    value="{{ old('link', isset($writing->extra_info['link']) ? $writing->extra_info['link'] : '') }}"
                     minlength="3"
                     maxlength="250"
                     placeholder="">

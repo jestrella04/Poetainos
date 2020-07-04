@@ -164,7 +164,7 @@ class UsersController extends Controller
                 'youtube' => request('youtube') ?? '',
                 'goodreads' => request('goodreads') ?? '',
             ],
-            'avatar' => $avatar ?? $user->extra_info['avatar'],
+            'avatar' => $avatar ?? (isset($user->extra_info['avatar']) ? $user->extra_info['avatar'] : ''),
             'website' => request('website') ?? '',
             'location' => request('location') ?? '',
             'interests' => request('interests') ?? '',
