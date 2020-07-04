@@ -12,6 +12,7 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/static/js')
+    .js('resources/js/pwabuilder-sw.js', 'public/pwabuilder-sw.js')
     .sass('resources/sass/app.scss', 'public/static/css').options({
         processCssUrls: false
     })

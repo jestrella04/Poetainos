@@ -3,6 +3,7 @@
 /public/storage
 /public/static/*
 /public/sitemap.xml
+/public/pwabuilder-sw.js
 /storage/*.key
 /vendor
 .env

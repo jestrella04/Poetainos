@@ -14,7 +14,7 @@
         </div>
 
         <div>
-            <a class="btn btn-dark btn-lg btn-block" href="{{ route('home') }}" role="button">{{ __('Reload') }}</a>
+            <a class="btn btn-primary btn-lg btn-block" href="{{ route('home') }}" role="button">{{ __('Reload') }}</a>
         </div>
     </div>
 </main>
