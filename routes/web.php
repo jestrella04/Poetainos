@@ -45,12 +45,12 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/writings/create', 'WritingsController@create')->name('writings.create');
     Route::post('/writings/create', 'WritingsController@store')->name('writings.store');
     Route::get('/writings/edit/{writing}', 'WritingsController@edit')->name('writings.edit');
-    Route::put('/writings/edit/{writing}', 'WritingsController@update')->name('writings.edit');
+    Route::put('/writings/edit/{writing}', 'WritingsController@update')->name('writings.update');
     Route::delete('/writings/delete/{writing}', 'WritingsController@destroy')->name('writings.destroy');
 
     // Users
     Route::get('/users/edit/{user}', 'UsersController@edit')->name('users.edit');
-    Route::put('/users/edit/{user}', 'UsersController@update')->name('users.edit');
+    Route::put('/users/edit/{user}', 'UsersController@update')->name('users.update');
     Route::delete('/users/delete/{user}', 'UsersController@destroy')->middleware('password.confirm')->name('users.destroy');
 
     // Comments and replies

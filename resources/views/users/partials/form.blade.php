@@ -2,7 +2,7 @@
 <div id="profile-form-wrapper" class="form-wrapper">
     <h2 class="title all-caps">{{ __('Update profile') }}</h2>
 
-    <form id="profile-form" action="{{ route('users.edit', $user) }}" method="POST">
+    <form id="profile-form" action="{{ route('users.update', $user) }}" method="POST">
         @csrf
 
         @method('put')
