@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     fx.handleForm(element, 'response');
 
                     // Scroll back to the form header
-                    document.querySelector('#writing-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    document.querySelector('#writing-form-wrapper .title').scrollIntoView({ behavior: 'smooth', block: 'end' });
                 });
         }
 
@@ -485,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     fx.handleForm(element, 'response');
 
                     // Scroll back to the form header
-                    document.querySelector('#profile-form-wrapper h3').scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    document.querySelector('#profile-form-wrapper .title').scrollIntoView({ behavior: 'smooth', block: 'end' });
                 });
         }
 
