@@ -15,13 +15,6 @@ class Reply extends Model
         'user_id', 'comment_id', 'message',
     ];
 
-     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
     public function comment()
     {
         return $this->belongsTo(Comment::class);
