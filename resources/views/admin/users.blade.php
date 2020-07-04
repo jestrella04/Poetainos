@@ -50,7 +50,7 @@
                         @foreach ($users as $user)
                             <tr>
                                 <th scope="row">{{ $user->id }}</th>
-                                <td>{{ ucfirst($user->role) }}</td>
+                                <td>{{ ucfirst($user->role->name) }}</td>
                                 <td>{{ $user->username }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->writings()->count() }}</td>

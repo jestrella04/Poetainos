@@ -33,8 +33,7 @@
                         <tr>
                             <th scope="col">{{ __('Id') }}</th>
                             <th scope="col">{{ __('Title') }}</th>
-                            <th scope="col">{{ __('Category') }}</th>
-                            <th scope="col">{{ __('Type') }}</th>
+                            <th scope="col">{{ __('Categories') }}</th>
                             <th scope="col">{{ __('Author') }}</th>
                             <th scope="col">{{ __('Aura') }}</th>
                             <th scope="col">{{ __('Created') }}</th>
@@ -47,8 +46,7 @@
                             <tr>
                                 <th scope="row">{{ $writing->id }}</th>
                                 <td>{{ $writing->title }}</td>
-                                <td>{{ $writing->category->name ?? '' }}</td>
-                                <td>{{ $writing->type->name ?? '' }}</td>
+                                <td>{{ $writing->categoriesAsString() ?? '' }}</td>
                                 <td>{{ $writing->author->getName() }}</td>
                                 <td>{{ $writing->aura }}</td>
                                 <td>{{ $writing->created_at }}</td>

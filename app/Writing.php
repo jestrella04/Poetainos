@@ -74,15 +74,26 @@ class Writing extends Model
         return $this->belongsToMany(Tag::class);
     }
 
+    public function categoriesAsString($delimiter = ',')
+    {
+        $array = $this->categories
+        ->map(function ($category) {
+            return $category->name;
+        })
+        ->toArray();
+
+        return implode($delimiter, $array);
+    }
+
     public function tagsAsString($delimiter = ',')
     {
-        $tagsArray = $this->tags
+        $array = $this->tags
         ->map(function ($tag) {
             return $tag->name;
         })
         ->toArray();
 
-        return implode($delimiter, $tagsArray);
+        return implode($delimiter, $array);
     }
 
     public function shelf()
