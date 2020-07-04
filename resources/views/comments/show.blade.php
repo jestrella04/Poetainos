@@ -37,7 +37,15 @@
 
                 <div class="form-group">
                     <small id="reply-error-{{ $comment->id }}" class="form-text d-none text-danger"></small>
-                    <textarea name="reply" class="form-control" maxlength="300" required></textarea>
+
+                    <textarea
+                        name="reply"
+                        class="form-control"
+                        placeholder="{{ __('Leave your reply here') }}"
+                        aria-label="{{ __('Leave your reply here') }}"
+                        maxlength="300"
+                        required>
+                    </textarea>
                 </div>
 
                 <button class="btn btn-dark btn-sm btn-block">{{ __('Post Reply') }}</button>
