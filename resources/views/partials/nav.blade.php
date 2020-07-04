@@ -17,6 +17,13 @@
 
         <div id="header-navbar" class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="{{ route('home') }}">
+                        <i class="fas fa-home fa-fw"></i>
+                        {{ __('Home') }}
+                    </a>
+                </li>
+
                 @if (auth()->check() && auth()->user()->isAllowed('admin'))
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('admin.index') }}">
