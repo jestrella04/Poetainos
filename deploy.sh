@@ -1,8 +1,8 @@
 #!/bin/bash
 php artisan down
 git pull
-mkdir public/static/storage
-php artisan storage:link
+#mkdir public/static/storage
+#php artisan storage:link
 composer install --optimize-autoloader --no-dev
 php artisan config:cache
 php artisan route:cache
