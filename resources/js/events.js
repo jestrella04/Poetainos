@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let slimSelector = document.querySelector('.slim-select');
 
     // Initialize Slim Select
-    if(null !== slimSelector) {
+    if(null !== slimSelector && undefined !== slimSelector) {
         var slimSelect = new SlimSelect({
             select: slimSelector,
             showSearch: false,
@@ -95,12 +95,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen to the window resize event and act accordingly
     window.addEventListener('resize', function () {
+        let overlay = document.querySelector('#side-menu-overlay');
+        let toggler = document.querySelector('#toggler i');
+        let sideMenu = document.querySelectorAll('.side-menu');
+
         document.body.classList.remove('overflow-hidden');
-        document.querySelector('#side-menu-overlay').classList.add('d-none');
-        document.querySelector('#toggler i').classList.remove('fa-times');
-        document.querySelectorAll('.side-menu').forEach(function (aside) {
-            aside.classList.remove('show');
-        });
+
+        if (null !== overlay && undefined !== overlay) {
+            overlay.classList.add('d-none');
+        }
+
+        if (null !== toggler && undefined !== toggler) {
+            toggler.classList.remove('fa-times');
+        }
+
+        if (null !== sideMenu && undefined !== sideMenu) {
+            sideMenu.forEach(function (aside) {
+                aside.classList.remove('show');
+            });
+        }
     });
 
     // Listen to the on click event on the page and act accordingly
@@ -150,10 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Dynamically load comments for a writing
-        if (element.parentElement.hasAttribute('id') && 'load-more' === element.parentElement.attributes['id'].value) {
-            let url = element.attributes['data-href'].value;
+        if (null !== element.parentElement && undefined !== element.parentElement) {
+            if (element.parentElement.hasAttribute('id') && 'load-more' === element.parentElement.attributes['id'].value) {
+                let url = element.attributes['data-href'].value;
 
-            fx.loadComments(url);
+                fx.loadComments(url);
+            }
         }
 
         // Show/hide the comment reply form

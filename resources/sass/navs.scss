@@ -37,21 +37,23 @@ nav {
     }
 
     .navbar-nav {
-        li {
-            margin-left: 1.5rem;
+        li:not(:first-child) {
+            margin-left: $wh-m-xl;
         }
     }
 
     .nav-item {
         border-bottom: 0.15rem solid transparent;
 
-        a {
+        .nav-link {
             color: $white;
             font-weight: 700;
+            padding-left: 0;
+            padding-right: 0;
         }
 
         i {
-            margin-right: 0.2rem;
+            margin-right: $wh-m-sm;
         }
 
         .dropdown-menu {
