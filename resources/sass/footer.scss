@@ -1,25 +1,24 @@
 #footer {
     margin-top: auto;
-    font-size: 0.7rem;
+    font-size: $wh-font-sm;
     text-align: center;
-    background: linear-gradient(180deg, $dark 0%, $indigo 100%);
+    background: $bg-gradient;
     color: $white;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding: 2rem;
 
     a {
-        color: $light;
-    }
-
-    a:hover {
         color: $white;
     }
 
+    a:hover {
+        color: $light;
+    }
+
     .social-links {
-        font-size: 1.2rem;
+        font-size: $wh-font-md;
 
         a {
-            margin: 0 0.25rem;
+            margin: 0 $wh-m-sm;
         }
 
         a:hover {
@@ -28,32 +27,13 @@
     }
 
     .social-links:not(:empty) {
-        margin-bottom: 1rem;
+        margin-bottom: $wh-m-lg;
     }
 
     #back-to-top-wrapper {
         position: fixed;
-        right: 20px;
-        bottom: 20px;
+        right: 2rem;
+        bottom: 1rem;
         z-index: 99999;
-
-        button {
-            width: 42px !important;
-            height: 42px !important;
-            font-size: 24px !important;
-            padding: 4px !important;
-            border-radius: 100% !important;
-            border: 1px solid darken($indigo, 10%);
-            background-color: $indigo;
-            color: $light;
-
-            i {
-                vertical-align: text-top;
-            }
-        }
-
-        button:hover {
-            background-color: darken($indigo, 10%);
-        }
     }
 }

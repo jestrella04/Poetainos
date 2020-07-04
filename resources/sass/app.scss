@@ -1,10 +1,11 @@
+@import './bs_variables.scss';
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
 @import 'node_modules/@fortawesome/fontawesome-free/scss/brands';
 @import 'node_modules/@fortawesome/fontawesome-free/scss/regular';
 @import 'node_modules/@fortawesome/fontawesome-free/scss/solid';
 @import 'node_modules/slim-select/src/slim-select/slimselect.scss';
-/* @import './_variables.scss'; */
+@import './_wh_variables.scss';
 @import './base.scss';
 @import './toast.scss';
 @import './waves.scss';
@@ -17,4 +18,3 @@
 @import './footer.scss';
 @import './admin.scss';
 @import './login.scss';
-@import './animations.scss';

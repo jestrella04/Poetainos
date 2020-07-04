@@ -1,5 +1,5 @@
 <a href="{{ route('social.login', 'facebook') }}"
-    class="btn btn-primary"
+    class="btn btn-primary btn-blue"
     title="{{ __('Login with Facebook') }}"
     data-toggle="tooltip"
     data-placement="top">

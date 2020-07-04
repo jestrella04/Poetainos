@@ -1,18 +1,18 @@
 .avatar {
-    width: 96px;
-    height: 96px;
-    max-width: 96px;
-    max-height: 96px;
-    border: 1px solid $gray-700;
-    background-color: $gray-400;
+    width: $wh-avatar-xxl;
+    height: $wh-avatar-xxl;
+    max-width: $wh-avatar-xxl;
+    max-height: $wh-avatar-xxl;
+    border: 1px solid $gray-500;
+    background-color: $gray-300;
     color: $dark;
     border-radius: 100%;
     display: inline-block;
     text-align: center;
     vertical-align: middle;
     font-weight: 700;
-    font-size: 38px;
-    line-height: 96px;
+    font-size: $wh-avatar-xxl * 0.4;
+    line-height: $wh-avatar-xxl;
     overflow: hidden;
 }
 
@@ -53,7 +53,7 @@
             }
 
             .avatar {
-                margin-bottom: 0.5rem;
+                margin-bottom: $wh-m-sm;
             }
 
             p {
@@ -69,69 +69,69 @@
 
 .navbar {
     .avatar {
-        width: 22px;
-        height: 22px;
-        max-width: 22px;
-        max-height: 22px;
-        font-size: 8px;
-        line-height: 22px;
-        margin-right: 0.2rem;
+        width: $wh-avatar-sm;
+        height: $wh-avatar-sm;
+        max-width: $wh-avatar-sm;
+        max-height: $wh-avatar-sm;
+        font-size: $wh-avatar-sm * 0.4;
+        line-height: $wh-avatar-sm;
+        margin-right: $wh-m-sm;
     }
 }
 
 .block {
     .avatar {
-        width: 32px;
-        height: 32px;
-        max-width: 32px;
-        max-height: 32px;
-        font-size: 12px;
-        line-height: 32px;
-        margin-right: 0.2rem;
+        width: $wh-avatar-md;
+        height: $wh-avatar-md;
+        max-width: $wh-avatar-md;
+        max-height: $wh-avatar-md;
+        font-size: $wh-avatar-md * 0.4;
+        line-height: $wh-avatar-md;
+        margin-right: $wh-m-sm;
     }
 
     .author-link {
-        margin-bottom: 0.2rem;
-        margin-right: 0.3em;
+        margin-bottom: $wh-m-sm;
+        margin-right: $wh-m-sm;
     }
 }
 
 .comment-list {
     .avatar {
-        width: 64px;
-        height: 64px;
-        max-width: 64px;
-        max-height: 64px;
-        font-size: 25px;
-        line-height: 64px;
+        width: $wh-avatar-xl;
+        height: $wh-avatar-xl;
+        max-width: $wh-avatar-xl;
+        max-height: $wh-avatar-xl;
+        font-size: $wh-avatar-xl * 0.4;
+        line-height: $wh-avatar-xl;
     }
 
     .reply-list {
         .avatar {
-            width: 48px;
-            height: 48px;
-            max-width: 48px;
-            max-height: 48px;
-            font-size: 20px;
-            line-height: 48px;
+            width: $wh-avatar-lg;
+            height: $wh-avatar-lg;
+            max-width: $wh-avatar-lg;
+            max-height: $wh-avatar-lg;
+            font-size: $wh-avatar-lg * 0.4;
+            line-height: $wh-avatar-lg;
         }
     }
 }
 
 hr.banner {
-    margin-bottom: 2rem;
+    margin-bottom: $wh-m-xl;
 }
 
 .user-profile {
-    margin-bottom: 1rem;
+    margin-bottom: $wh-m-lg;
 
     .profile-header {
-        margin-bottom: 1rem;
+        margin-bottom: $wh-m-lg;
 
         .user-name {
-            font-size: 1.2rem;
+            font-size: $wh-font-md;
             font-weight: 700;
-            margin-bottom: .5rem;
+            margin-bottom: $wh-m-sm;
         }
 
         .profile-bio {
@@ -143,11 +143,11 @@ hr.banner {
     }
 
     .avatar {
-        margin-bottom: 0.5rem;
+        margin-bottom: $wh-m-sm;
     }
 
     .user-stats {
-        margin-bottom: 2rem;
+        margin-bottom: $wh-m-xl;
     }
 
     .profile-footer {
@@ -161,7 +161,7 @@ hr.banner {
                 text-transform: capitalize;
 
                 i {
-                    margin-right: 0.2rem;
+                    margin-right: $wh-m-sm;
                 }
             }
         }
@@ -171,7 +171,7 @@ hr.banner {
 #profile-form-wrapper {
     #profile-form {
         .form-check {
-            font-size: 0.8rem;
+            font-size: $wh-font-sm
 
             span {
                 vertical-align: middle;

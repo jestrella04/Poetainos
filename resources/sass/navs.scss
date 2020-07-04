@@ -1,8 +1,11 @@
 nav {
-    font-size: 0.8rem;
+    font-size: $wh-font-sm;
 }
 
 .navbar {
+    padding-top: 1rem;
+    padding-bottom: 0;
+
     .navbar-brand {
         img {
             transition: transform .5s, filter .5s ease-in-out;
@@ -25,7 +28,7 @@ nav {
         background-color: transparent;
 
         i {
-            color: $light;
+            color: $white;
         }
     }
 
@@ -40,18 +43,11 @@ nav {
     }
 
     .nav-item {
+        border-bottom: 0.15rem solid transparent;
+
         a {
             color: $white;
             font-weight: 700;
-        }
-
-        .nav-link:active,
-        .nav-link:hover {
-            background-color: rgba($indigo, 0.7);
-
-            @media (min-width: 992px) {
-                border-radius: 0.5rem;
-            }
         }
 
         i {
@@ -77,22 +73,21 @@ nav {
         }
     }
 
+    .nav-item:active,
+    .nav-item:hover,
     .nav-item.active {
-        background-color: $indigo;
-        font-weight: 700;
+        border-bottom: 0.15rem solid $primary;
+    }
 
+    .nav-item.active {
         a {
             font-weight: 700;
-        }
-
-        @media (min-width: 992px) {
-            border-radius: 1rem;
         }
     }
 }
 
 .admin-main-wrapper {
-    margin-top: 1rem;
+    margin-top: $wh-m-lg;
 
     nav {
         position: absolute;

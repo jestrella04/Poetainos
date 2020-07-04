@@ -107,16 +107,11 @@
                     <li class="nav-item d-lg-none">
                         <form class="d-inline" method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="dropdown-item">
+                            <button type="submit" class="btn">
                                 <i class="fas fa-sign-out-alt fa-fw"></i>
                                 {{ __('Logout') }}
                             </button>
                         </form>
-
-                        {{-- <a class="nav-link" href="{{ route('logout') }}">
-                            <i class="fas fa-sign-out-alt fa-fw"></i>
-                            {{ __('Logout') }}
-                        </a> --}}
                     </li>
                 @else
                     <li class="nav-item {{ Route::current()->getName() === 'login' ? 'active' : '' }}">

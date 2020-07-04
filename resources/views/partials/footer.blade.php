@@ -46,7 +46,7 @@
     <div id="back-to-top-wrapper" class="fade-out">
         <button
             id="back-to-top"
-            class="btn"
+            class="btn btn-primary btn-sm"
             title="{{ __('Back to top') }}"
             data-toggle="tooltip"
             data-placement="left"

@@ -1,6 +1,6 @@
 .settings-json-input {
     font-family: monospace;
-    font-size: 0.8rem;
+    font-size: $wh-font-sm;
 }
 
 .admin-main-wrapper {
@@ -12,10 +12,10 @@
     padding: 1rem 2rem;
 
     .admin-section {
-        margin-bottom: 2rem;
+        margin-bottom: $wh-m-xl;
 
         .top-section {
-            margin-bottom: 2rem;
+            margin-bottom: $wh-m-xl;
 
             h1,
             h2,
@@ -23,17 +23,17 @@
             h4,
             h5,
             h6 {
-                margin-bottom: 2rem;
+                margin-bottom: $wh-m-xl;
             }
 
             .filter-box {
-                margin-right: 1rem;
+                margin-right: $wh-m-lg;
             }
         }
 
         .admin-counter {
             padding: 2rem;
-            margin: 0.5rem;
+            margin: $wh-m-sm;
             background-color: $primary;
             color: $light;
             border-radius: 1rem;
@@ -49,7 +49,7 @@
                 line-height: initial;
 
                 i {
-                    opacity: 0.7;
+                    opacity: 0.85;
                 }
             }
 
