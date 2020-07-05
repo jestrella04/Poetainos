@@ -29,6 +29,10 @@
             <hr class="banner">
         @endif
 
+        @if ('home' === Route::current()->getName())
+            @include('partials.home-head')
+        @endif
+
         @if ('home' !== Route::current()->getName() && count($writings) > 0)
             @include('writings.partials.toplinks')
         @endif
