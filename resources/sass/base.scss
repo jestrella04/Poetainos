@@ -290,13 +290,35 @@ hr {
 
 .offline-wrapper {
     text-align: center;
+    background: $bg-gradient;
+    display: flex;
+    flex-grow: 1;
+    color: $white;
+
+    @media (min-height: 740px) {
+        align-items: center;
+    }
 
     #offline {
         margin: 2rem auto;
         width: 90%;
         max-width: 25rem;
         border-radius: 0.6rem;
-        padding: 1rem 2rem;
+        padding: 2rem;
+
+        @media (min-width: 992px) {
+            background-color: rgba($dark, 0.1);
+        }
+
+        img {
+            width: 96px;
+            height: 96px;
+
+            @media (min-width: 992px) {
+                width: 192px;
+                height: 192px;
+            }
+        }
 
         i {
             opacity: 0.6;
