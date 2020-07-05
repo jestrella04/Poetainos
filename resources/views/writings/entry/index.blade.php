@@ -5,7 +5,7 @@
     @if ($params['single_entry'] ?? false)
         @if (! empty($writing->externalLink()))
             <div class="writing-link">
-                <a href="{{ $writing->externalLink() }}" class="btn btn-link text-truncate" target="_blank" rel="nofollow">
+                <a href="{{ $writing->externalLink() }}" class="btn btn-link" target="_blank" rel="nofollow">
                     <i class="fa fa-link fa-fw"></i>
                     {{ $writing->externalLink() }}
                 </a>

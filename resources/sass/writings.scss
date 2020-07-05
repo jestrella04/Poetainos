@@ -75,6 +75,8 @@
 
     .writing-link {
         margin-bottom: $wh-m-lg;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         .btn {
             text-align: left;
