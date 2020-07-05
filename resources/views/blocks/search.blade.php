@@ -11,7 +11,11 @@
                 </div>
             </div>
 
-            <input type="text" class="form-control" placeholder="{{ __('Enter search criteria') }}">
+            <input
+                type="text"
+                class="form-control"
+                placeholder="{{ __('Enter search criteria') }}"
+                autocomplete="off">
         </div>
     </div>
 </div>

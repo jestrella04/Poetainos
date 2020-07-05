@@ -31,7 +31,8 @@
                             minlength="3"
                             maxlength="40"
                             placeholder=""
-                            required>
+                            required
+                            autocomplete="off">
                         <small id="name-error" class="text-danger d-none"></small>
                     </div>
 

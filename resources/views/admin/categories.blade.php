@@ -11,7 +11,8 @@
                         type="text"
                         class="filter-box-input form-control"
                         data-target=".filter-table"
-                        placeholder="{{ __('Filter by') }}...">
+                        placeholder="{{ __('Filter by') }}..."
+                        autocomplete="off">
                 </div>
 
                 <div class="buttons">

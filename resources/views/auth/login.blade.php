@@ -23,9 +23,9 @@
                         class="form-control form-control-lg @error('username') is-invalid @enderror"
                         name="username" value="{{ old('username') }}"
                         required
-                        autocomplete="username"
                         pattern="[-._A-Za-z0-9]+"
-                        placeholder="{{ __('Enter your username') }}">
+                        placeholder="{{ __('Enter your username') }}"
+                        autocomplete="off">
 
                     @error('username')
                         <span class="invalid-feedback" role="alert">
@@ -40,8 +40,8 @@
                         class="form-control form-control-lg @error('password') is-invalid @enderror"
                         name="password"
                         required
-                        autocomplete="current-password"
-                        placeholder="{{ __('Enter your password') }}">
+                        placeholder="{{ __('Enter your password') }}"
+                        autocomplete="off">
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">

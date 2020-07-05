@@ -23,9 +23,9 @@
                         class="form-control form-control-lg @error('username') is-invalid @enderror toggle-popover-register"
                         name="username" value="{{ old('username') }}"
                         required
-                        autocomplete="username"
                         pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
-                        placeholder="{{ __('Enter your username') }}">
+                        placeholder="{{ __('Enter your username') }}"
+                        autocomplete="off">
 
                     @error('username')
                         <span class="invalid-feedback" role="alert">
@@ -50,8 +50,8 @@
                         name="email"
                         value="{{ old('email') }}"
                         required
-                        autocomplete="email"
-                        placeholder="{{ __('Enter your email') }}">
+                        placeholder="{{ __('Enter your email') }}"
+                        autocomplete="off">
 
                     @error('email')
                         <span class="invalid-feedback" role="alert">
@@ -66,9 +66,9 @@
                         class="form-control form-control-lg @error('password') is-invalid @enderror toggle-popover-register"
                         name="password"
                         required
-                        autocomplete="new-password"
                         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                        placeholder="{{ __('Enter your password') }}">
+                        placeholder="{{ __('Enter your password') }}"
+                        autocomplete="off">
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -92,9 +92,9 @@
                         class="form-control form-control-lg toggle-popover-register"
                         name="password_confirmation"
                         required
-                        autocomplete="new-password"
                         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                        placeholder="{{ __('Confirm your password') }}">
+                        placeholder="{{ __('Confirm your password') }}"
+                        autocomplete="off">
 
                     <div class="d-none help">
                         <ul class="list-unstyled mb-0">

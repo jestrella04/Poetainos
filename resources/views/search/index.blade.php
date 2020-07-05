@@ -9,7 +9,12 @@
 @section('main')
     <div id="search-main-content" class="main-content">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Recipient's username" value="{{ $params['query'] ?? '' }}">
+            <input
+                type="text"
+                class="form-control"
+                placeholder="Recipient's username"
+                value="{{ $params['query'] ?? '' }}"
+                autocomplete="off">
 
             <div class="input-group-append">
                 <button class="btn btn-dark" type="button" id="">

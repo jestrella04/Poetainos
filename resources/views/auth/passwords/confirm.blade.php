@@ -14,7 +14,14 @@
                 @csrf
 
                 <div class="form-group">
-                    <input id="password" type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" required placeholder="{{ __('Enter your password') }}">
+                    <input
+                        id="password"
+                        type="password"
+                        class="form-control form-control-lg @error('password') is-invalid @enderror"
+                        name="password"
+                        required
+                        placeholder="{{ __('Enter your password') }}"
+                        autocomplete="off">
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">

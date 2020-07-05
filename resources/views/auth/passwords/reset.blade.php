@@ -23,7 +23,7 @@
                         name="email"
                         value="{{ $email ?? old('email') }}"
                         required
-                        autocomplete="email">
+                        readonly>
 
                     @error('email')
                         <span class="invalid-feedback" role="alert">
@@ -39,8 +39,8 @@
                         class="form-control form-control-lg @error('password') is-invalid @enderror"
                         name="password"
                         required
-                        autocomplete="new-password"
-                        placeholder="{{ __('Enter your password') }}">
+                        placeholder="{{ __('Enter your password') }}"
+                        autocomplete="off">
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -56,8 +56,8 @@
                         class="form-control form-control-lg"
                         name="password_confirmation"
                         required
-                        autocomplete="new-password"
-                        placeholder="{{ __('Confirm your password') }}">
+                        placeholder="{{ __('Confirm your password') }}"
+                        autocomplete="off">
                 </div>
 
                 <div class="form-group">

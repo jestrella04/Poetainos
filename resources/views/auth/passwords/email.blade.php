@@ -26,8 +26,8 @@
                         class="form-control form-control-lg @error('email') is-invalid @enderror"
                         name="email" value="{{ old('email') }}"
                         required
-                        autocomplete="email"
-                        placeholder="{{ __('Enter your email address') }}">
+                        placeholder="{{ __('Enter your email address') }}"
+                        autocomplete="off">
 
                     @error('email')
                         <span class="invalid-feedback" role="alert">

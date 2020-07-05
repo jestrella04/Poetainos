@@ -31,7 +31,8 @@
                     minlength="3"
                     maxlength="100"
                     placeholder=""
-                    required>
+                    required
+                    autocomplete="off">
                 <small id="title-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -89,7 +90,8 @@
                     value="{{ old('tags', $writing->tagsAsString()) }}"
                     minlength="3"
                     maxlength="50"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="tags-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -106,7 +108,8 @@
                     value="{{ old('link', isset($writing->extra_info['link']) ? $writing->extra_info['link'] : '') }}"
                     minlength="3"
                     maxlength="250"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="link-error" class="text-danger d-none"></small>
             </div>
         </div>

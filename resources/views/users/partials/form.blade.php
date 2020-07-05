@@ -69,7 +69,8 @@
                     minlength="3"
                     maxlength="60"
                     placeholder=""
-                    required>
+                    required
+                    autocomplete="off">
                 <small id="name-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -87,7 +88,8 @@
                     maxlength="40"
                     placeholder=""
                     pattern="[A-Za-z0-9]+"
-                    disabled>
+                    disabled
+                    autocomplete="off">
                 <small id="username-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -104,7 +106,8 @@
                     minlength="3"
                     maxlength="40"
                     placeholder=""
-                    required>
+                    required
+                    autocomplete="off">
                 <small id="email-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -135,7 +138,8 @@
                     value="{{ @old('location', $user->extra_info['location']) }}"
                     minlength="3"
                     maxlength="40"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="location-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -151,7 +155,8 @@
                     value="{{ @old('occupation', $user->extra_info['occupation']) }}"
                     minlength="3"
                     maxlength="40"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="occupation-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -167,7 +172,8 @@
                     value="{{ @old('interests', $user->extra_info['interests']) }}"
                     minlength="3"
                     maxlength="100"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="interests-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -183,7 +189,8 @@
                     value="{{ @old('website', $user->extra_info['website']) }}"
                     minlength="3"
                     maxlength="250"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="website-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -200,7 +207,8 @@
                     minlength="3"
                     maxlength="40"
                     pattern="[A-Za-z0-9]+"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="twitter-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -217,7 +225,8 @@
                     minlength="3"
                     maxlength="40"
                     pattern="[A-Za-z0-9]+"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="instagram-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -234,7 +243,8 @@
                     minlength="3"
                     maxlength="40"
                     pattern="[A-Za-z0-9]+"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="facebook-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -251,7 +261,8 @@
                     minlength="3"
                     maxlength="40"
                     pattern="[A-Za-z0-9]+"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="youtube-error" class="text-danger d-none"></small>
             </div>
         </div>
@@ -268,7 +279,8 @@
                     minlength="3"
                     maxlength="40"
                     pattern="[A-Za-z0-9]+"
-                    placeholder="">
+                    placeholder=""
+                    autocomplete="off">
                 <small id="goodreads-error" class="text-danger d-none"></small>
             </div>
         </div>
