@@ -32,8 +32,12 @@
 
     #back-to-top-wrapper {
         position: fixed;
-        right: 2rem;
+        right: 1rem;
         bottom: 1rem;
         z-index: 99999;
+
+        @media (min-width: 992px) {
+            right: 2rem;
+        }
     }
 }
