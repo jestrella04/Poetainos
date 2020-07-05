@@ -165,6 +165,8 @@ Project Link: [https://github.com/jestrella04/Writerhood](https://github.com/jes
 * [laravel-adjacency-list](https://github.com/staudenmeir/laravel-adjacency-list)
 * [Intervention Image](http://image.intervention.io/)
 * [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
+* [laravel-sitemap](https://github.com/spatie/laravel-sitemap)
+* [PWA Builder](https://www.pwabuilder.com/)
 
 
 <!-- MARKDOWN LINKS & IMAGES -->

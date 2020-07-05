@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="{{ getSiteConfig('slogan') }}">
-        <meta name="keywords" content="{{ __('writings, poetry, short stories, writers, amateur writers, writerhood, writers hood, poets') }}">
+        <meta name="keywords" content="{{ __('writings, poetry, poems, short stories, writers, amateur writers, writerhood, writers hood, poets') }}">
         <meta name="author" content="Jonathan Estrella">
         <meta name="generator" content="Writerhood">
         <meta name="csrf-token" content="{{ csrf_token() }}">
