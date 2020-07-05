@@ -52,6 +52,7 @@ class CategoriesController extends Controller
 
         $params = [
             'title' => $category->name,
+            'description' => $category->description,
         ];
 
         if ('latest' === $sort) {

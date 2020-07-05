@@ -1,6 +1,6 @@
 @extends('layouts.index')
 
-@section('title', $params['title'])
+@section('meta.title', $params['title'])
 
 @section('header')
     @include('partials.header')

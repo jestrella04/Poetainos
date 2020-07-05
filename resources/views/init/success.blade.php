@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Database Initialization')
+@section('meta.title', 'Database Initialization')
 
 @section('body')
 <main role="main" class="container installation-wrapper">

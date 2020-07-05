@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', $params['title'])
+@section('meta.title', $params['title'])
 
 @section('body')
 <main role="main" class="offline-wrapper">

@@ -1,6 +1,10 @@
 @extends('layouts.index')
 
-@section('title', $params['title'])
+@section('meta.title', $params['title'])
+
+@isset($writing->tags)
+    @section('meta.keywords', $writing->tagsAsString())
+@endisset
 
 @section('header')
     @include('partials.header')

@@ -1,6 +1,6 @@
 @extends('layouts.login')
 
-@section('title', __('Create account'))
+@section('meta.title', __('Create account'))
 
 @section('main')
     <div id="register" class="login">

@@ -1,9 +1,9 @@
 @extends('layouts.index')
 
 @if ($writing->exists)
-    @section('title', $params['title']['update'])
+    @section('meta.title', $params['title']['update'])
 @else
-    @section('title', $params['title']['create'])
+    @section('meta.title', $params['title']['create'])
 @endif
 
 @section('header')

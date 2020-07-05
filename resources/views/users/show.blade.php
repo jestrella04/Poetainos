@@ -1,6 +1,14 @@
 @extends('layouts.index')
 
-@section('title', $params['title'])
+@section('meta.title', $params['title'])
+
+@isset($user->extra_info['bio'])
+    @section('meta.description', $user->extra_info['bio'])
+@endisset
+
+@isset($user->extra_info['interests'])
+    @section('meta.keywords', $user->extra_info['interests'])
+@endisset
 
 @section('header')
     @include('partials.header')

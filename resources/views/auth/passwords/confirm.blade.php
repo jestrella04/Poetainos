@@ -1,6 +1,6 @@
 @extends('layouts.login')
 
-@section('title', __('Confirm Password'))
+@section('meta.title', __('Confirm Password'))
 
 @section('main')
     <div id="confirm-password" class="login">

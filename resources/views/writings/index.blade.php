@@ -1,6 +1,14 @@
 @extends('layouts.index')
 
-@section('title', $params['title'])
+@section('meta.title', $params['title'])
+
+@isset($params['description'])
+    @section('meta.description', $params['description'])
+@endisset
+
+@isset($params['keywords'])
+    @section('meta.keywords', $params['keywords'])
+@endisset
 
 @section('header')
     @include('partials.header')

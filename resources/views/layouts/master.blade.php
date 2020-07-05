@@ -3,13 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="{{ getSiteConfig('slogan') }}">
-        <meta name="keywords" content="{{ __('writings, poetry, poems, short stories, writers, amateur writers, writerhood, writers hood, poets') }}">
+        <meta name="description" content="@yield('meta.description', getSiteConfig('slogan'))">
+        <meta name="keywords" content="@yield('meta.keywords', __('writings, poetry, poems, short stories, writers, amateur writers, writerhood, writers hood, poets'))">
         <meta name="author" content="Jonathan Estrella">
         <meta name="generator" content="Writerhood">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>@yield('title') - {{ getSiteConfig('name') }}</title>
+        <title>@yield('meta.title') - {{ getSiteConfig('name') }}</title>
 
         <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">
         <link rel="preload" href="{{ mix('/static/js/app.js') }}" as="script">
