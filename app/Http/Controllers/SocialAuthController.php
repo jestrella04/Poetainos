@@ -31,12 +31,7 @@ class SocialAuthController extends Controller
         // Get user data from the external service
         $social = Socialite::driver($service)->user();
         $exists = User::where('email', $social->getEmail())->exists();
-
-        $nick = $social->getNickname();
-
-        if (! isset($nick)) {
-            $nick = explode('@', $social->getEmail())[0];
-        }
+        $nick = $social->getNickname() ?? explode('@', $social->getEmail())[0];
 
         // Check if user already exists
         // If not, one will be created
@@ -51,11 +46,13 @@ class SocialAuthController extends Controller
         // Grab avatar
         if (empty($user->extra_info['avatar'])) {
             $updated = true;
-            $avatar = basename($social->getAvatar());
-            $avatar = bin2hex(random_bytes(10)) . '-' . $avatar;
-            $avatar = 'avatars/' . $avatar;
-            Storage::disk('local')->put($avatar, file_get_contents($social->getAvatar()));
-            $user->extra_info = ['avatar' => $avatar];
+            $avatar = file_get_contents($social->getAvatar());
+            $size = getimagesize($social->getAvatar());
+            $extension = image_type_to_extension($size[2]);
+            $base = bin2hex(random_bytes(20));
+            $path = 'avatars/' . $base . $extension;
+            Storage::disk('local')->put($path, $avatar);
+            $user->extra_info = ['avatar' => $path];
         }
 
         // Set email as verified
