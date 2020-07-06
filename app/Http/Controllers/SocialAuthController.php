@@ -32,13 +32,19 @@ class SocialAuthController extends Controller
         $social = Socialite::driver($service)->user();
         $exists = User::where('email', $social->getEmail())->exists();
 
+        $nick = $social->getNickname();
+
+        if (! isset($nick)) {
+            $nick = explode('@', $social->getEmail())[0];
+        }
+
         // Check if user already exists
         // If not, one will be created
         $user = User::firstOrCreate([
             'email' => $social->getEmail()
         ], [
             'name' => $social->getName(),
-            'username' => slugify('users', $social->getNickname(), 'username', '_'),
+            'username' => slugify('users', $nick, 'username', '_'),
             'password' => Hash::make(bin2hex(random_bytes(10))),
         ]);
 
