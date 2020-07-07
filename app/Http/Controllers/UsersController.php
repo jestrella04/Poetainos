@@ -147,8 +147,7 @@ class UsersController extends Controller
             // Scale the image
             Image::make($avatarRealPath)->resize(128, null, function ($constraint) {
                 $constraint->aspectRatio();
-                $constraint->upsize();
-            })->save();
+            })->crop(128, 128)->save();
 
             // Optimize the image
             app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize($avatarRealPath);

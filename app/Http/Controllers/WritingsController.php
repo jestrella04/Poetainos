@@ -155,11 +155,10 @@ class WritingsController extends Controller
             $cover = $request->file('cover')->store('covers');
             $coverRealPath = storage_path('app/' . $cover);
 
-            // Scale the image
-            Image::make($coverRealPath)->resize(1080, null, function ($constraint) {
+            // Scale image and enforce 16:9 aspect ratio
+            Image::make($coverRealPath)->resize(1280, null, function ($constraint) {
                 $constraint->aspectRatio();
-                $constraint->upsize();
-            })->save();
+            })->crop(1280, 720)->save();
 
             // Optimize the image
             app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize($coverRealPath);
