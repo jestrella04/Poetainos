@@ -171,10 +171,10 @@ class WritingsController extends Controller
         ];
 
         // Persist to database
-        $writing->user_id = auth()->user()->id;
         $writing->title = request('title');
 
         if (! $writing->exists) {
+            $writing->user_id = auth()->user()->id;
             $writing->slug = slugify($writing->getTable(), $writing->title);
         }
 
