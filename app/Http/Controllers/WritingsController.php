@@ -186,10 +186,12 @@ class WritingsController extends Controller
         $tags = [];
 
         // Let's grab the entered tags
-        if (!empty(request('tags'))) {
+        if (! empty(request('tags'))) {
             $rawTags = explode(',', request('tags'));
 
             foreach ($rawTags as $rawTag) {
+                $rawTag = trim($rawTag);
+
                 $tag = Tag::firstOrCreate(
                     ['name' => $rawTag],
                     ['slug' => slugify('tags', $rawTag)]
