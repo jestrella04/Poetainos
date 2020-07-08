@@ -30,6 +30,22 @@
         margin-bottom: $wh-m-lg;
     }
 
+    .copyright {
+        margin-bottom: $wh-m-lg;
+    }
+
+    .pages {
+        font-size: $wh-font-sm;
+
+        .separator {
+            margin: 0 $wh-m-sm;
+        }
+
+        .separator:last-child {
+            display: none;
+        }
+    }
+
     #back-to-top-wrapper {
         position: fixed;
         right: 1rem;

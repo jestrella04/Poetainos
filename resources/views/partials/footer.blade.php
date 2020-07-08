@@ -41,6 +41,13 @@
         <div class="copyright">
             &copy; 2020 <strong>{{ getSiteConfig('name') }}</strong>.
         </div>
+
+        <div class="pages">
+            @foreach (App\Page::all() as $page)
+                <a href="{{ route('pages.show', $page->slug ) }}">{{ $page->title }}</a>
+                <span class="separator">|</span>
+            @endforeach
+        </div>
     </div>
 
     <div id="back-to-top-wrapper" class="fade-out">
