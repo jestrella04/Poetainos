@@ -25,6 +25,8 @@
         <link rel="apple-touch-icon" href="{{ mix('/static/images/logo.svg') }}">
         <link rel="manifest" href="{{ route('pwa.manifest') }}">
 
+        <base href="{{ config('app.url') }}">
+
         <script src="{{ mix('/static/js/app.js') }}" defer></script>
         @yield('scripts')
     </head>
@@ -35,16 +37,4 @@
 
         @yield('body')
     </body>
-
-    <script type="module">
-        /*
-         This code uses the pwa-update web component https://github.com/pwa-builder/pwa-update to register your service worker,
-         tell the user when there is an update available and let the user know when your PWA is ready to use offline.
-        */
-
-        import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
-
-        const el = document.createElement('pwa-update');
-        document.body.appendChild(el);
-    </script>
 </html>

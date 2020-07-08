@@ -1,6 +1,11 @@
 import * as fx from './functions';
 import BSN from "bootstrap.native";
-import SlimSelect from 'slim-select'
+import SlimSelect from 'slim-select';
+import '@pwabuilder/pwaupdate';
+
+// Needed for the PWA Builder service worker
+const el = document.createElement('pwa-update');
+document.body.appendChild(el);
 
 // Wait for the page to be fully loaded
 window.addEventListener('load', () => {
