@@ -94,12 +94,12 @@ git clone https://github.com/jestrella04/Writerhood.git
 composer install
 ```
 
-2. Install NPM modules
+3. Install NPM modules
 ```sh
 yarn install
 ```
 
-2. Compile assets
+4. Compile assets
 ```sh
 yarn run dev
 ```
@@ -167,6 +167,7 @@ Project Link: [https://github.com/jestrella04/Writerhood](https://github.com/jes
 * [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 * [laravel-sitemap](https://github.com/spatie/laravel-sitemap)
 * [PWA Builder](https://www.pwabuilder.com/)
+* [Markdown for Laravel](https://github.com/ARCANEDEV/LaravelMarkdown)
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
