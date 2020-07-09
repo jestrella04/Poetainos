@@ -9,7 +9,7 @@
 @section('main')
     <div id="pages-main-content" class="main-content">
         <div class="page-header">
-            <h2 class="page-title">{{ $page->title }}</h2>
+            <h2 class="all-caps">{{ $page->title }}</h2>
         </div>
 
         <div class="page-body">

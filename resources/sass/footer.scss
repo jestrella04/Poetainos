@@ -36,6 +36,7 @@
 
     .pages {
         font-size: $wh-font-sm;
+        text-transform: capitalize;
 
         .separator {
             margin: 0 $wh-m-sm;
