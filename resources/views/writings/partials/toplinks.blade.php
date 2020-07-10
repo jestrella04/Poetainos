@@ -2,7 +2,7 @@
 
 <div id="writings-top-links" class="top-links">
     <nav class="nav justify-content-center">
-        <a class="{{ 'latest' === $sort ? 'active' : '' }}" href="?sort=latest">{{ __('Latest') }}</a>
-        <a class="{{ 'popular' === $sort ? 'active' : '' }}" href="?sort=popular">{{ __('Popular') }}</a>
+        <a class="{{ 'latest' === $sort ? 'active' : '' }}" href="{{ url()->current() }}?sort=latest">{{ __('Latest') }}</a>
+        <a class="{{ 'popular' === $sort ? 'active' : '' }}" href="{{ url()->current() }}?sort=popular">{{ __('Popular') }}</a>
     </nav>
 </div>
