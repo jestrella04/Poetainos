@@ -6,15 +6,10 @@
     <div class="block-body">
         @forelse (App\User::featured(20) as $author)
         <div class="d-inline-flex d-lg-block author-link">
-            <a href="{{ $author->path() }}">
+            <a href="{{ $author->path() }}" class="stretched-link">
                 <div class="d-inline-flex">
-                    <div>
-                        {!! getUserAvatar($author) !!}
-                    </div>
-
-                    <div>
-                        <span>{{ $author->getName() }}</span>
-                    </div>
+                    <div>{!! getUserAvatar($author) !!}</div>
+                    <div>{{ $author->getName() }}</div>
                 </div>
             </a>
         </div>
