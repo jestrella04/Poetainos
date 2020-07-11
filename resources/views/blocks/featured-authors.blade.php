@@ -9,7 +9,7 @@
             <a href="{{ $author->path() }}" class="stretched-link">
                 <div class="d-inline-flex">
                     <div>{!! getUserAvatar($author) !!}</div>
-                    <div>{{ $author->getName() }}</div>
+                    <div class="my-auto">{{ $author->getName() }}</div>
                 </div>
             </a>
         </div>

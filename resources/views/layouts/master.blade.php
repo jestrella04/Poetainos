@@ -28,6 +28,9 @@
         <base href="{{ config('app.url') }}">
 
         <script src="{{ mix('/static/js/app.js') }}" defer></script>
+        @if (! empty(config('services.google.analytics_id')))
+            @include('partials.analytics')
+        @endif
         @yield('scripts')
     </head>
 
