@@ -45,7 +45,6 @@
                             id="text"
                             rows="8"
                             minlength="10"
-                            maxlength="5000"
                             required></textarea>
                         <small id="text-error" class="text-danger d-none"></small>
                     </div>
