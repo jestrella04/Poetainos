@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\WritingShelved;
 use App\Shelf;
 use App\User;
 use App\Writing;
@@ -36,6 +37,9 @@ class ShelvesController extends Controller
             // Update aura
             User::find($userId)->updateAura();
             Writing::find($writingId)->updateAura();
+
+            // Notify user
+            User::find($userId)->notify(new WritingShelved(Writing::find($writingId)));
         }
 
         $count = ReadableHumanNumber(Shelf::where('writing_id', $writingId)->count());

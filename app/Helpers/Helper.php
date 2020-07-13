@@ -118,3 +118,22 @@ function getUserAvatar(User $user) {
         return '<span class="avatar">'. e($user->initials()) .'</span>' . PHP_EOL;
     }
 }
+
+function getNotificationMessage($notification) {
+    switch ($notification->type) {
+        case 'App\Notifications\WritingCommented':
+            return __(':name has added a comment on your writing', ['name' => User::find($notification->data['user_id'])->getName()]);
+
+        case 'App\Notifications\WritingFeatured':
+            return __('Your writing has been featured on the home page');
+
+        case 'App\Notifications\WritingLiked':
+            return __(':name has liked your writing', ['name' => User::find($notification->data['user_id'])->getName()]);
+
+        case 'App\Notifications\WritingReplied':
+            return __(':name has posted a reply to one of your comments', ['name' => User::find($notification->data['user_id'])->getName()]);
+
+        case 'App\Notifications\WritingShelved':
+            return __(':name has added your writing to his shelf', ['name' => User::find($notification->data['user_id'])->getName()]);
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Notifications\WritingFeatured;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -149,6 +150,8 @@ class Writing extends Model
                 'aura_updated_at' => Carbon::now(),
                 'home_posted_at' => Carbon::now(),
             ]);
+
+            $this->author->notify(new WritingFeatured($this));
         } else {
             DB::table($this->getTable())->whereId($this->id)->update([
                 'aura' => $auraNew,

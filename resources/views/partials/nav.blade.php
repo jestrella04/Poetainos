@@ -24,6 +24,20 @@
                     </a>
                 </li>
 
+                @auth
+                    <li class="nav-item d-lg-none">
+                        <a class="nav-link" href="{{ route('notifications.index') }}">
+                            <i class="fas fa-bell fa-fw"></i>
+                            {{ __('Notifications') }}
+
+                            @if (auth()->user()->unreadNotifications->count() > 0)
+                                <span class="badge badge-light ml-3">{{ auth()->user()->unreadNotifications->count() }}</span>
+                                <span class="sr-only">{{ __('Unread notifications') }}</span>
+                            @endif
+                        </a>
+                    </li>
+                @endauth
+
                 @if (auth()->check() && auth()->user()->isAllowed('admin'))
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('admin.index') }}">
@@ -80,6 +94,14 @@
                             @if (auth()->user()->isAllowed('admin'))
                                 <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
                             @endif
+                            <a class="dropdown-item" href="{{ route('notifications.index') }}">
+                                {{ __('Notifications') }}
+
+                                @if (auth()->user()->unreadNotifications->count() > 0)
+                                    <span class="badge badge-dark ml-3">{{ auth()->user()->unreadNotifications->count() }}</span>
+                                    <span class="sr-only">{{ __('Unread notifications') }}</span>
+                                @endif
+                            </a>
                             <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>
                             <a class="dropdown-item" href="{{ auth()->user()->writingsPath() }}">{{ __('My writings') }}</a>
                             <a class="dropdown-item" href="{{ auth()->user()->shelfPath() }}">{{ __('My shelf') }}</a>

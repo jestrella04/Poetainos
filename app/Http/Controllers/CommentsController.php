@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Comment;
+use App\Notifications\WritingCommented;
 use Illuminate\Http\Request;
 
 class CommentsController extends Controller
@@ -48,8 +49,8 @@ class CommentsController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'comment' => ['required', 'min:2', 'max:300'],
-            'writing_id' => ['required'],
+            'comment' => 'required|min:2|max:300',
+            'writing_id' => 'required|exists:writings,id',
         ]);
 
         $comment = Comment::create([
@@ -61,6 +62,9 @@ class CommentsController extends Controller
         // Update aura
         $comment->author->updateAura();
         $comment->writing->updateAura();
+
+        // Notify author
+        $comment->writing->author->notify(new WritingCommented($comment->writing, auth()->user()));
 
         return view('comments.show', [
             'comment' => $comment,

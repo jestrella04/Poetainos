@@ -127,6 +127,17 @@
     }
 }
 
+.user-notifications {
+    .avatar {
+        width: $wh-avatar-lg;
+        height: $wh-avatar-lg;
+        max-width: $wh-avatar-lg;
+        max-height: $wh-avatar-lg;
+        font-size: $wh-avatar-lg * 0.4;
+        line-height: $wh-avatar-lg;
+    }
+}
+
 hr.banner {
     margin-bottom: $wh-m-xl;
 }

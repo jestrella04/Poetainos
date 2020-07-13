@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\WritingCommented;
+use App\Notifications\WritingReplied;
 use App\Reply;
 use Illuminate\Http\Request;
 
@@ -36,8 +38,8 @@ class RepliesController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'reply' => ['required', 'min:2', 'max:300'],
-            'comment_id' => ['required'],
+            'reply' => 'required|min:2|max:300',
+            'comment_id' => 'required|exists:comments,id',
         ]);
 
         $reply = Reply::create([
@@ -49,6 +51,10 @@ class RepliesController extends Controller
         // Update aura
         $reply->author->updateAura();
         $reply->comment->writing->updateAura();
+
+        // Notify users
+        $reply->comment->writing->author->notify(new WritingCommented($reply->comment->writing, auth()->user()));
+        $reply->comment->author->notify(new WritingReplied($reply->comment->writing, auth()->user()));
 
         return view('comments.replies.show', [
             'reply' => $reply,

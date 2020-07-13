@@ -311,3 +311,26 @@ hr {
         }
     }
 }
+
+.user-notifications {
+    .user-notification {
+        position: relative;
+        margin-bottom: $wh-m-md;
+
+        .card-body {
+            padding: $wh-m-md $wh-m-lg;
+
+            a {
+                font-weight: 700;
+            }
+
+            .avatar-wrapper {
+                margin-right: $wh-m-lg;
+            }
+        }
+    }
+}
+
+.home-head {
+    margin-bottom: $wh-m-xl;
+}

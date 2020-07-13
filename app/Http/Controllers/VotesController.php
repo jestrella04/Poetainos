@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\WritingLiked;
 use App\Vote;
 use Illuminate\Http\Request;
 
@@ -57,6 +58,9 @@ class VotesController extends Controller
             // Update aura
             $new->user->updateAura();
             $new->writing->updateAura();
+
+            // Notify author
+            $new->user->notify(new WritingLiked($new->writing, auth()->user()));
         }
 
         if (0 === $vote) {

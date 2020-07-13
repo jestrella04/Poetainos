@@ -61,6 +61,10 @@ Route::middleware(['verified'])->group(function () {
     Route::post('/votes/store', 'VotesController@store')->name('votes.store');
     Route::post('/shelves/store', 'ShelvesController@store')->name('shelves.store');
     Route::post('/hoods/store', 'HoodsController@store')->name('hoods.store');
+
+    // Notifications
+    Route::get('/notifications', 'UsersNotificationsController@index')->name('notifications.index');
+    Route::post('/notifications/markasread', 'UsersNotificationsController@markAllRead')->name('notifications.read');
 });
 
 /* Public routes */
