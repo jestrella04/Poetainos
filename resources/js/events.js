@@ -669,4 +669,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Listen to the focusout event on the page and act accordingly
+    document.addEventListener('focusout', (event) => {
+        let element = event.target;
+
+        // Trim start/end commas from entered tags (if any)
+        if (element.hasAttribute('id') && 'tags' === element.attributes['id'].value) {
+            let trimTags = element.value.replace(/^\,+|\,+$/g, '');
+            element.value = trimTags;
+        }
+    });
 });

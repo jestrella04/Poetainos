@@ -91,7 +91,8 @@
                     minlength="3"
                     maxlength="50"
                     placeholder=""
-                    autocomplete="off">
+                    autocomplete="off"
+                    pattern="^[a-z][a-z0-9_\s,]+[a-z0-9]$">
                 <small id="tags-error" class="text-danger d-none"></small>
             </div>
         </div>

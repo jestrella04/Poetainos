@@ -187,7 +187,9 @@ class WritingsController extends Controller
 
         // Let's grab the entered tags
         if (! empty(request('tags'))) {
-            $rawTags = explode(',', request('tags'));
+            $rawTags = preg_replace('/\s+/', ' ', request('tags'));
+            $rawTags = preg_replace('/,+/', ',', request('tags'));
+            $rawTags = explode(',', $rawTags);
 
             foreach ($rawTags as $rawTag) {
                 $rawTag = trim($rawTag);
