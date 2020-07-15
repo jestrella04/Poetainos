@@ -7,6 +7,7 @@
 
     <div id="sidebar-main" class="collapse no-collapse-lg">
         {{-- @include('blocks.search') --}}
+        @include('blocks.main-categories')
         @include('blocks.pop-categories')
         @include('blocks.pop-tags')
         @include('blocks.featured-authors')

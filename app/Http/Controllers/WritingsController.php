@@ -108,7 +108,7 @@ class WritingsController extends Controller
             $this->authorize('update', $writing);
         }
 
-        $categories = Category::tree()->breadthFirst()->get();
+        $categories = Category::whereNotNull('parent_id')->tree()->depthFirst()->get();
 
         $params = [
             'title' => [

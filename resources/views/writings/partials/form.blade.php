@@ -45,10 +45,10 @@
                     <select
                         name="categories[]"
                         id="categories"
-                        class="form-control slim-select"
+                        class="form-control"
                         multiple
                         required>
-                        <option value="" data-placeholder="true">{{ __('Click to select') }}</option>
+                        <option value="" data-placeholder="true">{{ __('Click to select (1 or more)') }}</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}"
                             @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif>

@@ -23,6 +23,11 @@ class Category extends Model
         return $this->belongsToMany(Writing::class);
     }
 
+    public static function main()
+    {
+        return Self::withCount('writings')->orderByDesc('writings_count')->isRoot()->get();
+    }
+
     public static function popular($count = 20)
     {
         return Self::withCount('writings')->orderByDesc('writings_count')->take($count)->get();

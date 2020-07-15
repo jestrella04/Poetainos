@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Set element where to initialize Slim Select
-    let slimSelector = document.querySelector('.slim-select');
+    let slimSelector = document.querySelector('#writing-form #categories');
 
     // Initialize Slim Select
     if(null !== slimSelector && undefined !== slimSelector) {
