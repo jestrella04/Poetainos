@@ -20,16 +20,36 @@ class Category extends Model
 
     public function writings()
     {
-        return $this->belongsToMany(Writing::class);
+        $descendants = $this->descendantsAndSelf()->get('id')->pluck('id')->toArray();
+        return $this->belongsToMany(Writing::class)->wherePivotIn('category_id', $descendants, 'or');
+    }
+
+    public function writingsCount()
+    {
+        return $this->writings->count();
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function childrenCategories()
+    {
+        return $this->hasMany(Category::class, 'parent_id')->with('categories');
     }
 
     public static function main()
     {
-        return Self::withCount('writings')->orderByDesc('writings_count')->isRoot()->get();
+        return Self::whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
     }
 
-    public static function popular($count = 20)
+    public static function secondary()
     {
-        return Self::withCount('writings')->orderByDesc('writings_count')->take($count)->get();
+        return Self::whereNotNull('parent_id')
+            ->orderBy('name')
+            ->get();
     }
 }

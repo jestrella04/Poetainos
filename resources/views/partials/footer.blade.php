@@ -36,6 +36,15 @@
                     <i class="fab fa-youtube fa-fw"></i>
                 </a>
             @endif
+
+            @if (getSiteConfig('social.telegram'))
+                <a href="{{ getSocialLink(getSiteConfig('social.telegram'), 'telegram') }}"
+                    title="{{ __('Join our Telegram channel') }}"
+                    aria-label="{{ __('Join our Telegram channel') }}"
+                    data-toggle="tooltip">
+                    <i class="fab fa-telegram-plane fa-fw"></i>
+                </a>
+            @endif
         </div>
 
         <div class="copyright">

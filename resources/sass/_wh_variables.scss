@@ -29,8 +29,8 @@ $bg-gradient-danger: linear-gradient(180deg, darken($danger, 20%) 0%, $danger 10
 $height: 30px !default;
 $white: $white !default;
 $font-color: $body-color !default;
-$font-placeholder-color: $gray-600 !default;
-$font-disabled-color: $gray-600 !default;
+$font-placeholder-color: $body-color !default;
+$font-disabled-color: $body-color !default;
 $primary-color: $primary !default;
 $border-color: $gray-700 !default;
 $search-highlight-color: #fffb8c !default;

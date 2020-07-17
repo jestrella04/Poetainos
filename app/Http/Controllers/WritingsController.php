@@ -108,7 +108,8 @@ class WritingsController extends Controller
             $this->authorize('update', $writing);
         }
 
-        $categories = Category::whereNotNull('parent_id')->tree()->depthFirst()->get();
+        $mainCategories = Category::whereNull('parent_id')->get();
+        //$altCategories = Category::whereNotNull('parent_id')->tree()->depthFirst()->get();
 
         $params = [
             'title' => [
@@ -119,7 +120,8 @@ class WritingsController extends Controller
 
         return view('writings.edit', [
             'params' => $params,
-            'categories' => $categories,
+            'mainCategories' => $mainCategories,
+            //'altCategories' => $altCategories,
             'writing' => $writing,
         ]);
     }
@@ -142,6 +144,7 @@ class WritingsController extends Controller
         // Validate user input
         request()->validate([
             'title' => 'required|string|min:3|max:100',
+            'main_category' => 'required|integer|exists:categories,id',
             'categories' => 'nullable|array|exists:categories,id',
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|string|min:3|max:50',
@@ -183,6 +186,7 @@ class WritingsController extends Controller
         $writing->save();
 
         $categories = request('categories');
+        array_unshift($categories, request('main_category'));
         $tags = [];
 
         // Let's grab the entered tags

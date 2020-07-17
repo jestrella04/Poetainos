@@ -40,8 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
             showSearch: false,
             closeOnSelect: false,
             allowDeselectOption: true,
+            hideSelectedOption: true,
             deselectLabel: '<i class="fas fa-times-circle"></i>',
         });
+
+        slimSelect.disable();
     }
 
     // Disable tracking if the opt-out cookie exists.
@@ -666,6 +669,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 fx.previewAvatar('');
                 avatarInput.value = '';
+            }
+        }
+
+        // Populate alternative categories
+        if (element.hasAttribute('id') && 'main-category' === element.attributes['id'].value) {
+            // Disable alternative categories select box
+            if (null !== slimSelect && undefined !== slimSelect) {
+                slimSelect.disable();
+            }
+
+            // Clear previous options
+            if (null !== slimSelect && undefined !== slimSelect) {
+                slimSelect.set([]);
+            }
+
+            document.querySelector('#categories').innerHTML = '';
+
+            if ('' !== element.value) {
+                let selectedIndex = element.selectedIndex;
+                let descendants = JSON.parse(element.options[selectedIndex].attributes['data-descendants'].value);
+
+                if (Object.keys(descendants).length > 0) {
+                    // Add new options
+                    for (let idx in descendants) {
+                        let descendant = descendants[idx];
+                        let option = document.createElement('option');
+                        let targetSelect = document.querySelector('#categories');
+
+                        option.setAttribute('value', descendant.id);
+                        option.innerHTML = descendant.name;
+                        targetSelect.appendChild(option);
+                    }
+
+                    if (null !== slimSelect && undefined !== slimSelect) {
+                        slimSelect.enable();
+                    }
+                }
             }
         }
     });
