@@ -73,13 +73,6 @@
                     class="form-control"
                     multiple
                     required>
-                    {{-- <option value="" data-placeholder="true">{{ __('Click to select') }} {{ __('(1 or more)') }}</option>
-                    @foreach ($altCategories as $category)
-                        <option value="{{ $category->id }}"
-                        @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif>
-                        {{ $category->name }}
-                        </option>
-                    @endforeach --}}
                 </select>
 
                 <small id="categories-error" class="text-danger d-none"></small>

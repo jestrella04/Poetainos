@@ -31,6 +31,11 @@ class WritingsController extends Controller
         } elseif ('popular' === $sort) {
             $writings = Writing::orderBy('views', 'desc')
             ->simplePaginate($this->pagination);
+        } elseif ('lobby' === $sort) {
+            $auraHome = getSiteConfig('aura.min_at_home');
+            $writings = Writing::orderBy('aura', 'desc')
+            ->whereBetween('aura', [$auraHome - 3, $auraHome])
+            ->simplePaginate($this->pagination);
         }
 
         return view('writings.index', [
