@@ -47,7 +47,7 @@
                         id="main-category"
                         class="form-control custom-select"
                         required>
-                        <option value="" disabled>{{ __('Click to select') }}</option>
+                        <option value="" disabled selected>{{ __('Click to select') }}</option>
                         @foreach ($mainCategories as $category)
                             <option
                                 value="{{ $category->id }}"
