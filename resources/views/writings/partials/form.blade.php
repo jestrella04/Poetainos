@@ -71,6 +71,7 @@
                     name="categories[]"
                     id="categories"
                     class="form-control"
+                    data-placeholder="{{ __('Click to select') }} {{ __('(1 or more)') }}"
                     multiple
                     required>
                 </select>
