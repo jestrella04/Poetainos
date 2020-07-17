@@ -47,7 +47,7 @@
                         id="main-category"
                         class="form-control custom-select"
                         required>
-                        <option value="">{{ __('Click to select') }}</option>
+                        <option value="" disabled>{{ __('Click to select') }}</option>
                         @foreach ($mainCategories as $category)
                             <option
                                 value="{{ $category->id }}"
@@ -74,6 +74,7 @@
                     data-placeholder="{{ __('Click to select') }} {{ __('(1 or more)') }}"
                     multiple
                     required>
+                    <option value="" data-placeholder="true">{{ __('Click to select') }} {{ __('(1 or more)') }}</option>
                 </select>
 
                 <small id="categories-error" class="text-danger d-none"></small>
