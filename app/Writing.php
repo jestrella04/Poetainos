@@ -183,7 +183,7 @@ class Writing extends Model
         $url = $this->path();
         $title = $this->title;
         $facebookBaseUrl = 'https://facebook.com/sharer/sharer.php?u={url}';
-        $twitterBaseUrl = 'https://twitter.com/intent/tweet/?text={text}&amp;url={url}';
+        $twitterBaseUrl = 'https://twitter.com/intent/tweet/?text={text}&url={url}';
         $whatsappBaseUrl = 'whatsapp://send?text={text}%20{url}';
         $telegramBaseUrl = 'https://t.me/share/url?url={url}&text={text}';
 
