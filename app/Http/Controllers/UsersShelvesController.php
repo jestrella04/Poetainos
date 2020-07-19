@@ -9,7 +9,7 @@ class UsersShelvesController extends Controller
 {
     public function index(User $user)
     {
-        $sort = request('sort') ?? 'latest';
+        $sort = in_array(request('sort'), ['latest', 'popular']) ? request('sort') : 'latest';
 
         $params = [
             'section' => 'shelf',
@@ -32,7 +32,8 @@ class UsersShelvesController extends Controller
 
         return view('writings.index', [
             'writings' => $writings,
-            'params' => $params
+            'params' => $params,
+            'sort' => $sort,
         ]);
     }
 }
