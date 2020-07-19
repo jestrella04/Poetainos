@@ -33,7 +33,11 @@ nav {
     }
 
     #toggler.rotate {
-        transform: rotate(180deg);
+        transform: rotate(360deg);
+
+        .icon-badge {
+            opacity: 0;
+        }
     }
 
     .navbar-nav {

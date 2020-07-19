@@ -11,7 +11,13 @@
                 data-source="#header-navbar"
                 data-target="#user-side-menu"
                 aria-label="{{ __('Toggle sidebar') }}">
-                <i class="fa fa-bars"></i>
+                <span class="icon-badge-container">
+                    <i class="fa fa-bars"></i>
+
+                    @if (auth()->user()->unreadNotifications->count() > 0)
+                        <div class="icon-badge"></div>
+                    @endif
+                </span>
             </button>
         </div>
 
@@ -85,7 +91,12 @@
                 @auth
                     <li class="nav-item dropdown d-none d-lg-block">
                         <a class="nav-link" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {!! getUserAvatar(auth()->user()) !!}
+                            <div class="icon-badge-container">
+                                {!! getUserAvatar(auth()->user()) !!}
+                                @if (auth()->user()->unreadNotifications->count() > 0)
+                                    <div class="icon-badge"></div>
+                                @endif
+                            </div>
 
                             {{ __('Hi') }} {{ auth()->user()->firstName() }}
                         </a>
