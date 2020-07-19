@@ -14,7 +14,7 @@
                 <span class="icon-badge-container">
                     <i class="fa fa-bars"></i>
 
-                    @if (auth()->user()->unreadNotifications->count() > 0)
+                    @if (auth()->check() && auth()->user()->unreadNotifications->count() > 0)
                         <div class="icon-badge"></div>
                     @endif
                 </span>
