@@ -19,7 +19,7 @@ class WritingsController extends Controller
      */
     public function index()
     {
-        $sort = request('sort') ?? 'latest';
+        $sort = in_array(request('sort'), ['latest', 'popular', 'lobby']) ? request('sort') : 'latest';
 
         $params = [
             'title' => __('Writings'),
@@ -40,7 +40,9 @@ class WritingsController extends Controller
 
         return view('writings.index', [
             'writings' => $writings,
-            'params' => $params
+            'params' => $params,
+            'sort' => $sort,
+            'main' => true,
         ]);
     }
 

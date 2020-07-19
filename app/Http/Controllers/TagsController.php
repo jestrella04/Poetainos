@@ -46,7 +46,7 @@ class TagsController extends Controller
      */
     public function show(Tag $tag)
     {
-        $sort = request('sort') ?? 'latest';
+        $sort = in_array(request('sort'), ['latest', 'popular']) ? request('sort') : 'latest';
 
         $params = [
             'title' => $tag->name,
@@ -64,7 +64,8 @@ class TagsController extends Controller
 
         return view('writings.index', [
             'writings' => $writings,
-            'params' => $params
+            'params' => $params,
+            'sort' => $sort,
         ]);
     }
 

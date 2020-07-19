@@ -48,7 +48,7 @@ class CategoriesController extends Controller
      */
     public function show(Category $category)
     {
-        $sort = request('sort') ?? 'latest';
+        $sort = in_array(request('sort'), ['latest', 'popular']) ? request('sort') : 'latest';
 
         $params = [
             'title' => $category->name,
@@ -67,7 +67,8 @@ class CategoriesController extends Controller
 
         return view('writings.index', [
             'writings' => $writings,
-            'params' => $params
+            'params' => $params,
+            'sort' => $sort,
         ]);
     }
 
