@@ -6,6 +6,10 @@
     @section('meta.keywords', $writing->tagsAsString())
 @endisset
 
+@if(! empty($writing->coverPath()))
+    @section('meta.card', $writing->coverPath())
+@endif
+
 @section('header')
     @include('partials.header')
 @endsection

@@ -42,6 +42,7 @@ class WritingFeatured extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+                    ->subject(__('Your writing has been featured on the home page'))
                     ->greeting(__('Hello!'))
                     ->line(__('Your writing has been featured on the home page'))
                     ->action(__('View writing'), route('writings.show', $this->writing))

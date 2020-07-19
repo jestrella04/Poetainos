@@ -44,6 +44,7 @@ class WritingReplied extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+                    ->subject(__(':name has posted a reply to one of your comments', ['name' => $this->user->getName()]))
                     ->greeting(__('Hello!'))
                     ->line(__(':name has posted a reply to one of your comments', ['name' => $this->user->getName()]))
                     ->action(__('View writing'), route('writings.show', $this->writing))

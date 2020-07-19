@@ -17,13 +17,27 @@
         <link rel="alternate icon" href="{{ mix('/static/images/logo-32.png') }}" sizes="32x32" type="image/png">
         <link rel="stylesheet" href="{{ mix('/static/css/app.css') }}" type="text/css">
 
-        {{-- PWA Support --}}
+        <!-- PWA Support -->
         <meta name="theme-color" content="#2F3BA2" />
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <meta name="apple-mobile-web-app-title" content="{{ getSiteConfig('name') }}">
         <link rel="apple-touch-icon" href="{{ mix('/static/images/logo.svg') }}">
         <link rel="manifest" href="{{ route('pwa.manifest') }}">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="@yield('meta.title') - {{ getSiteConfig('name') }}">
+        <meta property="og:description" content="@yield('meta.description', getSiteConfig('slogan'))">
+        <meta property="og:image" content="@yield('meta.card', mix('/static/images/cover.jpg'))">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ url()->current() }}">
+        <meta property="twitter:title" content="@yield('meta.title') - {{ getSiteConfig('name') }}">
+        <meta property="twitter:description" content="@yield('meta.description', getSiteConfig('slogan'))">
+        <meta property="twitter:image" content="@yield('meta.card', mix('/static/images/cover.jpg'))">
 
         <base href="{{ config('app.url') }}">
 

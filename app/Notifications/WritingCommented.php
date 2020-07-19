@@ -44,6 +44,7 @@ class WritingCommented extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+                    ->subject(__(':name has added a comment on your writing', ['name' => $this->user->getName()]))
                     ->greeting(__('Hello!'))
                     ->line(__(':name has added a comment on your writing', ['name' => $this->user->getName()]))
                     ->action(__('View writing'), route('writings.show', $this->writing))
