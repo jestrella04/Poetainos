@@ -8,9 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WritingFeatured extends Notification
+class WritingFeatured extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $writing;
 
     /**
      * Create a new notification instance.

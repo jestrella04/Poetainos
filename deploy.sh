@@ -9,5 +9,6 @@ php artisan view:cache
 php artisan optimize
 php artisan cache:clear
 php artisan migrate --force
+php artisan queue:restart
 yarnpkg run production
 php artisan up
