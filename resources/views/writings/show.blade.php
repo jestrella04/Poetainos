@@ -7,7 +7,7 @@
 @endisset
 
 @if(! empty($writing->coverPath()))
-    @section('meta.card', $writing->coverPath())
+    @section('meta.card', asset($writing->coverPath()))
 @endif
 
 @section('header')
