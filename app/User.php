@@ -101,6 +101,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return strtoupper(substr($this->username, 0, 1));
     }
 
+    public function getTwitterUsername()
+    {
+        if (! empty($this->extra_info['social']['twitter'])) {
+            return '@' . $this->extra_info['social']['twitter'];
+        }
+
+        return $this->getName();
+    }
+
     public function role()
     {
         return $this->belongsTo(Role::class);

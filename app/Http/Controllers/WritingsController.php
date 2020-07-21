@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Notifications\WritingPublished;
 use App\Tag;
 use App\Type;
 use App\Writing;
@@ -193,7 +194,11 @@ class WritingsController extends Controller
         $writing->save();
 
         $categories = request('categories');
-        array_unshift($categories, request('main_category'));
+
+        if (! empty(request('categories'))) {
+            array_unshift($categories, request('main_category'));
+        }
+
         $tags = [];
 
         // Let's grab the entered tags
@@ -223,11 +228,14 @@ class WritingsController extends Controller
         // Update user aura
         $writing->author->updateAura();
 
-        // Set response message
+        // Set response message and trigger notification
         if (isset($action) && 'update' === $action) {
             $message = __('Your writing was successfully updated.');
         } else {
             $message = __('Your writing was successfully posted.');
+
+            // Share on social media
+            $writing->author->notify(new WritingPublished($writing));
         }
 
         // Apend link

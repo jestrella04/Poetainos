@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
 
-class WritingFeatured extends Notification implements ShouldQueue
+class WritingPublished extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -34,7 +34,7 @@ class WritingFeatured extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', TwitterChannel::class];
+        return [TwitterChannel::class];
     }
 
     /**
@@ -46,16 +46,14 @@ class WritingFeatured extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(__('Your writing has been featured on the home page'))
-            ->greeting(__('Hello!'))
-            ->line(__('Your writing has been featured on the home page'))
-            ->action(__('View writing'), route('writings.show', $this->writing))
-            ->line(__('Thank you for being part of the hood!'));
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     public function toTwitter($notifiable)
     {
-        $msg = __('":title" by :author has just been featured on our home page.', [
+        $msg = __('":title" by :author has just been published on our site.', [
             'title' => $this->writing->title,
             'author' => $this->writing->author->getTwitterUsername()
         ]);
@@ -75,7 +73,7 @@ class WritingFeatured extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'writing_id' => $this->writing->id,
+            //
         ];
     }
 }
