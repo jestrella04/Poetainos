@@ -171,7 +171,10 @@ class UsersController extends Controller
         ];
 
         // Persist to database
-        $user->role_id = request('role');
+        if (! empty(request('role'))) {
+            $user->role_id = request('role');
+        }
+
         $user->name = request('name');
         $user->email = request('email');
         $user->extra_info = $extraInfo;

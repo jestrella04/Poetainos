@@ -46,14 +46,14 @@
                 <label for="role" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
                 <div class="col-sm-9">
                     <select class="form-control custom-select" name="role" id="role">
-                        <option value="null">User</option>
+                        <option value="">{{ __('User') }}</option>
                         @foreach (App\Role::all() as $role)
                             <option value="{{ $role->id }}" @if ($user->role_id === $role->id) {{ 'selected' }} @endif>
                                 {{ $role->name }}
                             </option>
                         @endforeach
                     </select>
-                    <small id="name-error" class="text-danger d-none"></small>
+                    <small id="role-error" class="text-danger d-none"></small>
                 </div>
             </div>
         @endif
