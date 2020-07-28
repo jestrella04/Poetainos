@@ -30,7 +30,7 @@ php artisan config:cache
 
 # Clear and cache views
 php artisan view:clear
-php artisan view:
+php artisan view:cache
 
 # Restart service worker
 php artisan queue:restart
