@@ -15,7 +15,8 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $sort = request('sort') ?? 'featured';
+        $sort = in_array(request('sort'), ['latest', 'popular', 'featured']) ? request('sort') : 'featured';
+
         $params = [
             'title' => __('Writers'),
         ];
@@ -26,13 +27,14 @@ class UsersController extends Controller
         } elseif ('popular' === $sort) {
             $users = User::orderBy('profile_views', 'desc')
             ->simplePaginate($this->pagination);
-        } else {
+        } elseif ('featured' === $sort) {
             $users = User::orderBy('aura', 'desc')
             ->simplePaginate($this->pagination);
         }
 
         return view('users.index', [
             'users' => $users,
+            'sort' => $sort,
             'params' => $params
         ]);
     }

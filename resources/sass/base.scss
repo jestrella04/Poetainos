@@ -93,25 +93,6 @@ hr {
     font-size: $wh-font-lg;
     margin-bottom: $wh-m-xxl;
     text-transform: capitalize;
-
-    a {
-        color: $dark;
-        text-decoration: none;
-        margin: 0 0.5rem;
-        display: inline-block;
-        padding: 0.5rem 1.3rem;
-        border-radius: 0.3rem;
-        background-color: $gray-100;
-    }
-
-    a:hover {
-        background-color: $gray-200;
-    }
-
-    .active,
-    .active:hover {
-        background-color: $gray-300;
-    }
 }
 
 .stats {
