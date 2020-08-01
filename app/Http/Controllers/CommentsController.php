@@ -64,7 +64,9 @@ class CommentsController extends Controller
         $comment->writing->updateAura();
 
         // Notify author
-        $comment->writing->author->notify(new WritingCommented($comment->writing, auth()->user()));
+        if (! $comment->writing->author->is(auth()->user())) {
+            $comment->writing->author->notify(new WritingCommented($comment->writing, auth()->user()));
+        }
 
         return view('comments.show', [
             'comment' => $comment,

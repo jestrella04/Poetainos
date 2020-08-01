@@ -39,7 +39,9 @@ class ShelvesController extends Controller
             Writing::find($writingId)->updateAura();
 
             // Notify author
-            Writing::find($writingId)->author->notify(new WritingShelved(Writing::find($writingId), auth()->user()));
+            if (! Writing::find($writingId)->author->is(auth()->user())) {
+                Writing::find($writingId)->author->notify(new WritingShelved(Writing::find($writingId), auth()->user()));
+            }
         }
 
         $count = ReadableHumanNumber(Shelf::where('writing_id', $writingId)->count());

@@ -62,7 +62,9 @@ class VotesController extends Controller
             $new->writing->updateAura();
 
             // Notify author
-            $new->writing->author->notify(new WritingLiked($new->writing, auth()->user()));
+            if (! $new->writing->author->is(auth()->user())) {
+                $new->writing->author->notify(new WritingLiked($new->writing, auth()->user()));
+            }
         }
 
         if (0 === $vote) {

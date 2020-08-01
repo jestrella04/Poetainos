@@ -52,9 +52,15 @@ class RepliesController extends Controller
         $reply->author->updateAura();
         $reply->comment->writing->updateAura();
 
-        // Notify users
-        $reply->comment->writing->author->notify(new WritingCommented($reply->comment->writing, auth()->user()));
-        $reply->comment->author->notify(new WritingReplied($reply->comment->writing, auth()->user()));
+        // Notify author
+        if (! $reply->comment->writing->author->is(auth()->user())) {
+            $reply->comment->writing->author->notify(new WritingCommented($reply->comment->writing, auth()->user()));
+        }
+
+        // Notify commenter
+        if (! $reply->comment->author->is(auth()->user())) {
+            $reply->comment->author->notify(new WritingReplied($reply->comment->writing, auth()->user()));
+        }
 
         return view('comments.replies.show', [
             'reply' => $reply,
