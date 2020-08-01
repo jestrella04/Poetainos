@@ -4,7 +4,7 @@
             <div class="btn-group" role="group">
                 {{-- Previous Page Link --}}
                 @if ($paginator->onFirstPage())
-                    <a class="btn btn-dprimaryark disabled"
+                    <a class="btn btn-primary disabled"
                         title="{{ __('Previous') }}"
                         data-toggle="tooltip"
                         data-placement="top"
