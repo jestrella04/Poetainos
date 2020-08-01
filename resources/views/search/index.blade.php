@@ -12,12 +12,12 @@
             <input
                 type="text"
                 class="form-control"
-                placeholder="Recipient's username"
+                placeholder=""
                 value="{{ $params['query'] ?? '' }}"
                 autocomplete="off">
 
             <div class="input-group-append">
-                <button class="btn btn-dark" type="button" id="">
+                <button class="btn btn-primary" type="button" id="">
                     <i class="fas fa-search"></i>
                 </button>
             </div>

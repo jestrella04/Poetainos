@@ -23,7 +23,7 @@
         @else
             <div class="text-center">
                 <p>{{ __('Please login to your account before you can comment.') }}</p>
-                <a href="{{ route('login') }}" class="btn btn-dark btn-sm">{{ __('Login') }}</a>
+                <a href="{{ route('login') }}" class="btn btn-primary btn-sm">{{ __('Login') }}</a>
             </div>
         @endauth
     </div>

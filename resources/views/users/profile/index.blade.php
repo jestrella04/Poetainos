@@ -134,14 +134,14 @@
     <div class="profile-footer">
         <div class="actions">
             @can('update', $user)
-                <a href="{{ route('users.edit', $user) }}" class="btn btn-dark btn-sm">
+                <a href="{{ route('users.edit', $user) }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-user-edit fa-fw"></i>
                     {{ __('Update profile') }}
                 </a>
             @endcan
 
             @if ($user->writings()->count() > 0)
-                <a href="{{ $user->writingsPath() }}" class="btn btn-dark btn-sm">
+                <a href="{{ $user->writingsPath() }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-feather fa-fw"></i>
                     @if (auth()->check() && auth()->user()->is($user))
                         {{ __('My writings') }}
@@ -152,7 +152,7 @@
             @endif
 
             @if ($user->Shelf()->count() > 0)
-                <a href="{{ $user->shelfPath() }}" class="btn btn-dark btn-sm">
+                <a href="{{ $user->shelfPath() }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-book-reader fa-fw"></i>
                     @if (auth()->check() && auth()->user()->is($user))
                         {{ __('My shelf') }}

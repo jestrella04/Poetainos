@@ -6,7 +6,7 @@
     <div class="block-body">
         @forelse (App\Tag::popular(20) as $tag)
             @if ($tag->writings_count > 0)
-                <a href="{{ $tag->path() }}" class="btn btn-outline-dark btn-sm writing-tag d-title">
+                <a href="{{ $tag->path() }}" class="btn btn-outline-primary btn-sm writing-tag d-title">
                     <span>{{ $tag->name }}</span>
                     <span>({{ $tag->writings_count }})</span>
                 </a>
