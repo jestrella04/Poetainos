@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Notifications\WritingRandom;
-use App\Writing;
+use App\User;
 use Illuminate\Console\Command;
 
 class PostRandomWriting extends Command
@@ -39,7 +39,12 @@ class PostRandomWriting extends Command
      */
     public function handle()
     {
-        $writing = Writing::inRandomOrder()->firstOrFail();
+        $writing = User::has('writings', '>', 0)
+            ->inRandomOrder()
+            ->firstOrFail()
+            ->writings()
+            ->inRandomOrder()
+            ->firstOrFail();
         $writing->author->notify(new WritingRandom($writing));
     }
 }

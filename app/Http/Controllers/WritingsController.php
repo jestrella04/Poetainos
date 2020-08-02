@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Notifications\WritingPublished;
 use App\Tag;
-use App\Type;
+use App\User;
 use App\Writing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -100,7 +100,13 @@ class WritingsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function random() {
-        return redirect(Writing::inRandomOrder()->firstOrFail()->path());
+        $writing = User::has('writings', '>', 0)
+            ->inRandomOrder()
+            ->firstOrFail()
+            ->writings()
+            ->inRandomOrder()
+            ->firstOrFail();
+        return redirect($writing->path());
     }
 
     /**
