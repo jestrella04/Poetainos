@@ -56,6 +56,9 @@
                 <a href="{{ route('pages.show', $page->slug ) }}">{{ $page->title }}</a>
                 <span class="separator">|</span>
             @endforeach
+
+            <a href="{{ route('contact.create') }}">{{ __('Contact form') }}</a>
+            <span class="separator">|</span>
         </div>
     </div>
 

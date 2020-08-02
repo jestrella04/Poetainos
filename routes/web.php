@@ -113,3 +113,7 @@ Route::get('/tags/{tag}', 'TagsController@show')->name('tags.show');
 
 // Comments and replies
 Route::get('/comments/{writing}', 'CommentsController@index')->name('comments.index');
+
+// Contact form
+Route::get('/contact', 'ContactsController@create')->name('contact.create');
+Route::post('/contact', 'ContactsController@store')->name('contact.store');
