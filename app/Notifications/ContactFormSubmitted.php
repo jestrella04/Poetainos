@@ -51,7 +51,7 @@ class ContactFormSubmitted extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->from($this->email)
+                    ->replyTo($this->email)
                     ->subject('[' . $this->site . '] ' . $this->subject)
                     ->line(__(':name just sent a message to the site administrators using the contact form at :site', [
                         'name' => $this->name,
