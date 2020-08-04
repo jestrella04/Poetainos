@@ -184,6 +184,12 @@ hr.banner {
                     margin-right: $wh-m-sm;
                 }
             }
+
+            @media (max-width: 576px) {
+                .btn {
+                    display: block;
+                }
+            }
         }
     }
 }

@@ -32,8 +32,12 @@ nav {
         }
     }
 
+    #toggler:focus {
+        outline: none;
+    }
+
     #toggler.rotate {
-        transform: rotate(360deg);
+        transform: rotate(180deg);
 
         .icon-badge {
             opacity: 0;

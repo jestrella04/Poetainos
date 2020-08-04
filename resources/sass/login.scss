@@ -91,3 +91,12 @@
         }
     }
 }
+
+.socialite {
+    margin: $wh-m-lg auto;
+
+    .btn-blue {
+        background-color: $blue;
+        border-color: $blue;
+    }
+}

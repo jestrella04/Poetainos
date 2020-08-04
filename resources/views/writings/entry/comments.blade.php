@@ -23,7 +23,18 @@
         @else
             <div class="text-center">
                 <p>{{ __('Please login to your account before you can comment.') }}</p>
-                <a href="{{ route('login') }}" class="btn btn-primary btn-sm">{{ __('Login') }}</a>
+
+                <div class="socialite">
+                    @include('partials.socialite')
+
+                    <a href="{{ route('login') }}"
+                        class="btn btn-success"
+                        title="{{ __('Login with email') }}"
+                        data-toggle="tooltip"
+                        data-placement="top">
+                        <i class="fas fa-fw fa-at"></i>
+                    </a>
+                </div>
             </div>
         @endauth
     </div>
