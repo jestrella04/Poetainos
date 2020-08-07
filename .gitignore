@@ -4,6 +4,7 @@
 /public/static/*
 /public/sitemap.xml
 /public/pwabuilder-sw.js
+/public/robots.txt
 /storage/*.key
 /vendor
 .env
