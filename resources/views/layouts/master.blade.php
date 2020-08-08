@@ -13,7 +13,8 @@
 
         <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">
         <link rel="preload" href="{{ mix('/static/js/app.js') }}" as="script">
-        <link rel="preload" href="{{ mix('/static/images/cover.jpg') }}" as="image">
+        <link rel="preload" href="/static/images/cover.jpg" as="image">
+
         <link rel="icon" href="{{ mix('/static/images/logo.svg') }}" type="image/svg+xml">
         <link rel="alternate icon" href="{{ mix('/static/images/logo-32.png') }}" sizes="32x32" type="image/png">
         <link rel="stylesheet" href="{{ mix('/static/css/app.css') }}" type="text/css">
