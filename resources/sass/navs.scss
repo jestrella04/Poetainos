@@ -22,10 +22,23 @@ nav {
 
     #toggler {
         position: relative;
-        transition: all 0.5s;
         box-sizing: border-box;
         z-index: 9998;
         background-color: transparent;
+        width: 48px;
+        height: 48px;
+
+        .icon-badge-container {
+            transition: all 0.5s;
+        }
+
+        .icon-badge-container.rotate {
+            transform: rotate(180deg);
+
+            .icon-badge {
+                opacity: 0;
+            }
+        }
 
         i {
             color: $white;
@@ -33,15 +46,7 @@ nav {
     }
 
     #toggler:focus {
-        outline: none;
-    }
-
-    #toggler.rotate {
-        transform: rotate(180deg);
-
-        .icon-badge {
-            opacity: 0;
-        }
+        outline: 1px solid $primary;
     }
 
     .navbar-nav {

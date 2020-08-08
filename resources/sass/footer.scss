@@ -4,7 +4,7 @@
     text-align: center;
     background: $bg-gradient;
     color: $white;
-    padding: 2rem;
+    padding: $wh-m-xl $wh-m-lg 0;
 
     a {
         color: $white;
@@ -27,16 +27,23 @@
     }
 
     .social-links:not(:empty) {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-m-xl;
     }
 
     .copyright {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-m-xl;
     }
 
     .pages {
         font-size: $wh-font-sm;
         text-transform: capitalize;
+
+        @media (max-width: 576px) {
+            a {
+                display: inline-block;
+                height: 48px;
+            }
+        }
 
         .separator {
             margin: 0 $wh-m-sm;
@@ -45,6 +52,10 @@
         .separator:last-child {
             display: none;
         }
+    }
+
+    .pages:not(:empty) {
+        margin-bottom: $wh-m-lg;
     }
 
     #back-to-top-wrapper {

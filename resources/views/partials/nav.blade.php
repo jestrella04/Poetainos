@@ -7,7 +7,7 @@
         <div class="toggler-wrapper">
             <button
                 id="toggler"
-                class="navbar-toggler"
+                class="rounded navbar-toggler"
                 data-source="#header-navbar"
                 data-target="#user-side-menu"
                 aria-label="{{ __('Toggle sidebar') }}">

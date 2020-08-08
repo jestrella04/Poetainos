@@ -95,20 +95,20 @@
     <div class="dropdown dropdown-counter d-inline">
         <button
             class="btn btn-sm btn-counter click share"
-            title="{{ __('Share') }}"
+            title="{{ __('Share writing') }}"
             role="button"
-            id="dropdown-share"
+            id="dropdown-share-{{ $writing->id }}"
             data-url="{{ $writing->path() }}"
             data-writing-title="{{ $writing->title }}"
             data-toggle="tooltip"
             data-placement="top"
-            aria-label="{{ __('Share') }}"
+            aria-label="{{ __('Share writing :writing', ['writing' => $writing->title]) }}"
             aria-haspopup="true"
             aria-expanded="false">
             <i class="fa fa-share-alt fa-fw"></i>
         </button>
 
-        <div class="dropdown-menu" aria-labelledby="dropdown-share">
+        <div class="dropdown-menu" aria-labelledby="dropdown-share-{{ $writing->id }}">
             @foreach ($writing->shareLinks() as $serviceName => $serviceData)
                 <a class="dropdown-item {{ $serviceData['class'] }}"
                     href="{{ $serviceData['url'] }}"

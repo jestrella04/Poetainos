@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#side-menu-overlay').classList.toggle('d-none');
             targetNav.classList.toggle('show');
             element.querySelector('i').classList.toggle('fa-times');
-            element.classList.toggle('rotate');
+            element.querySelector('.icon-badge-container').classList.toggle('rotate');
             document.body.classList.toggle('overflow-hidden');
         }
 
