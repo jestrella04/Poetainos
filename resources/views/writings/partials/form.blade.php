@@ -72,6 +72,7 @@
                     id="categories"
                     class="form-control"
                     data-placeholder="{{ __('Click to select') }} {{ __('(1 or more)') }}"
+                    data-selected="{{ $writing->categories->pluck('id')->toJson() }}"
                     multiple
                     required>
                     <option value="" data-placeholder="true">{{ __('Click to select') }} {{ __('(1 or more)') }}</option>

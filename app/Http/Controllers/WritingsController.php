@@ -123,8 +123,6 @@ class WritingsController extends Controller
         }
 
         $mainCategories = Category::whereNull('parent_id')->get();
-        //$altCategories = Category::whereNotNull('parent_id')->tree()->depthFirst()->get();
-
         $params = [
             'title' => [
                 'update' => __('Update writing'),
@@ -135,7 +133,6 @@ class WritingsController extends Controller
         return view('writings.edit', [
             'params' => $params,
             'mainCategories' => $mainCategories,
-            //'altCategories' => $altCategories,
             'writing' => $writing,
         ]);
     }

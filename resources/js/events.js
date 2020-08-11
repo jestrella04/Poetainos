@@ -13,6 +13,14 @@ window.addEventListener('load', () => {
     fx.showToast({
         'selector': '#toast-flash',
     });
+
+    // Dispatch change event to enforce the app loads
+    // alternative categories when editing a writing
+    let mainCategory = document.querySelector('#main-category');
+
+    if (null !== mainCategory && undefined !== mainCategory) {
+        mainCategory.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 })
 
 // Wait for the DOM to be readay
@@ -673,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Populate alternative categories
-        if (element.hasAttribute('id') && 'main-category' === element.attributes['id'].value) {
+        if (element.hasAttribute('id') && 'main-category' === element.attributes['id'].value && '' !== element.value) {
             // Disable alternative categories select box
             if (null !== slimSelect && undefined !== slimSelect) {
                 slimSelect.disable();
@@ -686,25 +694,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.querySelector('#categories').innerHTML = '';
 
-            if ('' !== element.value) {
-                let selectedIndex = element.selectedIndex;
-                let descendants = JSON.parse(element.options[selectedIndex].attributes['data-descendants'].value);
+            let selectedIndex = element.selectedIndex;
+            let currentCategories = JSON.parse(document.querySelector('#categories').attributes['data-selected'].value);
+            let descendants = JSON.parse(element.options[selectedIndex].attributes['data-descendants'].value);
 
-                if (Object.keys(descendants).length > 0) {
-                    // Add new options
-                    for (let idx in descendants) {
-                        let descendant = descendants[idx];
-                        let option = document.createElement('option');
-                        let targetSelect = document.querySelector('#categories');
+            if (Object.keys(descendants).length > 0) {
+                // Add new options
+                for (let idx in descendants) {
+                    let descendant = descendants[idx];
+                    let option = document.createElement('option');
+                    let targetSelect = document.querySelector('#categories');
 
-                        option.setAttribute('value', descendant.id);
-                        option.innerHTML = descendant.name;
-                        targetSelect.appendChild(option);
+                    option.setAttribute('value', descendant.id);
+                    option.innerHTML = descendant.name;
+
+                    if (currentCategories.includes(descendant.id)) {
+                        option.selected = 'selected';
                     }
 
-                    if (null !== slimSelect && undefined !== slimSelect) {
-                        slimSelect.enable();
-                    }
+                    targetSelect.appendChild(option);
+                }
+
+                if (null !== slimSelect && undefined !== slimSelect) {
+                    slimSelect.enable();
                 }
             }
         }
