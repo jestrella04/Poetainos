@@ -56,11 +56,11 @@ class CategoriesController extends Controller
         ];
 
         if ('latest' === $sort) {
-            $writings = $category->writings()
+            $writings = $category->writingsRecursive()
             ->orderBy('created_at', 'desc')
             ->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = $category->writings()
+            $writings = $category->writingsRecursive()
             ->orderBy('views', 'desc')
             ->simplePaginate($this->pagination);
         }

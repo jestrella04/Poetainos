@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Category extends Model
 {
@@ -20,13 +21,24 @@ class Category extends Model
 
     public function writings()
     {
-        $descendants = $this->descendantsAndSelf()->get('id')->pluck('id')->toArray();
-        return $this->belongsToMany(Writing::class)->wherePivotIn('category_id', $descendants, 'or');
+        return $this->belongsToMany(Writing::class);
+    }
+
+    public function writingsRecursive()
+    {
+        $ids = $this->descendantsAndSelf()
+            ->get('id')
+            ->pluck('id')
+            ->toArray();
+
+        return Writing::with('categories')->whereHas('categories', function($q) use($ids) {
+            $q->whereIn('category_id', $ids);
+        });
     }
 
     public function writingsCount()
     {
-        return $this->writings->count();
+        return $this->writings->unique()->count();
     }
 
     public function categories()
@@ -36,7 +48,8 @@ class Category extends Model
 
     public function childrenCategories()
     {
-        return $this->hasMany(Category::class, 'parent_id')->with('categories');
+        return $this->hasMany(Category::class, 'parent_id')
+            ->with('categories');
     }
 
     public static function main()
@@ -48,8 +61,10 @@ class Category extends Model
 
     public static function secondary()
     {
-        return Self::whereNotNull('parent_id')
-            ->orderBy('name')
+        return Self::withCount('writings')
+            ->whereNotNull('parent_id')
+            ->orderByDesc('writings_count')
+            ->having('writings_count', '>', 0)
             ->get();
     }
 }

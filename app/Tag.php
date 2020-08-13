@@ -40,6 +40,10 @@ class Tag extends Model
 
     public static function popular($count = 20)
     {
-        return Self::withCount('writings')->orderByDesc('writings_count')->take($count)->get();
+        return Self::withCount('writings')
+            ->orderByDesc('writings_count')
+            ->having('writings_count', '>', 0)
+            ->take($count)
+            ->get();
     }
 }
