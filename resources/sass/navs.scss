@@ -2,20 +2,17 @@ nav {
     font-size: $wh-font-sm;
 }
 
-.navbar {
-    padding-top: 1rem;
-    padding-bottom: 0;
+#nav-main {
+    padding: $wh-m-md 0;
 
     .navbar-brand {
         img {
-            transition: transform .5s, filter .5s ease-in-out;
-            filter: grayscale(90%);
+            transition: transform .5s;
         }
     }
 
     .navbar-brand:hover {
         img {
-            filter: grayscale(0);
             transform: scale(1.3);
         }
     }
@@ -78,7 +75,7 @@ nav {
 
     .nav-item:hover,
     .nav-item.active {
-        border-bottom: 0.15rem solid $primary;
+        border-bottom: 0.15rem solid $white;
     }
 
     .nav-item.active {

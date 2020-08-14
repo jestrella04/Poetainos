@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fx.createSideMenu();
 
     // Hide Whatsapp sharer on Desktop
-    if (! fx.isMobile()) {
+    if (!fx.isMobile()) {
         document.querySelectorAll('.whatsapp-link').forEach(function (link) {
             link.classList.add('d-none');
         })
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let slimSelector = document.querySelector('#writing-form #categories');
 
     // Initialize Slim Select
-    if(null !== slimSelector && undefined !== slimSelector) {
+    if (null !== slimSelector && undefined !== slimSelector) {
         var slimSelect = new SlimSelect({
             select: slimSelector,
             showSearch: false,
@@ -152,7 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Scroll to the top of the document
         if (element.hasAttribute('id') && 'back-to-top' === element.attributes['id'].value) {
-            document.querySelector('.header').scrollIntoView({ behavior: 'smooth', block: 'end' });
+            document.querySelector('body').scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        // Scroll to the main nav
+        if (element.hasAttribute('id') && 'jump-to-nav' === element.attributes['id'].value) {
+            event.preventDefault();
+            document.querySelector('#nav-main').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Populate and/or show the side menu
@@ -444,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let method = element.elements['_method'] || false;
 
                     // Form posted successfully, let's reset it
-                    if (! method) {
+                    if (!method) {
                         element.reset();
 
                         if (null !== slimSelect && undefined !== slimSelect) {
@@ -730,6 +736,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.hasAttribute('id') && 'tags' === element.attributes['id'].value) {
             let trimTags = element.value.replace(/^\,+|\,+$/g, '');
             element.value = trimTags;
+        }
+    });
+
+    //Listen to the window scroll event and act accordingly
+    window.addEventListener('scroll', (event) => {
+        let header = document.querySelector('.header');
+        let mainWrapper = document.querySelector('.main-wrapper');
+        let jumpToMainNav = document.querySelector('#jump-to-nav');
+        let jumpToHeader = document.querySelector('#back-to-top-wrapper');
+
+        console.log(fx.isInViewport(header));
+        if (null !== header && null !== jumpToHeader) {
+            if (fx.isInViewport(header)) {
+                jumpToHeader.classList.remove('fade-in')
+                jumpToHeader.classList.add('fade-out')
+            } else {
+                jumpToHeader.classList.remove('fade-out')
+                jumpToHeader.classList.add('fade-in')
+            }
+        }
+
+        if (null !== mainWrapper && null !== jumpToMainNav) {
+            if (fx.isInViewport(mainWrapper)) {
+                jumpToMainNav.classList.remove('fade-in')
+                jumpToMainNav.classList.add('fade-out')
+            } else {
+                jumpToMainNav.classList.remove('fade-out')
+                jumpToMainNav.classList.add('fade-in')
+            }
         }
     });
 });

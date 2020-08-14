@@ -1,67 +1,85 @@
-#header,
-#header-mini {
-    background-image: url('/static/images/cover.jpg');
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: scroll;
-    background-size: cover;
-    background-color: $dark;
+section.header {
+    display: flex;
+    flex-direction: column;
     color: $white;
+    background: linear-gradient(
+                45deg,
+                rgba($dark, 0.7),
+                rgba($primary, 0.7),
+                rgba($dark, 0.7),
+                rgba($primary, 0.7),
+                rgba($dark, 0.7)
+            )
+            0 0 / 1000% no-repeat,
+        url('/static/images/cover.jpg') 0 0 / cover no-repeat;
+    -webkit-animation: gradientAnimation 40s ease infinite;
+    animation: gradientAnimation 40s ease infinite;
 
-    .header-wrapper,
-    .header-mini-wrapper {
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .header-welcome {
+    .welcome {
         flex-grow: 1;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
         text-align: center;
-        text-shadow: 2px 2px $gray-700;
-        padding: 0 0.5rem;
 
-        h1, h2 {
-            color: $white;
+        h1 {
+            @media (min-width: 768px) {
+                font-size: 4rem;
+                margin-bottom: 1.5rem;
+            }
         }
+
+        p.lead {
+            @media (min-width: 768px) {
+                font-size: $wh-font-lg;
+            }
+        }
+
+        #jump-to-nav {
+            color: rgba($white, 0.3);
+            position: absolute;
+            bottom: 3rem;
+        }
+    }
+}
+
+#hero {
+    .welcome {
+        height: 100vh;
     }
 }
 
 #header {
-    max-height: 600px;
-
-    h1 {
-        color: $white;
-
-        @media (min-width: 768px) {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-        }
-    }
-
-    p.lead {
-        @media (min-width: 768px) {
-            font-size: $wh-font-lg;
-        }
-    }
-
-    .header-main {
-        height: 530px;
-    }
-}
-
-#header-mini {
-    max-height: 300px;
+    height: 300px;
 
     h1 {
         @media (min-width: 768px) {
             font-size: $wh-font-xxl;
         }
     }
+}
 
-    .header-mini-main {
-        height: 234px;
+@-webkit-keyframes gradientAnimation {
+    0% {
+        background-position: 0% 30%, 0 0;
+    }
+    50% {
+        background-position: 100% 70%, 0 0;
+    }
+    100% {
+        background-position: 0% 30%, 0 0;
+    }
+}
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 30%, 0 0;
+    }
+    50% {
+        background-position: 100% 70%, 0 0;
+    }
+    100% {
+        background-position: 0% 30%, 0 0;
     }
 }

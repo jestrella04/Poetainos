@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg">
+<nav id="nav-main" class="navbar navbar-dark navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <img src="{{ mix('/static/images/logo.svg') }}" width="32" height="32" alt="{{ getSiteConfig('name') }}">
