@@ -36,10 +36,10 @@ php artisan view:cache
 php artisan queue:restart
 
 # Install node modules
-yarnpkg install
+npm install
 
 # Build assets using Laravel Mix
-yarnpkg run production
+npm run production
 
 # Turn off maintenance mode
 php artisan up

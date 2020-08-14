@@ -9,7 +9,8 @@
         "prod": "npm run production",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
         "workspace-start": "cd laradock && docker-compose up -d nginx mariadb workspace && docker-compose exec workspace bash",
-        "workspace-stop": "cd laradock && docker-compose stop"
+        "workspace-stop": "cd laradock && docker-compose stop",
+        "translate": "php artisan translatable:export es"
     },
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.13.0",

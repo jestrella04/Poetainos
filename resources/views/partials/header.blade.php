@@ -6,7 +6,7 @@
 
         @if ('hero' === $type)
             <p class="lead">{{ getSiteConfig('slogan') }}</p>
-            <a id="jump-to-nav" href="#nav-main">
+            <a id="jump-to-nav" href="#nav-main" aria-label="{{ __('Jump to the main content') }}">
                 <i class="fas fa-chevron-down fa-3x"></i>
             </a>
         @endif
