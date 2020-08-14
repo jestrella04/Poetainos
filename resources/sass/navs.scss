@@ -3,7 +3,8 @@ nav {
 }
 
 #nav-main {
-    padding: $wh-m-md 0;
+    padding-top: $wh-m-md;
+    padding-bottom: $wh-m-md;
 
     .navbar-brand {
         img {

@@ -1,7 +1,7 @@
 @php $type = ('home' === Route::current()->getName()) ? 'hero' : 'header' @endphp
 
 <section id="{{ $type }}" class="header">
-    <div class="welcome">
+    <div class="container welcome">
         <h1>{{ getSiteConfig('name') }}</h1>
 
         @if ('hero' === $type)
@@ -12,5 +12,7 @@
         @endif
     </div>
 
-    @include('partials.nav')
+    <div class="container">
+        @include('partials.nav')
+    </div>
 </section>
