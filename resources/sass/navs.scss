@@ -7,8 +7,11 @@ nav {
     padding-bottom: $wh-m-md;
 
     .navbar-brand {
+        font-weight: 700;
+
         img {
             transition: transform .5s;
+            margin-right: $wh-m-sm;
         }
     }
 

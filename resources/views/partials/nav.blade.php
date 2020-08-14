@@ -2,6 +2,7 @@
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <img src="{{ mix('/static/images/logo.svg') }}" width="32" height="32" alt="{{ getSiteConfig('name') }}">
+            @if ('hero' !== $type) {{ getSiteConfig('name') }} @endif
         </a>
 
         <div class="toggler-wrapper">
