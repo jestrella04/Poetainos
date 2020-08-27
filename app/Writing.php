@@ -75,7 +75,7 @@ class Writing extends Model
         return $this->belongsToMany(Tag::class);
     }
 
-    public function categoriesAsString($delimiter = ',')
+    public function categoriesAsString($delimiter = ', ')
     {
         $array = $this->categories
         ->map(function ($category) {
@@ -86,7 +86,7 @@ class Writing extends Model
         return implode($delimiter, $array);
     }
 
-    public function tagsAsString($delimiter = ',')
+    public function tagsAsString($delimiter = ', ')
     {
         $array = $this->tags
         ->map(function ($tag) {
@@ -143,8 +143,11 @@ class Writing extends Model
         $auraNew = ($totalPoints / $basePoints) * (1 + ($basePoints / 100));
         $auraNew = number_format($auraNew, 2);
 
+        // Check when writing was posted (in days)
+        $postedAt = Carbon::parse($this->created_at)->diffInDays();
+
         // Persist to the database
-        if ($auraOld < $auraHome && $auraNew >= $auraHome) {
+        if ($auraOld < $auraHome && $auraNew >= $auraHome && $postedAt <= 31) {
             DB::table($this->getTable())->whereId($this->id)->update([
                 'aura' => $auraNew,
                 'aura_updated_at' => Carbon::now(),

@@ -181,7 +181,7 @@ class WritingsController extends Controller
         // Create the extra info array
         $extraInfo = [
             'link' => request('link') ?? '',
-            'cover' => $cover ?? $writing->extra_info['cover'],
+            'cover' => $cover ?? ($writing->extra_info['cover'] ?? ''),
         ];
 
         // Persist to database

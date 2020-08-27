@@ -60,7 +60,7 @@ class WritingFeatured extends Notification implements ShouldQueue
             'author' => $this->writing->author->getTwitterUsername()
         ]);
 
-        $msg = $msg . ' ' . __('Go read it, what are you waiting for? #poetry');
+        $msg = $msg . ' ' . __('You cannot miss this! #poetry');
         $msg = $msg . ' ' . $this->writing->path();
 
         return new TwitterStatusUpdate($msg);
