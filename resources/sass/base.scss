@@ -96,6 +96,8 @@ hr {
 }
 
 .stats {
+    text-align: center;
+
     button {
         @media (max-width: 576px) {
             margin-bottom: $wh-m-sm;

@@ -13,10 +13,8 @@
         @endif
 
         @include('writings.entry.footer')
-
-        <div class="text-center">
-            @include('writings.entry.stats')
-        </div>
+        @include('writings.entry.stats')
+        @include('writings.entry.likers')
     @else
         <div class="d-flex flex-column flex-md-row">
             <div class="btn-read-more">

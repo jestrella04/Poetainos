@@ -218,4 +218,10 @@ class Writing extends Model
             ],
         ];
     }
+
+    public function likers()
+    {
+        $likers = $this->votes()->where('vote', '>', 0)->pluck('user_id');
+        return User::whereIn('id', $likers);
+    }
 }
