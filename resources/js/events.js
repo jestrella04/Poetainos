@@ -346,6 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Deleting a record (confirmation prompt)
         if (element.classList.contains('admin-content-delete') || element.classList.contains('user-content-delete')) {
+            event.preventDefault();
+
             let targetModal = element.attributes['href'].value;
             let btnDelete = document.querySelector('#btn-modal-delete');
             let warningDelete = document.querySelector('#content-delete-warning');
