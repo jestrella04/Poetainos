@@ -119,7 +119,8 @@
     .writing-likers {
         margin-top: $wh-m-lg;
 
-        p {
+        small {
+            display: block;
             margin-bottom: $wh-m-md;
         }
     }
