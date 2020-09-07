@@ -7,6 +7,7 @@ use App\Notifications\WritingPublished;
 use App\Tag;
 use App\User;
 use App\Writing;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
@@ -36,6 +37,7 @@ class WritingsController extends Controller
             $auraHome = getSiteConfig('aura.min_at_home');
             $writings = Writing::orderBy('aura', 'desc')
             ->whereBetween('aura', [$auraHome - 3, $auraHome])
+            ->whereBetween('created_at', [Carbon::today()->subMonth(), Carbon::today()])
             ->simplePaginate($this->pagination);
         }
 
