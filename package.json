@@ -28,5 +28,7 @@
         "slim-select": "^1.26.0",
         "vue-template-compiler": "^2.6.11"
     },
-    "dependencies": {}
+    "dependencies": {
+        "@ivanhanak_com/js-textarea-autogrow": "^1.0.2"
+    }
 }

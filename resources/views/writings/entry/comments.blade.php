@@ -11,7 +11,7 @@
 
                     <textarea
                         name="comment"
-                        class="form-control"
+                        class="form-control autogrow"
                         placeholder="{{ __('Leave your comment here') }}"
                         aria-label="{{ __('Leave your comment here') }}"
                         maxlength="300"

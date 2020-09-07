@@ -11,6 +11,12 @@
         }
     }
 
+    #post-comment-form textarea,
+    .reply-form textarea {
+        resize: none;
+        overflow: hidden;
+    }
+
     #post-comment + hr {
         margin: $wh-m-xxl auto;
 

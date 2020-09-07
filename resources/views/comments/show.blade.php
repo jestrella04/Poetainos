@@ -40,7 +40,7 @@
 
                     <textarea
                         name="reply"
-                        class="form-control"
+                        class="form-control autogrow"
                         placeholder="{{ __('Leave your reply here') }}"
                         aria-label="{{ __('Leave your reply here') }}"
                         maxlength="300"

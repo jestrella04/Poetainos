@@ -2,6 +2,7 @@ import * as fx from './functions';
 import BSN from "bootstrap.native";
 import SlimSelect from 'slim-select';
 import '@pwabuilder/pwaupdate';
+import autoGrow, {initializeTextAreaAutoGrow} from '@ivanhanak_com/js-textarea-autogrow';
 
 // Needed for the PWA Builder service worker
 const el = document.createElement('pwa-update');
@@ -21,7 +22,7 @@ window.addEventListener('load', () => {
     if (null !== mainCategory && undefined !== mainCategory) {
         mainCategory.dispatchEvent(new Event('change', { bubbles: true }));
     }
-})
+});
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
@@ -325,7 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let targetForm = document.querySelector(element.attributes['data-target-form'].value);
             let targetData = JSON.parse(element.attributes['data-target-form-data'].value);
 
-            console.log(targetModel);
             if ('category' === targetModel) {
                 targetForm.id.value = targetData.id;
                 targetForm.name.value = targetData.name;
@@ -741,14 +741,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    //Listen to the window scroll event and act accordingly
+    // Listen to the window scroll event and act accordingly
     window.addEventListener('scroll', (event) => {
         let header = document.querySelector('.header');
         let mainWrapper = document.querySelector('.main-wrapper');
         let jumpToMainNav = document.querySelector('#jump-to-nav');
         let jumpToHeader = document.querySelector('#back-to-top-wrapper');
 
-        console.log(fx.isInViewport(header));
         if (null !== header && null !== jumpToHeader) {
             if (fx.isInViewport(header)) {
                 jumpToHeader.classList.remove('fade-in')
@@ -767,6 +766,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 jumpToMainNav.classList.remove('fade-out')
                 jumpToMainNav.classList.add('fade-in')
             }
+        }
+    });
+
+    // Listen to the input event and act accordingly
+    document.addEventListener('input', (event) => {
+        let element = event.target;
+
+        if (element.classList.contains('autogrow')) {
+            autoGrow(element);
         }
     });
 });
