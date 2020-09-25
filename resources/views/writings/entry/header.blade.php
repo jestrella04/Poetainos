@@ -17,7 +17,7 @@
 
                     <small>
                         @if ('home' === Route::current()->getName())
-                            <i class="fas fa-award fa-fw"></i>
+                            <i class="fas fa-home fa-fw"></i>
                             {{ Carbon\Carbon::parse($writing->home_posted_at)->diffForHumans() }}
                         @else
                             <i class="fas fa-calendar fa-fw"></i>
