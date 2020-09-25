@@ -16,8 +16,13 @@
                     </small>
 
                     <small>
-                        <i class="fas fa-calendar fa-fw"></i>
-                        {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
+                        @if ('home' === Route::current()->getName())
+                            <i class="fas fa-award fa-fw"></i>
+                            {{ Carbon\Carbon::parse($writing->home_posted_at)->diffForHumans() }}
+                        @else
+                            <i class="fas fa-calendar fa-fw"></i>
+                            {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
+                            @endif
                     </small>
                 </div>
 
