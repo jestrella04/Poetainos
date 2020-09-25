@@ -28,14 +28,17 @@ class WritingsController extends Controller
         ];
 
         if ('latest' === $sort) {
-            $writings = Writing::latest()
+            $writings = Writing::whereNull('home_posted_at')
+            ->latest()
             ->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = Writing::orderBy('views', 'desc')
+            $writings = Writing::whereNull('home_posted_at')
+            ->orderBy('views', 'desc')
             ->simplePaginate($this->pagination);
         } elseif ('lobby' === $sort) {
             $auraHome = getSiteConfig('aura.min_at_home');
-            $writings = Writing::orderBy('aura', 'desc')
+            $writings = Writing::whereNull('home_posted_at')
+            ->orderBy('aura', 'desc')
             ->whereBetween('aura', [$auraHome - 3, $auraHome])
             ->whereBetween('created_at', [Carbon::today()->subMonth(), Carbon::today()])
             ->simplePaginate($this->pagination);
