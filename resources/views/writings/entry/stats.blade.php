@@ -9,6 +9,16 @@
 @endphp
 
 <div class="stats writing-stats">
+    @if (isset($writing->home_posted_at))
+        <button
+            class="btn btn-sm btn-counter"
+            title="{{ __('Awarded a Golden Flower') }}"
+            data-toggle="tooltip"
+            data-placement="top">
+            <i class="fas fa-fan fa-fw" style="color:goldenrod"></i>
+        </button>
+    @endif
+
     <button
         class="btn btn-sm btn-counter @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
         @if (auth()->check() && $voted > 0)

@@ -14,6 +14,15 @@
 
     <button
         class="btn btn-sm btn-counter"
+        title="{{ __('Golden Flowers') }}"
+        data-toggle="tooltip"
+        data-placement="top">
+        <i class="fa fa-fan fa-fw"></i>
+        <span class="counter">{{ $count['flowers'] }}</span>
+    </button>
+
+    <button
+        class="btn btn-sm btn-counter"
         title="{{ __('Comments') }}"
         data-toggle="tooltip"
         data-placement="top">

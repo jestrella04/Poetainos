@@ -100,6 +100,7 @@ function getWritingCounter($writing) {
 function getUserCounter($user) {
     return [
         'writings' => ReadableHumanNumber($user->writings()->count()),
+        'flowers' => ReadableHumanNumber($user->writings()->whereNotNull('home_posted_at')->count()),
         'comments' => ReadableHumanNumber($user->comments()->count()),
         'replies' => ReadableHumanNumber($user->replies()->count()),
         'votes' => ReadableHumanNumber($user->votes()->count()),

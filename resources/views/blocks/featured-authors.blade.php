@@ -4,7 +4,7 @@
     </div>
 
     <div class="block-body">
-        @forelse (App\User::featured(20) as $author)
+        @forelse (App\User::featured(10) as $author)
         <div class="d-inline-flex d-lg-block author-link">
             <a href="{{ $author->path() }}" class="stretched-link">
                 <div class="d-inline-flex">

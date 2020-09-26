@@ -61,10 +61,10 @@
                     </a>
                 </li>
 
-                <li class="nav-item {{ Route::current()->getName() === 'writings.index' ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('writings.index') }}">
-                        <i class="fas fa-feather fa-fw"></i>
-                        {{ __('Writings') }}
+                <li class="nav-item {{ Route::current()->getName() === 'writings.awards' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('writings.awards') }}">
+                        <i class="fas fa-fan fa-fw"></i>
+                        {{ __('Golden Flowers') }}
                     </a>
                 </li>
 

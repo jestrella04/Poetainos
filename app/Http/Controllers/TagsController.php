@@ -46,7 +46,7 @@ class TagsController extends Controller
      */
     public function show(Tag $tag)
     {
-        $sort = in_array(request('sort'), ['latest', 'popular']) ? request('sort') : 'latest';
+        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
 
         $params = [
             'title' => $tag->name,
@@ -59,6 +59,11 @@ class TagsController extends Controller
         } elseif ('popular' === $sort) {
             $writings = $tag->writings()
             ->orderBy('views', 'desc')
+            ->simplePaginate($this->pagination);
+        } elseif ('likes' === $sort) {
+            $writings = $tag->writings()
+            ->withCount('votes')
+            ->orderBy('votes_count', 'desc')
             ->simplePaginate($this->pagination);
         }
 

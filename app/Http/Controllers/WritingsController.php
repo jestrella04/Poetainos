@@ -7,10 +7,9 @@ use App\Notifications\WritingPublished;
 use App\Tag;
 use App\User;
 use App\Writing;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
+use Carbon\Carbon;
 
 class WritingsController extends Controller
 {
@@ -21,34 +20,28 @@ class WritingsController extends Controller
      */
     public function index()
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'lobby']) ? request('sort') : 'latest';
-
-        $params = [
-            'title' => __('Writings'),
-        ];
+        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
 
         if ('latest' === $sort) {
-            $writings = Writing::whereNull('home_posted_at')
-            ->latest()
+            $writings = Writing::latest()
             ->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = Writing::whereNull('home_posted_at')
-            ->orderBy('views', 'desc')
+            $writings = Writing::orderBy('views', 'desc')
             ->simplePaginate($this->pagination);
-        } elseif ('lobby' === $sort) {
-            $auraHome = getSiteConfig('aura.min_at_home');
-            $writings = Writing::whereNull('home_posted_at')
-            ->orderBy('aura', 'desc')
-            ->whereBetween('aura', [$auraHome - 3, $auraHome])
-            ->whereBetween('created_at', [Carbon::today()->subMonth(), Carbon::today()])
+        } elseif ('likes' === $sort) {
+            $writings = Writing::withCount('votes')
+            ->orderBy('votes_count', 'desc')
             ->simplePaginate($this->pagination);
         }
+
+        $params = [
+            'title' => __('Home'),
+        ];
 
         return view('writings.index', [
             'writings' => $writings,
             'params' => $params,
             'sort' => $sort,
-            'main' => true,
         ]);
     }
 

@@ -9,7 +9,7 @@ class UsersWritingsController extends Controller
 {
     public function index(User $user)
     {
-        $sort = in_array(request('sort'), ['latest', 'popular']) ? request('sort') : 'latest';
+        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
 
         $params = [
             'section' => 'my_writings',
@@ -26,6 +26,11 @@ class UsersWritingsController extends Controller
         } elseif ('popular' === $sort) {
             $writings = $user->writings()
             ->orderBy('views', 'desc')
+            ->simplePaginate($this->pagination);
+        } elseif ('likes' === $sort) {
+            $writings = $user->writings()
+            ->withCount('votes')
+            ->orderBy('votes_count', 'desc')
             ->simplePaginate($this->pagination);
         }
 

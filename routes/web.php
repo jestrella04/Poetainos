@@ -82,13 +82,12 @@ Route::get('/login/{service}', 'SocialAuthController@redirectToProvider')->name(
 Route::get('/login/{service}/callback', 'SocialAuthController@handleProviderCallback');
 
 // Generic
-Route::get('/', 'HomeController@show')->name('home');
 Route::get('/offline', 'HomeController@offline')->name('offline');
-Route::redirect('/home', '/');
 Route::get('/search', 'SearchController@show')->name('search');
 
 // Writings
-Route::get('/writings', 'WritingsController@index')->name('writings.index');
+Route::get('/', 'WritingsController@index')->name('home');
+Route::get('/writings/awards', 'GoldenFlowersController@index')->name('writings.awards');
 Route::get('/writings/random', 'WritingsController@random')->name('writings.random');
 Route::get('/writings/{writing}', 'WritingsController@show')->name('writings.show');
 
@@ -117,3 +116,7 @@ Route::get('/comments/{writing}', 'CommentsController@index')->name('comments.in
 // Contact form
 Route::get('/contact', 'ContactsController@create')->name('contact.create');
 Route::post('/contact', 'ContactsController@store')->name('contact.store');
+
+// Redirects
+Route::redirect('/home', '/');
+Route::redirect('/writings', '/');
