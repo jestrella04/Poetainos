@@ -46,16 +46,16 @@ class WritingFeatured extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(__('Your writing has been featured on the home page'))
+            ->subject(__('Your writing has been awarded with a Golden Flower'))
             ->greeting(__('Hello!'))
-            ->line(__('Your writing has been featured on the home page'))
+            ->line(__('Your writing ":title" has been awarded with a Golden Flower', ['title' =>$this->writing->title]))
             ->action(__('View writing'), route('writings.show', $this->writing))
             ->line(__('Thank you for being part of the hood!'));
     }
 
     public function toTwitter($notifiable)
     {
-        $msg = __('":title" by :author has just been featured on our home page.', [
+        $msg = __('":title" by :author has been awarded with a #GoldenFlower.', [
             'title' => $this->writing->title,
             'author' => $this->writing->author->getTwitterUsername()
         ]);
