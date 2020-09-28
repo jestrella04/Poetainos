@@ -39,15 +39,19 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-center">
                             <div class="avatar-wrapper">
-                                @if (isset($notification->data['user_id']))
-                                    {!! getUserAvatar(App\User::find($notification->data['user_id'])) !!}
+                                @if (isset($notification->data['user_id']) && $user = App\User::findOrFail($notification->data['user_id']))
+                                    {!! getUserAvatar($user) !!}
+                                @else
+                                    <img class="avatar" src="{{ mix('/static/images/logo.svg') }}" alt="{{ getSiteConfig('name') }}" loading="lazy">
                                 @endif
                             </div>
 
                             <div class="flex-grow-1">
-                                <a href="{{ route('writings.show', App\Writing::find($notification->data['writing_id'])) }}" class="stretched-link">
-                                    {{ App\Writing::find($notification->data['writing_id'])->title }}
-                                </a>
+                                @if ($writing = App\Writing::findOrFail($notification->data['writing_id']))
+                                    <a href="{{ route('writings.show', $writing) }}" class="stretched-link">
+                                        {{ $writing->title }}
+                                    </a>
+                                @endif
 
                                 <div>{{ getNotificationMessage($notification) }}.</div>
 
