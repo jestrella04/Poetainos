@@ -126,7 +126,7 @@ function getNotificationMessage($notification) {
             return __(':name has added a comment on your writing', ['name' => User::find($notification->data['user_id'])->getName()]);
 
         case 'App\Notifications\WritingFeatured':
-            return __('Your writing has been featured on the home page');
+            return __('Your writing has been awarded with a Golden Flower');
 
         case 'App\Notifications\WritingLiked':
             return __(':name has liked your writing', ['name' => User::find($notification->data['user_id'])->getName()]);
