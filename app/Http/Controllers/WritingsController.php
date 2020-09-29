@@ -10,6 +10,7 @@ use App\Writing;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class WritingsController extends Controller
 {
@@ -262,6 +263,9 @@ class WritingsController extends Controller
     {
         $this->authorize('delete', $writing);
         $writing->delete();
+
+        // Delete related notifications
+        DB::delete('DELETE FROM `notifications` WHERE JSON_EXTRACT(`data`, "$.writing_id") = ?', [$writing->id]);
 
         if (request('redirect')) {
             request()->session()->flash('flash', __('Writing deleted successfully'));
