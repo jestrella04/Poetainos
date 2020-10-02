@@ -42,10 +42,14 @@
         <meta property="twitter:image" content="@yield('meta.card', asset(mix('/static/images/cover.jpg')))">
 
         <base href="{{ config('app.url') }}">
-
         <script src="{{ mix('/static/js/app.js') }}" defer></script>
+
         @if (! empty(config('services.google.analytics_id')))
             @include('partials.analytics')
+        @endif
+
+        @if (! empty(config('services.webpushr.tracking_id')))
+            @include('partials.webpushr')
         @endif
         @yield('scripts')
     </head>
