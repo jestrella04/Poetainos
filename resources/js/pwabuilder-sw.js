@@ -1,7 +1,8 @@
 // Import service worker scripts
 // webpushr-sw.js -> Webpushr service worker
 // workbox-sw.js -> This is the "Offline page" service worker
-importScripts('webpushr-sw.js', 'workbox-sw.js');
+//importScripts('webpushr-sw.js', 'https://storage.googleapis.com/workbox-cdn/releases/5.0.0/workbox-sw.js');
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.0.2/workbox-sw.js');
 
 const CACHE = "pwabuilder-page";
 

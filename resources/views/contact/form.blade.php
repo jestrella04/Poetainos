@@ -78,6 +78,26 @@
         </div>
 
         <div class="form-group">
+            @captcha
+
+            <input
+                type="text"
+                name="captcha"
+                id="captcha"
+                class="form-control mt-3"
+                value=""
+                placeholder="{{ __('Validate you are not a robot') }}"
+                autocomplete="off"
+                required>
+
+            @error('captcha')
+                <small class="text-danger" role="alert">
+                    {{ $message }}
+                </small>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <button type="submit" id="submit" class="btn btn-primary btn-lg btn-block d-title">
                 {{ __('Send message') }}
             </button>

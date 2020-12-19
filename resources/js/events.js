@@ -57,10 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Disable tracking if the opt-out cookie exists.
-    let disableStr = 'ga-disable-' + analytics_id;
+    if (null !== window.analytics_id && undefined !== window.analytics_id) {
+        let disableStr = 'ga-disable-' + window.analytics_id;
 
-    if (document.cookie.indexOf(disableStr + '=true') > -1) {
-        window[disableStr] = true;
+        if (document.cookie.indexOf(disableStr + '=true') > -1) {
+            window[disableStr] = true;
+        }
     }
 
     // Set what modal element should be displayed

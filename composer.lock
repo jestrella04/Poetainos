@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "04a7decd86c774de03d30a50c474d8aa",
+    "content-hash": "43ba838c902552f797d6ad248e768d46",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -237,6 +237,69 @@
                 "stack"
             ],
             "time": "2019-12-24T22:41:47+00:00"
+        },
+        {
+            "name": "bonecms/laravel-captcha",
+            "version": "v2.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/igoshev/laravel-captcha.git",
+                "reference": "4affdb757d7c2cd60a4f1a177e1fd123013c8362"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/igoshev/laravel-captcha/zipball/4affdb757d7c2cd60a4f1a177e1fd123013c8362",
+                "reference": "4affdb757d7c2cd60a4f1a177e1fd123013c8362",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "illuminate/config": "^5.5|^6.0|^7.0|^8.0",
+                "illuminate/http": "^5.5|^6.0|^7.0|^8.0",
+                "illuminate/routing": "^5.5|^6.0|^7.0|^8.0",
+                "illuminate/session": "^5.5|^6.0|^7.0|^8.0",
+                "illuminate/support": "^5.5|^6.0|^7.0|^8.0",
+                "illuminate/translation": "^5.5|^6.0|^7.0|^8.0",
+                "illuminate/view": "^5.5|^6.0|^7.0|^8.0",
+                "php": ">=7.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.2-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Igoshev\\Captcha\\Providers\\CaptchaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Igoshev\\Captcha\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dmitriy Igoshev",
+                    "email": "dmitry.igo@gmail.com"
+                }
+            ],
+            "description": "Captcha integration for Laravel",
+            "homepage": "https://github.com/igoshev/laravel-captcha",
+            "keywords": [
+                "Laravel Captcha",
+                "captcha"
+            ],
+            "support": {
+                "issues": "https://github.com/igoshev/laravel-captcha/issues",
+                "source": "https://github.com/igoshev/laravel-captcha"
+            },
+            "time": "2020-09-16T15:08:10+00:00"
         },
         {
             "name": "brick/math",

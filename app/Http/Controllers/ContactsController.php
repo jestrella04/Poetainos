@@ -34,6 +34,7 @@ class ContactsController extends Controller
             'email' => 'required|string|email|max:45',
             'subject' => 'required|string|min:3|max:40',
             'message' => 'required|string|min:100',
+            'captcha' => 'required|captcha'
         ]);
 
         $name = request('name');

@@ -30,7 +30,6 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
-        "@ivanhanak_com/js-textarea-autogrow": "^1.0.2",
-        "workbox-sw": "^6.0.2"
+        "@ivanhanak_com/js-textarea-autogrow": "^1.0.2"
     }
 }
