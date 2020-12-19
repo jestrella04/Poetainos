@@ -48,9 +48,9 @@
             @include('partials.analytics')
         @endif
 
-        {{-- @if (! empty(config('services.webpushr.tracking_id')))
+        @if (! empty(config('services.webpushr.tracking_id')))
             @include('partials.webpushr')
-        @endif --}}
+        @endif
         @yield('scripts')
     </head>
 
