@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43ba838c902552f797d6ad248e768d46",
+    "content-hash": "6a6ed86183357af455852be7c0d74f96",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -2269,6 +2269,64 @@
             "time": "2020-11-07T02:01:34+00:00"
         },
         {
+            "name": "pharaonic/laravel-readable",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Pharaonic/laravel-readable.git",
+                "reference": "3b51e228ab5c83dffd392e78ed5675029bcc7ee6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Pharaonic/laravel-readable/zipball/3b51e228ab5c83dffd392e78ed5675029bcc7ee6",
+                "reference": "3b51e228ab5c83dffd392e78ed5675029bcc7ee6",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">=6.0",
+                "php": ">=7.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Pharaonic\\Laravel\\Readable\\ReadableServiceProvider"
+                    ],
+                    "aliases": {
+                        "Readable": "Pharaonic\\Laravel\\Readable\\Readable"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pharaonic\\Laravel\\Readable\\": "src"
+                },
+                "files": [
+                    "src/Helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Raggi",
+                    "email": "support@pharaonic.io",
+                    "homepage": "https://pharaonic.io"
+                }
+            ],
+            "description": "Laravel - Readable Number (Integer|decimal) & DateTime & Time Length & File Size.",
+            "keywords": [
+                "human readable",
+                "laravel",
+                "pharaonic",
+                "php",
+                "readable"
+            ],
+            "time": "2020-11-06T11:39:28+00:00"
+        },
+        {
             "name": "phpoption/phpoption",
             "version": "1.7.5",
             "source": {
@@ -2644,64 +2702,6 @@
                 "shell"
             ],
             "time": "2020-12-04T02:51:30+00:00"
-        },
-        {
-            "name": "raggitech/laravel-readable",
-            "version": "1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/RaggiTech/laravel-readable.git",
-                "reference": "c112f717eb1c6b492d645d31e221696778cb43be"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/RaggiTech/laravel-readable/zipball/c112f717eb1c6b492d645d31e221696778cb43be",
-                "reference": "c112f717eb1c6b492d645d31e221696778cb43be",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": ">=6.0",
-                "php": ">=7.2"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "RaggiTech\\Laravel\\Readable\\ReadableServiceProvider"
-                    ],
-                    "aliases": {
-                        "Readable": "RaggiTech\\Laravel\\Readable\\Readable"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "RaggiTech\\Laravel\\Readable\\": "src"
-                },
-                "files": [
-                    "src/Helpers.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Moamen Eltouny",
-                    "email": "support@raggitech.com",
-                    "homepage": "https://raggitech.com"
-                }
-            ],
-            "description": "Laravel - Readable Number (Integer|decimal) & DateTime & Time Length & File Size.",
-            "keywords": [
-                "human readable",
-                "laravel",
-                "php",
-                "raggitech",
-                "readable"
-            ],
-            "time": "2020-08-04T16:49:50+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

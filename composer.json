@@ -20,7 +20,7 @@
         "laravel/socialite": "^4.4",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.0",
-        "raggitech/laravel-readable": "^1.0",
+        "pharaonic/laravel-readable": "^1.0",
         "spatie/laravel-image-optimizer": "^1.6",
         "spatie/laravel-sitemap": "^5.7",
         "staudenmeir/laravel-adjacency-list": "^1.5"
