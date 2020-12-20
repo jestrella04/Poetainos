@@ -18,7 +18,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        //Resources
+        $this->registerResources();
     }
 
     /**
@@ -56,7 +57,15 @@ class AppServiceProvider extends ServiceProvider
                 Log::info($sql->time);
             });
         }
+    }
 
+    /**
+     * Register the package resources
+     *
+     * @return void
+     */
+    protected function registerResources(): void
+    {
         // Loading project's custom language strings
         $this->loadJSONTranslationsFrom(resource_path('lang/Writerhood'));
     }
