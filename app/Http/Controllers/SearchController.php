@@ -11,7 +11,7 @@ class SearchController extends Controller
         $query = request('q') ?? false;
 
         $params = [
-            'title' => __('Search'),
+            'title' => getPageTitle([__('Search')]),
             'query' => $query,
         ];
 

@@ -19,7 +19,9 @@ class UsersNotificationsController extends Controller
         }
 
         $params = [
-            'title' => __('Notifications') . ' - ' . $user->getName(),
+            'title' => getPageTitle([
+                __('My notifications'),
+                ]),
         ];
 
         return view('notifications.index', [

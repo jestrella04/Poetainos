@@ -18,7 +18,7 @@ class UsersController extends Controller
         $sort = in_array(request('sort'), ['latest', 'popular', 'featured']) ? request('sort') : 'featured';
 
         $params = [
-            'title' => __('Writers'),
+            'title' => getPageTitle([__('Writers')]),
         ];
 
         if ('latest' === $sort) {
@@ -70,7 +70,10 @@ class UsersController extends Controller
     {
         $params = [
             'single_entry' => true,
-            'title' => $user->getName(),
+            'title' => getPageTitle([
+                $user->getName(),
+                __('Writers'),
+                ]),
         ];
 
         // Increment writing views
@@ -96,7 +99,7 @@ class UsersController extends Controller
         $this->authorize('update', $user);
 
         $params = [
-            'title' => __('Update profile'),
+            'title' => getPageTitle([__('Update profile')]),
             'roles' => ['user', 'moderator', 'admin'],
         ];
 

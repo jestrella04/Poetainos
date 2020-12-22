@@ -138,3 +138,15 @@ function getNotificationMessage($notification) {
             return __(':name has added your writing to his shelf', ['name' => User::find($notification->data['user_id'])->getName()]);
     }
 }
+
+function getPageTitle(Array $titleParts, $separator = '–') {
+    $titleParts[] = getSiteConfig('name');
+    $title = [];
+
+    foreach($titleParts as $part) {
+        $title[] = ucfirst($part);
+    }
+
+    unset($titleParts);
+    return trim(implode(' ' . $separator . ' ', $title), ' ');
+}

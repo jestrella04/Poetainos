@@ -1,6 +1,6 @@
 @extends('layouts.index')
 
-@section('meta.title', __('Contact form'))
+@section('meta.title', $params['title'])
 
 @section('header')
     @include('partials.header')

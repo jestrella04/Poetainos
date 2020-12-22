@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('meta.title', __('Administration'))
+@section('meta.title', $params['title'])
 
 @section('main')
     <nav>

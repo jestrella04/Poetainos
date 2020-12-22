@@ -9,7 +9,7 @@
         <meta name="generator" content="Writerhood">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>@yield('meta.title') - {{ getSiteConfig('name') }}</title>
+        <title>@yield('meta.title')</title>
 
         <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">
         <link rel="preload" href="{{ mix('/static/js/app.js') }}" as="script">

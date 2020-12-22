@@ -49,7 +49,10 @@ class TagsController extends Controller
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
 
         $params = [
-            'title' => $tag->name,
+            'title' => getPageTitle([
+                $tag->name,
+                __('Tags'),
+                ]),
         ];
 
         if ('latest' === $sort) {

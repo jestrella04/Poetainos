@@ -48,7 +48,7 @@ class PagesController extends Controller
     public function show(Page $page)
     {
         $params = [
-            'title' => $page->title,
+            'title' => getPageTitle([$page->title]),
         ];
 
         // Increment page views

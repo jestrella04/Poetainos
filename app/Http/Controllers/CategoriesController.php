@@ -51,7 +51,10 @@ class CategoriesController extends Controller
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
 
         $params = [
-            'title' => $category->name,
+            'title' => getPageTitle([
+                $category->name,
+                __('Categories')
+                ]),
             'description' => $category->description,
         ];
 

@@ -36,7 +36,7 @@ class WritingsController extends Controller
         }
 
         $params = [
-            'title' => __('Home'),
+            'title' => getPageTitle([]),
         ];
 
         return view('writings.index', [
@@ -77,7 +77,10 @@ class WritingsController extends Controller
     {
         $params = [
             'single_entry' => true,
-            'title' => $writing->title,
+            'title' => getPageTitle([
+                $writing->title,
+                $writing->author->getName(),
+            ]),
         ];
 
         // Increment writing views
@@ -124,8 +127,8 @@ class WritingsController extends Controller
         $mainCategories = Category::whereNull('parent_id')->get();
         $params = [
             'title' => [
-                'update' => __('Update writing'),
-                'create' => __('Publish a writing'),
+                'update' => getPageTitle([__('Update writing')]),
+                'create' => getPageTitle([__('Publish a writing')]),
             ],
         ];
 

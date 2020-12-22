@@ -31,7 +31,7 @@ class GoldenFlowersController extends Controller
         }
 
         $params = [
-            'title' => __('Golden Flowers'),
+            'title' => getPageTitle([__('Golden Flowers')]),
         ];
 
         return view('writings.index', [

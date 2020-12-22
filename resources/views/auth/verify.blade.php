@@ -1,6 +1,6 @@
 @extends('layouts.login')
 
-@section('meta.title', __('Verify Account'))
+@section('meta.title', getPageTitle([__('Verify Account')]))
 
 @section('main')
     <div id="register" class="login">

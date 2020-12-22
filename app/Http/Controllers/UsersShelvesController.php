@@ -13,7 +13,10 @@ class UsersShelvesController extends Controller
 
         $params = [
             'section' => 'shelf',
-            'title' => __('Shelf') . ' - ' . $user->getName(),
+            'title' => getPageTitle([
+                __('Shelf'),
+                $user->getName()
+                ]),
             'author' => $user,
             'empty-head' => __('This shelf is empty'),
             'empty-msg' => __("We're afraid that :name has not added any writings to the shelf yet.", ['name' => $user->firstName()]),

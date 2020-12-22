@@ -8,7 +8,7 @@ class HomeController extends Controller
     {
         return view('offline.index', [
             'params' => [
-                'title' => __('Offline')
+                'title' => getPageTitle([__('Offline')]),
             ]
         ]);
     }

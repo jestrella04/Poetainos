@@ -1,6 +1,6 @@
 @extends('layouts.login')
 
-@section('meta.title', __('Password Recovery'))
+@section('meta.title', getPageTitle([__('Password Recovery')]))
 
 @section('main')
     <div id="email-password" class="login">

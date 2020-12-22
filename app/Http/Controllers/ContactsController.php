@@ -17,7 +17,15 @@ class ContactsController extends Controller
      */
     public function create()
     {
-        return view('contact.index');
+        $params = [
+            'title' => getPageTitle([
+                __('Contact form'),
+            ]),
+        ];
+
+        return view('contact.index', [
+            'params' => $params,
+        ]);
     }
 
     /**

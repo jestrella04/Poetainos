@@ -1,6 +1,6 @@
 @extends('layouts.login')
 
-@section('meta.title', __('Login'))
+@section('meta.title', getPageTitle([__('Login')]))
 
 @section('main')
     <div id="login" class="login">
