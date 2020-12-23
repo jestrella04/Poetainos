@@ -30,14 +30,14 @@
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:title" content="@yield('meta.title') - {{ getSiteConfig('name') }}">
+        <meta property="og:title" content="@yield('meta.title')">
         <meta property="og:description" content="@yield('meta.description', getSiteConfig('slogan'))">
         <meta property="og:image" content="@yield('meta.card', asset(mix('/static/images/cover.jpg')))">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ url()->current() }}">
-        <meta property="twitter:title" content="@yield('meta.title') - {{ getSiteConfig('name') }}">
+        <meta property="twitter:title" content="@yield('meta.title')">
         <meta property="twitter:description" content="@yield('meta.description', getSiteConfig('slogan'))">
         <meta property="twitter:image" content="@yield('meta.card', asset(mix('/static/images/cover.jpg')))">
 
