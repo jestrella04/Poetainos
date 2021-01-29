@@ -3,6 +3,10 @@
 # Turn on maintenance mode
 php artisan down
 
+# Reset permissions recursively for the storage directory
+# From time to time the reset cache command fails because of this
+chmod -R 0777 storage/
+
 # Pull the latest changes from the git repository
 # git reset --hard
 # git clean -df
