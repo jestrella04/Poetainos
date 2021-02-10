@@ -24,11 +24,28 @@
             "type": "image/png"
         }
     ],
+    "shortcuts": [
+        {
+            "name": "{{publish}}",
+            "short_name": "{{publish}}",
+            "url": "{{url.publish}}"
+        },
+        {
+            "name": "{{featured}}",
+            "short_name": "{{featured}}",
+            "url": "{{url.featured}}"
+        }
+    ],
     "start_url": "/",
     "display": "standalone",
     "orientation": "any",
     "lang": "Spanish; Castilian",
-    "categories": ["books", "literature", "poetry", "social"],
+    "categories": [
+        "books",
+        "literature",
+        "poetry",
+        "social"
+    ],
     "background_color": "#343a40",
     "theme_color": "#2F3BA2"
 }

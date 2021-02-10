@@ -11,6 +11,10 @@ class ResourcesController extends Controller
         $json = file_get_contents(base_path('resources/json/pwa.json'));
         $json = str_replace('{{name}}', getSiteConfig('name'), $json);
         $json = str_replace('{{description}}', getSiteConfig('slogan'), $json);
+        $json = str_replace('{{publish}}', __('Publish'), $json);
+        $json = str_replace('{{featured}}', __('Golden Flowers'), $json);
+        $json = str_replace('{{url.publish}}', route('writings.create'), $json);
+        $json = str_replace('{{url.featured}}', route('writings.awards'), $json);
 
         return $json;
     }
