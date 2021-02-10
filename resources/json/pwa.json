@@ -1,6 +1,7 @@
 {
     "name": "{{name}}",
     "short_name": "{{name}}",
+    "description": "{{description}}",
     "icons": [
         {
             "src": "/static/images/logo.svg",
@@ -25,6 +26,9 @@
     ],
     "start_url": "/",
     "display": "standalone",
+    "orientation": "any",
+    "lang": "Spanish; Castilian",
+    "categories": ["books", "literature", "poetry", "social"],
     "background_color": "#343a40",
     "theme_color": "#2F3BA2"
 }

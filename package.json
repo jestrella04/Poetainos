@@ -16,6 +16,7 @@
     },
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.15.2",
+        "@ivanhanak_com/js-textarea-autogrow": "^1.0.2",
         "@pwabuilder/pwaupdate": "^0.2.0",
         "axios": "^0.21.1",
         "bootstrap": "^4.6.0",
@@ -30,7 +31,5 @@
         "slim-select": "^1.27.0",
         "vue-template-compiler": "^2.6.12"
     },
-    "dependencies": {
-        "@ivanhanak_com/js-textarea-autogrow": "^1.0.2"
-    }
+    "dependencies": {}
 }
