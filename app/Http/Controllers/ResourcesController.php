@@ -10,7 +10,7 @@ class ResourcesController extends Controller
     {
         $json = file_get_contents(base_path('resources/json/pwa.json'));
         $json = str_replace('{{name}}', getSiteConfig('name'), $json);
-        $json = str_replace('{{description}}', getSiteConfig('description'), $json);
+        $json = str_replace('{{description}}', getSiteConfig('slogan'), $json);
 
         return $json;
     }
