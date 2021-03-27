@@ -6,6 +6,7 @@ use App\Category;
 use App\Notifications\WritingPublished;
 use App\Tag;
 use App\User;
+use App\Vote;
 use App\Writing;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
@@ -241,6 +242,13 @@ class WritingsController extends Controller
 
             // Share on social media
             $writing->author->notify(new WritingPublished($writing));
+
+            // Add a vote automatically from the poster
+            Vote::create([
+                'writing_id' => $writing->id,
+                'user_id' => $writing->author->id,
+                'vote' => 1,
+            ]);
         }
 
         // Apend link
