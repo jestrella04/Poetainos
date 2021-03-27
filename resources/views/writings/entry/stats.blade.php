@@ -75,10 +75,10 @@
     </button>
 
     <button
-        class="btn btn-sm btn-counter @auth {{ 'click shelf' }} @endauth @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
+        class="btn btn-sm btn-counter @if (isset($userId) && $userId !== $writing->author->id) {{ 'click shelf' }} @endif @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
         @if (auth()->check() && $shelved === $writing->id)
         title="{{ __('On my shelf') }}"
-        @elseif (auth()->check() && null === $shelved)
+        @elseif (auth()->check() && $userId !== $writing->author->id && null === $shelved)
         title="{{ __('Add to my shelf') }}"
         @else
         title="{{ __('Shelved') }}"
