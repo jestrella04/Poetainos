@@ -8,6 +8,7 @@ import autoGrow, {initializeTextAreaAutoGrow} from '@ivanhanak_com/js-textarea-a
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
 const updateComponent = document.createElement('pwa-update');
+
 document.body.appendChild(installComponent);
 document.body.appendChild(updateComponent);
 

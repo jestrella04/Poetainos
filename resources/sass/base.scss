@@ -349,9 +349,17 @@ hr {
 
 pwa-install {
     position: fixed;
-    bottom: 0;
-    --install-button-color: #593196;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 9997;
+    --install-button-color: var(--primary);
     --modal-z-index: 99999;
     --modal-background-index: 99998;
-    --modal-background-color: #fff;
+    --modal-background-color: var(--white);
+}
+
+pwa-install::part(openButton) {
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-primary;
 }
