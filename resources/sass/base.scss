@@ -346,3 +346,12 @@ hr {
     top: -3px; /* changed */
     left: 15px; /* changed */
 }
+
+pwa-install {
+    position: fixed;
+    bottom: 0;
+    --install-button-color: #593196;
+    --modal-z-index: 99999;
+    --modal-background-index: 99998;
+    --modal-background-color: #fff;
+}

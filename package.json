@@ -31,5 +31,7 @@
         "slim-select": "^1.27.0",
         "vue-template-compiler": "^2.6.12"
     },
-    "dependencies": {}
+    "dependencies": {
+        "@pwabuilder/pwainstall": "^1.6.7"
+    }
 }

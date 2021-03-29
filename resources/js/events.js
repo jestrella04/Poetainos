@@ -2,11 +2,23 @@ import * as fx from './functions';
 import BSN from "bootstrap.native";
 import SlimSelect from 'slim-select';
 import '@pwabuilder/pwaupdate';
+import '@pwabuilder/pwainstall';
 import autoGrow, {initializeTextAreaAutoGrow} from '@ivanhanak_com/js-textarea-autogrow';
 
-// Needed for the PWA Builder service worker
-const el = document.createElement('pwa-update');
-document.body.appendChild(el);
+// PWA Builder goodies
+const installComponent = document.createElement('pwa-install');
+const updateComponent = document.createElement('pwa-update');
+document.body.appendChild(installComponent);
+document.body.appendChild(updateComponent);
+
+installComponent.manifestpath = '/static/json/pwa-manifest.json';
+installComponent.explainer = 'Esta aplicación puede ser instalada en';
+installComponent.featuresheader = 'Funcionalidades Principales';
+installComponent.descriptionheader = 'Descripción';
+installComponent.installbuttontext = 'Instalar';
+installComponent.cancelbuttontext = 'Cancelar';
+installComponent.iosinstallinfotext = 'Presiona el botón compartir y después "Añadir a la pantalla principal"';
+installComponent.getInstalledStatus();
 
 // Wait for the page to be fully loaded
 window.addEventListener('load', () => {
