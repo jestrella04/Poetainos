@@ -13,8 +13,10 @@ class ResourcesController extends Controller
         $json = str_replace('{{description}}', getSiteConfig('slogan'), $json);
         $json = str_replace('{{publish}}', __('Publish'), $json);
         $json = str_replace('{{featured}}', __('Golden Flowers'), $json);
+        $json = str_replace('{{random}}', __('Random'), $json);
         $json = str_replace('{{url.publish}}', route('writings.create'), $json);
         $json = str_replace('{{url.featured}}', route('writings.awards'), $json);
+        $json = str_replace('{{url.random}}', route('writings.random'), $json);
 
         return $json;
     }

@@ -34,6 +34,11 @@
             "name": "{{featured}}",
             "short_name": "{{featured}}",
             "url": "{{url.featured}}"
+        },
+        {
+            "name": "{{random}}",
+            "short_name": "{{random}}",
+            "url": "{{url.random}}"
         }
     ],
     "start_url": "/",
