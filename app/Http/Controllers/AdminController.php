@@ -135,4 +135,26 @@ class AdminController extends Controller
             'params' => $params,
         ]);
     }
+
+    public function tools() {
+        ob_start () ;
+        phpinfo () ;
+        $pinfo = ob_get_contents () ;
+        ob_end_clean () ;
+
+        $log = storage_path('logs/laravel.log');
+        $params = [
+            'title' => getPageTitle([
+                __('Tools'),
+                __('Administration'),
+            ]),
+            'log_file' => $log,
+            'log_contents' => shell_exec('tail -n 100 ' . $log),
+            'php_info' => $pinfo,
+        ];
+
+        return view('admin.tools', [
+            'params' => $params,
+        ]);
+    }
 }

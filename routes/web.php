@@ -26,6 +26,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('pages', 'AdminController@pages')->name('pages');
     Route::get('users', 'AdminController@users')->name('users');
     Route::get('writings', 'AdminController@writings')->name('writings');
+    Route::get('tools', 'AdminController@tools')->name('tools');
 
     Route::put('settings/edit', 'SettingsController@update')->name('settings.edit');
     Route::put('categories/edit', 'CategoriesController@update')->name('categories.edit');

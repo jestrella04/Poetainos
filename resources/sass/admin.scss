@@ -1,4 +1,5 @@
-.settings-json-input {
+.settings-json-input,
+#logview textarea {
     font-family: monospace;
     font-size: $wh-font-sm;
 }
@@ -58,6 +59,16 @@
                     opacity: 1;
                 }
             }
+        }
+
+        .nav-tabs {
+            margin-bottom: $wh-m-lg;
+        }
+
+        iframe {
+            border: 0;
+            width: 100%;
+            height: 500px;
         }
     }
 }

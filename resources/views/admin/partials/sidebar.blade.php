@@ -55,5 +55,12 @@
                 {{ __('Writings') }}
             </a>
         </li>
+
+        <li class="nav-item {{ Route::current()->getName() === 'admin.tools' ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.tools') }}">
+                <i class="fas fa-fw fa-tools"></i>
+                {{ __('Tools') }}
+            </a>
+        </li>
     </ul>
 </aside>
