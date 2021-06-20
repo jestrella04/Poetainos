@@ -7,7 +7,7 @@
         <button
             id="toggler"
             class="btn btn-sm btn-outline-dark"
-            data-target="#admin-side-menu"
+            data-wh-target="#admin-side-menu"
             aria-label="{{ __('Toggle sidebar') }}">
             <i class="fa fa-bars"></i>
         </button>

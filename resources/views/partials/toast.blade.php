@@ -4,11 +4,8 @@
             <div id="toast-flash" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <img src="{{ mix('/static/images/logo.svg') }}" width="20" height="20" alt="">
-                    <strong class="mr-auto">{{ getSiteConfig('name')}}</strong>
-
-                    <button type="button" class="close" data-dismiss="toast" aria-label="{{ __('Close') }}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <strong class="me-auto">{{ getSiteConfig('name')}}</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="{{ __('Close') }}"></button>
                 </div>
 
                 <div class="toast-body">
@@ -20,11 +17,8 @@
         <div id="toast-reuse" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <img src="{{ mix('/static/images/logo.svg') }}" width="20" height="20" alt="">
-                <strong class="mr-auto">{{ getSiteConfig('name')}}</strong>
-
-                <button type="button" class="close" data-dismiss="toast" aria-label="{{ __('Close') }}">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <strong class="me-auto">{{ getSiteConfig('name')}}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <div class="toast-body"></div>

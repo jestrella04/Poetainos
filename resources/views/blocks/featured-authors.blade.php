@@ -4,13 +4,10 @@
     </div>
 
     <div class="block-body">
-        @forelse (App\User::featured(10) as $author)
-        <div class="d-inline-flex d-lg-block author-link">
-            <a href="{{ $author->path() }}" class="stretched-link">
-                <div class="d-inline-flex">
-                    <div>{!! getUserAvatar($author) !!}</div>
-                    <div class="my-auto">{{ $author->getName() }}</div>
-                </div>
+        @forelse (App\User::featured(15) as $author)
+        <div class="d-inline-flex author-link">
+            <a href="{{ $author->path() }}" data-bs-toggle="tooltip" title="{{ $author->getName() }}">
+                {!! getUserAvatar($author) !!}
             </a>
         </div>
 

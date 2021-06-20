@@ -3,7 +3,7 @@
         <div class="footer-item">
             <i class="fas fa-folder-open fa-fw" title="{{ __('Categories') }}"></i>
             @foreach ( $writing->categories as $category )
-                <a href="{{ $category->path() }}" class="badge badge-light d-title">{{ $category->name }}</a>
+                <a href="{{ $category->path() }}" class="btn btn-sm btn-secondary d-title">{{ $category->name }}</a>
             @endforeach
         </div>
     @endif
@@ -12,7 +12,7 @@
         <div class="footer-item">
             <i class="fas fa-hashtag fa-fw" title="{{ __('Tags') }}"></i>
             @foreach ( $writing->tags as $tag )
-                <a href="{{ $tag->path() }}" class="badge badge-light d-title">{{ $tag->name }}</a>
+                <a href="{{ $tag->path() }}" class="btn btn-sm btn-secondary d-title">{{ $tag->name }}</a>
             @endforeach
         </div>
     @endif

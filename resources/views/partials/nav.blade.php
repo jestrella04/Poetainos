@@ -9,12 +9,11 @@
             <button
                 id="toggler"
                 class="rounded navbar-toggler"
-                data-source="#header-navbar"
-                data-target="#user-side-menu"
+                data-wh-source="#header-navbar"
+                data-wh-target="#user-side-menu"
                 aria-label="{{ __('Toggle sidebar') }}">
                 <span class="icon-badge-container">
                     <i class="fa fa-bars"></i>
-
                     @if (auth()->check() && auth()->user()->unreadNotifications->count() > 0)
                         <div class="icon-badge"></div>
                     @endif
@@ -23,7 +22,7 @@
         </div>
 
         <div id="header-navbar" class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item d-lg-none">
                     <a class="nav-link" href="{{ route('home') }}">
                         <i class="fas fa-home fa-fw"></i>
@@ -38,7 +37,7 @@
                             {{ __('Notifications') }}
 
                             @if (auth()->user()->unreadNotifications->count() > 0)
-                                <span class="badge badge-light ml-3">{{ auth()->user()->unreadNotifications->count() }}</span>
+                                <span class="badge bg-light ms-3">{{ auth()->user()->unreadNotifications->count() }}</span>
                                 <span class="sr-only">{{ __('Unread notifications') }}</span>
                             @endif
                         </a>
@@ -91,7 +90,7 @@
 
                 @auth
                     <li class="nav-item dropdown d-none d-lg-block">
-                        <a class="nav-link" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <div class="icon-badge-container">
                                 {!! getUserAvatar(auth()->user()) !!}
                                 @if (auth()->user()->unreadNotifications->count() > 0)
@@ -110,7 +109,7 @@
                                 {{ __('Notifications') }}
 
                                 @if (auth()->user()->unreadNotifications->count() > 0)
-                                    <span class="badge badge-dark ml-3">{{ auth()->user()->unreadNotifications->count() }}</span>
+                                    <span class="badge bg-dark ms-3">{{ auth()->user()->unreadNotifications->count() }}</span>
                                     <span class="sr-only">{{ __('Unread notifications') }}</span>
                                 @endif
                             </a>

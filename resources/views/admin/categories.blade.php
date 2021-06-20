@@ -10,7 +10,7 @@
                     <input
                         type="text"
                         class="filter-box-input form-control"
-                        data-target=".filter-table"
+                        data-wh-target=".filter-table"
                         placeholder="{{ __('Filter by') }}..."
                         autocomplete="off">
                 </div>
@@ -21,8 +21,8 @@
                         class="btn btn-primary btn-create"
                         type="button"
                         title="{{ __('Create new category') }}"
-                        data-toggle="modal"
-                        data-target="#admin-categories-form-wrapper"
+                        data-bs-toggle="modal"
+                        data-bs-target="#admin-categories-form-wrapper"
                         aria-expanded="false">
                         <i class="fas fa-plus"></i>
                     </button>
@@ -61,17 +61,17 @@
 
                                     <a href="#"
                                         class="admin-edit btn"
-                                        data-target-modal="#admin-categories-form-wrapper"
-                                        data-target-model="category"
-                                        data-target-form="#admin-categories-form"
-                                        data-target-form-data="{{ $category->toJson() }}">
+                                        data-wh-target-modal="#admin-categories-form-wrapper"
+                                        data-wh-target-model="category"
+                                        data-wh-target-form="#admin-categories-form"
+                                        data-wh-target-form-data="{{ $category->toJson() }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.categories.destroy', $category) }}"
-                                        data-warning="{{ __('Deleting a category will not delete associated writings') }}.">
+                                        data-wh-target="{{ route('admin.categories.destroy', $category) }}"
+                                        data-wh-warning="{{ __('Deleting a category will not delete associated writings') }}.">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

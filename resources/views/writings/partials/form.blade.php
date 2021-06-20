@@ -18,7 +18,7 @@
             @method('put')
         @endif
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="title" class="col-sm-2 col-form-label">{{ __('Title') }}:</label>
 
             <div class="col-sm-10">
@@ -38,20 +38,20 @@
         </div>
 
         @if ($mainCategories->count() > 0)
-            <div class="form-group row">
+            <div class="row mb-3">
                 <label for="main-category" class="col-sm-2 col-form-label">{{ __('Main category') }}:</label>
 
                 <div class="col-sm-10">
                     <select
                         name="main_category"
                         id="main-category"
-                        class="form-control custom-select"
+                        class="form-control form-select"
                         required>
                         <option value="" disabled selected>{{ __('Click to select') }}</option>
                         @foreach ($mainCategories as $category)
                             <option
                                 value="{{ $category->id }}"
-                                data-descendants="{{ $category->descendants()->depthFirst()->get(['id', 'name'])->toJson() }}"
+                                data-wh-descendants="{{ $category->descendants()->depthFirst()->get(['id', 'name'])->toJson() }}"
                                 @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif>
                                 {{ $category->name }}
                             </option>
@@ -63,16 +63,16 @@
             </div>
         @endif
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="categories" class="col-sm-2 col-form-label">{{ __('Alternative categories') }}:</label>
 
             <div class="col-sm-10">
                 <select
                     name="categories[]"
                     id="categories"
-                    class="form-control"
+                    class="form-control form-select"
                     data-placeholder="{{ __('Click to select') }} {{ __('(1 or more)') }}"
-                    data-selected="{{ $writing->categories->pluck('id')->toJson() }}"
+                    data-wh-selected="{{ $writing->categories->pluck('id')->toJson() }}"
                     multiple
                     required>
                     <option value="" data-placeholder="true">{{ __('Click to select') }} {{ __('(1 or more)') }}</option>
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="text" class="col-sm-2 col-form-label">{{ __('Text') }}:</label>
 
             <div class="col-sm-10">
@@ -98,7 +98,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="tags" class="col-sm-2 col-form-label">{{ __('Tags') }}:</label>
 
             <div class="col-sm-10">
@@ -117,7 +117,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="link" class="col-sm-2 col-form-label">{{ __('Link') }}:</label>
 
             <div class="col-sm-10">
@@ -135,7 +135,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="cover" class="col-sm-2 col-form-label">{{ __('Cover') }}:</label>
 
             <div class="col-sm-10">
@@ -145,11 +145,11 @@
                 id="cover"
                 class="form-control-file d-none"
                 accept="image/png, image/jpeg"
-                data-target="#selected-file"
-                data-max-size="{{ getSiteConfig('uploads_max_file_size') }}"
+                data-wh-target="#selected-file"
+                data-wh-max-size="{{ getSiteConfig('uploads_max_file_size') }}"
                 placeholder="">
 
-                <button id="cover-chooser" data-target="#cover">
+                <button id="cover-chooser" data-wh-target="#cover">
                     <div class="placeholder">
                         <p>
                             <strong>{{ __('Click here to select a file') }}</strong>
@@ -167,25 +167,25 @@
         </div>
 
         @if ($writing->exists && auth()->user()->can('delete', $writing))
-        <div class="form-group row">
-            <div class="offset-sm-2 col-sm-10">
+        <div class="row mb-3">
+            <div class="offset-sm-2 col-sm-10 d-grid gap-2">
                 <a href="#delete-modal"
-                    class="user-content-delete btn btn-link btn-sm btn-block text-danger"
-                    data-target="{{ route('writings.destroy', $writing) }}"
-                    data-redirect="{{ route('home') }}"
-                    data-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
+                    class="user-content-delete btn btn-link btn-sm text-danger"
+                    data-wh-target="{{ route('writings.destroy', $writing) }}"
+                    data-wh-redirect="{{ route('home') }}"
+                    data-wh-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
                     {{ __('Delete this writing?') }}
                 </a>
             </div>
         </div>
         @endif
 
-        <div class="form-group row">
-            <div class="offset-sm-2 col-sm-10">
+        <div class="row mb-3">
+            <div class="offset-sm-2 col-sm-10 d-grid gap-2 mb-3">
                 <button
                     type="submit"
                     id="submit"
-                    class="btn btn-primary btn-lg btn-block">
+                    class="btn btn-primary btn-lg">
                     @if ($writing->exists)
                         {{ __('Save changes') }}
                     @else

@@ -2,7 +2,7 @@
     @csrf
     @method('put')
 
-    <div class="form-group">
+    <div class="mb-3">
         <label for="json" class="col-form-label text-primary">
             <small>
                 {{ __('You are manually editing the JSON settings, be sure you understand the changes before saving') }}.
@@ -18,7 +18,7 @@
         <small id="json-error" class="text-danger d-none"></small>
     </div>
 
-    <div class="float-right">
+    <div class="float-end">
         <button type="reset" id="reset" class="btn btn-danger">{{ __('Reset') }}</button>
         <button type="submit" id="submit" class="btn btn-primary">{{ __('Save changes') }}</button>
     </div>

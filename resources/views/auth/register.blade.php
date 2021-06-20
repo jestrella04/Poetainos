@@ -17,12 +17,13 @@
             <form method="POST" action="{{ route('register') }}">
                 @csrf
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input id="username"
                         type="text"
-                        class="form-control form-control-lg @error('username') is-invalid @enderror toggle-popover-register"
+                        class="form-control form-control-lg @error('username') is-invalid @enderror"
                         name="username" value="{{ old('username') }}"
                         required
+                        data-bs-toggle="popover"
                         pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                         placeholder="{{ __('Enter your username') }}"
                         autocomplete="off">
@@ -43,7 +44,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input id="email"
                         type="email"
                         class="form-control form-control-lg @error('email') is-invalid @enderror"
@@ -60,12 +61,13 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input id="password"
                         type="password"
-                        class="form-control form-control-lg @error('password') is-invalid @enderror toggle-popover-register"
+                        class="form-control form-control-lg @error('password') is-invalid @enderror"
                         name="password"
                         required
+                        data-bs-toggle="popover"
                         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
                         placeholder="{{ __('Enter your password') }}"
                         autocomplete="off">
@@ -86,12 +88,13 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input id="password-confirm"
                         type="password"
-                        class="form-control form-control-lg toggle-popover-register"
+                        class="form-control form-control-lg"
                         name="password_confirmation"
                         required
+                        data-bs-toggle="popover"
                         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
                         placeholder="{{ __('Confirm your password') }}"
                         autocomplete="off">
@@ -106,14 +109,12 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <div class="d-flex flex-wrap">
-                        <button type="submit" class="btn btn-primary btn-lg btn-block">
-                            {{ __('Create account') }}
-                        </button>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        {{ __('Create account') }}
+                    </button>
 
-                        <a href="{{ route('login') }}" class="btn btn-dark btn-lg btn-block">{{ __('Login') }}</a>
-                    </div>
+                    <a href="{{ route('login') }}" class="btn btn-dark btn-lg">{{ __('Login') }}</a>
                 </div>
             </form>
         </div>

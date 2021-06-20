@@ -5,7 +5,7 @@
                 <a href="{{ getSocialLink(getSiteConfig('social.twitter'), 'twitter') }}"
                     title="{{ __('Follow us on Twitter') }}"
                     aria-label="{{ __('Follow us on Twitter') }}"
-                    data-toggle="tooltip">
+                    data-bs-toggle="tooltip">
                     <i class="fab fa-twitter fa-fw"></i>
                 </a>
             @endif
@@ -14,7 +14,7 @@
                 <a href="{{ getSocialLink(getSiteConfig('social.facebook'), 'facebook') }}"
                     title="{{ __('Join us on Facebook') }}"
                     aria-label="{{ __('Join us on Facebook') }}"
-                    data-toggle="tooltip">
+                    data-bs-toggle="tooltip">
                     <i class="fab fa-facebook fa-fw"></i>
                 </a>
             @endif
@@ -23,7 +23,7 @@
                 <a href="{{ getSocialLink(getSiteConfig('social.instagram'), 'instagram') }}"
                     title="{{ __('Follow us on Instagram') }}"
                     aria-label="{{ __('Follow us on Instagram') }}"
-                    data-toggle="tooltip">
+                    data-bs-toggle="tooltip">
                     <i class="fab fa-instagram fa-fw"></i>
                 </a>
             @endif
@@ -32,7 +32,7 @@
                 <a href="{{ getSocialLink(getSiteConfig('social.youtube'), 'youtube') }}"
                     title="{{ __('Join us on Youtube') }}"
                     aria-label="{{ __('Join us on Youtube') }}"
-                    data-toggle="tooltip">
+                    data-bs-toggle="tooltip">
                     <i class="fab fa-youtube fa-fw"></i>
                 </a>
             @endif
@@ -41,7 +41,7 @@
                 <a href="{{ getSocialLink(getSiteConfig('social.telegram'), 'telegram') }}"
                     title="{{ __('Join our Telegram channel') }}"
                     aria-label="{{ __('Join our Telegram channel') }}"
-                    data-toggle="tooltip">
+                    data-bs-toggle="tooltip">
                     <i class="fab fa-telegram-plane fa-fw"></i>
                 </a>
             @endif
@@ -67,8 +67,8 @@
             id="back-to-top"
             class="btn btn-primary"
             title="{{ __('Back to top') }}"
-            data-toggle="tooltip"
-            data-placement="left"
+            data-bs-toggle="tooltip"
+            data-bs-placement="left"
             aria-label="{{ __('Back to top') }}">
             <i class="fas fa-chevron-up"></i>
         </button>

@@ -26,7 +26,7 @@
             <form method="POST">
                 @csrf
 
-                <div class="form-group row">
+                <div class="row mb-3">
                     <label for="site-name" class="col-sm-4 col-form-label">Site name:</label>
 
                     <div class="col-sm-8">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="row mb-3">
                     <label for="site-slogan" class="col-sm-4 col-form-label">Site slogan:</label>
 
                     <div class="col-sm-8">
@@ -67,7 +67,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="row mb-3">
                     <label for="admin-username" class="col-sm-4 col-form-label">Admin username:</label>
 
                     <div class="col-sm-8">
@@ -89,7 +89,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="row mb-3">
                     <label for="admin-email" class="col-sm-4 col-form-label">Admin email:</label>
 
                     <div class="col-sm-8">
@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="row mb-3">
                     <label for="admin-password" class="col-sm-4 col-form-label">Admin password:</label>
 
                     <div class="col-sm-8">
@@ -131,7 +131,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="row mb-3">
                     <label for="admin-confirm" class="col-sm-4 col-form-label">Confirm password:</label>
                     <div class="col-sm-8">
                         <input
@@ -145,10 +145,8 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
-                    <div class="col-sm-12">
-                        <button type="submit" class="btn btn-primary btn-lg btn-block">Initialize</button>
-                    </div>
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">Initialize</button>
                 </div>
             </form>
         </div>

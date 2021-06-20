@@ -13,7 +13,7 @@
             <form method="POST" action="{{ route('password.confirm') }}">
                 @csrf
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input
                         id="password"
                         type="password"
@@ -30,13 +30,13 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
                         {{ __('Confirm Password') }}
                     </button>
 
                     @if (Route::has('password.request'))
-                        <a class="btn btn-link btn-block" href="{{ route('password.request') }}">
+                        <a class="btn btn-link" href="{{ route('password.request') }}">
                             {{ __('Forgot Your Password?') }}
                         </a>
                     @endif

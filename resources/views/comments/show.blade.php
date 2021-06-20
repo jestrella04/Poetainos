@@ -23,7 +23,7 @@
             {{ $comment->message }}
 
             @auth
-                <span class="badge badge-primary badge-reply" data-target="#reply-form-{{ $comment->id }}">
+                <span class="badge bg-primary badge-reply" data-wh-target="#reply-form-{{ $comment->id }}">
                     {{ __('Reply') }}
                 </span>
             @endauth
@@ -35,7 +35,7 @@
                 <input type="hidden" name="writing_id" value="{{ $comment->writing->id }}">
                 <input type="hidden" name="comment_id" value="{{ $comment->id }}">
 
-                <div class="form-group">
+                <div class="mb-3">
                     <small id="reply-error-{{ $comment->id }}" class="form-text d-none text-danger"></small>
 
                     <textarea
@@ -47,7 +47,9 @@
                         required></textarea>
                 </div>
 
-                <button class="btn btn-primary btn-block">{{ __('Post Reply') }}</button>
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-primary">{{ __('Post Reply') }}</button>
+                </div>
             </form>
         @endauth
     </div>

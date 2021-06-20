@@ -9,7 +9,7 @@
                 <div class="filter-box flex-grow-1">
                     <input type="text"
                         class="filter-box-input form-control"
-                        data-target=".filter-table"
+                        data-wh-target=".filter-table"
                         placeholder="{{ __('Filter by') }}..."
                         autocomplete="off">
                 </div>
@@ -63,8 +63,8 @@
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.writings.destroy', $writing) }}"
-                                        data-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
+                                        data-wh-target="{{ route('admin.writings.destroy', $writing) }}"
+                                        data-wh-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

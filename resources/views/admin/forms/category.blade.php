@@ -1,4 +1,4 @@
-<div id="admin-categories-form-wrapper" class="modal fade form-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
+<div id="admin-categories-form-wrapper" class="modal fade form-wrapper" data-bs-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -7,9 +7,7 @@
                     <span class="update d-none">{{ __('Edit category') }}</span>
                 </h5>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <div class="modal-body">
@@ -19,7 +17,7 @@
 
                     <input type="hidden" name="id" value="-1">
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="title" class="col-form-label">{{ __('Name') }}:</label>
 
                         <input
@@ -37,13 +35,13 @@
                     </div>
 
                     @if ($categories->count() > 0)
-                        <div class="form-group">
+                        <div class="mb-3">
                             <label for="parent" class="col-form-label">{{ __('Parent') }}:</label>
 
                             <select
                                 name="parent"
                                 id="parent"
-                                class="form-control custom-select">
+                                class="form-control form-select">
                                 <option value="">{{ __('None') }}</option>
                                 @foreach (App\Category::tree()->breadthFirst()->get() as $category)
                                     <option value="{{ $category->id }}">{{ ucfirst($category->name) }}</option>
@@ -53,7 +51,7 @@
                         </div>
                     @endif
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="description" class="col-form-label">{{ __('Description') }}:</label>
 
                         <textarea

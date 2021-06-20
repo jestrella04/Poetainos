@@ -12,7 +12,7 @@
                     class="nav-link active"
                     href="#phpinfo"
                     id="phpinfo-tab"
-                    data-toggle="tab"
+                    data-bs-toggle="tab"
                     role="tab"
                     aria-controls="phpinfo"
                     aria-selected="true">
@@ -25,7 +25,7 @@
                     class="nav-link"
                     href="#logview"
                     id="log-tab"
-                    data-toggle="tab"
+                    data-bs-toggle="tab"
                     role="tab"
                     aria-controls="logview"
                     aria-selected="false">

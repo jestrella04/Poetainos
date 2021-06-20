@@ -22,13 +22,13 @@
                 <small>Whooray, the process was completed successfully!</small>
             </div>
 
-            <div class="buttons">
-                <a class="btn btn-primary btn-lg btn-block" href="{{ route('home') }}" role="button">
+            <div class="d-grid gap-2 mb-3">
+                <a class="btn btn-primary btn-lg" href="{{ route('home') }}" role="button">
                     <i class="fas fa-home fa-fw"></i>
                     Go to the homepage
                 </a>
 
-                <a class="btn btn-primary btn-lg btn-block" href="{{ route('admin.index') }}" role="button">
+                <a class="btn btn-primary btn-lg" href="{{ route('admin.index') }}" role="button">
                     <i class="fas fa-cogs fa-fw"></i>
                     Go to the admin panel
                 </a>

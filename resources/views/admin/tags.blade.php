@@ -9,7 +9,7 @@
                 <div class="filter-box flex-grow-1">
                     <input type="text"
                         class="filter-box-input form-control"
-                        data-target=".filter-table"
+                        data-wh-target=".filter-table"
                         placeholder="{{ __('Filter by') }}..."
                         autocomplete="off">
                 </div>
@@ -19,8 +19,8 @@
                         class="btn btn-primary btn-create"
                         type="button"
                         title="{{ __('Create new tag') }}"
-                        data-toggle="modal"
-                        data-target="#tag-form-wrapper"
+                        data-bs-toggle="modal"
+                        data-bs-target="#tag-form-wrapper"
                         aria-expanded="false"
                         disabled>
                         <i class="fas fa-plus"></i>
@@ -63,8 +63,8 @@
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.tags.destroy', $tag) }}"
-                                        data-warning="{{ __('Deleting a tag will not delete associated writings') }}.">
+                                        data-wh-target="{{ route('admin.tags.destroy', $tag) }}"
+                                        data-wh-warning="{{ __('Deleting a tag will not delete associated writings') }}.">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

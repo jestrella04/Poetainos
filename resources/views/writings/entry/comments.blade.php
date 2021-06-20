@@ -5,7 +5,7 @@
                 @csrf
                 <input type="hidden" name="writing_id" value="{{ $writing->id }}">
 
-                <div class="form-group">
+                <div class="mb-3">
                     <small id="post-comment-success" class="form-text d-none text-success">{{ __('Comment posted successfully') }}</small>
                     <small id="post-comment-error" class="form-text d-none text-danger"></small>
 
@@ -18,7 +18,9 @@
                         required></textarea>
                 </div>
 
-                <button class="btn btn-primary btn-block">{{ __('Post Comment') }}</button>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary">{{ __('Post Comment') }}</button>
+                </div>
             </form>
         @else
             <div class="text-center">
@@ -30,8 +32,8 @@
                     <a href="{{ route('login') }}"
                         class="btn btn-success"
                         title="{{ __('Login with email') }}"
-                        data-toggle="tooltip"
-                        data-placement="top">
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top">
                         <i class="fas fa-fw fa-at"></i>
                     </a>
                 </div>
@@ -53,7 +55,9 @@
         <h3 class="all-caps">{{ __('Comments') }}</h3>
 
         <div id="load-more" class="d-none">
-            <button class="btn btn-link btn-sm btn-block" data-href="">{{ __('Load older comments') }}</button>
+            <div class="d-grid gap-2">
+                <button class="btn btn-link btn-sm" data-wh-href="">{{ __('Load older comments') }}</button>
+            </div>
         </div>
 
         <div id="loading-comments" class="text-center">
