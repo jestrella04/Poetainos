@@ -7,8 +7,8 @@
 
         @method('put')
 
-        <div class="form-group text-center">
-            <span class="avatar-chooser" data-target="#avatar">
+        <div class=" text-center">
+            <span class="avatar-chooser" data-wh-target="#avatar">
                 <img src="{{ $avatarSrc }}" alt="" class="avatar avatar-preview">
 
                 <i class="fas fa-camera"></i>
@@ -26,11 +26,11 @@
                 id="avatar"
                 class="form-control-file"
                 accept="image/png, image/jpeg"
-                data-max-size="{{ getSiteConfig('uploads_max_file_size') }}"
+                data-wh-max-size="{{ getSiteConfig('uploads_max_file_size') }}"
                 placeholder="">
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <div class="offset-3 col-sm-9">
                 <div class="form-check">
                     <label class="form-check-label">
@@ -42,10 +42,10 @@
         </div>
 
         @if (auth()->user()->isAllowed('admin'))
-            <div class="form-group row">
+            <div class="row mb-3">
                 <label for="role" class="col-sm-3 col-form-label">{{ __('Role') }}:</label>
                 <div class="col-sm-9">
-                    <select class="form-control custom-select" name="role" id="role">
+                    <select class="form-control form-select" name="role" id="role">
                         <option value="">{{ __('User') }}</option>
                         @foreach (App\Role::all() as $role)
                             <option value="{{ $role->id }}" @if ($user->role_id === $role->id) {{ 'selected' }} @endif>
@@ -58,7 +58,7 @@
             </div>
         @endif
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="name" class="col-sm-3 col-form-label">{{ __('Name') }}:</label>
             <div class="col-sm-9">
                 <input type="text"
@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="username" class="col-sm-3 col-form-label">{{ __('Username') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="email" class="col-sm-3 col-form-label">{{ __('Email') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -112,7 +112,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="bio" class="col-sm-3 col-form-label">{{ __('Bio') }}:</label>
             <div class="col-sm-9">
                 <textarea
@@ -127,7 +127,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="location" class="col-sm-3 col-form-label">{{ __('Location') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -144,7 +144,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="occupation" class="col-sm-3 col-form-label">{{ __('Occupation') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -161,7 +161,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="interests" class="col-sm-3 col-form-label">{{ __('Interests') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -178,7 +178,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="website" class="col-sm-3 col-form-label">{{ __('Website') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -195,7 +195,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="twitter" class="col-sm-3 col-form-label">{{ __('Twitter') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -213,7 +213,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="instagram" class="col-sm-3 col-form-label">{{ __('Instagram') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -231,7 +231,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="facebook" class="col-sm-3 col-form-label">{{ __('Facebook') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -249,7 +249,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="youtube" class="col-sm-3 col-form-label">{{ __('Youtube') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -267,7 +267,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="row mb-3">
             <label for="goodreads" class="col-sm-3 col-form-label">{{ __('Goodreads') }}:</label>
             <div class="col-sm-9">
                 <input
@@ -285,10 +285,10 @@
             </div>
         </div>
 
-        <div class="form-group row">
-            <div class="offset-sm-3 col-sm-9">
-                <a class="btn btn-link btn-sm btn-block mb-1"
-                    data-toggle="collapse"
+        <div class="row mb-3">
+            <div class="offset-sm-3 col-sm-9 d-grid gap-2">
+                <a class="btn btn-link btn-sm mb-1"
+                    data-bs-toggle="collapse"
                     href="#user-profile-delete"
                     role="button"
                     aria-expanded="false"
@@ -297,7 +297,7 @@
                 </a>
 
                 <div class="collapse" id="user-profile-delete">
-                    <div class="card card-body">
+                    <div class="card card-body d-grid gap-2">
                         <p>
                             {{ __("We're sorry to see you go") }}.
                             {{ __('Please be aware that when you delete your account all related content will also be removed') }},
@@ -306,7 +306,7 @@
 
                         <button
                             type="submit"
-                            class="btn btn-danger btn-block"
+                            class="btn btn-danger"
                             form="user-delete-form">
                             {{ __('Delete account') }}
                         </button>
@@ -315,11 +315,11 @@
             </div>
         </div>
 
-        <div class="form-group row">
-            <div class="offset-sm-3 col-sm-9">
+        <div class="row mb-3">
+            <div class="offset-sm-3 col-sm-9 d-grid gap-2">
                 <button
                     type="submit"
-                    class="btn btn-primary btn-lg btn-block"
+                    class="btn btn-primary btn-lg"
                     id="submit">
                     {{ __('Save changes') }}
                 </button>

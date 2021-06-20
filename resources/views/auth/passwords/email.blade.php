@@ -19,7 +19,7 @@
             <form method="POST" action="{{ route('password.email') }}">
                 @csrf
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input
                         id="email"
                         type="email"
@@ -36,12 +36,12 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
                         {{ __('Reset password') }}
                     </button>
 
-                    <a href="{{ route('login') }}" class="btn btn-dark btn-lg btn-block">{{ __('Login') }}</a>
+                    <a href="{{ route('login') }}" class="btn btn-dark btn-lg">{{ __('Login') }}</a>
                 </div>
             </form>
         </div>

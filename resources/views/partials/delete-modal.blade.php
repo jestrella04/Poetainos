@@ -1,12 +1,10 @@
-<div id="delete-modal" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" aria-hidden="true" aria-modal="true">
+<div id="delete-modal" class="modal fade" tabindex="-1" role="dialog" data-bs-backdrop="static" aria-hidden="true" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <span class="modal-title">{{ __('Please proceed with caution') }}...</span>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <div class="modal-body">
@@ -24,7 +22,7 @@
                 <button
                     type="button"
                     class="btn btn-danger"
-                    data-dismiss="modal">
+                    data-bs-dismiss="modal">
                     {{ __('No, cancel') }}
                 </button>
 
@@ -32,9 +30,9 @@
                     id="btn-modal-delete"
                     type="button"
                     class="btn btn-primary"
-                    data-dismiss="modal"
-                    data-delete-url=""
-                    data-redirect-url="">
+                    data-bs-dismiss="modal"
+                    data-wh-delete-url=""
+                    data-wh-redirect-url="">
                     {{ __("Yes, I'm sure") }}
                 </button>
             </div>

@@ -4,7 +4,7 @@
     <form id="contact-form" action="{{ route('contact.create') }}" method="POST">
         @csrf
 
-        <div class="form-group">
+        <div class="mb-3">
             <input
                 type="text"
                 name="name"
@@ -23,7 +23,7 @@
             @enderror
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
             <input
                 type="email"
                 name="email"
@@ -41,7 +41,7 @@
             @enderror
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
             <input
                 type="text"
                 name="subject"
@@ -60,7 +60,7 @@
             @enderror
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
             <textarea
                 class="form-control"
                 name="message"
@@ -77,7 +77,7 @@
             @enderror
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
             @captcha
 
             <input
@@ -97,8 +97,8 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <button type="submit" id="submit" class="btn btn-primary btn-lg btn-block d-title">
+        <div class="d-grid gap-2 mb-3">
+            <button type="submit" id="submit" class="btn btn-primary btn-lg d-title">
                 {{ __('Send message') }}
             </button>
         </div>

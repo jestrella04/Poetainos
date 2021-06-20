@@ -6,8 +6,8 @@
                 @if ($paginator->onFirstPage())
                     <a class="btn btn-primary disabled"
                         title="{{ __('Previous') }}"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         aria-label="{{ __('Previous') }}">
                         <i class="fa fa-chevron-left fa-fw"></i>
                     </a>
@@ -15,8 +15,8 @@
                     <a class="btn btn-primary"
                         href="{{ $paginator->previousPageUrl() }}"
                         title="{{ __('Previous') }}"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         aria-label="{{ __('Previous') }}">
                         <i class="fa fa-chevron-left fa-fw"></i>
                     </a>
@@ -31,8 +31,8 @@
                     <a class="btn btn-primary"
                         href="{{ $paginator->nextPageUrl() }}"
                         title="{{ __('Next') }}"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         aria-label="{{ __('Next') }}">
                         <i class="fa fa-chevron-right fa-fw"></i>
                     </a>
@@ -40,8 +40,8 @@
                     <a class="btn btn-primary disabled"
                         href="{{ $paginator->nextPageUrl() }}"
                         title="{{ __('Next') }}"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         aria-label="{{ __('Next') }}">
                         <i class="fa fa-chevron-right fa-fw"></i>
                     </a>

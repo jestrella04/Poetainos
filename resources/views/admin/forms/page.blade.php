@@ -1,4 +1,4 @@
-<div id="admin-pages-form-wrapper" class="modal fade form-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
+<div id="admin-pages-form-wrapper" class="modal fade form-wrapper" data-bs-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -7,9 +7,7 @@
                     <span class="update d-none">{{ __('Edit page') }}</span>
                 </h5>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
 
             <div class="modal-body">
@@ -19,7 +17,7 @@
 
                     <input type="hidden" name="id" value="-1">
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="title" class="col-form-label">{{ __('Title') }}:</label>
 
                         <input
@@ -36,7 +34,7 @@
                         <small id="title-error" class="text-danger d-none"></small>
                     </div>
 
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="text" class="col-form-label">{{ __('Text') }}:</label>
 
                         <textarea

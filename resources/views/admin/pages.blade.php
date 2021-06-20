@@ -9,7 +9,7 @@
                 <div class="filter-box flex-grow-1">
                     <input type="text"
                         class="filter-box-input form-control"
-                        data-target=".filter-table"
+                        data-wh-target=".filter-table"
                         placeholder="{{ __('Filter by') }}..."
                         autocomplete="off">
                 </div>
@@ -19,8 +19,8 @@
                         class="btn btn-primary btn-create"
                         type="button"
                         title="{{ __('Create new page') }}"
-                        data-toggle="modal"
-                        data-target="#admin-pages-form-wrapper"
+                        data-bs-toggle="modal"
+                        data-bs-target="#admin-pages-form-wrapper"
                         aria-expanded="false">
                         <i class="fas fa-plus"></i>
                     </button>
@@ -55,16 +55,16 @@
 
                                     <a href="#"
                                         class="admin-edit btn"
-                                        data-target-modal="#admin-pages-form-wrapper"
-                                        data-target-model="page"
-                                        data-target-form="#admin-pages-form"
-                                        data-target-form-data="{{ $page->toJson() }}">
+                                        data-wh-target-modal="#admin-pages-form-wrapper"
+                                        data-wh-target-model="page"
+                                        data-wh-target-form="#admin-pages-form"
+                                        data-wh-target-form-data="{{ $page->toJson() }}">
                                         <i class="fas fa-fw fa-edit"></i>
                                     </a>
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
-                                        data-target="{{ route('admin.pages.destroy', $page) }}">
+                                        data-wh-target="{{ route('admin.pages.destroy', $page) }}">
                                         <i class="fas fa-fw fa-trash"></i>
                                     </a>
                                 </td>

@@ -24,12 +24,17 @@
 
             <form method="POST" action="{{ route('verification.resend') }}">
                 @csrf
-                <button type="submit" class="btn btn-primary btn-lg btn-block">{{ __('Request verification') }}</button>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">{{ __('Request verification') }}</button>
+                </div>
             </form>
 
-            <a href="{{ route('home') }}" class="btn btn-link btn-block email-confirmed">
-                <small>{{ __('Already confirmed? Continue to the homepage') }}.</small>
-            </a>
+            <div class="d-grid gap-2 mb-3">
+                <a href="{{ route('home') }}" class="btn btn-link email-confirmed">
+                    <small>{{ __('Already confirmed? Continue to the homepage') }}.</small>
+                </a>
+            </div>
         </div>
     </div>
 @endsection

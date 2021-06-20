@@ -98,27 +98,18 @@
 
 .block {
     .avatar {
-        width: $wh-avatar-md;
-        height: $wh-avatar-md;
-        max-width: $wh-avatar-md;
-        max-height: $wh-avatar-md;
-        font-size: $wh-avatar-md * 0.4;
-        line-height: $wh-avatar-md;
+        width: $wh-avatar-xl;
+        height: $wh-avatar-xl;
+        max-width: $wh-avatar-xl;
+        max-height: $wh-avatar-xl;
+        font-size: $wh-avatar-xl * 0.4;
+        line-height: $wh-avatar-xl;
         margin-right: $wh-m-sm;
     }
 
     .author-link {
         position: relative;
-        margin-bottom: $wh-m-sm;
-        margin-right: $wh-m-sm;
-
-        a {
-            color: $body-color;
-        }
-
-        a:hover {
-            color: $dark;
-        }
+        margin: 0.2rem;
     }
 }
 

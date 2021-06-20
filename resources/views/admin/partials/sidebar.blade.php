@@ -1,5 +1,5 @@
 <aside id="admin-side-menu" class="side-menu">
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ms-auto">
         <li class="nav-item">
             <a class="nav-link" href="{{ route('home') }}">
                 <i class="fas fa-fw fa-feather-alt"></i>

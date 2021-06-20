@@ -1,5 +1,5 @@
+import * as bootstrap from 'bootstrap';
 import * as fx from './functions';
-import BSN from "bootstrap.native";
 import SlimSelect from 'slim-select';
 import '@pwabuilder/pwaupdate';
 import '@pwabuilder/pwainstall';
@@ -68,6 +68,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         slimSelect.disable();
     }
+
+    // Initialize tooltips
+    [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    //Initialize popovers
+    [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(function (popoverTriggerEl) {
+        let helpText = popoverTriggerEl.parentElement.querySelector('.help').innerHTML;
+        let options = {
+            delay: 100,
+            trigger: 'focus',
+            placement: 'top',
+            content: helpText,
+            html: true,
+        };
+
+        return new bootstrap.Popover(popoverTriggerEl, options);
+    });
 
     // Disable tracking if the opt-out cookie exists.
     if (null !== window.analytics_id && undefined !== window.analytics_id) {
@@ -179,12 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Populate and/or show the side menu
         if (element.hasAttribute('id') && 'toggler' === element.attributes['id'].value) {
-            let targetNav = document.querySelector(element.attributes['data-target'].value);
+            let targetNav = document.querySelector(element.attributes['data-wh-target'].value);
             let dataSource = null;
             let sourceNav = null;
 
-            if (element.hasAttribute('data-source')) {
-                dataSource = element.attributes['data-source'].value;
+            if (element.hasAttribute('data-wh-source')) {
+                dataSource = element.attributes['data-wh-source'].value;
             }
 
             if (null !== dataSource) {
@@ -210,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Dynamically load comments for a writing
         if (null !== element.parentElement && undefined !== element.parentElement) {
             if (element.parentElement.hasAttribute('id') && 'load-more' === element.parentElement.attributes['id'].value) {
-                let url = element.attributes['data-href'].value;
+                let url = element.attributes['data-wh-href'].value;
 
                 fx.loadComments(url);
             }
@@ -218,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show/hide the comment reply form
         if (element.classList.contains('badge-reply')) {
-            let target = element.attributes['data-target'].value;
+            let target = element.attributes['data-wh-target'].value;
             let targetForm = document.querySelector(target);
             targetForm.classList.toggle('d-none');
 
@@ -230,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trigger the cover chooser
         if (element.hasAttribute('id') && 'cover-chooser' === element.attributes['id'].value) {
             event.preventDefault();
-            let fileChooser = document.querySelector(element.attributes['data-target'].value);
+            let fileChooser = document.querySelector(element.attributes['data-wh-target'].value);
 
             fileChooser.click();
         }
@@ -238,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trigger the avatar chooser
         if (element.classList.contains('avatar-chooser')) {
             event.preventDefault();
-            let fileChooser = document.querySelector(element.attributes['data-target'].value);
+            let fileChooser = document.querySelector(element.attributes['data-wh-target'].value);
 
             fileChooser.click();
         }
@@ -249,10 +268,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Liking a writing
             if (element.classList.contains('like')) {
-                if (element.hasAttribute('data-target') && element.hasAttribute('data-id') && element.hasAttribute('data-value')) {
-                    let url = element.attributes['data-target'].value;
-                    let id = element.attributes['data-id'].value;
-                    let value = element.attributes['data-value'].value;
+                if (element.hasAttribute('data-wh-target') && element.hasAttribute('data-wh-id') && element.hasAttribute('data-wh-value')) {
+                    let url = element.attributes['data-wh-target'].value;
+                    let id = element.attributes['data-wh-id'].value;
+                    let value = element.attributes['data-wh-value'].value;
                     let params = new FormData();
 
                     params.append('id', id);
@@ -279,9 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Adding to shelf
             if (element.classList.contains('shelf')) {
-                if (element.hasAttribute('data-target') && element.hasAttribute('data-id')) {
-                    let url = element.attributes['data-target'].value;
-                    let id = element.attributes['data-id'].value;
+                if (element.hasAttribute('data-wh-target') && element.hasAttribute('data-wh-id')) {
+                    let url = element.attributes['data-wh-target'].value;
+                    let id = element.attributes['data-wh-id'].value;
                     let params = new FormData();
 
                     params.append('id', id);
@@ -308,12 +327,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (element.classList.contains('share')) {
                 // Check if Share API is supported
                 if (navigator.share) {
+                    element.preventDefault();
+
                     navigator.share({
-                        title: element.attributes['data-writing-title'].value,
-                        url: element.attributes['data-url'].value
+                        title: element.attributes['data-wh-writing-title'].value,
+                        url: element.attributes['data-wh-url'].value
                     });
                 } else {
-                    new BSN.Dropdown(element).toggle();
+                    //new bootstrap.Dropdown(element).toggle();
                 }
             }
         }
@@ -336,10 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.classList.contains('admin-edit')) {
             event.preventDefault();
 
-            let targetModal = document.querySelector(element.attributes['data-target-modal'].value);
-            let targetModel = element.attributes['data-target-model'].value;
-            let targetForm = document.querySelector(element.attributes['data-target-form'].value);
-            let targetData = JSON.parse(element.attributes['data-target-form-data'].value);
+            let targetModal = document.querySelector(element.attributes['data-wh-target-modal'].value);
+            let targetModel = element.attributes['data-wh-target-model'].value;
+            let targetForm = document.querySelector(element.attributes['data-wh-target-form'].value);
+            let targetData = JSON.parse(element.attributes['data-wh-target-form-data'].value);
 
             if ('category' === targetModel) {
                 targetForm.id.value = targetData.id;
@@ -367,17 +388,17 @@ document.addEventListener('DOMContentLoaded', () => {
             let btnDelete = document.querySelector('#btn-modal-delete');
             let warningDelete = document.querySelector('#content-delete-warning');
 
-            if (null !== warningDelete && element.hasAttribute('data-warning')) {
-                warningDelete.innerHTML = element.attributes['data-warning'].value;
+            if (null !== warningDelete && element.hasAttribute('data-wh-warning')) {
+                warningDelete.innerHTML = element.attributes['data-wh-warning'].value;
                 warningDelete.parentElement.classList.remove('d-none');
             }
 
-            if (null !== btnDelete && element.hasAttribute('data-target')) {
-                btnDelete.attributes['data-delete-url'].value = element.attributes['data-target'].value;
+            if (null !== btnDelete && element.hasAttribute('data-wh-target')) {
+                btnDelete.attributes['data-wh-delete-url'].value = element.attributes['data-wh-target'].value;
             }
 
-            if (null !== btnDelete && element.hasAttribute('data-redirect')) {
-                btnDelete.attributes['data-redirect-url'].value = element.attributes['data-redirect'].value;
+            if (null !== btnDelete && element.hasAttribute('data-wh-redirect')) {
+                btnDelete.attributes['data-wh-redirect-url'].value = element.attributes['data-wh-redirect'].value;
             }
 
             fx.showModal(targetModal, {
@@ -387,8 +408,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Deleting a record
         if (element.hasAttribute('id') && 'btn-modal-delete' === element.attributes['id'].value) {
-            let url = element.attributes['data-delete-url'].value;
-            let redirect = element.attributes['data-redirect-url'].value;
+            let url = element.attributes['data-wh-delete-url'].value;
+            let redirect = element.attributes['data-wh-redirect-url'].value;
             let params = new FormData();
 
             params.append('_method', 'delete');
@@ -418,18 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(function () {
                     //
                 });
-        }
-
-        // Showing Popovers on register screen
-        if (element.classList.contains('toggle-popover-register')) {
-            let helpText = element.parentElement.querySelector('.help').innerHTML;
-
-            new BSN.Popover(element, {
-                delay: 100,
-                trigger: 'focus',
-                placement: 'top',
-                content: helpText,
-            }).show();
         }
 
         // Opting out of GA tracking
@@ -660,8 +669,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.hasAttribute('id') && 'cover' === element.attributes['id'].value) {
             const file = element.files[0];
             const fileSizeKb = parseInt(file.size / 1024);
-            const maxFileSizeKb = element.attributes['data-max-size'].value;
-            let info = document.querySelector(element.attributes['data-target'].value);
+            const maxFileSizeKb = element.attributes['data-wh-max-size'].value;
+            let info = document.querySelector(element.attributes['data-wh-target'].value);
             let error = element.parentElement.querySelector('#selected-error');
 
             if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
@@ -680,7 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.hasAttribute('id') && 'avatar' === element.attributes['id'].value) {
             const file = element.files[0];
             const fileSizeKb = parseInt(file.size / 1024);
-            const maxFileSizeKb = element.attributes['data-max-size'].value;
+            const maxFileSizeKb = element.attributes['data-wh-max-size'].value;
             let error = document.querySelector('#avatar-error');
 
             if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
@@ -718,8 +727,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#categories').innerHTML = '';
 
             let selectedIndex = element.selectedIndex;
-            let currentCategories = JSON.parse(document.querySelector('#categories').attributes['data-selected'].value);
-            let descendants = JSON.parse(element.options[selectedIndex].attributes['data-descendants'].value);
+            let currentCategories = JSON.parse(document.querySelector('#categories').attributes['data-wh-selected'].value);
+            let descendants = JSON.parse(element.options[selectedIndex].attributes['data-wh-descendants'].value);
 
             if (Object.keys(descendants).length > 0) {
                 // Add new options

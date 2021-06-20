@@ -15,7 +15,7 @@
 
                 <input type="hidden" name="token" value="{{ $token }}">
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input
                         id="email"
                         type="email"
@@ -32,7 +32,7 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input
                         id="password"
                         type="password"
@@ -49,7 +49,7 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input
                         id="password-confirm"
                         type="password"
@@ -60,8 +60,8 @@
                         autocomplete="off">
                 </div>
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
                         {{ __('Reset Password') }}
                     </button>
                 </div>

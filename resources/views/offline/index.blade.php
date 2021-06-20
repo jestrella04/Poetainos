@@ -13,8 +13,8 @@
             <i class="fas fa-sad-tear fa-7x"></i>
         </div>
 
-        <div>
-            <a class="btn btn-primary btn-lg btn-block"
+        <div class="d-grid gap-2 mb-3">
+            <a class="btn btn-primary btn-lg"
                 href="#"
                 onclick="location.reload()"
                 role="button">{{ __('Reload') }}</a>

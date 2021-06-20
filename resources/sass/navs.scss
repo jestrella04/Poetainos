@@ -26,8 +26,7 @@ nav {
         box-sizing: border-box;
         z-index: 9996;
         background-color: transparent;
-        width: 48px;
-        height: 48px;
+        padding: $wh-m-sm $wh-m-md;
 
         .icon-badge-container {
             transition: all 0.5s;

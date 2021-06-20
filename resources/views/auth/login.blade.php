@@ -17,7 +17,7 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input id="username"
                         type="text"
                         class="form-control form-control-lg @error('username') is-invalid @enderror"
@@ -34,7 +34,7 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <input id="password"
                         type="password"
                         class="form-control form-control-lg @error('password') is-invalid @enderror"
@@ -50,7 +50,7 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
+                <div class="mb-3">
                     <div class="form-check text-center">
                         <input class="form-check-input"
                             type="checkbox"
@@ -63,18 +63,18 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
                         {{ __('Login') }}
                     </button>
 
-                    <a href="{{ route('register') }}" class="btn btn-dark btn-lg btn-block">
+                    <a href="{{ route('register') }}" class="btn btn-dark btn-lg">
                         {{ __('Create account') }}
                     </a>
                 </div>
 
                 @if (Route::has('password.request'))
-                    <div class="form-group text-center">
+                    <div class=" text-center">
                         <a class="btn btn-link" href="{{ route('password.request') }}">
                             <small>{{ __('Forgot your password?') }}</small>
                         </a>

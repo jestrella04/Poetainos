@@ -195,39 +195,23 @@ hr {
     text-transform: capitalize;
 }
 
-.popover {
-    color: $white;
-    background: rgba($primary, 0.9);
-
-    .arrow {
-        visibility: hidden;
-    }
-
-    .popover-body {
-        color: $white;
-    }
-}
-
 .ss-main {
-    padding: 0;
-
     .ss-multi-selected {
-        border: 0;
-        height: 100%;
-        padding: 0;
+        border: 0 !important;
+        padding: 0 !important;
 
         .ss-add {
-            margin: auto $wh-m-lg;
+            display: none !important;
         }
 
         .ss-values {
-            padding: 0.15rem $wh-m-sm;
+            padding: 0 !important;
 
             .ss-value {
-                padding: 0.2rem 0.6rem;
+                padding: 0.2rem 0.6rem !important;
 
                 .ss-value-text {
-                    font-size: 0.7rem;
+                    font-size: 0.7rem !important;
                 }
             }
         }

@@ -1,4 +1,4 @@
-import BSN from "bootstrap.native";
+import * as bootstrap from 'bootstrap';
 
 window.loadComments = loadComments;
 
@@ -15,10 +15,10 @@ export function loadComments(url) {
             embedComments.insertAdjacentHTML('afterbegin', response.data.comments);
 
             if (null !== response.data.next && '' !== response.data.next) {
-                loadMore.attributes['data-href'].value = response.data.next;
+                loadMore.attributes['data-wh-href'].value = response.data.next;
                 loadMore.parentElement.classList.remove('d-none');
             } else {
-                loadMore.attributes['data-href'].value = '';
+                loadMore.attributes['data-wh-href'].value = '';
                 loadMore.parentElement.classList.add('d-none');
             }
         })
@@ -124,7 +124,7 @@ export function resetAdminFormCreate(form) {
 }
 
 export function showModal(targetModal, options = {}) {
-    new BSN.Modal(targetModal, options).show();
+    new bootstrap.Modal(targetModal, options).show();
 }
 
 export function showToast(options = {}) {
@@ -148,8 +148,7 @@ export function showToast(options = {}) {
             toast.querySelector('.toast-body').innerHTML = message;
         }
 
-        // Display toast
-        new BSN.Toast(selector, {
+        new bootstrap.Toast(selector, {
             'delay': delay
         }).show();
     }
