@@ -88,6 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return new bootstrap.Popover(popoverTriggerEl, options);
     });
 
+    // Disable share dropdown if Share API is supported
+    if (navigator.share) {
+        [].slice.call(document.querySelectorAll('.dropdown .share')).map(function (shareBtn) {
+            shareBtn.attributes['data-bs-toggle'].value = '';
+        });
+    }
+
     // Disable tracking if the opt-out cookie exists.
     if (null !== window.analytics_id && undefined !== window.analytics_id) {
         let disableStr = 'ga-disable-' + window.analytics_id;
@@ -323,19 +330,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Share button
-            if (element.classList.contains('share')) {
-                // Check if Share API is supported
-                if (navigator.share) {
-                    element.preventDefault();
-
-                    navigator.share({
-                        title: element.attributes['data-wh-writing-title'].value,
-                        url: element.attributes['data-wh-url'].value
-                    });
-                } else {
-                    //new bootstrap.Dropdown(element).toggle();
-                }
+            // Share button (if Share API is supported)
+            if (element.classList.contains('share') && navigator.share) {
+                navigator.share({
+                    title: element.attributes['data-wh-writing-title'].value,
+                    url: element.attributes['data-wh-url'].value
+                });
             }
         }
 
