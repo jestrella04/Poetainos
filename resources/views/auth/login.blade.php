@@ -17,15 +17,17 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input id="username"
                         type="text"
                         class="form-control form-control-lg @error('username') is-invalid @enderror"
                         name="username" value="{{ old('username') }}"
                         required
                         pattern="[-._A-Za-z0-9]+"
-                        placeholder="{{ __('Enter your username') }}"
+                        placeholder="{{ __('Username') }}"
                         autocomplete="off">
+
+                    <label for="username">{{ __('Username') }}</label>
 
                     @error('username')
                         <span class="invalid-feedback" role="alert">
@@ -34,14 +36,16 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input id="password"
                         type="password"
                         class="form-control form-control-lg @error('password') is-invalid @enderror"
                         name="password"
                         required
-                        placeholder="{{ __('Enter your password') }}"
+                        placeholder="{{ __('Password') }}"
                         autocomplete="off">
+
+                    <label for="password">{{ __('Password') }}</label>
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">

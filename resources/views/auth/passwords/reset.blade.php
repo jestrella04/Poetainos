@@ -15,7 +15,7 @@
 
                 <input type="hidden" name="token" value="{{ $token }}">
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input
                         id="email"
                         type="email"
@@ -23,7 +23,10 @@
                         name="email"
                         value="{{ $email ?? old('email') }}"
                         required
+                        placeholder="{{ __('Email') }}"
                         readonly>
+
+                    <label for="email">{{ __('Email') }}</label>
 
                     @error('email')
                         <span class="invalid-feedback" role="alert">
@@ -32,15 +35,17 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input
                         id="password"
                         type="password"
                         class="form-control form-control-lg @error('password') is-invalid @enderror"
                         name="password"
                         required
-                        placeholder="{{ __('Enter your password') }}"
+                        placeholder="{{ __('Password') }}"
                         autocomplete="off">
+
+                    <label for="password">{{ __('Password') }}</label>
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -49,15 +54,17 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input
                         id="password-confirm"
                         type="password"
                         class="form-control form-control-lg"
                         name="password_confirmation"
                         required
-                        placeholder="{{ __('Confirm your password') }}"
+                        placeholder="{{ __('Confirm password') }}"
                         autocomplete="off">
+
+                    <label for="password-confirm">{{ __('Confirm password') }}</label>
                 </div>
 
                 <div class="d-grid gap-2 mb-3">

@@ -13,15 +13,17 @@
             <form method="POST" action="{{ route('password.confirm') }}">
                 @csrf
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input
                         id="password"
                         type="password"
                         class="form-control form-control-lg @error('password') is-invalid @enderror"
                         name="password"
                         required
-                        placeholder="{{ __('Enter your password') }}"
+                        placeholder="{{ __('Password') }}"
                         autocomplete="off">
+
+                    <label for="password">{{ __('Password') }}</label>
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">

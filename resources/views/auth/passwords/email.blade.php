@@ -19,15 +19,17 @@
             <form method="POST" action="{{ route('password.email') }}">
                 @csrf
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input
                         id="email"
                         type="email"
                         class="form-control form-control-lg @error('email') is-invalid @enderror"
                         name="email" value="{{ old('email') }}"
                         required
-                        placeholder="{{ __('Enter your email address') }}"
+                        placeholder="{{ __('Email') }}"
                         autocomplete="off">
+
+                    <label for="email">{{ __('Email') }}</label>
 
                     @error('email')
                         <span class="invalid-feedback" role="alert">

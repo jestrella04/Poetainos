@@ -17,7 +17,7 @@
             <form method="POST" action="{{ route('register') }}">
                 @csrf
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input id="username"
                         type="text"
                         class="form-control form-control-lg @error('username') is-invalid @enderror"
@@ -25,8 +25,10 @@
                         required
                         data-bs-toggle="popover"
                         pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
-                        placeholder="{{ __('Enter your username') }}"
+                        placeholder="{{ __('Username') }}"
                         autocomplete="off">
+
+                    <label for="username">{{ __('Username') }}</label>
 
                     @error('username')
                         <span class="invalid-feedback" role="alert">
@@ -44,15 +46,17 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input id="email"
                         type="email"
                         class="form-control form-control-lg @error('email') is-invalid @enderror"
                         name="email"
                         value="{{ old('email') }}"
                         required
-                        placeholder="{{ __('Enter your email') }}"
+                        placeholder="{{ __('Email') }}"
                         autocomplete="off">
+
+                    <label for="email">{{ __('Email') }}</label>
 
                     @error('email')
                         <span class="invalid-feedback" role="alert">
@@ -61,7 +65,7 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input id="password"
                         type="password"
                         class="form-control form-control-lg @error('password') is-invalid @enderror"
@@ -69,8 +73,10 @@
                         required
                         data-bs-toggle="popover"
                         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                        placeholder="{{ __('Enter your password') }}"
+                        placeholder="{{ __('Password') }}"
                         autocomplete="off">
+
+                    <label for="password">{{ __('Password') }}</label>
 
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -88,7 +94,7 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
+                <div class="form-floating mb-3">
                     <input id="password-confirm"
                         type="password"
                         class="form-control form-control-lg"
@@ -96,8 +102,10 @@
                         required
                         data-bs-toggle="popover"
                         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                        placeholder="{{ __('Confirm your password') }}"
+                        placeholder="{{ __('Confirm password') }}"
                         autocomplete="off">
+
+                    <label for="password-confirm">{{ __('Confirm password') }}</label>
 
                     <div class="d-none help">
                         <ul class="list-unstyled mb-0">
