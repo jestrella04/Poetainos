@@ -194,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Scroll to the top of the document
         if (element.hasAttribute('id') && 'back-to-top' === element.attributes['id'].value) {
+            element.dispatchEvent(new Event('focusout', { bubbles: true }));
             document.querySelector('body').scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
