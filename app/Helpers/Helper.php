@@ -112,11 +112,11 @@ function getUserCounter($user) {
     ];
 }
 
-function getUserAvatar(User $user) {
+function getUserAvatar(User $user, $size = 'md') {
     if (! empty($user->avatarPath())) {
-        return '<img class="avatar" src="'. e($user->avatarPath()) .'" alt="'. e($user->getName()) .'" loading="lazy">' . PHP_EOL;
+        return '<img class="avatar avatar-'. $size .'" src="'. e($user->avatarPath()) .'" alt="'. e($user->getName()) .'" loading="lazy">' . PHP_EOL;
     } else {
-        return '<span class="avatar">'. e($user->initials()) .'</span>' . PHP_EOL;
+        return '<span class="avatar avatar-'. $size .'">'. e($user->initials()) .'</span>' . PHP_EOL;
     }
 }
 

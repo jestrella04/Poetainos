@@ -40,9 +40,9 @@
                         <div class="d-flex justify-content-center">
                             <div class="avatar-wrapper">
                                 @if (isset($notification->data['user_id']) && $user = App\User::findOrFail($notification->data['user_id']))
-                                    {!! getUserAvatar($user) !!}
+                                    {!! getUserAvatar($user, $size = 'lg') !!}
                                 @else
-                                    <img class="avatar" src="{{ mix('/static/images/logo.svg') }}" alt="{{ getSiteConfig('name') }}" loading="lazy">
+                                    <img class="avatar avatar-lg" src="{{ mix('/static/images/logo.svg') }}" alt="{{ getSiteConfig('name') }}" loading="lazy">
                                 @endif
                             </div>
 

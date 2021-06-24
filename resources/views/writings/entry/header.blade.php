@@ -2,7 +2,7 @@
     <div class="d-flex flex-column flex-md-row justify-content-center">
         <div class="writing-author align-self-center">
             <a href="{{ $writing->author->path() }}">
-                {!! getUserAvatar($writing->author) !!}
+                {!! getUserAvatar($writing->author, $size = 'xl') !!}
             </a>
         </div>
 

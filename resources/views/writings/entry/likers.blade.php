@@ -10,7 +10,7 @@
             @foreach ($writing->likers()->inRandomOrder()->take(5)->get() as $liker)
             <div class="author-link">
                 <a href="{{ $liker->path() }}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ $liker->getName() }}">
-                    {!! getUserAvatar($liker) !!}
+                    {!! getUserAvatar($liker, $size = 'xl') !!}
                 </a>
             </div>
             @endforeach

@@ -12,6 +12,11 @@
 
     .writing-meta {
         text-transform: uppercase;
+        font-size: 0.85rem;
+
+        @include media-breakpoint-up(md) {
+            font-size: 0.95rem;
+        }
 
         i {
             opacity: 0.7;

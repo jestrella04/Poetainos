@@ -7,7 +7,7 @@
         @forelse (App\User::featured(15) as $author)
         <div class="d-inline-flex author-link">
             <a href="{{ $author->path() }}" data-bs-toggle="tooltip" title="{{ $author->getName() }}">
-                {!! getUserAvatar($author) !!}
+                {!! getUserAvatar($author, $size = 'xl') !!}
             </a>
         </div>
 

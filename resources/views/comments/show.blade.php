@@ -1,7 +1,7 @@
 <div class="comment d-flex justify-content-center">
     <div class="comment-author">
         <a href="{{ $comment->author->path() }}">
-            {!! getUserAvatar($comment->author) !!}
+            {!! getUserAvatar($comment->author, $size = 'xl') !!}
         </a>
     </div>
 

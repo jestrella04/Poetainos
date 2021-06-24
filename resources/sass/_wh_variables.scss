@@ -7,7 +7,7 @@ $wh-m-sm: 0.3rem;
 $wh-icon-opacity: 0.75;
 $wh-icon-opacity-hover: 0.90;
 
-$wh-body-font-size: 18px;
+$wh-body-font-size: 20px;
 
 $wh-font-xxl: 2.4rem;
 $wh-font-xl: 2.0rem;
@@ -15,15 +15,17 @@ $wh-font-lg: 1.6rem;
 $wh-font-md: 1.2rem;
 $wh-font-sm: 0.8rem;
 
-$wh-avatar-xxl: 96px;
-$wh-avatar-xl: 64px;
-$wh-avatar-lg: 48px;
-$wh-avatar-md: 32px;
-$wh-avatar-sm: 22px;
-
 $bg-gradient: linear-gradient(180deg, $dark 0%, $primary 100%);
 $bg-gradient-success: linear-gradient(180deg, darken($success, 20%) 0%, $success 100%);
 $bg-gradient-danger: linear-gradient(180deg, darken($danger, 20%) 0%, $danger 100%);
+
+$avatar-sizes: (
+    "xxl": 96px,
+    "xl": 64px,
+    "lg": 48px,
+    "md": 32px,
+    "sm": 16px,
+);
 
 // Slim select varibles
 $height: 30px !default;

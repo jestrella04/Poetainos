@@ -92,7 +92,7 @@
                     <li class="nav-item dropdown d-none d-lg-block">
                         <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <div class="icon-badge-container">
-                                {!! getUserAvatar(auth()->user()) !!}
+                                {!! getUserAvatar(auth()->user(), $size = 'md') !!}
                                 @if (auth()->user()->unreadNotifications->count() > 0)
                                     <div class="icon-badge"></div>
                                 @endif

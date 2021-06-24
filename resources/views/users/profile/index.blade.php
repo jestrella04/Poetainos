@@ -1,6 +1,6 @@
 <div class="user-profile">
     <div class="profile-header text-center">
-        {!! getUserAvatar($user) !!}
+        {!! getUserAvatar($user, $size = 'xxl') !!}
 
         <div class="user-name align-self-center">
             {{ $user->getName() }}

@@ -1,0 +1,31 @@
+@mixin avatar() {
+    border: 1px solid $gray-500;
+    background-color: $gray-300;
+    color: $dark;
+    border-radius: 100%;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 700;
+    overflow: hidden;
+}
+
+@mixin avatar-variant($size) {
+    @include avatar();
+    width: $size;
+    height: $size;
+    max-width: $size;
+    max-height: $size;
+    font-size: $size * 0.4;
+    line-height: $size;
+}
+
+.avatar {
+    @include avatar();
+}
+
+@each $size, $value in $avatar-sizes {
+    .avatar-#{$size} {
+        @include avatar-variant($value);
+    }
+}
