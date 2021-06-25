@@ -29,35 +29,35 @@ hr {
 .main-content:not(#admin-main-content),
 .sidebar-toggle,
 .block {
-    margin-bottom: $wh-m-xl;
+    margin-bottom: $wh-s-xl;
 }
 
 .main-content + .main-pagination {
-    margin-top: $wh-m-xxl;
+    margin-top: $wh-s-xxl;
 }
 
 .main-pagination {
-    margin-bottom: $wh-m-xxl;
+    margin-bottom: $wh-s-xxl;
 }
 
 .main-sidebar {
     padding: 0;
 
     @media (min-width: 992px) {
-        margin-left: $wh-m-xxl;
+        margin-left: $wh-s-xxl;
     }
 
     .block {
         .block-title {
-            font-size: $wh-font-md;
+            font-size: $wh-fs-md;
             font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: $wh-m-lg;
+            margin-bottom: $wh-s-lg;
         }
 
         .writing-tag,
         .writing-category {
-            margin-bottom: $wh-m-sm;
+            margin-bottom: $wh-s-sm;
         }
     }
 }
@@ -69,8 +69,8 @@ hr {
     text-align: center;
 
     .title {
-        margin-bottom: $wh-m-lg;
-        font-size: $wh-font-md;
+        margin-bottom: $wh-s-lg;
+        font-size: $wh-fs-md;
         font-weight: 700;
         text-transform: uppercase;
     }
@@ -90,8 +90,8 @@ hr {
 }
 
 .top-links {
-    font-size: $wh-font-lg;
-    margin-bottom: $wh-m-xxl;
+    font-size: $wh-fs-lg;
+    margin-bottom: $wh-s-xxl;
     text-transform: capitalize;
 }
 
@@ -100,7 +100,7 @@ hr {
 
     button {
         @media (max-width: 576px) {
-            margin-bottom: $wh-m-sm;
+            margin-bottom: $wh-s-sm;
         }
     }
 }
@@ -153,7 +153,7 @@ hr {
     text-align: center;
 
     img {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
     }
 }
 
@@ -167,15 +167,15 @@ hr {
 
 .form-wrapper {
     .title {
-        margin-bottom: $wh-m-xl;
+        margin-bottom: $wh-s-xl;
     }
 
     .alert {
         width: 90%;
         max-width: 25rem;
-        margin: 0 auto $wh-m-xl;
+        margin: 0 auto $wh-s-xl;
         text-align: center;
-        font-size: $wh-font-sm;
+        font-size: $wh-fs-sm;
 
         p {
             margin-bottom: 0;
@@ -196,6 +196,16 @@ hr {
 }
 
 .ss-main {
+    .ss-multi-selected.ss-disabled {
+        background-color: transparent !important;
+
+        .ss-values {
+            .ss-disabled {
+                color: $gray-600 !important;
+            }
+        }
+    }
+
     .ss-multi-selected {
         border: 0 !important;
         padding: 0 !important;
@@ -288,24 +298,24 @@ hr {
 .user-notifications {
     .user-notification {
         position: relative;
-        margin-bottom: $wh-m-md;
+        margin-bottom: $wh-s-md;
 
         .card-body {
-            padding: $wh-m-md $wh-m-lg;
+            padding: $wh-s-md $wh-s-lg;
 
             a {
                 font-weight: 700;
             }
 
             .avatar-wrapper {
-                margin-right: $wh-m-lg;
+                margin-right: $wh-s-lg;
             }
         }
     }
 }
 
 .home-head {
-    margin-bottom: $wh-m-xl;
+    margin-bottom: $wh-s-xl;
 }
 
 

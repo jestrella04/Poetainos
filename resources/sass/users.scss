@@ -35,7 +35,7 @@
             }
 
             .avatar {
-                margin-bottom: $wh-m-sm;
+                margin-bottom: $wh-s-sm;
             }
 
             p {
@@ -51,15 +51,15 @@
 
 .navbar {
     .avatar {
-        margin-right: $wh-m-sm;
+        margin-right: $wh-s-sm;
     }
 }
 
 .writing-likers {
     .author-link {
         position: relative;
-        margin-bottom: $wh-m-sm;
-        margin-right: $wh-m-sm;
+        margin-bottom: $wh-s-sm;
+        margin-right: $wh-s-sm;
     }
 }
 
@@ -71,19 +71,19 @@
 }
 
 hr.banner {
-    margin-bottom: $wh-m-xl;
+    margin-bottom: $wh-s-xl;
 }
 
 .user-profile {
-    margin-bottom: $wh-m-lg;
+    margin-bottom: $wh-s-lg;
 
     .profile-header {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
 
         .user-name {
-            font-size: $wh-font-md;
+            font-size: $wh-fs-md;
             font-weight: 700;
-            margin-bottom: $wh-m-sm;
+            margin-bottom: $wh-s-sm;
         }
 
         .profile-bio {
@@ -95,11 +95,11 @@ hr.banner {
     }
 
     .avatar {
-        margin-bottom: $wh-m-sm;
+        margin-bottom: $wh-s-sm;
     }
 
     .user-stats {
-        margin-bottom: $wh-m-xl;
+        margin-bottom: $wh-s-xl;
     }
 
     .profile-footer {
@@ -113,7 +113,7 @@ hr.banner {
                 text-transform: capitalize;
 
                 i {
-                    margin-right: $wh-m-sm;
+                    margin-right: $wh-s-sm;
                 }
             }
 
@@ -129,7 +129,7 @@ hr.banner {
 #profile-form-wrapper {
     #profile-form {
         .form-check {
-            font-size: $wh-font-sm span {
+            font-size: $wh-fs-sm span {
                 vertical-align: middle;
             }
         }

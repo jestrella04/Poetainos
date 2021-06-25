@@ -32,7 +32,7 @@
                 img {
                     width: 64px;
                     height: 64px;
-                    margin-bottom: $wh-m-lg;
+                    margin-bottom: $wh-s-lg;
 
                     @media (min-width: 992px) {
                         width: 128px;
@@ -42,7 +42,7 @@
 
                 h1 {
                     @media (max-width: 992px) {
-                        font-size: $wh-font-xl;
+                        font-size: $wh-fs-xl;
                         margin-bottom: 0;
                     }
                 }
@@ -73,16 +73,16 @@
         .header,
         .info {
             text-align: center;
-            margin-bottom: $wh-m-lg;
+            margin-bottom: $wh-s-lg;
         }
 
         .email-confirmed {
-            margin-top: $wh-m-lg;
+            margin-top: $wh-s-lg;
         }
 
         .social {
             text-align: center;
-            margin-bottom: $wh-m-lg;
+            margin-bottom: $wh-s-lg;
 
             .btn-blue {
                 background-color: $blue;
@@ -93,7 +93,7 @@
 }
 
 .socialite {
-    margin: $wh-m-lg auto;
+    margin: $wh-s-lg auto;
 
     .btn-blue {
         background-color: $blue;

@@ -1,8 +1,8 @@
 .writing-entry + hr {
-    margin: $wh-m-xxl auto;
+    margin: $wh-s-xxl auto;
 
     @media (max-width: 576px) {
-        margin: $wh-m-xl auto;
+        margin: $wh-s-xl auto;
     }
 }
 
@@ -23,7 +23,7 @@
         }
 
         small:first-child {
-            margin-right: $wh-m-md;
+            margin-right: $wh-s-md;
         }
     }
 
@@ -38,11 +38,11 @@
     }
 
     .writing-heading {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
 
         p {
             span {
-                margin-right: $wh-m-xl;
+                margin-right: $wh-s-xl;
             }
         }
     }
@@ -58,7 +58,7 @@
         overflow: hidden;
         margin-right: auto;
         margin-left: auto;
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
 
         img {
             transition: transform .5s, filter .5s ease-in-out;
@@ -71,16 +71,16 @@
 
     .writing-author {
         @media (min-width: 768px) {
-            margin-right: $wh-m-lg;
+            margin-right: $wh-s-lg;
         }
 
         @media (max-width: 768px) {
-            margin-bottom: $wh-m-lg;
+            margin-bottom: $wh-s-lg;
         }
     }
 
     .writing-link {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
         overflow: hidden;
         text-overflow: ellipsis;
 
@@ -101,11 +101,11 @@
     }
 
     .writing-footer {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
 
         .footer-item {
             i {
-                margin-right: $wh-m-md;
+                margin-right: $wh-s-md;
                 opacity: 0.8;
                 vertical-align: middle;
             }
@@ -117,16 +117,16 @@
         }
 
         .footer-item:not(:last-child) {
-            margin-bottom: $wh-m-sm;
+            margin-bottom: $wh-s-sm;
         }
     }
 
     .writing-likers {
-        margin-top: $wh-m-lg;
+        margin-top: $wh-s-lg;
 
         small {
             display: block;
-            margin-bottom: $wh-m-md;
+            margin-bottom: $wh-s-md;
         }
     }
 
@@ -134,11 +134,11 @@
         text-transform: capitalize;
 
         @media (max-width: 768px) {
-            margin-bottom: $wh-m-lg;
+            margin-bottom: $wh-s-lg;
         }
 
         @media (min-width: 768px) {
-            margin-right: $wh-m-xl;
+            margin-right: $wh-s-xl;
         }
     }
 }
@@ -146,12 +146,12 @@
 #writings-main-content {
     .user-banner {
         .avatar {
-            margin-bottom: $wh-m-md
+            margin-bottom: $wh-s-md
         }
 
         .user-name {
             font-weight: 700;
-            font-size: $wh-font-md;
+            font-size: $wh-fs-md;
             text-decoration: none;
         }
     }
@@ -171,7 +171,7 @@
             border: 1px solid $gray-400;
             border-radius: 0.5rem;
             cursor: pointer;
-            font-size: $wh-font-sm;
+            font-size: $wh-fs-sm;
             width: 100%;
 
             p {

@@ -1,10 +1,10 @@
 #footer {
     margin-top: auto;
-    font-size: $wh-font-sm;
+    font-size: $wh-fs-sm;
     text-align: center;
     background: $bg-gradient;
     color: $white;
-    padding: $wh-m-xl $wh-m-lg 0;
+    padding: $wh-s-xl $wh-s-lg 0;
 
     a {
         color: $white;
@@ -15,10 +15,10 @@
     }
 
     .social-links {
-        font-size: $wh-font-md;
+        font-size: $wh-fs-md;
 
         a {
-            margin: 0 $wh-m-sm;
+            margin: 0 $wh-s-sm;
             text-decoration: none;
             opacity: 0.7;
             transition:opacity 1s;
@@ -32,15 +32,15 @@
     }
 
     .social-links:not(:empty) {
-        margin-bottom: $wh-m-xl;
+        margin-bottom: $wh-s-xl;
     }
 
     .copyright {
-        margin-bottom: $wh-m-xl;
+        margin-bottom: $wh-s-xl;
     }
 
     .pages {
-        font-size: $wh-font-sm;
+        font-size: $wh-fs-sm;
         text-transform: capitalize;
 
         @media (max-width: 576px) {
@@ -51,7 +51,7 @@
         }
 
         .separator {
-            margin: 0 $wh-m-sm;
+            margin: 0 $wh-s-sm;
         }
 
         .separator:last-child {
@@ -60,7 +60,7 @@
     }
 
     .pages:not(:empty) {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
     }
 
     #back-to-top-wrapper {

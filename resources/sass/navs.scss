@@ -1,17 +1,17 @@
 nav {
-    font-size: $wh-font-sm;
+    font-size: $wh-fs-sm;
 }
 
 #nav-main {
-    padding-top: $wh-m-md;
-    padding-bottom: $wh-m-md;
+    padding-top: $wh-s-md;
+    padding-bottom: $wh-s-md;
 
     .navbar-brand {
         font-weight: 700;
 
         img {
             transition: transform .5s;
-            margin-right: $wh-m-sm;
+            margin-right: $wh-s-sm;
         }
     }
 
@@ -26,7 +26,7 @@ nav {
         box-sizing: border-box;
         z-index: 9996;
         background-color: transparent;
-        padding: $wh-m-sm $wh-m-md;
+        padding: $wh-s-sm $wh-s-md;
 
         .icon-badge-container {
             transition: all 0.5s;
@@ -51,7 +51,7 @@ nav {
 
     .navbar-nav {
         li:not(:first-child) {
-            margin-left: $wh-m-lg;
+            margin-left: $wh-s-lg;
         }
     }
 
@@ -64,7 +64,7 @@ nav {
         }
 
         i {
-            margin-right: $wh-m-sm;
+            margin-right: $wh-s-sm;
         }
 
         .dropdown-menu {
@@ -89,7 +89,7 @@ nav {
 }
 
 .admin-main-wrapper {
-    margin-top: $wh-m-lg;
+    margin-top: $wh-s-lg;
 
     nav {
         position: absolute;

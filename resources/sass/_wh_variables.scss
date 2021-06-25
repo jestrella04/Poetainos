@@ -1,24 +1,7 @@
-$wh-m-xxl: 3rem;
-$wh-m-xl: 2rem;
-$wh-m-lg: 1rem;
-$wh-m-md: 0.6rem;
-$wh-m-sm: 0.3rem;
-
-$wh-icon-opacity: 0.75;
-$wh-icon-opacity-hover: 0.90;
-
+// Default font size
 $wh-body-font-size: 20px;
 
-$wh-font-xxl: 2.4rem;
-$wh-font-xl: 2.0rem;
-$wh-font-lg: 1.6rem;
-$wh-font-md: 1.2rem;
-$wh-font-sm: 0.8rem;
-
-$bg-gradient: linear-gradient(180deg, $dark 0%, $primary 100%);
-$bg-gradient-success: linear-gradient(180deg, darken($success, 20%) 0%, $success 100%);
-$bg-gradient-danger: linear-gradient(180deg, darken($danger, 20%) 0%, $danger 100%);
-
+// Avatars
 $avatar-sizes: (
     "xxl": 96px,
     "xl": 64px,
@@ -27,7 +10,26 @@ $avatar-sizes: (
     "sm": 16px,
 );
 
-// Slim select varibles
+// Custom spacing
+$wh-s-xxl: 3rem;
+$wh-s-xl: 2rem;
+$wh-s-lg: 1rem;
+$wh-s-md: 0.6rem;
+$wh-s-sm: 0.3rem;
+
+// Custom font sizes
+$wh-fs-xxl: 2.4rem;
+$wh-fs-xl: 2.0rem;
+$wh-fs-lg: 1.6rem;
+$wh-fs-md: 1.2rem;
+$wh-fs-sm: 0.8rem;
+
+// Gradients
+$bg-gradient: linear-gradient(180deg, $dark 0%, $primary 100%);
+$bg-gradient-success: linear-gradient(180deg, darken($success, 20%) 0%, $success 100%);
+$bg-gradient-danger: linear-gradient(180deg, darken($danger, 20%) 0%, $danger 100%);
+
+// Slim select
 $height: 30px !default;
 $white: $white !default;
 $font-color: $body-color !default;

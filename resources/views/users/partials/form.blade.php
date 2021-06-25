@@ -7,9 +7,9 @@
 
         @method('put')
 
-        <div class=" text-center">
+        <div class=" text-center mb-3">
             <span class="avatar-chooser" data-wh-target="#avatar">
-                <img src="{{ $avatarSrc }}" alt="" class="avatar avatar-preview">
+                <img src="{{ $avatarSrc }}" alt="" class="avatar avatar-xxl avatar-preview">
 
                 <i class="fas fa-camera"></i>
             </span>

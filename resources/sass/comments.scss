@@ -1,13 +1,13 @@
 .writing-comments {
     .fa-spinner {
         opacity: 0.85;
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
     }
 
     #post-comment-form,
     .reply-form {
         .form-group {
-            margin-bottom: $wh-m-sm;
+            margin-bottom: $wh-s-sm;
         }
     }
 
@@ -18,39 +18,39 @@
     }
 
     #post-comment + hr {
-        margin: $wh-m-xxl auto;
+        margin: $wh-s-xxl auto;
 
         @media (max-width: 576px) {
-            margin: $wh-m-xl auto;
+            margin: $wh-s-xl auto;
         }
     }
 
     #load-more {
-        margin-bottom: $wh-m-lg;
+        margin-bottom: $wh-s-lg;
     }
 
     .comment-list {
         max-width: 100%;
 
         .comment {
-            margin-bottom: $wh-m-sm;
+            margin-bottom: $wh-s-sm;
             border: 1px solid $gray-300;
             background-color: $gray-100;
             border-radius: 0.5rem;
             padding: 0.5rem;
 
             .comment-author {
-                margin-right: $wh-m-lg;
+                margin-right: $wh-s-lg;
             }
 
             .comment-body {
                 .author {
                     text-transform: uppercase;
-                    font-size: $wh-font-sm;
-                    margin-bottom:$wh-m-sm;
+                    font-size: $wh-fs-sm;
+                    margin-bottom:$wh-s-sm;
 
                     small:first-child {
-                        margin-right: $wh-m-sm
+                        margin-right: $wh-s-sm
                     }
 
                     i {
@@ -61,7 +61,7 @@
                 .message {
                     .badge {
                         cursor: pointer;
-                        margin-left: $wh-m-sm;
+                        margin-left: $wh-s-sm;
                         opacity: 0.85;
                     }
 
@@ -76,24 +76,24 @@
             padding-left: 3rem;
 
             .reply {
-                margin-bottom: $wh-m-sm;
+                margin-bottom: $wh-s-sm;
                 border: 1px solid $gray-300;
                 background-color: $gray-100;
                 border-radius: 0.5rem;
                 padding: 0.5rem;
 
                 .reply-author {
-                    margin-right: $wh-m-lg;
+                    margin-right: $wh-s-lg;
                 }
 
                 .reply-body {
                     .author {
                         text-transform: uppercase;
-                        font-size: $wh-font-sm;
-                        margin-bottom: $wh-m-sm;
+                        font-size: $wh-fs-sm;
+                        margin-bottom: $wh-s-sm;
 
                         small:first-child {
-                            margin-right: $wh-m-sm;
+                            margin-right: $wh-s-sm;
                         }
 
                         i {
@@ -113,7 +113,7 @@
         }
 
         p:first-child {
-            margin-bottom: $wh-m-sm;
+            margin-bottom: $wh-s-sm;
         }
     }
 }

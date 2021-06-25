@@ -1,7 +1,7 @@
 .settings-json-input,
 #logview textarea {
     font-family: monospace;
-    font-size: $wh-font-sm;
+    font-size: $wh-fs-sm;
 }
 
 .admin-main-wrapper {
@@ -13,10 +13,10 @@
     padding: 1rem 2rem;
 
     .admin-section {
-        margin-bottom: $wh-m-xl;
+        margin-bottom: $wh-s-xl;
 
         .top-section {
-            margin-bottom: $wh-m-xl;
+            margin-bottom: $wh-s-xl;
 
             h1,
             h2,
@@ -24,17 +24,17 @@
             h4,
             h5,
             h6 {
-                margin-bottom: $wh-m-xl;
+                margin-bottom: $wh-s-xl;
             }
 
             .filter-box {
-                margin-right: $wh-m-lg;
+                margin-right: $wh-s-lg;
             }
         }
 
         .admin-counter {
             padding: 2rem;
-            margin: $wh-m-sm;
+            margin: $wh-s-sm;
             background-color: $primary;
             color: $light;
             border-radius: 1rem;
@@ -62,7 +62,7 @@
         }
 
         .nav-tabs {
-            margin-bottom: $wh-m-lg;
+            margin-bottom: $wh-s-lg;
         }
 
         iframe {

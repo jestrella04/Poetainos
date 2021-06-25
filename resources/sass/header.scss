@@ -32,7 +32,7 @@ section.header {
 
         p.lead {
             @media (min-width: 768px) {
-                font-size: $wh-font-lg;
+                font-size: $wh-fs-lg;
             }
         }
 
@@ -55,7 +55,7 @@ section.header {
 
     h1 {
         @media (min-width: 768px) {
-            font-size: $wh-font-xxl;
+            font-size: $wh-fs-xxl;
         }
     }
 }

@@ -7,7 +7,7 @@
 @endsection
 
 @section('main')
-    <div id="pages-main-content" class="main-content">
+    <div id="pages-main-content" class="main-content text-break">
         <div class="page-header">
             <h2 class="all-caps">{{ $page->title }}</h2>
         </div>
