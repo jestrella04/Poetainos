@@ -3,7 +3,7 @@
 <section id="{{ $type }}" class="header">
     @if ('hero' === $type)
     <div class="container welcome">
-        <h1>{{ getSiteConfig('name') }}</h1>
+        <h1 class="display-1">{{ getSiteConfig('name') }}</h1>
         <p class="lead">{{ getSiteConfig('slogan') }}</p>
         <a id="jump-to-nav" href="#nav-main" aria-label="{{ __('Jump to the main content') }}">
             <i class="fas fa-chevron-down fa-3x"></i>

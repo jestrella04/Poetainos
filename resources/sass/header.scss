@@ -11,9 +11,7 @@ section.header {
                 rgba($dark, 0.7)
             )
             0 0 / 1000% no-repeat,
-        url('/static/images/cover.jpg') 0 0 / cover no-repeat;
-    -webkit-animation: gradientAnimation 40s ease infinite;
-    animation: gradientAnimation 40s ease infinite;
+        url("/static/images/cover.jpg") 0 0 / cover no-repeat;
 
     .welcome {
         flex-grow: 1;
@@ -22,19 +20,6 @@ section.header {
         align-items: center;
         flex-direction: column;
         text-align: center;
-
-        h1 {
-            @media (min-width: 768px) {
-                font-size: 4rem;
-                margin-bottom: 1.5rem;
-            }
-        }
-
-        p.lead {
-            @media (min-width: 768px) {
-                font-size: $wh-fs-lg;
-            }
-        }
 
         #jump-to-nav {
             color: rgba($white, 0.3);
@@ -52,12 +37,6 @@ section.header {
 
 #header {
     height: 300px;
-
-    h1 {
-        @media (min-width: 768px) {
-            font-size: $wh-fs-xxl;
-        }
-    }
 }
 
 @-webkit-keyframes gradientAnimation {

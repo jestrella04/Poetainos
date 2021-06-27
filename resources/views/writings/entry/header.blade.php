@@ -35,6 +35,6 @@
 
 @if (! empty($writing->coverPath()))
     <div class="writing-cover">
-        <img src="{{ $writing->coverPath() }}" alt="" loading="lazy">
+        <img src="{{ $writing->coverPath() }}" width="1280" height="720" alt="" loading="lazy">
     </div>
 @endif

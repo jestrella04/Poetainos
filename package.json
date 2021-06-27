@@ -31,7 +31,5 @@
         "sass-loader": "^8.0.0",
         "slim-select": "^1.26.2"
     },
-    "dependencies": {
-
-    }
+    "dependencies": {}
 }

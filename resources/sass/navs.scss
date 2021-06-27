@@ -57,6 +57,7 @@ nav {
 
     .nav-item {
         border-bottom: 0.15rem solid transparent;
+        transition: border 1s linear;
 
         .nav-link {
             color: $white;
