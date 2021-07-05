@@ -8,4 +8,4 @@ $enable-rounded: true !default;
 @import '~@fortawesome/fontawesome-free/scss/regular';
 @import '~@fortawesome/fontawesome-free/scss/solid';
 @import './custom.scss';
-@import '~slim-select/src/slim-select/slimselect';
+@import 'node_modules/slim-select/src/slim-select/slimselect';
