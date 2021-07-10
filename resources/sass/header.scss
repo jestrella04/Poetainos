@@ -11,7 +11,7 @@ section.header {
                 rgba($dark, 0.7)
             )
             0 0 / 1000% no-repeat,
-        url("/static/images/cover.jpg") 0 0 / cover no-repeat;
+        url("../images/cover.jpg") 0 0 / cover no-repeat;
 
     .welcome {
         flex-grow: 1;

@@ -1,6 +1,6 @@
 {
-    "/static/js/app.js": "/static/js/app.js",
     "/pwabuilder-sw.js": "/pwabuilder-sw.js",
+    "/static/js/app.js": "/static/js/app.js",
     "/static/css/app.css": "/static/css/app.css",
     "/static/images/logo.svg": "/static/images/logo.svg",
     "/static/images/logo-32.png": "/static/images/logo-32.png",
@@ -8,20 +8,5 @@
     "/static/images/logo-144.png": "/static/images/logo-144.png",
     "/static/images/logo-192.png": "/static/images/logo-192.png",
     "/static/images/logo-512.png": "/static/images/logo-512.png",
-    "/static/images/cover.jpg": "/static/images/cover.jpg",
-    "/static/webfonts/fa-brands-400.eot": "/static/webfonts/fa-brands-400.eot",
-    "/static/webfonts/fa-brands-400.svg": "/static/webfonts/fa-brands-400.svg",
-    "/static/webfonts/fa-brands-400.ttf": "/static/webfonts/fa-brands-400.ttf",
-    "/static/webfonts/fa-brands-400.woff": "/static/webfonts/fa-brands-400.woff",
-    "/static/webfonts/fa-brands-400.woff2": "/static/webfonts/fa-brands-400.woff2",
-    "/static/webfonts/fa-regular-400.eot": "/static/webfonts/fa-regular-400.eot",
-    "/static/webfonts/fa-regular-400.svg": "/static/webfonts/fa-regular-400.svg",
-    "/static/webfonts/fa-regular-400.ttf": "/static/webfonts/fa-regular-400.ttf",
-    "/static/webfonts/fa-regular-400.woff": "/static/webfonts/fa-regular-400.woff",
-    "/static/webfonts/fa-regular-400.woff2": "/static/webfonts/fa-regular-400.woff2",
-    "/static/webfonts/fa-solid-900.eot": "/static/webfonts/fa-solid-900.eot",
-    "/static/webfonts/fa-solid-900.svg": "/static/webfonts/fa-solid-900.svg",
-    "/static/webfonts/fa-solid-900.ttf": "/static/webfonts/fa-solid-900.ttf",
-    "/static/webfonts/fa-solid-900.woff": "/static/webfonts/fa-solid-900.woff",
-    "/static/webfonts/fa-solid-900.woff2": "/static/webfonts/fa-solid-900.woff2"
+    "/static/images/cover.jpg": "/static/images/cover.jpg"
 }

@@ -11,21 +11,23 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/static/js')
-    .js('resources/js/pwabuilder-sw.js', 'public/pwabuilder-sw.js')
-    .sass('resources/sass/app.scss', 'public/static/css').options({
-        processCssUrls: false
-    })
+mix.options({
+    fileLoaderDirs: {
+        images: 'static/images',
+        fonts: 'static/fonts'
+    },
+});
+
+mix.js('resources/js/pwabuilder-sw.js', 'public')
+    .js('resources/js/app.js', 'public/static/js')
+    .sass('resources/sass/app.scss', 'public/static/css')
     .copy('resources/images/logo.svg', 'public/static/images/logo.svg')
     .copy('resources/images/logo-32.png', 'public/static/images/logo-32.png')
     .copy('resources/images/logo-64.png', 'public/static/images/logo-64.png')
     .copy('resources/images/logo-144.png', 'public/static/images/logo-144.png')
     .copy('resources/images/logo-192.png', 'public/static/images/logo-192.png')
     .copy('resources/images/logo-512.png', 'public/static/images/logo-512.png')
-    .copy('resources/images/cover.jpg', 'public/static/images/cover.jpg')
-    .copyDirectory('node_modules/@fortawesome/fontawesome-free/webfonts', 'public/static/webfonts').options({
-        processCssUrls: false
-    });
+    .copy('resources/images/cover.jpg', 'public/static/images/cover.jpg');
 
 if (mix.inProduction()) {
     mix.version();
