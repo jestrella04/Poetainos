@@ -8,6 +8,7 @@ use App\Setting;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -57,6 +58,9 @@ class AppServiceProvider extends ServiceProvider
                 Log::info($sql->time);
             });
         }
+
+        // Use Bootstrap for pagination
+        Paginator::useBootstrap();
     }
 
     /**
