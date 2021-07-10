@@ -17,7 +17,7 @@
         title="{{ __('Golden Flowers') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-fan fa-fw"></i>
+        <i class="fas fa-fan fa-fw"></i>
         <span class="counter">{{ $count['flowers'] }}</span>
     </button>
 
