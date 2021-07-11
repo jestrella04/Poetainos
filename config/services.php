@@ -53,7 +53,9 @@ return [
         'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
     ],
 
-    'webpushr' => [
-        'tracking_id' => env('WEBPUSHR_TRACKING_ID')
+    'pusher' => [
+        'beams_instance_id' => env('PUSHER_BEAMS_INSTANCE_ID'),
+        'beams_secret_key' => env('PUSHER_BEAMS_SECRET_KEY'),
     ],
+
 ];

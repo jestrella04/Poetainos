@@ -16,6 +16,12 @@
         <link rel="preload" href="{{ mix('/static/images/logo.svg') }}" as="image">
         <link rel="preload" href="{{ mix('/static/images/logo-32.png') }}" as="image">
         <link rel="preload" href="{{ route('pwa.manifest', [], false) }}" as="fetch" crossorigin="anonymous">
+        <!-- Preconnect to external hosts -->
+        <link rel="preconnect" href="https://storage.googleapis.com">
+        <link rel="preconnect" href="https://js.pusher.com">
+        @if (! empty(config('services.google.analytics_id')))
+        <link rel="preconnect" href="https://www.googletagmanager.com">
+        @endif
         <!-- Icons and CSS styles -->
         <link rel="icon" href="{{ mix('/static/images/logo.svg') }}" type="image/svg+xml">
         <link rel="alternate icon" href="{{ mix('/static/images/logo-32.png') }}" sizes="32x32" type="image/png">

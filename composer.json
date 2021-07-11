@@ -15,6 +15,7 @@
         "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "intervention/image": "^2.5",
+        "laravel-notification-channels/pusher-push-notifications": "^2.3",
         "laravel-notification-channels/twitter": "^5.0",
         "laravel/framework": "^8.0",
         "laravel/legacy-factories": "^1.1",
