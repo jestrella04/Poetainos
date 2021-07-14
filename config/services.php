@@ -52,10 +52,4 @@ return [
         'redirect' => env('GOOGLE_CALLBACK_URL'),
         'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
     ],
-
-    'pusher' => [
-        'beams_instance_id' => env('PUSHER_BEAMS_INSTANCE_ID'),
-        'beams_secret_key' => env('PUSHER_BEAMS_SECRET_KEY'),
-    ],
-
 ];

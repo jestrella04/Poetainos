@@ -24,14 +24,13 @@
         "bootstrap": "^5.0.1",
         "bootswatch": "^5.0.1",
         "cross-env": "^7.0.3",
+        "laravel-echo": "^1.11.0",
         "laravel-mix": "^6.0.20",
         "lodash": "^4.17.21",
+        "pusher-js": "^7.0.3",
         "resolve-url-loader": "^4.0.0",
         "sass": "^1.32.8",
         "sass-loader": "^8.0.0",
         "slim-select": "^1.26.2"
-    },
-    "dependencies": {
-        "@pusher/push-notifications-web": "^1.1.0"
     }
 }

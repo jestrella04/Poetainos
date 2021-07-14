@@ -1,10 +1,10 @@
 import * as bootstrap from 'bootstrap';
 import * as fx from './functions';
+import * as push from './push';
 import SlimSelect from 'slim-select';
 import '@pwabuilder/pwaupdate';
 import '@pwabuilder/pwainstall';
 import autoGrow, { initializeTextAreaAutoGrow } from '@ivanhanak_com/js-textarea-autogrow';
-import * as PusherPushNotifications from "@pusher/push-notifications-web";
 
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
@@ -13,7 +13,7 @@ const updateComponent = document.createElement('pwa-update');
 document.body.appendChild(installComponent);
 document.body.appendChild(updateComponent);
 
-installComponent.manifestpath = '/static/json/pwa-manifest.json';
+installComponent.manifestpath = '/manifest.json';
 installComponent.explainer = 'Esta aplicación web puede ser instalada en tu dispositivo';
 installComponent.featuresheader = 'Funcionalidades Principales';
 installComponent.descriptionheader = 'Descripción';
@@ -21,21 +21,6 @@ installComponent.installbuttontext = 'Instalar';
 installComponent.cancelbuttontext = 'Cancelar';
 installComponent.iosinstallinfotext = 'Presiona el botón compartir y después "Añadir a la pantalla principal"';
 installComponent.getInstalledStatus();
-
-// Pusher Beams
-window.navigator.serviceWorker.ready.then(serviceWorkerRegistration => {
-    const beamsClient = new PusherPushNotifications.Client({
-        instanceId: process.env.MIX_PUSHER_BEAMS_INSTANCE_ID,
-        serviceWorkerRegistration: serviceWorkerRegistration,
-    });
-
-    beamsClient.start()
-    .then((beamsClient) => beamsClient.getDeviceId())
-    .then((deviceId) =>
-        console.log("Successfully registered with Beams. Device ID:", deviceId)
-    )
-    .catch(console.error);
-});
 
 // Wait for the page to be fully loaded
 window.addEventListener('load', () => {
@@ -206,6 +191,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (bubble) {
             element = bubble;
+        }
+
+        // Push button playground
+        if (element.classList.contains('push-enable')) {
+            push.subscribe();
+        }
+        if (element.classList.contains('push-disable')) {
+            push.unsubscribe();
         }
 
         // Scroll to the top of the document

@@ -32,7 +32,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <meta name="apple-mobile-web-app-title" content="{{ getSiteConfig('name') }}">
         <link rel="apple-touch-icon" href="{{ mix('/static/images/logo.svg') }}">
-        <link rel="manifest" href="{{ route('pwa.manifest') }}">
+        <link rel="manifest" href="{{ route('pwa.manifest', [], false) }}">
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">

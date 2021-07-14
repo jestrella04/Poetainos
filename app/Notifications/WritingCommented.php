@@ -8,6 +8,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\WebPush\WebPushChannel;
 
 class WritingCommented extends Notification implements ShouldQueue
 {
@@ -35,7 +37,7 @@ class WritingCommented extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', WebPushChannel::class];
     }
 
     /**
@@ -52,6 +54,25 @@ class WritingCommented extends Notification implements ShouldQueue
                     ->line(__(':name has added a comment on your writing', ['name' => $this->user->getName()]))
                     ->action(__('View writing'), route('writings.show', $this->writing))
                     ->line(__('Thank you for being part of the hood!'));
+    }
+
+    public function toWebPush($notifiable, $notification)
+    {
+        return (new WebPushMessage)
+            ->title('Approved!')
+            ->icon('/approved-icon.png')
+            ->body('Your account was approved!')
+            ->action('View account', 'view_account')
+            ->options(['TTL' => 1000]);
+            // ->data(['id' => $notification->id])
+            // ->badge()
+            // ->dir()
+            // ->image()
+            // ->lang()
+            // ->renotify()
+            // ->requireInteraction()
+            // ->tag()
+            // ->vibrate()
     }
 
     /**

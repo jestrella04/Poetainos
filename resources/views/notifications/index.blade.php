@@ -22,6 +22,8 @@
             <div class="d-flex flex-wrap">
                 <div class="flex-grow-1">
                     <h2 class="all-caps">{{ __('Notifications') }}</h2>
+                    <button class="btn btn-light btn-sm push-enable">{{ __('Push On') }}</button>
+                    <button class="btn btn-light btn-sm push-disable">{{ __('Push Off') }}</button>
                 </div>
 
                 @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
@@ -30,6 +32,7 @@
                             @csrf
                             <button type="submit" class="btn btn-light btn-sm">{{ __('Mark all as read') }}</button>
                         </form>
+
                     </div>
                 @endif
             </div>
