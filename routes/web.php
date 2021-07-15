@@ -65,7 +65,8 @@ Route::middleware(['verified'])->group(function () {
 
     // Notifications
     Route::get('/notifications', 'UsersNotificationsController@index')->name('notifications.index');
-    Route::post('/notifications/markasread', 'UsersNotificationsController@markAllRead')->name('notifications.read');
+    Route::get('/notifications/read/{notification}', 'UsersNotificationsController@read')->name('notifications.read');
+    Route::post('/notifications/read/all', 'UsersNotificationsController@clear')->name('notifications.clear');
 
     // Push Subscriptions
     Route::post('subscriptions', 'PushNotificationsController@update')->name('push.update');

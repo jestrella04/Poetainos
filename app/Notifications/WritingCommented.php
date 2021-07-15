@@ -17,6 +17,7 @@ class WritingCommented extends Notification implements ShouldQueue
 
     protected $writing;
     protected $user;
+    protected $notification;
 
     /**
      * Create a new notification instance.
@@ -27,6 +28,15 @@ class WritingCommented extends Notification implements ShouldQueue
     {
         $this->writing = $writing;
         $this->user = $user;
+        $this->notification = [
+            'title' => __(':name commented on your writing', ['name' => $this->user->getName()]),
+            'greeting' => __('Hello!'),
+            'body' => __(':name commented on your writing', ['name' => $this->user->getName()]),
+            'footer' => __('Thank you for being part of the hood!'),
+            'url' => route('writings.show', $this->writing),
+            'action' => __('View writing'),
+            'icon' => mix('/static/images/logo.svg'),
+        ];
     }
 
     /**
@@ -49,20 +59,27 @@ class WritingCommented extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject(__(':name has added a comment on your writing', ['name' => $this->user->getName()]))
-                    ->greeting(__('Hello!'))
-                    ->line(__(':name has added a comment on your writing', ['name' => $this->user->getName()]))
-                    ->action(__('View writing'), route('writings.show', $this->writing))
-                    ->line(__('Thank you for being part of the hood!'));
+                    ->subject($this->notification['title'])
+                    ->greeting($this->notification['greeting'])
+                    ->line($this->notification['body'])
+                    ->action($this->notification['action'], $this->notification['url'])
+                    ->line($this->notification['footer']);
     }
 
+    /**
+     * Get the web push representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $notification
+     * @return \Illuminate\Notifications\Messages\DatabaseMessage
+     */
     public function toWebPush($notifiable, $notification)
     {
         return (new WebPushMessage)
-            ->title('Approved!')
-            ->icon('/approved-icon.png')
-            ->body('Your account was approved!')
-            ->action('View account', 'view_account')
+            ->title($this->notification['title'])
+            ->icon($this->notification['icon'])
+            ->body($this->notification['body'])
+            ->action($this->notification['action'], $this->notification['url'])
             ->options(['TTL' => 1000]);
             // ->data(['id' => $notification->id])
             // ->badge()

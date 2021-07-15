@@ -84,12 +84,7 @@ self.addEventListener('fetch', (event) => {
          */
         notificationClick(event) {
             // console.log(event.notification)
-
-            if (event.action === 'some_action') {
-                // Do something...
-            } else {
-                self.clients.openWindow('/')
-            }
+            self.clients.openWindow(event.action)
         },
 
         /**
@@ -134,7 +129,7 @@ self.addEventListener('fetch', (event) => {
             data.append('endpoint', endpoint)
 
             // Send a request to the server to mark the notification as read.
-            fetch(`/notifications/${notification.data.id}/dismiss`, {
+            fetch(`/notifications/read/${notification.data.id}`, {
                 method: 'POST',
                 body: data
             })

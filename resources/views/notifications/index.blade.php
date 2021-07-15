@@ -28,7 +28,7 @@
 
                 @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
                     <div>
-                        <form action="{{ route('notifications.read') }}" method="post">
+                        <form action="{{ route('notifications.clear') }}" method="post">
                             @csrf
                             <button type="submit" class="btn btn-light btn-sm">{{ __('Mark all as read') }}</button>
                         </form>
@@ -51,7 +51,7 @@
 
                             <div class="flex-grow-1">
                                 @if ($writing = App\Writing::findOrFail($notification->data['writing_id']))
-                                    <a href="{{ route('writings.show', $writing) }}" class="stretched-link">
+                                    <a href="{{ route('notifications.read', $notification) }}" class="stretched-link">
                                         {{ $writing->title }}
                                     </a>
                                 @endif
