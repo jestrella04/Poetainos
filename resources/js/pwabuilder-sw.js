@@ -62,7 +62,7 @@ self.addEventListener('fetch', (event) => {
          * @param {NotificationEvent} event
          */
         notificationPush(event) {
-            if (! (self.Notification && self.Notification.permission === 'granted')) {
+            if (!(self.Notification && self.Notification.permission === 'granted')) {
                 return;
             }
 
@@ -84,14 +84,37 @@ self.addEventListener('fetch', (event) => {
             let action = null;
             let url = null;
 
-            if (! action) {
+            if (!action) {
+                //Default to the first action defined
                 url = clickedNotification.actions[0].action;
             } else {
                 url = clickedNotification.actions[action].action;
             }
 
+            const promiseChain = clients.matchAll({
+                type: 'window',
+                includeUncontrolled: true
+            }).then((windowClients) => {
+                let matchingClient = null;
+
+                for (let i = 0; i < windowClients.length; i++) {
+                    const windowClient = windowClients[i];
+
+                    if (windowClient.url === url) {
+                        matchingClient = windowClient;
+                        break;
+                    }
+                }
+
+                if (matchingClient) {
+                    return matchingClient.focus();
+                } else {
+                    return clients.openWindow(url);
+                }
+            });
+
+            event.waitUntil(promiseChain);
             clickedNotification.close();
-            self.clients.openWindow(url);
         },
 
         /**
