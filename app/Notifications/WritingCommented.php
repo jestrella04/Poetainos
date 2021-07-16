@@ -31,11 +31,15 @@ class WritingCommented extends Notification implements ShouldQueue
         $this->notification = [
             'title' => __(':name commented on your writing', ['name' => $this->user->getName()]),
             'greeting' => __('Hello!'),
-            'body' => __(':name commented on your writing', ['name' => $this->user->getName()]),
+            'body' => __('We love sharing the good news with you, :name just commented on your writing at :site.', [
+                'name' => $this->user->getName(),
+                'site' => getSiteConfig('name')
+            ]),
             'footer' => __('Thank you for being part of the hood!'),
             'url' => route('writings.show', $this->writing),
             'action' => __('View writing'),
-            'icon' => mix('/static/images/logo.svg'),
+            'icon' => asset('/static/images/logo-192.png'),
+            'tag' => getSiteConfig('name'),
         ];
     }
 
@@ -59,11 +63,11 @@ class WritingCommented extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject($this->notification['title'])
-                    ->greeting($this->notification['greeting'])
-                    ->line($this->notification['body'])
-                    ->action($this->notification['action'], $this->notification['url'])
-                    ->line($this->notification['footer']);
+            ->subject($this->notification['title'])
+            ->greeting($this->notification['greeting'])
+            ->line($this->notification['body'])
+            ->action($this->notification['action'], $this->notification['url'])
+            ->line($this->notification['footer']);
     }
 
     /**
@@ -80,16 +84,16 @@ class WritingCommented extends Notification implements ShouldQueue
             ->icon($this->notification['icon'])
             ->body($this->notification['body'])
             ->action($this->notification['action'], $this->notification['url'])
-            ->options(['TTL' => 1000]);
-            // ->data(['id' => $notification->id])
-            // ->badge()
-            // ->dir()
-            // ->image()
-            // ->lang()
-            // ->renotify()
-            // ->requireInteraction()
-            // ->tag()
-            // ->vibrate()
+            ->options(['TTL' => 1000])
+            ->renotify()
+            ->requireInteraction()
+            ->tag($this->notification['tag']);
+        // ->data(['id' => $notification->id])
+        // ->badge()
+        // ->dir()
+        // ->image()
+        // ->lang()
+        // ->vibrate()
     }
 
     /**
