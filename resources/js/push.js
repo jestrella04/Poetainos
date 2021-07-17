@@ -45,8 +45,8 @@ export function unsubscribe() {
             })
             .catch(e => {
                 console.log('Error thrown while unsubscribing.', e);
-            })
-    })
+            });
+    });
 }
 
 /**

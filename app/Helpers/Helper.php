@@ -158,6 +158,6 @@ function linkify($string) {
         $emailPattern = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
         $isEmail = preg_match($emailPattern, $matches[0]) ? 'mailto:' : '';
 
-        return '<a href="'. $isEmail . $matches[0] .'" target="_blank" title="'. $matches[0] .'">'. $matches[0] .'</a>';
+        return '<a href="'. $isEmail . $matches[0] .'" target="_blank" title="'. $matches[0] .'">'. Str::limit($matches[0], 50) .'</a>';
     }, $string);
 }

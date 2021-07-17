@@ -22,19 +22,27 @@
             <div class="d-flex flex-wrap">
                 <div class="flex-grow-1">
                     <h2 class="all-caps">{{ __('Notifications') }}</h2>
-                    <button class="btn btn-light btn-sm push-enable">{{ __('Push On') }}</button>
-                    <button class="btn btn-light btn-sm push-disable">{{ __('Push Off') }}</button>
                 </div>
 
-                @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
-                    <div>
-                        <form action="{{ route('notifications.clear') }}" method="post">
-                            @csrf
-                            <button type="submit" class="btn btn-light btn-sm">{{ __('Mark all as read') }}</button>
-                        </form>
+                <div>
+                    <button class="btn btn-light btn-push push-enable d-none" title="{{ __('Enable push notifications') }}" data-bs-toggle="tooltip">
+                        <i class="fas fa-bell"></i>
+                    </button>
 
-                    </div>
-                @endif
+                    <button class="btn btn-light btn-push push-disable d-none" title="{{ __('Disable push notifications') }}" data-bs-toggle="tooltip">
+                        <i class="far fa-bell-slash"></i>
+                    </button>
+
+                    <form action="{{ route('notifications.clear') }}" method="post">
+                        @csrf
+
+                        @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
+                        <button type="submit" class="btn btn-light" title="{{ __('Mark all as read') }}" data-bs-toggle="tooltip">
+                            <i class="fas fa-check-double"></i>
+                        </button>
+                        @endif
+                    </form>
+                </div>
             </div>
 
             @forelse ($notifications as $notification)

@@ -14,7 +14,7 @@ document.body.appendChild(installComponent);
 document.body.appendChild(updateComponent);
 
 installComponent.manifestpath = '/manifest.json';
-installComponent.explainer = 'Esta aplicación web puede ser instalada en tu dispositivo';
+installComponent.explainer = 'Puedes instalar esta aplicacion web en tu dispositivo y disfrutar de una experiencia nativa en tu sistema.';
 installComponent.featuresheader = 'Funcionalidades Principales';
 installComponent.descriptionheader = 'Descripción';
 installComponent.installbuttontext = 'Instalar';
@@ -140,6 +140,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Check if subscribed to push notifications
+    let pushEnable = document.querySelector('.push-enable');
+    let pushDisable = document.querySelector('.push-disable');
+
+    navigator.serviceWorker.ready.then(registration => {
+        registration.pushManager.getSubscription()
+            .then(subscription => {
+                if (subscription && null !== pushDisable && undefined !== pushDisable) {
+                    pushDisable.classList.remove('d-none');
+                }
+
+                if (! subscription && null !== pushEnable && undefined !== pushEnable) {
+                    pushEnable.classList.remove('d-none');
+                }
+            })
+            .catch(e => {
+                console.log('Error thrown checking subscription status.', e);
+            });
+    });
+
     // Listen to the toast show event and act accordingly
     document.querySelector('.toast').addEventListener('show.bs.toast', (event) => {
         event.target.closest('.toast-wrapper').classList.add('show');
@@ -193,12 +213,26 @@ document.addEventListener('DOMContentLoaded', () => {
             element = bubble;
         }
 
-        // Push button playground
+        // Enable push notifications
         if (element.classList.contains('push-enable')) {
             push.subscribe();
+            document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
+                pushBtn.classList.add('d-none');
+            });
+
+            element.dispatchEvent(new Event('focusout', { bubbles: true }));
+            document.querySelector('.push-disable').classList.remove('d-none');
         }
+
+        // Disable push notifications
         if (element.classList.contains('push-disable')) {
             push.unsubscribe();
+            document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
+                pushBtn.classList.add('d-none');
+            });
+
+            element.dispatchEvent(new Event('focusout', { bubbles: true }));
+            document.querySelector('.push-enable').classList.remove('d-none');
         }
 
         // Scroll to the top of the document
