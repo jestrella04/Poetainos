@@ -31,7 +31,7 @@ nav {
         .icon-badge {
             transition: all 0.5s;
 
-            span {
+            span.unread {
                 left: 100% !important;
             }
         }

@@ -296,6 +296,12 @@ hr {
 }
 
 .user-notifications {
+    @include media-breakpoint-down(sm) {
+        .actions {
+            margin-bottom: $wh-s-sm;
+        }
+    }
+
     .user-notification {
         position: relative;
         margin-bottom: $wh-s-md;
@@ -321,7 +327,7 @@ hr {
 .icon-badge {
     position: relative;
 
-    span {
+    span.unread {
         position: absolute;
         left: 80% !important;
         background-color: $primary;

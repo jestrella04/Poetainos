@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\User;
 use App\Writing;
+use App\Events\NotificationEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,7 +30,10 @@ class WritingLiked extends Notification implements ShouldQueue
         $this->writing = $writing;
         $this->user = $user;
         $this->notification = [
-            'title' => __(':name likes your writing', ['name' => $this->user->getName()]),
+            'title' => __('Updates from :name at :site', [
+                'name' => $this->user->getName(),
+                'site' => getSiteConfig('name')
+            ]),
             'greeting' => __('Hello!'),
             'body' => __('Isn\'t it amazing?, :name likes your writing at :site.', [
                 'name' => $this->user->getName(),
@@ -51,7 +55,7 @@ class WritingLiked extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database', WebPushChannel::class];
+        return ['database', 'broadcast', WebPushChannel::class];
     }
 
     /**
@@ -92,6 +96,17 @@ class WritingLiked extends Notification implements ShouldQueue
         // ->image()
         // ->lang()
         // ->vibrate()
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return event(new NotificationEvent($notifiable));
     }
 
     /**

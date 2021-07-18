@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\User;
 use App\Writing;
+use App\Events\NotificationEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -35,7 +36,7 @@ class WritingShelved extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -50,6 +51,17 @@ class WritingShelved extends Notification implements ShouldQueue
             ->line('The introduction to the notification.')
             ->action('Notification Action', url('/'))
             ->line('Thank you for using our application!');
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return event(new NotificationEvent($notifiable));
     }
 
     /**

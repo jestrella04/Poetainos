@@ -185,15 +185,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for new user notification events coming from the server
     if (null !== userToken && undefined !== userToken) {
-        Echo.private(`notifications.${userToken}`).listen('NotificationEvent', (event) => {
-            let message = JSON.parse(event.message);
-
+        Echo.private(`notifications.${userToken}`).listen('NotificationEvent', (payload) => {
             document.querySelectorAll('.unread').forEach((badge) => {
                 badge.classList.remove('d-none');
             });
 
             document.querySelectorAll('.unread-count').forEach((count) => {
-                count.innerHTML = message.notifications.unread;
+                count.innerHTML = payload.notifications.unread;
             });
         });
     }

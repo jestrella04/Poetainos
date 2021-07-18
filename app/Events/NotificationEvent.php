@@ -15,18 +15,16 @@ class NotificationEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $message;
-    private $userId;
+    public $user;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($message)
+    public function __construct(User $user)
     {
-        $this->message = json_encode($message);
-        $this->userId = $message['user_id'];
+        $this->user = $user;
     }
 
     /**
@@ -36,6 +34,32 @@ class NotificationEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('notifications.' . $this->userId);
+        return new PrivateChannel('notifications.' . $this->user->id);
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return [
+            'user_id' => $this->user->id,
+            'notifications' => [
+                'unread' => $this->user->unreadNotifications()->count(),
+                'total' => $this->user->notifications()->count(),
+            ],
+        ];
+    }
+
+    /**
+     * Determine if this event should broadcast.
+     *
+     * @return bool
+     */
+    public function broadcastWhen()
+    {
+        return $this->user->unreadNotifications()->count() > 0;
     }
 }

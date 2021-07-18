@@ -95,7 +95,7 @@
                                 </div>
                             </a>
 
-                            <div class="dropdown-menu">
+                            <div class="dropdown-menu dropdown-menu-end">
                                 @if (auth()->user()->isAllowed('admin'))
                                     <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
                                 @endif
