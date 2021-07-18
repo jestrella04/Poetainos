@@ -55,7 +55,7 @@ class WritingReplied extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', 'bradcast', WebPushChannel::class];
+        return ['mail', 'database', 'broadcast', WebPushChannel::class];
     }
 
     /**
