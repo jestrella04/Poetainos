@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -65,7 +66,12 @@ Route::middleware(['verified'])->group(function () {
 
     // Notifications
     Route::get('/notifications', 'UsersNotificationsController@index')->name('notifications.index');
-    Route::post('/notifications/markasread', 'UsersNotificationsController@markAllRead')->name('notifications.read');
+    Route::get('/notifications/read/{notification}', 'UsersNotificationsController@read')->name('notifications.read');
+    Route::post('/notifications/read/all', 'UsersNotificationsController@clear')->name('notifications.clear');
+
+    // Push Subscriptions
+    Route::post('subscriptions', 'PushNotificationsController@update')->name('push.update');
+    Route::post('subscriptions/delete', 'PushNotificationsController@destroy')->name('push.delete');
 });
 
 /* Public routes */
@@ -76,7 +82,7 @@ Route::post('/init', 'InitController@init')->name('init.init');
 Route::get('/init/success', 'InitController@success')->name('init.success');
 
 // PWA manifest
-Route::get('/static/json/pwa-manifest.json', 'ResourcesController@pwaManifest')->name('pwa.manifest');
+Route::get('/manifest.json', 'ResourcesController@pwaManifest')->name('pwa.manifest');
 
 // Social authentication
 Route::get('/login/{service}', 'SocialAuthController@redirectToProvider')->name('social.login');

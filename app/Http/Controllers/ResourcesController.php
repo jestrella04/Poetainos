@@ -10,6 +10,7 @@ class ResourcesController extends Controller
     {
         $json = file_get_contents(base_path('resources/json/pwa.json'));
         $json = str_replace('{{name}}', getSiteConfig('name'), $json);
+        $json = str_replace('{{gcm_sender_id}}', config('webpush.gcm.sender_id'), $json);
         $json = str_replace('{{description}}', getSiteConfig('slogan'), $json);
         $json = str_replace('{{publish}}', __('Publish'), $json);
         $json = str_replace('{{featured}}', __('Golden Flowers'), $json);

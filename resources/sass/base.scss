@@ -296,6 +296,12 @@ hr {
 }
 
 .user-notifications {
+    @include media-breakpoint-down(sm) {
+        .actions {
+            margin-bottom: $wh-s-sm;
+        }
+    }
+
     .user-notification {
         position: relative;
         margin-bottom: $wh-s-md;
@@ -318,27 +324,14 @@ hr {
     margin-bottom: $wh-s-xl;
 }
 
-
-.icon-badge-container {
-    position:relative;
-    display: inline-block;
-}
-
-.icon-badge-icon {
-    font-size: 30px;
-    position: relative;
-}
-
 .icon-badge {
-    background-color: $primary;
-    color: white;
-    text-align: center;
-    width: 12px;
-    height: 12px;
-    border-radius: 100%;
-    position: absolute; /* changed */
-    top: -3px; /* changed */
-    left: 15px; /* changed */
+    position: relative;
+
+    span.unread {
+        position: absolute;
+        left: 80% !important;
+        background-color: $primary;
+    }
 }
 
 pwa-install {

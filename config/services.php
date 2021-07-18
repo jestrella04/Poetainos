@@ -52,8 +52,4 @@ return [
         'redirect' => env('GOOGLE_CALLBACK_URL'),
         'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
     ],
-
-    'webpushr' => [
-        'tracking_id' => env('WEBPUSHR_TRACKING_ID')
-    ],
 ];

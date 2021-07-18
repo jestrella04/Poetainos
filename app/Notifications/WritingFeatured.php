@@ -9,12 +9,15 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
+use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\WebPush\WebPushChannel;
 
 class WritingFeatured extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $writing;
+    protected $notification;
 
     /**
      * Create a new notification instance.
@@ -24,6 +27,27 @@ class WritingFeatured extends Notification implements ShouldQueue
     public function __construct(Writing $writing)
     {
         $this->writing = $writing;
+        $this->notification = [
+            'title' => __('Your writing has been awarded with a Golden Flower'),
+            'greeting' => __('Hello!'),
+            'body' => __('Congratulations, your writing ":title" has been awarded with a Golden Flower at :site', [
+                'title' => $this->writing->title,
+                'site' => getSiteConfig('name'),
+            ]),
+            'body_twitter' => [
+                __('":title" by :author has been awarded with a #GoldenFlower.', [
+                    'title' => $this->writing->title,
+                    'author' => $this->writing->author->getTwitterUsername()
+                ]),
+                __('You cannot miss this! #poetry'),
+                $this->writing->path(),
+            ],
+            'footer' => __('Thank you for being part of the hood!'),
+            'url' => route('writings.show', $this->writing),
+            'action' => __('View writing'),
+            'icon' => asset('/static/images/logo-192.png'),
+            'tag' => getSiteConfig('name'),
+        ];
     }
 
     /**
@@ -34,7 +58,7 @@ class WritingFeatured extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', TwitterChannel::class];
+        return ['mail', 'database', TwitterChannel::class, WebPushChannel::class];
     }
 
     /**
@@ -46,24 +70,44 @@ class WritingFeatured extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(__('Your writing has been awarded with a Golden Flower'))
-            ->greeting(__('Hello!'))
-            ->line(__('Your writing ":title" has been awarded with a Golden Flower', ['title' =>$this->writing->title]))
-            ->action(__('View writing'), route('writings.show', $this->writing))
-            ->line(__('Thank you for being part of the hood!'));
+            ->subject($this->notification['title'])
+            ->greeting($this->notification['greeting'])
+            ->line($this->notification['body'])
+            ->action($this->notification['action'], $this->notification['url'])
+            ->line($this->notification['footer']);
     }
 
     public function toTwitter($notifiable)
     {
-        $msg = __('":title" by :author has been awarded with a #GoldenFlower.', [
-            'title' => $this->writing->title,
-            'author' => $this->writing->author->getTwitterUsername()
-        ]);
-
-        $msg = $msg . ' ' . __('You cannot miss this! #poetry');
-        $msg = $msg . ' ' . $this->writing->path();
+        $msg = implode(' ', $this->notification['body_twitter']);
 
         return new TwitterStatusUpdate($msg);
+    }
+
+    /**
+     * Get the web push representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @param  mixed  $notification
+     * @return \Illuminate\Notifications\Messages\DatabaseMessage
+     */
+    public function toWebPush($notifiable, $notification)
+    {
+        return (new WebPushMessage)
+            ->title($this->notification['title'])
+            ->icon($this->notification['icon'])
+            ->body($this->notification['body'])
+            ->action($this->notification['action'], $this->notification['url'])
+            ->options(['TTL' => 1000])
+            ->renotify()
+            ->requireInteraction()
+            ->tag($this->notification['tag']);
+        // ->data(['id' => $notification->id])
+        // ->badge()
+        // ->dir()
+        // ->image()
+        // ->lang()
+        // ->vibrate()
     }
 
     /**

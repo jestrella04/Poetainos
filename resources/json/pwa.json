@@ -1,5 +1,6 @@
 {
     "name": "{{name}}",
+    "gcm_sender_id": "{{gcm_sender_id}}",
     "short_name": "{{name}}",
     "description": "{{description}}",
     "icons": [

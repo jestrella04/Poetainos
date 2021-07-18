@@ -28,14 +28,18 @@ nav {
         background-color: transparent;
         padding: $wh-s-sm $wh-s-md;
 
-        .icon-badge-container {
+        .icon-badge {
             transition: all 0.5s;
+
+            span.unread {
+                left: 100% !important;
+            }
         }
 
-        .icon-badge-container.rotate {
+        .icon-badge.rotate {
             transform: rotate(180deg);
 
-            .icon-badge {
+            span {
                 opacity: 0;
             }
         }

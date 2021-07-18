@@ -1,9 +1,10 @@
 import * as bootstrap from 'bootstrap';
 import * as fx from './functions';
+import * as push from './push';
 import SlimSelect from 'slim-select';
 import '@pwabuilder/pwaupdate';
 import '@pwabuilder/pwainstall';
-import autoGrow, {initializeTextAreaAutoGrow} from '@ivanhanak_com/js-textarea-autogrow';
+import autoGrow, { initializeTextAreaAutoGrow } from '@ivanhanak_com/js-textarea-autogrow';
 
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
@@ -12,8 +13,8 @@ const updateComponent = document.createElement('pwa-update');
 document.body.appendChild(installComponent);
 document.body.appendChild(updateComponent);
 
-installComponent.manifestpath = '/static/json/pwa-manifest.json';
-installComponent.explainer = 'Esta aplicación puede ser instalada en';
+installComponent.manifestpath = '/manifest.json';
+installComponent.explainer = 'Puedes instalar esta aplicacion web en tu dispositivo y disfrutar de una experiencia nativa en tu sistema.';
 installComponent.featuresheader = 'Funcionalidades Principales';
 installComponent.descriptionheader = 'Descripción';
 installComponent.installbuttontext = 'Instalar';
@@ -39,6 +40,10 @@ window.addEventListener('load', () => {
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
+    // Check for user session
+    let userToken = document.querySelector('meta[name="user-token"]');
+    if (null !== userToken && undefined !== userToken) userToken = atob(userToken.content);
+
     // Enable scrolling on the document
     document.body.classList.remove('overflow-hidden');
 
@@ -139,6 +144,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Check if subscribed to push notifications
+    let pushEnable = document.querySelector('.push-enable');
+    let pushDisable = document.querySelector('.push-disable');
+
+    navigator.serviceWorker.ready.then(registration => {
+        registration.pushManager.getSubscription()
+            .then(subscription => {
+                if (subscription && null !== pushDisable && undefined !== pushDisable) {
+                    pushDisable.classList.remove('d-none');
+                }
+
+                if (! subscription && null !== pushEnable && undefined !== pushEnable) {
+                    pushEnable.classList.remove('d-none');
+                }
+            })
+            .catch(e => {
+                console.log('Error thrown checking subscription status.', e);
+            });
+    });
+
     // Listen to the toast show event and act accordingly
     document.querySelector('.toast').addEventListener('show.bs.toast', (event) => {
         event.target.closest('.toast-wrapper').classList.add('show');
@@ -157,6 +182,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove last message
         event.target.querySelector('.toast-body').innerHTML = '';
     }, false);
+
+    // Listen for new user notification events coming from the server
+    if (null !== userToken && undefined !== userToken) {
+        Echo.private(`notifications.${userToken}`).listen('NotificationEvent', (payload) => {
+            document.querySelectorAll('.unread').forEach((badge) => {
+                badge.classList.remove('d-none');
+            });
+
+            document.querySelectorAll('.unread-count').forEach((count) => {
+                count.innerHTML = payload.notifications.unread;
+            });
+        });
+    }
 
     // Listen to the window resize event and act accordingly
     window.addEventListener('resize', function () {
@@ -192,6 +230,28 @@ document.addEventListener('DOMContentLoaded', () => {
             element = bubble;
         }
 
+        // Enable push notifications
+        if (element.classList.contains('push-enable')) {
+            push.subscribe();
+            document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
+                pushBtn.classList.add('d-none');
+            });
+
+            element.dispatchEvent(new Event('focusout', { bubbles: true }));
+            document.querySelector('.push-disable').classList.remove('d-none');
+        }
+
+        // Disable push notifications
+        if (element.classList.contains('push-disable')) {
+            push.unsubscribe();
+            document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
+                pushBtn.classList.add('d-none');
+            });
+
+            element.dispatchEvent(new Event('focusout', { bubbles: true }));
+            document.querySelector('.push-enable').classList.remove('d-none');
+        }
+
         // Scroll to the top of the document
         if (element.hasAttribute('id') && 'back-to-top' === element.attributes['id'].value) {
             element.dispatchEvent(new Event('focusout', { bubbles: true }));
@@ -225,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#side-menu-overlay').classList.toggle('d-none');
             targetNav.classList.toggle('show');
             element.querySelector('i').classList.toggle('fa-times');
-            element.querySelector('.icon-badge-container').classList.toggle('rotate');
+            element.querySelector('.icon-badge').classList.toggle('rotate');
             document.body.classList.toggle('overflow-hidden');
         }
 

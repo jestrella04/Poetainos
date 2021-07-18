@@ -20,7 +20,7 @@
         </div>
 
         <div class="message">
-            {{ $comment->message }}
+            {!! linkify($comment->message) !!}
 
             @auth
                 <span class="badge bg-primary badge-reply" data-wh-target="#reply-form-{{ $comment->id }}">

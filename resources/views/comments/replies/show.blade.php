@@ -19,6 +19,6 @@
             </small>
         </div>
 
-        <div class="message">{{ $reply->message }}</div>
+        <div class="message">{!! linkify($reply->message) !!}</div>
     </div>
 </div>

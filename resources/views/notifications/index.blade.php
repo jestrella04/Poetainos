@@ -24,14 +24,32 @@
                     <h2 class="all-caps">{{ __('Notifications') }}</h2>
                 </div>
 
-                @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
-                    <div>
-                        <form action="{{ route('notifications.read') }}" method="post">
-                            @csrf
-                            <button type="submit" class="btn btn-light btn-sm">{{ __('Mark all as read') }}</button>
-                        </form>
+                <form action="{{ route('notifications.clear') }}" method="post">
+                    @csrf
+                    <div class="btn-group actions" role="group" aria-label="{{ __('Notification actions') }}">
+                        <button
+                            type="button"
+                            class="btn btn-light btn-push push-enable d-none"
+                            title="{{ __('Enable push notifications') }}"
+                            data-bs-toggle="tooltip">
+                            <i class="fas fa-bell"></i>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-light btn-push push-disable d-none"
+                            title="{{ __('Disable push notifications') }}"
+                            data-bs-toggle="tooltip">
+                            <i class="far fa-bell-slash"></i>
+                        </button>
+
+                        @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
+                        <button type="submit" class="btn btn-light" title="{{ __('Mark all as read') }}" data-bs-toggle="tooltip">
+                            <i class="fas fa-check-double"></i>
+                        </button>
+                        @endif
                     </div>
-                @endif
+                </form>
             </div>
 
             @forelse ($notifications as $notification)
@@ -48,7 +66,7 @@
 
                             <div class="flex-grow-1">
                                 @if ($writing = App\Writing::findOrFail($notification->data['writing_id']))
-                                    <a href="{{ route('writings.show', $writing) }}" class="stretched-link">
+                                    <a href="{{ route('notifications.read', $notification) }}" class="stretched-link">
                                         {{ $writing->title }}
                                     </a>
                                 @endif

@@ -150,3 +150,14 @@ function getPageTitle(Array $titleParts, $separator = '–') {
     unset($titleParts);
     return trim(implode(' ' . $separator . ' ', $title), ' ');
 }
+
+function linkify($string) {
+    $pattern = '/\(?(?:(http|https):\\/\\/)?(?:((?:[^\W\s]|\.|-|[:]{1})+)@{1})?((?:www.)?(?:[^\W\s]|\.|-)+[\.][^\W\s]{2,4}|localhost(?=\\/)|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::(\d*))?([\\/]?[^\s\?]*[\\/]{1})*(?:\\/?([^\s\n\?\[\]\{\}\#]*(?:(?=\.)){1}|[^\s\n\?\[\]\{\}\.\#]*)?([\.]{1}[^\s\?\#]*)?)?(?:\?{1}([^\s\n\#\[\]]*))?([\#][^\s\n]*)?\)?/';
+
+    return preg_replace_callback($pattern, function($matches) {
+        $emailPattern = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
+        $isEmail = preg_match($emailPattern, $matches[0]) ? 'mailto:' : '';
+
+        return '<a href="'. $isEmail . $matches[0] .'" target="_blank" title="'. $matches[0] .'">'. Str::limit($matches[0], 50) .'</a>';
+    }, $string);
+}

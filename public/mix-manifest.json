@@ -1,12 +1,12 @@
 {
-    "/pwabuilder-sw.js": "/pwabuilder-sw.js?id=060c4ae39d2728970873",
-    "/static/js/app.js": "/static/js/app.js?id=f94b994c8a1c90ac0de1",
-    "/static/css/app.css": "/static/css/app.css?id=c2075cb4726aef68f4ed",
-    "/static/images/logo.svg": "/static/images/logo.svg?id=4b01cbb32ec3da1313d6",
-    "/static/images/logo-32.png": "/static/images/logo-32.png?id=25934683264a833b4b27",
-    "/static/images/logo-64.png": "/static/images/logo-64.png?id=9e661a9a1ccf164d7168",
-    "/static/images/logo-144.png": "/static/images/logo-144.png?id=85bbd9917eb97c87e2d3",
-    "/static/images/logo-192.png": "/static/images/logo-192.png?id=badf266279e6f73be212",
-    "/static/images/logo-512.png": "/static/images/logo-512.png?id=a26512ae809c6d662c57",
-    "/static/images/cover.jpg": "/static/images/cover.jpg?id=5deba6f205cc24d0bf77"
+    "/pwabuilder-sw.js": "/pwabuilder-sw.js",
+    "/static/js/app.js": "/static/js/app.js",
+    "/static/css/app.css": "/static/css/app.css",
+    "/static/images/logo.svg": "/static/images/logo.svg",
+    "/static/images/logo-32.png": "/static/images/logo-32.png",
+    "/static/images/logo-64.png": "/static/images/logo-64.png",
+    "/static/images/logo-144.png": "/static/images/logo-144.png",
+    "/static/images/logo-192.png": "/static/images/logo-192.png",
+    "/static/images/logo-512.png": "/static/images/logo-512.png",
+    "/static/images/cover.jpg": "/static/images/cover.jpg"
 }

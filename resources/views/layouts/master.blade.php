@@ -8,6 +8,9 @@
         <meta name="author" content="Jonathan Estrella">
         <meta name="generator" content="Writerhood">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        @if (auth()->user())
+        <meta name="user-token" content="{{ base64_encode(auth()->user()->id) }}">
+        @endif
         <title>@yield('meta.title')</title>
         <!-- Preload resources -->
         <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">
@@ -16,6 +19,12 @@
         <link rel="preload" href="{{ mix('/static/images/logo.svg') }}" as="image">
         <link rel="preload" href="{{ mix('/static/images/logo-32.png') }}" as="image">
         <link rel="preload" href="{{ route('pwa.manifest', [], false) }}" as="fetch" crossorigin="anonymous">
+        <!-- Preconnect to external hosts -->
+        <link rel="preconnect" href="https://storage.googleapis.com">
+        <link rel="preconnect" href="https://js.pusher.com">
+        @if (! empty(config('services.google.analytics_id')))
+        <link rel="preconnect" href="https://www.googletagmanager.com">
+        @endif
         <!-- Icons and CSS styles -->
         <link rel="icon" href="{{ mix('/static/images/logo.svg') }}" type="image/svg+xml">
         <link rel="alternate icon" href="{{ mix('/static/images/logo-32.png') }}" sizes="32x32" type="image/png">
@@ -26,7 +35,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <meta name="apple-mobile-web-app-title" content="{{ getSiteConfig('name') }}">
         <link rel="apple-touch-icon" href="{{ mix('/static/images/logo.svg') }}">
-        <link rel="manifest" href="{{ route('pwa.manifest') }}">
+        <link rel="manifest" href="{{ route('pwa.manifest', [], false) }}">
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
