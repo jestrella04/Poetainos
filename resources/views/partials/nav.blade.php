@@ -12,12 +12,14 @@
                 data-wh-source="#header-navbar"
                 data-wh-target="#user-side-menu"
                 aria-label="{{ __('Toggle sidebar') }}">
-                <span class="icon-badge-container">
+
+                <div class="icon-badge">
+                    @php $display = (auth()->check() && auth()->user()->unreadNotifications->count() > 0) ? '' : 'd-none' @endphp
                     <i class="fa fa-bars"></i>
-                    @if (auth()->check() && auth()->user()->unreadNotifications->count() > 0)
-                        <div class="icon-badge"></div>
-                    @endif
-                </span>
+                    <span class="translate-middle p-2 border border-light rounded-circle unread {{ $display }}">
+                        <span class="visually-hidden">{{ __('Unread notifications') }}</span>
+                    </span>
+                </div>
             </button>
         </div>
 
@@ -36,10 +38,8 @@
                             <i class="fas fa-bell fa-fw"></i>
                             {{ __('Notifications') }}
 
-                            @if (auth()->user()->unreadNotifications->count() > 0)
-                                <span class="badge bg-light ms-3">{{ auth()->user()->unreadNotifications->count() }}</span>
-                                <span class="sr-only">{{ __('Unread notifications') }}</span>
-                            @endif
+                            <span class="badge bg-light ms-3 unread-count">{{ auth()->user()->unreadNotifications->count() ?: '' }}</span>
+                            <span class="visually-hidden">{{ __('Unread notifications') }}</span>
                         </a>
                     </li>
                 @endauth
@@ -81,45 +81,38 @@
                     </a>
                 </li>
 
-                {{-- <li class="nav-item {{ Route::current()->getName() === 'pages' ? 'active' : '' }}">
-                    <a class="nav-link" href="/page/about">
-                        <i class="fas fa-info-circle fa-fw"></i>
-                        {{ __('About') }}
-                    </a>
-                </li> --}}
-
                 @auth
-                    <li class="nav-item dropdown d-none d-lg-block">
-                        <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <div class="icon-badge-container">
-                                {!! getUserAvatar(auth()->user(), $size = 'md') !!}
-                                @if (auth()->user()->unreadNotifications->count() > 0)
-                                    <div class="icon-badge"></div>
-                                @endif
-                            </div>
+                    <li class="nav-item d-none d-lg-block">
+                        <div class="dropdown">
+                            <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <div class="icon-badge">
+                                    {!! getUserAvatar(auth()->user(), $size = 'md') !!}
 
-                            {{ __('Hi') }} {{ auth()->user()->firstName() }}
-                        </a>
-
-                        <div class="dropdown-menu">
-                            @if (auth()->user()->isAllowed('admin'))
-                                <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
-                            @endif
-                            <a class="dropdown-item" href="{{ route('notifications.index') }}">
-                                {{ __('Notifications') }}
-
-                                @if (auth()->user()->unreadNotifications->count() > 0)
-                                    <span class="badge bg-dark ms-3">{{ auth()->user()->unreadNotifications->count() }}</span>
-                                    <span class="sr-only">{{ __('Unread notifications') }}</span>
-                                @endif
+                                    @php $display = (auth()->check() && auth()->user()->unreadNotifications->count() > 0) ? '' : 'd-none' @endphp
+                                    <span class="translate-middle p-2 border border-light rounded-circle unread {{ $display }}">
+                                        <span class="visually-hidden">{{ __('Unread notifications') }}</span>
+                                    </span>
+                                </div>
                             </a>
-                            <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>
-                            <a class="dropdown-item" href="{{ auth()->user()->writingsPath() }}">{{ __('My writings') }}</a>
-                            <a class="dropdown-item" href="{{ auth()->user()->shelfPath() }}">{{ __('My shelf') }}</a>
-                            <form class="d-inline" method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="btn dropdown-item">{{ __('Logout') }}</button>
-                            </form>
+
+                            <div class="dropdown-menu">
+                                @if (auth()->user()->isAllowed('admin'))
+                                    <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
+                                @endif
+                                <a class="dropdown-item" href="{{ route('notifications.index') }}">
+                                    {{ __('Notifications') }}
+
+                                    <span class="badge bg-dark ms-3 unread-count">{{ auth()->user()->unreadNotifications->count() ?: '' }}</span>
+                                    <span class="visually-hidden">{{ __('Unread notifications') }}</span>
+                                </a>
+                                <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>
+                                <a class="dropdown-item" href="{{ auth()->user()->writingsPath() }}">{{ __('My writings') }}</a>
+                                <a class="dropdown-item" href="{{ auth()->user()->shelfPath() }}">{{ __('My shelf') }}</a>
+                                <form class="d-inline" method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="btn dropdown-item">{{ __('Logout') }}</button>
+                                </form>
+                            </div>
                         </div>
                     </li>
 

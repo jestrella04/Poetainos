@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -126,3 +127,16 @@ Route::post('/contact', 'ContactsController@store')->name('contact.store');
 // Redirects
 Route::redirect('/home', '/');
 Route::redirect('/writings', '/');
+
+// Test
+Route::get('/test', function() {
+    $u = \App\User::find('114');
+    $a = [
+        'user_id' => $u->id,
+        'notifications' => [
+            'unread' => $u->unreadNotifications()->count(),
+            'total' => $u->notifications()->count(),
+        ],
+    ];
+    event(new App\Events\NotificationEvent($a));
+});

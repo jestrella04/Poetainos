@@ -8,6 +8,9 @@
         <meta name="author" content="Jonathan Estrella">
         <meta name="generator" content="Writerhood">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        @if (auth()->user())
+        <meta name="user-token" content="{{ base64_encode(auth()->user()->id) }}">
+        @endif
         <title>@yield('meta.title')</title>
         <!-- Preload resources -->
         <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">

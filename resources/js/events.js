@@ -40,6 +40,10 @@ window.addEventListener('load', () => {
 
 // Wait for the DOM to be readay
 document.addEventListener('DOMContentLoaded', () => {
+    // Check for user session
+    let userToken = document.querySelector('meta[name="user-token"]');
+    if (null !== userToken && undefined !== userToken) userToken = atob(userToken.content);
+
     // Enable scrolling on the document
     document.body.classList.remove('overflow-hidden');
 
@@ -179,6 +183,21 @@ document.addEventListener('DOMContentLoaded', () => {
         event.target.querySelector('.toast-body').innerHTML = '';
     }, false);
 
+    // Listen for new user notification events coming from the server
+    if (null !== userToken && undefined !== userToken) {
+        Echo.private(`notifications.${userToken}`).listen('NotificationEvent', (event) => {
+            let message = JSON.parse(event.message);
+
+            document.querySelectorAll('.unread').forEach((badge) => {
+                badge.classList.remove('d-none');
+            });
+
+            document.querySelectorAll('.unread-count').forEach((count) => {
+                count.innerHTML = message.notifications.unread;
+            });
+        });
+    }
+
     // Listen to the window resize event and act accordingly
     window.addEventListener('resize', function () {
         let overlay = document.querySelector('#side-menu-overlay');
@@ -268,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#side-menu-overlay').classList.toggle('d-none');
             targetNav.classList.toggle('show');
             element.querySelector('i').classList.toggle('fa-times');
-            element.querySelector('.icon-badge-container').classList.toggle('rotate');
+            element.querySelector('.icon-badge').classList.toggle('rotate');
             document.body.classList.toggle('overflow-hidden');
         }
 
