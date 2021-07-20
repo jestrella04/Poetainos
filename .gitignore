@@ -5,6 +5,7 @@
 /public/sitemap.xml
 /public/pwabuilder-sw.js
 /public/robots.txt
+/public/.well-known/*
 /storage/*.key
 /vendor
 .env

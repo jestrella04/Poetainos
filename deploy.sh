@@ -39,6 +39,9 @@ php artisan view:cache
 # Restart service worker
 php artisan queue:restart
 
+# Generate assetlinks
+php artisan generate:assetlinks
+
 # Install node modules
 npm install
 
