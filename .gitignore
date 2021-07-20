@@ -5,6 +5,7 @@
 /public/sitemap.xml
 /public/pwabuilder-sw.js
 /public/robots.txt
+/public/mix-manifest.json
 /public/.well-known/*
 /storage/*.key
 /vendor
@@ -16,3 +17,5 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 /laradock
+./idea
+/.vscode
