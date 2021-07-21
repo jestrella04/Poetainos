@@ -51,5 +51,12 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_CALLBACK_URL'),
         'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
+        'android' => [
+            'assetlinks' => [
+                'namespace' => env('ANDROID_ASSETLINKS_NAMESPACE'),
+                'package_name' => env('ANDROID_ASSETLINKS_PACKAGE_NAME'),
+                'fingerprint' => env('ANDROID_ASSETLINKS_FINGERPRINT'),
+            ]
+        ]
     ],
 ];

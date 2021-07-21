@@ -44,10 +44,10 @@ class GenerateAssetLinks extends Command
                     0 => 'delegate_permission/common.handle_all_urls',
                 ],
                 'target' => [
-                    'namespace' => env('ANDROID_ASSETLINKS_NAMESPACE'),
-                    'package_name' => env('ANDROID_ASSETLINKS_PACKAGE_NAME'),
+                    'namespace' => config('services.google.android.assetlinks.namespace'),
+                    'package_name' => config('services.google.android.assetlinks.package_name'),
                     'sha256_cert_fingerprints' => [
-                        0 => env('ANDROID_ASSETLINKS_FINGERPRINT'),
+                        0 => config('services.google.android.assetlinks.fingerprint'),
                     ]
                 ]
             ]
