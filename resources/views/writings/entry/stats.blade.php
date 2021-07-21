@@ -70,7 +70,7 @@
         title="{{ __('Views') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-eye fa-fw"></i>
+        <i class="fa fa-book-reader fa-fw"></i>
         <span class="counter">{{ $count['views'] }}</span>
     </button>
 
@@ -89,7 +89,7 @@
         @endif
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-book-reader fa-fw"></i>
+        <i class="fa fa-bookmark fa-fw"></i>
         <span class="counter">{{ $count['shelf'] }}</span>
     </button>
 

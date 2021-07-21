@@ -58,7 +58,6 @@ class GenerateAssetLinks extends Command
         } else {
             $this->error('Something went wrong!');
         }
-
     }
 
     /**
