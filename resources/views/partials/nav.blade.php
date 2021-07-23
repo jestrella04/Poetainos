@@ -15,7 +15,7 @@
 
                 <div class="icon-badge">
                     @php $display = (auth()->check() && auth()->user()->unreadNotifications->count() > 0) ? '' : 'd-none' @endphp
-                    <i class="fa fa-bars"></i>
+                    <i class="fa fa-bars" aria-hidden="true"></i>
                     <span class="translate-middle p-2 border border-light rounded-circle unread {{ $display }}">
                         <span class="visually-hidden">{{ __('Unread notifications') }}</span>
                     </span>
@@ -27,7 +27,7 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item d-lg-none">
                     <a class="nav-link" href="{{ route('home') }}">
-                        <i class="fas fa-home fa-fw"></i>
+                        <i class="fas fa-home fa-fw" aria-hidden="true"></i>
                         {{ __('Home') }}
                     </a>
                 </li>
@@ -35,7 +35,7 @@
                 @auth
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('notifications.index') }}">
-                            <i class="fas fa-bell fa-fw"></i>
+                            <i class="fas fa-bell fa-fw" aria-hidden="true"></i>
                             {{ __('Notifications') }}
 
                             <span class="badge bg-light ms-3 unread-count">{{ auth()->user()->unreadNotifications->count() ?: '' }}</span>
@@ -47,7 +47,7 @@
                 @if (auth()->check() && auth()->user()->isAllowed('admin'))
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('admin.index') }}">
-                            <i class="fas fa-cogs fa-fw"></i>
+                            <i class="fas fa-cogs fa-fw" aria-hidden="true"></i>
                             {{ __('Administration') }}
                         </a>
                     </li>
@@ -55,28 +55,28 @@
 
                 <li class="nav-item {{ Route::current()->getName() === 'users.index' ? 'active' : '' }}">
                     <a class="nav-link " href="{{ route('users.index') }}">
-                        <i class="fas fa-users fa-fw"></i>
+                        <i class="fas fa-users fa-fw" aria-hidden="true"></i>
                         {{ __('Writers') }}
                     </a>
                 </li>
 
                 <li class="nav-item {{ Route::current()->getName() === 'writings.awards' ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('writings.awards') }}">
-                        <i class="fas fa-fan fa-fw"></i>
+                        <i class="fas fa-fan fa-fw" aria-hidden="true"></i>
                         {{ __('Golden Flowers') }}
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('writings.random') }}">
-                        <i class="fas fa-random fa-fw"></i>
+                        <i class="fas fa-random fa-fw" aria-hidden="true"></i>
                         {{ __('Random') }}
                     </a>
                 </li>
 
                 <li class="nav-item {{ Route::current()->getName() === 'writings.create' ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('writings.create') }}">
-                        <i class="fas fa-pen-nib fa-fw"></i>
+                        <i class="fas fa-pen-nib fa-fw" aria-hidden="true"></i>
                         {{ __('Publish') }}
                     </a>
                 </li>
@@ -118,21 +118,21 @@
 
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ auth()->user()->path() }}">
-                            <i class="fas fa-user-circle fa-fw"></i>
+                            <i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>
                             {{ __('My profile') }}
                         </a>
                     </li>
 
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ auth()->user()->writingsPath() }}">
-                            <i class="fas fa-feather fa-fw"></i>
+                            <i class="fas fa-feather fa-fw" aria-hidden="true"></i>
                             {{ __('My writings') }}
                         </a>
                     </li>
 
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ auth()->user()->shelfPath() }}">
-                            <i class="fas fa-book-reader fa-fw"></i>
+                            <i class="fas fa-book-reader fa-fw" aria-hidden="true"></i>
                             {{ __('My shelf') }}
                         </a>
                     </li>
@@ -141,7 +141,7 @@
                         <form class="d-inline" method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="btn">
-                                <i class="fas fa-sign-out-alt fa-fw"></i>
+                                <i class="fas fa-sign-out-alt fa-fw" aria-hidden="true"></i>
                                 {{ __('Logout') }}
                             </button>
                         </form>
@@ -149,7 +149,7 @@
                 @else
                     <li class="nav-item {{ Route::current()->getName() === 'login' ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('login') }}">
-                            <i class="fas fa-user fa-fw"></i>
+                            <i class="fas fa-user fa-fw" aria-hidden="true"></i>
                             {{ __('Login') }}
                         </a>
                     </li>

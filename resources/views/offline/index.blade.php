@@ -10,7 +10,7 @@
         <p class="lead">{{ __('Oh no, it seems you are offline!') }}</p>
 
         <div class="my-5">
-            <i class="fas fa-sad-tear fa-7x"></i>
+            <i class="fas fa-sad-tear fa-7x" aria-hidden="true"></i>
         </div>
 
         <div class="d-grid gap-2 mb-3">

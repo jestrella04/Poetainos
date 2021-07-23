@@ -9,7 +9,7 @@
             class="btn btn-sm btn-outline-dark"
             data-wh-target="#admin-side-menu"
             aria-label="{{ __('Toggle sidebar') }}">
-            <i class="fa fa-bars"></i>
+            <i class="fa fa-bars" aria-hidden="true"></i>
         </button>
     </nav>
 

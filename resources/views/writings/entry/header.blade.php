@@ -10,13 +10,13 @@
             <div class="d-flex flex-column">
                 <div class="writing-meta">
                     <small>
-                        <i class="fas fa-user fa-fw"></i>
+                        <i class="fas fa-user fa-fw" aria-hidden="true"></i>
                         {{ __('by') }}
                         {{ $writing->author->getName() }}
                     </small>
 
                     <small>
-                        <i class="fas fa-calendar fa-fw"></i>
+                        <i class="fas fa-calendar fa-fw" aria-hidden="true"></i>
                         {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
                     </small>
                 </div>

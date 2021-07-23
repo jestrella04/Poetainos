@@ -2,7 +2,7 @@
     <div class="sidebar-toggle d-block d-lg-none">
         <div class="d-grid">
             <a class="btn btn-light" data-bs-toggle="collapse" href="#sidebar-main" role="button" aria-label="{{ __('Toggle sidebar') }}">
-                <i class="fa fa-chevron-down"></i>
+                <i class="fa fa-chevron-down" aria-hidden="true"></i>
             </a>
         </div>
     </div>

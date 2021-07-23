@@ -112,7 +112,7 @@ export function isMobile() {
     })(navigator.userAgent || navigator.vendor || window.opera);
 
     return check;
-};
+}
 
 export function resetAdminFormCreate(form) {
     form.id.value = '-1';

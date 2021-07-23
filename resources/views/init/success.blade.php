@@ -24,12 +24,12 @@
 
             <div class="d-grid gap-2 mb-3">
                 <a class="btn btn-primary btn-lg" href="{{ route('home') }}" role="button">
-                    <i class="fas fa-home fa-fw"></i>
+                    <i class="fas fa-home fa-fw" aria-hidden="true"></i>
                     Go to the homepage
                 </a>
 
                 <a class="btn btn-primary btn-lg" href="{{ route('admin.index') }}" role="button">
-                    <i class="fas fa-cogs fa-fw"></i>
+                    <i class="fas fa-cogs fa-fw" aria-hidden="true"></i>
                     Go to the admin panel
                 </a>
             </div>

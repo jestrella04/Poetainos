@@ -7,7 +7,7 @@
         <div class="input-group mb-2">
             <div class="input-group-prepend">
                 <div class="input-group-text">
-                    <i class="fa fa-search fa-fw"></i>
+                    <i class="fa fa-search fa-fw" aria-hidden="true"></i>
                 </div>
             </div>
 

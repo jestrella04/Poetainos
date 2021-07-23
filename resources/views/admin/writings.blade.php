@@ -19,7 +19,7 @@
                         id="btn-create-writing"
                         class="btn btn-primary btn-create"
                         title="{{ __('Create new writing') }}">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
@@ -54,18 +54,18 @@
                                 <td class="action-links">
                                     <a href="{{ route('writings.show', $writing) }}"
                                         class="btn">
-                                        <i class="fas fa-fw fa-eye"></i>
+                                        <i class="fas fa-fw fa-eye" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="{{ route('writings.edit', $writing) }}" class="btn">
-                                        <i class="fas fa-fw fa-edit"></i>
+                                        <i class="fas fa-fw fa-edit" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
                                         data-wh-target="{{ route('admin.writings.destroy', $writing) }}"
                                         data-wh-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
-                                        <i class="fas fa-fw fa-trash"></i>
+                                        <i class="fas fa-fw fa-trash" aria-hidden="true"></i>
                                     </a>
                                 </td>
                             </tr>

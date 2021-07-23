@@ -9,7 +9,7 @@
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         aria-label="{{ __('Previous') }}">
-                        <i class="fa fa-chevron-left fa-fw"></i>
+                        <i class="fa fa-chevron-left fa-fw" aria-hidden="true"></i>
                     </a>
                 @else
                     <a class="btn btn-primary"
@@ -18,7 +18,7 @@
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         aria-label="{{ __('Previous') }}">
-                        <i class="fa fa-chevron-left fa-fw"></i>
+                        <i class="fa fa-chevron-left fa-fw" aria-hidden="true"></i>
                     </a>
                 @endif
 
@@ -34,7 +34,7 @@
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         aria-label="{{ __('Next') }}">
-                        <i class="fa fa-chevron-right fa-fw"></i>
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i>
                     </a>
                 @else
                     <a class="btn btn-primary disabled"
@@ -43,7 +43,7 @@
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         aria-label="{{ __('Next') }}">
-                        <i class="fa fa-chevron-right fa-fw"></i>
+                        <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i>
                     </a>
                 @endif
             </div>

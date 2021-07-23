@@ -24,7 +24,7 @@
                         data-bs-toggle="modal"
                         data-bs-target="#admin-categories-form-wrapper"
                         aria-expanded="false">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                                 <td class="action-links">
                                     <a href="{{ route('categories.show', $category) }}"
                                         class="btn">
-                                        <i class="fas fa-fw fa-eye"></i>
+                                        <i class="fas fa-fw fa-eye" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="#"
@@ -65,14 +65,14 @@
                                         data-wh-target-model="category"
                                         data-wh-target-form="#admin-categories-form"
                                         data-wh-target-form-data="{{ $category->toJson() }}">
-                                        <i class="fas fa-fw fa-edit"></i>
+                                        <i class="fas fa-fw fa-edit" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
                                         data-wh-target="{{ route('admin.categories.destroy', $category) }}"
                                         data-wh-warning="{{ __('Deleting a category will not delete associated writings') }}.">
-                                        <i class="fas fa-fw fa-trash"></i>
+                                        <i class="fas fa-fw fa-trash" aria-hidden="true"></i>
                                     </a>
                                 </td>
                             </tr>

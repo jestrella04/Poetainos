@@ -15,7 +15,7 @@
             title="{{ __('Awarded a Golden Flower') }}"
             data-bs-toggle="tooltip"
             data-bs-placement="top">
-            <i class="fas fa-fan fa-fw" style="color:goldenrod"></i>
+            <i class="fas fa-fan fa-fw" style="color:goldenrod" aria-hidden="true"></i>
         </button>
     @endif
 
@@ -35,7 +35,7 @@
         @endif
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-heart fa-fw"></i>
+        <i class="fa fa-heart fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['likes'] }}</span>
     </button>
 
@@ -52,7 +52,7 @@
         data-wh-id="{{ $writing->id }}"
         data-wh-value="0"
         @endif>
-        <i class="fa fa-heart-broken fa-fw"></i>
+        <i class="fa fa-heart-broken fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['downvotes'] }}</span>
     </button> --}}
 
@@ -61,7 +61,7 @@
         title="{{ __('Comments') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-comment fa-fw"></i>
+        <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['comments'] + $count['replies'] }}</span>
     </button>
 
@@ -70,7 +70,7 @@
         title="{{ __('Views') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-book-reader fa-fw"></i>
+        <i class="fa fa-book-reader fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['views'] }}</span>
     </button>
 
@@ -89,7 +89,7 @@
         @endif
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-bookmark fa-fw"></i>
+        <i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['shelf'] }}</span>
     </button>
 
@@ -98,7 +98,7 @@
         title="{{ __('Aura') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-dove fa-fw"></i>
+        <i class="fa fa-dove fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['aura'] }}</span>
     </button>
 
@@ -114,7 +114,7 @@
                 aria-label="{{ __('Share writing :writing', ['writing' => $writing->title]) }}"
                 aria-haspopup="true"
                 aria-expanded="false">
-                <i class="fa fa-share-alt fa-fw"></i>
+                <i class="fa fa-share-alt fa-fw" aria-hidden="true"></i>
             </button>
 
             <div class="dropdown-menu" aria-labelledby="dropdown-share-{{ $writing->id }}">
@@ -122,7 +122,7 @@
                     <a class="dropdown-item {{ $serviceData['class'] }}"
                         href="{{ $serviceData['url'] }}"
                         rel="noopener">
-                        <i class="{{ $serviceData['icon']}}"></i>
+                        <i class="{{ $serviceData['icon']}}" aria-hidden="true"></i>
                         {{ ucfirst($serviceName) }}
                     </a>
                 @endforeach
@@ -142,7 +142,7 @@
                     aria-label="{{ __('Actions') }}"
                     aria-haspopup="true"
                     aria-expanded="false">
-                    <i class="fas fa-cog fa-fw"></i>
+                    <i class="fas fa-cog fa-fw" aria-hidden="true"></i>
                 </button>
 
                 <div class="dropdown-menu" aria-labelledby="dropdown-owner">

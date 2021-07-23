@@ -14,7 +14,7 @@
     <div class="profile-body">
         <dl class="row">
             <dt class="col-sm-3">
-                <i class="fas fa-calendar-check fa-fw"></i>
+                <i class="fas fa-calendar-check fa-fw" aria-hidden="true"></i>
                 {{ __('Registered') }}:
             </dt>
 
@@ -22,7 +22,7 @@
 
             @if (! empty($user->extra_info['location']))
                 <dt class="col-sm-3">
-                    <i class="fas fa-fw fa-map-marker-alt"></i>
+                    <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i>
                     {{ __('Location') }}:
                 </dt>
 
@@ -31,7 +31,7 @@
 
             @if (! empty($user->extra_info['occupation']))
                 <dt class="col-sm-3">
-                    <i class="fas fa-fw fa-toolbox"></i>
+                    <i class="fas fa-fw fa-toolbox" aria-hidden="true"></i>
                     {{ __('Occupation') }}:
                 </dt>
 
@@ -40,7 +40,7 @@
 
             @if (! empty($user->extra_info['interests']))
                 <dt class="col-sm-3">
-                    <i class="fas fa-fw fa-tv"></i>
+                    <i class="fas fa-fw fa-tv" aria-hidden="true"></i>
                     {{ __('Interests') }}:
                 </dt>
 
@@ -49,12 +49,12 @@
 
             @if (! empty($user->extra_info['website']))
                 <dt class="col-sm-3">
-                    <i class="fas fa-fw fa-at"></i>
+                    <i class="fas fa-fw fa-at" aria-hidden="true"></i>
                     {{ __('Website') }}:
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ $user->extra_info['website'] }}" target="_blank">
+                    <a href="{{ $user->extra_info['website'] }}" target="_blank" rel="noopener">
                         {{ $user->extra_info['website'] }}
                     </a>
                 </dd>
@@ -62,12 +62,12 @@
 
             @if (! empty($user->extra_info['social']['twitter']))
                 <dt class="col-sm-3">
-                    <i class="fab fa-fw fa-twitter"></i>
+                    <i class="fab fa-fw fa-twitter" aria-hidden="true"></i>
                     {{ __('Twitter') }}:
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['twitter'], 'twitter') }}" target="_blank">
+                    <a href="{{ getSocialLink($user->extra_info['social']['twitter'], 'twitter') }}" target="_blank" rel="noopener">
                         {{ $user->extra_info['social']['twitter'] }}
                     </a>
                 </dd>
@@ -75,12 +75,12 @@
 
             @if (! empty($user->extra_info['social']['instagram']))
                 <dt class="col-sm-3">
-                    <i class="fab fa-fw fa-instagram"></i>
+                    <i class="fab fa-fw fa-instagram" aria-hidden="true"></i>
                     {{ __('Instagram') }}:
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['instagram'], 'instagram') }}" target="_blank">
+                    <a href="{{ getSocialLink($user->extra_info['social']['instagram'], 'instagram') }}" target="_blank" rel="noopener">
                         {{ $user->extra_info['social']['instagram'] }}
                     </a>
                 </dd>
@@ -88,12 +88,12 @@
 
             @if (! empty($user->extra_info['social']['facebook']))
                 <dt class="col-sm-3">
-                    <i class="fab fa-fw fa-facebook"></i>
+                    <i class="fab fa-fw fa-facebook" aria-hidden="true"></i>
                     {{ __('Facebook') }}:
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['facebook'], 'facebook') }}" target="_blank">
+                    <a href="{{ getSocialLink($user->extra_info['social']['facebook'], 'facebook') }}" target="_blank" rel="noopener">
                         {{ $user->extra_info['social']['facebook'] }}
                     </a>
                 </dd>
@@ -101,12 +101,12 @@
 
             @if (! empty($user->extra_info['social']['youtube']))
                 <dt class="col-sm-3">
-                    <i class="fab fa-fw fa-youtube"></i>
+                    <i class="fab fa-fw fa-youtube" aria-hidden="true"></i>
                     {{ __('Youtube') }}:
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['youtube'], 'youtube') }}" target="_blank">
+                    <a href="{{ getSocialLink($user->extra_info['social']['youtube'], 'youtube') }}" target="_blank" rel="noopener">
                         {{ $user->extra_info['social']['youtube'] }}
                     </a>
                 </dd>
@@ -114,12 +114,12 @@
 
             @if (! empty($user->extra_info['social']['goodreads']))
                 <dt class="col-sm-3">
-                    <i class="fab fa-fw fa-goodreads-g"></i>
+                    <i class="fab fa-fw fa-goodreads-g" aria-hidden="true"></i>
                     {{ __('Goodreads') }}:
                 </dt>
 
                 <dd class="col-sm-9">
-                    <a href="{{ getSocialLink($user->extra_info['social']['goodreads'], 'goodreads') }}" target="_blank">
+                    <a href="{{ getSocialLink($user->extra_info['social']['goodreads'], 'goodreads') }}" target="_blank" rel="noopener">
                         {{ $user->extra_info['social']['goodreads'] }}
                     </a>
                 </dd>
@@ -135,14 +135,14 @@
         <div class="actions">
             @can('update', $user)
                 <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">
-                    <i class="fas fa-user-edit fa-fw"></i>
+                    <i class="fas fa-user-edit fa-fw" aria-hidden="true"></i>
                     {{ __('Update profile') }}
                 </a>
             @endcan
 
             @if ($user->writings()->count() > 0)
                 <a href="{{ $user->writingsPath() }}" class="btn btn-primary">
-                    <i class="fas fa-feather fa-fw"></i>
+                    <i class="fas fa-feather fa-fw" aria-hidden="true"></i>
                     @if (auth()->check() && auth()->user()->is($user))
                         {{ __('My writings') }}
                     @else
@@ -153,7 +153,7 @@
 
             @if ($user->Shelf()->count() > 0)
                 <a href="{{ $user->shelfPath() }}" class="btn btn-primary">
-                    <i class="fas fa-book-reader fa-fw"></i>
+                    <i class="fas fa-book-reader fa-fw" aria-hidden="true"></i>
                     @if (auth()->check() && auth()->user()->is($user))
                         {{ __('My shelf') }}
                     @else

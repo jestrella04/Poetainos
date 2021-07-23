@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeOnSelect: false,
             allowDeselectOption: true,
             hideSelectedOption: true,
-            deselectLabel: '<i class="fas fa-times-circle"></i>',
+            deselectLabel: '<i class="fas fa-times-circle" aria-hidden="true"></i>',
         });
 
         slimSelect.disable();

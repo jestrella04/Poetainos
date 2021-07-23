@@ -6,7 +6,7 @@
         @if (! empty($writing->externalLink()))
             <div class="writing-link">
                 <a href="{{ $writing->externalLink() }}" class="btn btn-link" target="_blank" rel="nofollow">
-                    <i class="fa fa-link fa-fw"></i>
+                    <i class="fa fa-link fa-fw" aria-hidden="true"></i>
                     {{ $writing->externalLink() }}
                 </a>
             </div>

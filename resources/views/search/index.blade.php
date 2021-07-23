@@ -18,7 +18,7 @@
 
             <div class="input-group-append">
                 <button class="btn btn-primary" type="button" id="">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search" aria-hidden="true"></i>
                 </button>
             </div>
         </div>

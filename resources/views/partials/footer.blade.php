@@ -6,7 +6,7 @@
                     title="{{ __('Follow us on Twitter') }}"
                     aria-label="{{ __('Follow us on Twitter') }}"
                     data-bs-toggle="tooltip">
-                    <i class="fab fa-twitter fa-fw"></i>
+                    <i class="fab fa-twitter fa-fw" aria-hidden="true"></i>
                 </a>
             @endif
 
@@ -15,7 +15,7 @@
                     title="{{ __('Join us on Facebook') }}"
                     aria-label="{{ __('Join us on Facebook') }}"
                     data-bs-toggle="tooltip">
-                    <i class="fab fa-facebook fa-fw"></i>
+                    <i class="fab fa-facebook fa-fw" aria-hidden="true"></i>
                 </a>
             @endif
 
@@ -24,7 +24,7 @@
                     title="{{ __('Follow us on Instagram') }}"
                     aria-label="{{ __('Follow us on Instagram') }}"
                     data-bs-toggle="tooltip">
-                    <i class="fab fa-instagram fa-fw"></i>
+                    <i class="fab fa-instagram fa-fw" aria-hidden="true"></i>
                 </a>
             @endif
 
@@ -33,7 +33,7 @@
                     title="{{ __('Join us on Youtube') }}"
                     aria-label="{{ __('Join us on Youtube') }}"
                     data-bs-toggle="tooltip">
-                    <i class="fab fa-youtube fa-fw"></i>
+                    <i class="fab fa-youtube fa-fw" aria-hidden="true"></i>
                 </a>
             @endif
 
@@ -42,7 +42,7 @@
                     title="{{ __('Join our Telegram channel') }}"
                     aria-label="{{ __('Join our Telegram channel') }}"
                     data-bs-toggle="tooltip">
-                    <i class="fab fa-telegram-plane fa-fw"></i>
+                    <i class="fab fa-telegram-plane fa-fw" aria-hidden="true"></i>
                 </a>
             @endif
         </div>
@@ -70,7 +70,7 @@
             data-bs-toggle="tooltip"
             data-bs-placement="left"
             aria-label="{{ __('Back to top') }}">
-            <i class="fas fa-chevron-up"></i>
+            <i class="fas fa-chevron-up" aria-hidden="true"></i>
         </button>
     </div>
 </footer>

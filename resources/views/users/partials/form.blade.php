@@ -11,7 +11,7 @@
             <span class="avatar-chooser" data-wh-target="#avatar">
                 <img src="{{ $avatarSrc }}" alt="" class="avatar avatar-xxl avatar-preview">
 
-                <i class="fas fa-camera"></i>
+                <i class="fas fa-camera" aria-hidden="true"></i>
             </span>
 
             <div>

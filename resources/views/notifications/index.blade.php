@@ -32,7 +32,7 @@
                             class="btn btn-light btn-push push-enable d-none"
                             title="{{ __('Enable push notifications') }}"
                             data-bs-toggle="tooltip">
-                            <i class="fas fa-bell"></i>
+                            <i class="fas fa-bell" aria-hidden="true"></i>
                         </button>
 
                         <button
@@ -40,12 +40,12 @@
                             class="btn btn-light btn-push push-disable d-none"
                             title="{{ __('Disable push notifications') }}"
                             data-bs-toggle="tooltip">
-                            <i class="far fa-bell-slash"></i>
+                            <i class="far fa-bell-slash" aria-hidden="true"></i>
                         </button>
 
                         @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
                         <button type="submit" class="btn btn-light" title="{{ __('Mark all as read') }}" data-bs-toggle="tooltip">
-                            <i class="fas fa-check-double"></i>
+                            <i class="fas fa-check-double" aria-hidden="true"></i>
                         </button>
                         @endif
                     </div>

@@ -34,7 +34,7 @@
                         title="{{ __('Login with email') }}"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top">
-                        <i class="fas fa-fw fa-at"></i>
+                        <i class="fas fa-fw fa-at" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
@@ -61,14 +61,14 @@
         </div>
 
         <div id="loading-comments" class="text-center">
-            <i class="fa fa-spinner fa-5x fa-spin"></i>
+            <i class="fa fa-spinner fa-5x fa-spin" aria-hidden="true"></i>
             <p>{{ __('Loading comments') }}</p>
         </div>
     @else
         <div class="comments-empty">
             <p>{{ __('Do you like this writing?') }}</p>
             <p class="text-muted">{{ __('Be the first to leave a comment.') }}</p>
-            <i class="fas fa-comment fa-5x"></i>
+            <i class="fas fa-comment fa-5x" aria-hidden="true"></i>
         </div>
     @endif
 

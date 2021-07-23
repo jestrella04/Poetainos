@@ -8,7 +8,7 @@
         title="{{ __('Writings') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-feather fa-fw"></i>
+        <i class="fa fa-feather fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['writings'] }}</span>
     </button>
 
@@ -17,7 +17,7 @@
         title="{{ __('Golden Flowers') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fas fa-fan fa-fw"></i>
+        <i class="fas fa-fan fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['flowers'] }}</span>
     </button>
 
@@ -26,7 +26,7 @@
         title="{{ __('Comments') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-comment fa-fw"></i>
+        <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['comments'] + $count['replies'] }}</span>
     </button>
 
@@ -35,7 +35,7 @@
         title="{{ __('Likes') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fas fa-heart fa-fw"></i>
+        <i class="fas fa-heart fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['votes']   }}</span>
     </button>
 
@@ -44,7 +44,7 @@
         title="{{ __('Profile views') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-eye fa-fw"></i>
+        <i class="fa fa-eye fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['views']  }}</span>
     </button>
 
@@ -53,7 +53,7 @@
         title="{{ __('Shelved writings') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-book-reader fa-fw"></i>
+        <i class="fa fa-book-reader fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['shelf']  }}</span>
     </button>
 
@@ -62,7 +62,7 @@
             title="{{ __('User hood') }}"
             data-bs-toggle="tooltip"
             data-bs-placement="top">
-        <i class="fa fa-user-friends fa-fw"></i>
+        <i class="fa fa-user-friends fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['hood'] }}</span>
     </button>
 
@@ -71,7 +71,7 @@
         title="{{ __('Extended hood') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-users fa-fw"></i>
+        <i class="fa fa-users fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['extendedHood'] }}</span>
     </button> --}}
 
@@ -80,7 +80,7 @@
         title="{{ __('Aura') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fas fa-dove fa-fw"></i>
+        <i class="fas fa-dove fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['aura'] }}</span>
     </button>
 </div>

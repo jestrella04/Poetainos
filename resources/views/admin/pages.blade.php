@@ -22,7 +22,7 @@
                         data-bs-toggle="modal"
                         data-bs-target="#admin-pages-form-wrapper"
                         aria-expanded="false">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                                 <td class="action-links">
                                     <a href="{{ route('pages.show', $page) }}"
                                         class="btn">
-                                        <i class="fas fa-fw fa-eye"></i>
+                                        <i class="fas fa-fw fa-eye" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="#"
@@ -59,13 +59,13 @@
                                         data-wh-target-model="page"
                                         data-wh-target-form="#admin-pages-form"
                                         data-wh-target-form-data="{{ $page->toJson() }}">
-                                        <i class="fas fa-fw fa-edit"></i>
+                                        <i class="fas fa-fw fa-edit" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
                                         data-wh-target="{{ route('admin.pages.destroy', $page) }}">
-                                        <i class="fas fa-fw fa-trash"></i>
+                                        <i class="fas fa-fw fa-trash" aria-hidden="true"></i>
                                     </a>
                                 </td>
                             </tr>

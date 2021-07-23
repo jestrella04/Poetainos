@@ -79,7 +79,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getName()
     {
-        if (! empty($this->name)) return $this->name;
+        if (! empty($this->name)) {
+            return $this->name;
+        }
 
         return $this->username;
     }

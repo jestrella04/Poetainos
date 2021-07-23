@@ -8,6 +8,6 @@
     </p>
 
     <span class="empty-icon">
-        <i class="fas fa-@yield('empty-icon', 'sad-tear')"></i>
+        <i class="fas fa-@yield('empty-icon', 'sad-tear')" aria-hidden="true"></i>
     </span>
 </div>

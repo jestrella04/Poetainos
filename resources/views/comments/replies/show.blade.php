@@ -8,13 +8,13 @@
     <div class="reply-body flex-grow-1">
         <div class="author">
             <small>
-                <i class="fa fa-user"></i>
+                <i class="fa fa-user" aria-hidden="true"></i>
                 {{ __('by') }}
                 {{ $reply->author->getName() }}
             </small>
 
             <small>
-                <i class="fa fa-calendar"></i>
+                <i class="fa fa-calendar" aria-hidden="true"></i>
                 {{ Carbon\Carbon::parse($reply->created_at)->diffForHumans() }}
             </small>
         </div>

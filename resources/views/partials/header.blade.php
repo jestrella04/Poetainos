@@ -6,7 +6,7 @@
         <h1 class="display-1">{{ getSiteConfig('name') }}</h1>
         <p class="lead">{{ getSiteConfig('slogan') }}</p>
         <a id="jump-to-nav" href="#nav-main" aria-label="{{ __('Jump to the main content') }}">
-            <i class="fas fa-chevron-down fa-3x"></i>
+            <i class="fas fa-chevron-down fa-3x" aria-hidden="true"></i>
         </a>
     </div>
     @endif

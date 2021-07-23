@@ -23,7 +23,7 @@
                         data-bs-target="#tag-form-wrapper"
                         aria-expanded="false"
                         disabled>
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -53,19 +53,19 @@
                                 <td class="action-links">
                                     <a href="{{ route('tags.show', $tag) }}"
                                         class="btn">
-                                        <i class="fas fa-fw fa-eye"></i>
+                                        <i class="fas fa-fw fa-eye" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="#"
                                         class="admin-edit btn" disabled>
-                                        <i class="fas fa-fw fa-edit"></i>
+                                        <i class="fas fa-fw fa-edit" aria-hidden="true"></i>
                                     </a>
 
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
                                         data-wh-target="{{ route('admin.tags.destroy', $tag) }}"
                                         data-wh-warning="{{ __('Deleting a tag will not delete associated writings') }}.">
-                                        <i class="fas fa-fw fa-trash"></i>
+                                        <i class="fas fa-fw fa-trash" aria-hidden="true"></i>
                                     </a>
                                 </td>
                             </tr>

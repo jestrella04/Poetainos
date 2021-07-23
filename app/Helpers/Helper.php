@@ -7,8 +7,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-function getSiteConfig($path = '') {
-    if (! empty($path)) {
+function getSiteConfig($path = '')
+{
+    if (!empty($path)) {
         $path = config('writerhood.' . $path);
     } else {
         $path = config('writerhood');
@@ -21,7 +22,8 @@ function getSiteConfig($path = '') {
     }
 }
 
-function getSocialLink($user, $network) {
+function getSocialLink($user, $network)
+{
     $url = '';
 
     switch ($network) {
@@ -53,7 +55,8 @@ function getSocialLink($user, $network) {
     return $url;
 }
 
-function slugify($table, $title, $column = 'slug', $separator = '-') {
+function slugify($table, $title, $column = 'slug', $separator = '-')
+{
     // Normalize the title
     $slug = Str::of($title)->slug($separator);
 
@@ -62,7 +65,7 @@ function slugify($table, $title, $column = 'slug', $separator = '-') {
     $allSlugs = getRelatedIdentifiers($table, $slug, $column);
 
     // If we haven't used it before then we are all good.
-    if (! $allSlugs->contains($column, $slug)){
+    if (!$allSlugs->contains($column, $slug)) {
         return $slug;
     }
 
@@ -70,7 +73,7 @@ function slugify($table, $title, $column = 'slug', $separator = '-') {
     for ($i = 1; $i <= 10; $i++) {
         $newSlug = $slug . $separator . $i;
 
-        if (! $allSlugs->contains($column, $newSlug)) {
+        if (!$allSlugs->contains($column, $newSlug)) {
             return $newSlug;
         }
     }
@@ -78,14 +81,16 @@ function slugify($table, $title, $column = 'slug', $separator = '-') {
     throw new \Exception('Can not create a unique slug');
 }
 
-function getRelatedIdentifiers($table, $slug, $column) {
+function getRelatedIdentifiers($table, $slug, $column)
+{
     return DB::table($table)
         ->select($column)
         ->where($column, 'like', $slug . '%')
         ->get();
 }
 
-function getWritingCounter($writing) {
+function getWritingCounter($writing)
+{
     return [
         'likes' => ReadableHumanNumber($writing->votes->where('vote', '>', 0)->count()),
         //'dislikes' => ReadableHumanNumber($writing->votes->where('vote', 0)->count()),
@@ -97,14 +102,15 @@ function getWritingCounter($writing) {
     ];
 }
 
-function getUserCounter($user) {
+function getUserCounter($user)
+{
     return [
         'writings' => ReadableHumanNumber($user->writings()->count()),
         'flowers' => ReadableHumanNumber($user->writings()->whereNotNull('home_posted_at')->count()),
         'comments' => ReadableHumanNumber($user->comments()->count()),
         'replies' => ReadableHumanNumber($user->replies()->count()),
         'votes' => ReadableHumanNumber($user->votes()->count()),
-        'views' => ReadableHumanNumber($user->profile_views ),
+        'views' => ReadableHumanNumber($user->profile_views),
         'shelf' => ReadableHumanNumber($user->shelf()->count()),
         'hood' => ReadableHumanNumber($user->hood()->count()),
         'extendedHood' => ReadableHumanNumber($user->fellowHood($count = true)),
@@ -112,38 +118,59 @@ function getUserCounter($user) {
     ];
 }
 
-function getUserAvatar(User $user, $size = 'md') {
-    if (! empty($user->avatarPath())) {
-        return '<img class="avatar avatar-'. $size .'" src="'. e($user->avatarPath()) .'" alt="'. e($user->getName()) .'" loading="lazy">' . PHP_EOL;
+function getUserAvatar(User $user, $size = 'md')
+{
+    if (!empty($user->avatarPath())) {
+        return '<img class="avatar avatar-' . $size . '" src="' . e($user->avatarPath()) . '" alt="' . e($user->getName()) . '" loading="lazy">' . PHP_EOL;
     } else {
-        return '<span class="avatar avatar-'. $size .'">'. e($user->initials()) .'</span>' . PHP_EOL;
+        return '<span class="avatar avatar-' . $size . '">' . e($user->initials()) . '</span>' . PHP_EOL;
     }
 }
 
-function getNotificationMessage($notification) {
+function getNotificationMessage($notification)
+{
     switch ($notification->type) {
         case 'App\Notifications\WritingCommented':
-            return __(':name has added a comment on your writing', ['name' => User::find($notification->data['user_id'])->getName()]);
+            $message = __(':name has added a comment on your writing', [
+                'name' => User::find($notification->data['user_id'])->getName(),
+            ]);
+            break;
 
         case 'App\Notifications\WritingFeatured':
-            return __('Your writing has been awarded with a Golden Flower');
+            $message = __('Your writing has been awarded with a Golden Flower');
+            break;
 
         case 'App\Notifications\WritingLiked':
-            return __(':name has liked your writing', ['name' => User::find($notification->data['user_id'])->getName()]);
+            $message = __(':name has liked your writing', [
+                'name' => User::find($notification->data['user_id'])->getName(),
+            ]);
+            break;
 
         case 'App\Notifications\WritingReplied':
-            return __(':name has posted a reply to one of your comments', ['name' => User::find($notification->data['user_id'])->getName()]);
+            $message = __(':name has posted a reply to one of your comments', [
+                'name' => User::find($notification->data['user_id'])->getName(),
+            ]);
+            break;
 
         case 'App\Notifications\WritingShelved':
-            return __(':name has added your writing to his shelf', ['name' => User::find($notification->data['user_id'])->getName()]);
+            $message = __(':name has added your writing to his shelf', [
+                'name' => User::find($notification->data['user_id'])->getName(),
+            ]);
+            break;
+
+        default:
+            $message = false;
     }
+
+    return $message;
 }
 
-function getPageTitle(Array $titleParts, $separator = '–') {
+function getPageTitle(array $titleParts, $separator = '–')
+{
     $titleParts[] = getSiteConfig('name');
     $title = [];
 
-    foreach($titleParts as $part) {
+    foreach ($titleParts as $part) {
         $title[] = ucfirst($part);
     }
 
@@ -151,13 +178,14 @@ function getPageTitle(Array $titleParts, $separator = '–') {
     return trim(implode(' ' . $separator . ' ', $title), ' ');
 }
 
-function linkify($string) {
+function linkify($string)
+{
     $pattern = '/\(?(?:(http|https):\\/\\/)?(?:((?:[^\W\s]|\.|-|[:]{1})+)@{1})?((?:www.)?(?:[^\W\s]|\.|-)+[\.][^\W\s]{2,4}|localhost(?=\\/)|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::(\d*))?([\\/]?[^\s\?]*[\\/]{1})*(?:\\/?([^\s\n\?\[\]\{\}\#]*(?:(?=\.)){1}|[^\s\n\?\[\]\{\}\.\#]*)?([\.]{1}[^\s\?\#]*)?)?(?:\?{1}([^\s\n\#\[\]]*))?([\#][^\s\n]*)?\)?/';
 
-    return preg_replace_callback($pattern, function($matches) {
+    return preg_replace_callback($pattern, function ($matches) {
         $emailPattern = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
         $isEmail = preg_match($emailPattern, $matches[0]) ? 'mailto:' : '';
 
-        return '<a href="'. $isEmail . $matches[0] .'" target="_blank" title="'. $matches[0] .'">'. Str::limit($matches[0], 50) .'</a>';
+        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="' . $matches[0] . '">' . Str::limit($matches[0], 50) . '</a>';
     }, $string);
 }

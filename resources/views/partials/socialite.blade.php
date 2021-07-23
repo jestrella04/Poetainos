@@ -3,7 +3,7 @@
     title="{{ __('Login with Facebook') }}"
     data-bs-toggle="tooltip"
     data-bs-placement="top">
-    <i class="fab fa-fw fa-facebook-f"></i>
+    <i class="fab fa-fw fa-facebook-f" aria-hidden="true"></i>
 </a>
 
 <a href="{{ route('social.login', 'twitter') }}"
@@ -11,7 +11,7 @@
     title="{{ __('Login with Twitter') }}"
     data-bs-toggle="tooltip"
     data-bs-placement="top">
-    <i class="fab fa-fw fa-twitter"></i>
+    <i class="fab fa-fw fa-twitter" aria-hidden="true"></i>
 </a>
 
 <a href="{{ route('social.login', 'google') }}"
@@ -19,5 +19,5 @@
     title="{{ __('Login with Google') }}"
     data-bs-toggle="tooltip"
     data-bs-placement="top">
-    <i class="fab fa-fw fa-google"></i>
+    <i class="fab fa-fw fa-google" aria-hidden="true"></i>
 </a>
