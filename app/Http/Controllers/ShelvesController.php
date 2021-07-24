@@ -29,7 +29,7 @@ class ShelvesController extends Controller
         $old = Shelf::where('user_id', $userId)->where('writing_id', $writingId)->count();
 
         if (0 === $old) {
-            $new = Shelf::create([
+            Shelf::create([
                 'writing_id' => $writingId,
                 'user_id' => $userId,
             ]);

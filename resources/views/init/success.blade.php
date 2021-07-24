@@ -12,7 +12,7 @@
                 border: 1px solid #e3e3e3;
                 background-color: #ededed">
         <div class="logo text-center mb-4">
-            <img src="{{ mix('/static/images/logo.svg') }}" width="96" height="96">
+            <img src="{{ mix('/static/images/logo.svg') }}" width="96" height="96" alt="">
             <h1>{{ config('app.name') }}</h1>
             <p class="lead">Database Initialization</p>
         </div>
