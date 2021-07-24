@@ -636,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     postCommentSuccess.classList.remove('d-none');
                     postCommentError.classList.add('d-none');
 
-                    if (null !== commentsEmpty && '' !== commentsEmpty) {
+                    if (null !== commentsEmpty && undefined !== commentsEmpty) {
                         commentsEmpty.classList.add('d-none');
                     }
                 })
