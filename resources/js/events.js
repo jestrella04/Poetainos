@@ -14,7 +14,7 @@ document.body.appendChild(installComponent);
 document.body.appendChild(updateComponent);
 
 installComponent.manifestpath = '/manifest.json';
-installComponent.explainer = 'Puedes instalar esta aplicacion web en tu dispositivo y disfrutar de una experiencia nativa en tu sistema.';
+installComponent.explainer = 'Puedes instalar esta aplicacion web en tu dispositivo y disfrutar de una experiencia nativa.';
 installComponent.featuresheader = 'Funcionalidades Principales';
 installComponent.descriptionheader = 'Descripción';
 installComponent.installbuttontext = 'Instalar';
@@ -232,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Enable push notifications
         if (element.classList.contains('push-enable')) {
+            event.preventDefault();
             push.subscribe();
             document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
                 pushBtn.classList.add('d-none');
@@ -243,6 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Disable push notifications
         if (element.classList.contains('push-disable')) {
+            event.preventDefault();
             push.unsubscribe();
             document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
                 pushBtn.classList.add('d-none');

@@ -24,30 +24,39 @@
                     <h2 class="all-caps">{{ __('Notifications') }}</h2>
                 </div>
 
-                <form action="{{ route('notifications.clear') }}" method="post">
+                <form action="{{ route('notifications.clear') }}" method="post" name="notifications.clear">
                     @csrf
-                    <div class="btn-group actions" role="group" aria-label="{{ __('Notification actions') }}">
+                    <div class="dropdown">
                         <button
+                            class="btn btn-light"
                             type="button"
-                            class="btn btn-light btn-push push-enable d-none"
-                            title="{{ __('Enable push notifications') }}"
-                            data-bs-toggle="tooltip">
-                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            data-bs-toggle="dropdown"
+                            role="menu"
+                            aria-label="{{ __('Notification actions') }}"
+                            aria-expanded="false">
+                            <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
                         </button>
 
-                        <button
-                            type="button"
-                            class="btn btn-light btn-push push-disable d-none"
-                            title="{{ __('Disable push notifications') }}"
-                            data-bs-toggle="tooltip">
-                            <i class="far fa-bell-slash" aria-hidden="true"></i>
-                        </button>
-
-                        @if ('unread' === (request('filter') ?? 'unread') && $notifications->count() > 0)
-                        <button type="submit" class="btn btn-light" title="{{ __('Mark all as read') }}" data-bs-toggle="tooltip">
-                            <i class="fas fa-check-double" aria-hidden="true"></i>
-                        </button>
-                        @endif
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            <li>
+                                <a class="dropdown-item btn-push push-enable d-none" href="#">
+                                    <i class="fas fa-bell" aria-hidden="true"></i>
+                                    {{ __('Enable push notifications') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item btn-push push-disable d-none" href="#">
+                                    <i class="fas fa-bell-slash" aria-hidden="true"></i>
+                                    {{ __('Disable push notifications') }}
+                                </a>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" type="submit">
+                                    <i class="fas fa-check-double" aria-hidden="true"></i>
+                                    {{ __('Mark all as read') }}
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                 </form>
             </div>
