@@ -53,7 +53,7 @@
         title="{{ __('Shelved writings') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
-        <i class="fa fa-book-reader fa-fw" aria-hidden="true"></i>
+        <i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['shelf']  }}</span>
     </button>
 

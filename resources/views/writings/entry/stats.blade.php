@@ -142,7 +142,7 @@
                     aria-label="{{ __('Actions') }}"
                     aria-haspopup="true"
                     aria-expanded="false">
-                    <i class="fas fa-cog fa-fw" aria-hidden="true"></i>
+                    <i class="fas fa-ellipsis-v fa-fw" aria-hidden="true"></i>
                 </button>
 
                 <div class="dropdown-menu" aria-labelledby="dropdown-owner">
