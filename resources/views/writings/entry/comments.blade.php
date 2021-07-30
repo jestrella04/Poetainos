@@ -66,7 +66,7 @@
         </div>
     @else
         <div class="comments-empty">
-            <p>{{ __('Do you like this writing?') }}</p>
+            <p>{{ __('What do you think?') }}</p>
             <p class="text-muted">{{ __('Be the first to leave a comment.') }}</p>
             <i class="fas fa-comment fa-5x" aria-hidden="true"></i>
         </div>

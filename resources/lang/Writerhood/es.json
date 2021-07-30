@@ -79,7 +79,7 @@
     "Login with email": "Ingresar con tu correo",
     "Load older comments": "Cargar antiguos comentarios",
     "Loading comments": "Cargando comentarios",
-    "Do you like this writing?": "¿Te gusta este texto?",
+    "What do you think?": "¿Qué te ha parecido?",
     "Be the first to leave a comment.": "Se el primero en dejar un comentario.",
     "by": "por",
     "Read more": "Seguir leyendo",
@@ -258,5 +258,8 @@
     "You have no notifications at this time": "No tienes notificaciones en este momento",
     "Reply": "Responder",
     "Leave your reply here": "Deja tu respuesta aquí",
-    "Post Reply": "Enviar Respuesta"
+    "Post Reply": "Enviar Respuesta",
+    "Links": "Enlaces",
+    "Get the app": "Descarga la app",
+    "Follow us at": "Síguenos en"
 }
