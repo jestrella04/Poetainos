@@ -92,5 +92,32 @@
                 }
             }
         }
+    },
+    "stores": {
+        "Google Play": {
+            "value": "",
+            "icon": "fab fa-google-play",
+            "description": "URL to get the application on Google Play."
+        },
+        "AppStore": {
+            "value": "",
+            "icon": "fab fa-apple",
+            "description": "URL to get the application on Apple AppStore."
+        },
+        "Microsoft Store": {
+            "value": "",
+            "icon": "fab fa-microsoft",
+            "description": "URL to get the application on Microsoft Store."
+        },
+        "AppGallery": {
+            "value": "",
+            "icon": "fas fa-shopping-bag",
+            "description": "URL to get the application on Huawei AppGallery."
+        },
+        "Samsung Finder": {
+            "value": "",
+            "icon": "fas fa-shopping-bag",
+            "description": "URL to get the application on Samsung Finder."
+        }
     }
 }

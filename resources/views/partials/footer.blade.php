@@ -25,19 +25,16 @@
                 <p class="column-title">{{ __('Get the app') }}</p>
 
                 <div class="d-flex flex-column gap-2">
+                    @foreach (getSiteConfig('stores') as $store => $info)
+                        @if (! empty($info['value']))
                     <div>
-                        <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.poetainos.twa" target="_blank" rel="noopener">
-                            <i class="fab fa-google-play fa-fw" aria-hidden="true"></i>
-                            Google Play
+                        <a class="btn btn-primary text-nowrap" href="{{ $info['value'] }}" target="_blank" rel="noopener">
+                            <i class="{{ $info['icon'] }} fa-fw" aria-hidden="true"></i>
+                            {{ $store }}
                         </a>
                     </div>
-
-                    {{-- <div>
-                        <a class="btn btn-primary" href="http://" target="_blank" rel="noopener">
-                            <i class="fab fa-microsoft fa-fw" aria-hidden="true"></i>
-                            Microsoft Store
-                        </a>
-                    </div> --}}
+                        @endif
+                    @endforeach
                 </div>
             </div>
 
