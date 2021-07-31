@@ -16,6 +16,7 @@
 
 @section('main')
     <div id="notifications-main-content" class="main-content">
+        @include('notifications.partials.settings')
         @include('notifications.partials.toplinks')
 
         <div class="user-notifications">
@@ -39,17 +40,12 @@
 
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                             <li>
-                                <a class="dropdown-item btn-push push-enable d-none" href="#">
-                                    <i class="fas fa-bell" aria-hidden="true"></i>
-                                    {{ __('Enable push notifications') }}
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#notifications-settings">
+                                    <i class="fas fa-sliders-h" aria-hidden="true"></i>
+                                    {{ __('Notifications settings') }}
                                 </a>
                             </li>
-                            <li>
-                                <a class="dropdown-item btn-push push-disable d-none" href="#">
-                                    <i class="fas fa-bell-slash" aria-hidden="true"></i>
-                                    {{ __('Disable push notifications') }}
-                                </a>
-                            </li>
+
                             <li>
                                 <button class="dropdown-item" type="submit">
                                     <i class="fas fa-check-double" aria-hidden="true"></i>

@@ -9,10 +9,12 @@ import autoGrow, { initializeTextAreaAutoGrow } from '@ivanhanak_com/js-textarea
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
 const updateComponent = document.createElement('pwa-update');
+const isInstalled = installComponent.getInstalledStatus();
 
 document.body.appendChild(installComponent);
 document.body.appendChild(updateComponent);
 
+// Customizing displayed messages
 installComponent.manifestpath = '/manifest.json';
 installComponent.explainer = 'Puedes instalar esta aplicacion web en tu dispositivo y disfrutar de una experiencia nativa.';
 installComponent.featuresheader = 'Funcionalidades Principales';
@@ -20,7 +22,7 @@ installComponent.descriptionheader = 'Descripción';
 installComponent.installbuttontext = 'Instalar';
 installComponent.cancelbuttontext = 'Cancelar';
 installComponent.iosinstallinfotext = 'Presiona el botón compartir y después "Añadir a la pantalla principal"';
-installComponent.getInstalledStatus();
+updateComponent.updatemessage = "Hay una actualización disponible";
 
 // Wait for the page to be fully loaded
 window.addEventListener('load', () => {
@@ -42,7 +44,10 @@ window.addEventListener('load', () => {
 document.addEventListener('DOMContentLoaded', () => {
     // Check for user session
     let userToken = document.querySelector('meta[name="user-token"]');
-    if (null !== userToken && undefined !== userToken) userToken = atob(userToken.content);
+
+    if (null !== userToken && undefined !== userToken) {
+        userToken = atob(userToken.content);
+    }
 
     // Enable scrolling on the document
     document.body.classList.remove('overflow-hidden');
@@ -144,18 +149,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Check if subscribed to push notifications
+    // Push buttons
     let pushEnable = document.querySelector('.push-enable');
     let pushDisable = document.querySelector('.push-disable');
 
+    // Managing push subscriptions
     navigator.serviceWorker.ready.then(registration => {
         registration.pushManager.getSubscription()
             .then(subscription => {
+                // Keep subscription in sync with server
+                if (subscription) {
+                    push.subscribe();
+                }
+
+                // Hide the push disable button
                 if (subscription && null !== pushDisable && undefined !== pushDisable) {
                     pushDisable.classList.remove('d-none');
                 }
 
-                if (! subscription && null !== pushEnable && undefined !== pushEnable) {
+                // Hide the push enable button
+                if (!subscription && null !== pushEnable && undefined !== pushEnable) {
                     pushEnable.classList.remove('d-none');
                 }
             })

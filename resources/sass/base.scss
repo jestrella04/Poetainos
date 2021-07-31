@@ -338,15 +338,34 @@ pwa-install {
     left: 1rem;
     bottom: 1rem;
     z-index: 9997;
-    color: var(--dark);
-    --install-button-color: var(--primary);
+    color: var(--bs-dark);
+    --install-button-color: var(--bs-primary);
     --modal-z-index: 99999;
     --modal-background-index: 99998;
-    --modal-background-color: var(--white);
+    --modal-background-color: var(--bs-white);
+}
+
+pwa-update {
+    --button-background: var(--bs-primary);
 }
 
 pwa-install::part(openButton) {
-    @extend .btn;
-    @extend .btn-sm;
-    @extend .btn-primary;
+    @extend .btn, .btn-sm, .btn-primary;
+}
+
+pwa-update::part(updateToast),
+pwa-update::part(offlineToast) {
+    @extend .alert, .alert-primary;
+    position: fixed;
+    bottom: 1rem;
+    right: 2rem;
+    font-weight: 300;
+    max-width: 100%;
+    z-index: 9999;
+
+    @include media-breakpoint-down(sm) {
+        min-width: unset;
+        right: 0.5rem;
+        left: 0.5rem;
+    }
 }
