@@ -1,4 +1,4 @@
-section.header {
+header {
     display: flex;
     flex-direction: column;
     color: $white;
@@ -21,7 +21,7 @@ section.header {
         flex-direction: column;
         text-align: center;
 
-        #jump-to-nav {
+        .jump-to-nav {
             color: rgba($white, 0.3);
             position: absolute;
             bottom: 3rem;
@@ -29,13 +29,13 @@ section.header {
     }
 }
 
-#hero {
+header.hero {
     .welcome {
         height: 100vh;
     }
 }
 
-#header {
+header.standard {
     height: 300px;
 }
 

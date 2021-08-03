@@ -11,8 +11,8 @@ const installComponent = document.createElement('pwa-install');
 const updateComponent = document.createElement('pwa-update');
 const isInstalled = installComponent.getInstalledStatus();
 
-document.body.appendChild(installComponent);
-document.body.appendChild(updateComponent);
+document.querySelector('footer').appendChild(installComponent);
+document.querySelector('footer').appendChild(updateComponent);
 
 // Customizing displayed messages
 installComponent.manifestpath = '/manifest.json';
@@ -267,15 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.push-enable').classList.remove('d-none');
         }
 
-        // Scroll to the top of the document
-        if (element.hasAttribute('id') && 'back-to-top' === element.attributes['id'].value) {
-            element.dispatchEvent(new Event('focusout', { bubbles: true }));
-            document.querySelector('body').scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-
         // Scroll to the main nav
-        if (element.hasAttribute('id') && 'jump-to-nav' === element.attributes['id'].value) {
-            event.preventDefault();
+        if (element.classList.contains('jump-to-nav')) {
+            element.dispatchEvent(new Event('focusout', { bubbles: true }));
             document.querySelector('#nav-main').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -843,7 +837,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen to the window scroll event and act accordingly
     window.addEventListener('scroll', (event) => {
-        let header = document.querySelector('.header');
+        let header = document.querySelector('header');
         let mainWrapper = document.querySelector('.main-wrapper');
         let jumpToMainNav = document.querySelector('#jump-to-nav');
         let jumpToHeader = document.querySelector('#back-to-top-wrapper');

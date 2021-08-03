@@ -8,7 +8,8 @@
                         title="{{ __('Previous') }}"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        aria-label="{{ __('Previous') }}">
+                        aria-label="{{ __('Previous') }}"
+                        role="button">
                         <i class="fa fa-chevron-left fa-fw" aria-hidden="true"></i>
                     </a>
                 @else
@@ -17,12 +18,13 @@
                         title="{{ __('Previous') }}"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        aria-label="{{ __('Previous') }}">
+                        aria-label="{{ __('Previous') }}"
+                        role="button">
                         <i class="fa fa-chevron-left fa-fw" aria-hidden="true"></i>
                     </a>
                 @endif
 
-                <span class="btn btn-primary disabled">
+                <span class="btn btn-primary disabled" aria-disabled="true">
                     <small>{{ __('Page :page', ['page' => $paginator->currentPage()]) }}</small>
                 </span>
 
@@ -33,7 +35,8 @@
                         title="{{ __('Next') }}"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        aria-label="{{ __('Next') }}">
+                        aria-label="{{ __('Next') }}"
+                        role="button">
                         <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i>
                     </a>
                 @else
@@ -42,7 +45,8 @@
                         title="{{ __('Next') }}"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        aria-label="{{ __('Next') }}">
+                        aria-label="{{ __('Next') }}"
+                        role="button">
                         <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i>
                     </a>
                 @endif

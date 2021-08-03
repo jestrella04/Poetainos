@@ -16,6 +16,7 @@
             data-bs-toggle="tooltip"
             data-bs-placement="top">
             <i class="fas fa-fan fa-fw" style="color:goldenrod" aria-hidden="true"></i>
+            <span class="visually-hidden">{{ __('Awarded a Golden Flower') }}</span>
         </button>
     @endif
 

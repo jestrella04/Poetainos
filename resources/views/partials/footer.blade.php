@@ -13,12 +13,12 @@
             <div class="pages footer-column">
                 <p class="column-title">{{ __('Links') }}</p>
 
-                <nav class="nav flex-column">
+                <div class="nav flex-column">
                     @foreach (App\Page::all() as $page)
                     <a class="nav-link" href="{{ route('pages.show', $page->slug ) }}">{{ $page->title }}</a>
                     @endforeach
                     <a class="nav-link" href="{{ route('contact.create') }}">{{ __('Contact form') }}</a>
-                </nav>
+                </div>
             </div>
 
             <div class="apps footer-column">
@@ -28,7 +28,7 @@
                     @foreach (getSiteConfig('stores') as $store => $info)
                         @if (! empty($info['value']))
                     <div>
-                        <a class="btn btn-primary text-nowrap" href="{{ $info['value'] }}" target="_blank" rel="noopener">
+                        <a class="btn btn-primary btn-sm text-nowrap" href="{{ $info['value'] }}" target="_blank" rel="noopener">
                             <i class="{{ $info['icon'] }} fa-fw" aria-hidden="true"></i>
                             {{ $store }}
                         </a>
@@ -41,7 +41,7 @@
             <div class="social-links footer-column">
                 <p class="column-title">{{ __('Follow us at') }}</p>
 
-                <nav class="nav flex-column">
+                <div class="nav flex-column">
                     @foreach (getSiteConfig('social') as $site => $info)
                     <a class="nav-link"
                         href="{{ getSocialLink($info['value'], $site) }}"
@@ -51,7 +51,7 @@
                         {{ ucfirst($site) }}
                     </a>
                     @endforeach
-                </nav>
+                </div>
             </div>
         </div>
     </div>
@@ -59,7 +59,7 @@
     <div id="back-to-top-wrapper" class="fade-out">
         <button
             id="back-to-top"
-            class="btn btn-primary"
+            class="btn btn-primary jump-to-nav"
             title="{{ __('Back to top') }}"
             data-bs-toggle="tooltip"
             data-bs-placement="left"
