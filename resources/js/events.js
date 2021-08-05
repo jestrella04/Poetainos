@@ -269,7 +269,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Scroll to the main nav
         if (element.classList.contains('jump-to-nav')) {
-            element.dispatchEvent(new Event('focusout', { bubbles: true }));
+            // Check if triggered from footer btn and hide tooltip
+            if (element.hasAttribute('id') && 'back-to-top' === element.attributes['id'].value) {
+                bootstrap.Tooltip.getInstance(element).hide();
+            }
+
             document.querySelector('#nav-main').scrollIntoView({ behavior: 'smooth' });
         }
 
