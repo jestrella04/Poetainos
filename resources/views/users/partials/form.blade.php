@@ -32,10 +32,10 @@
 
         <div class="row mb-3">
             <div class="offset-3 col-sm-9">
-                <div class="form-check">
+                <div class="form-check form-switch">
                     <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" name="avatar-remove" id="avatar-remove" value="1">
-                        <span>{{ __('Check if you just want to remove your current avatar') }}</span>
+                        <span>{{ __('Remove current avatar') }}</span>
                     </label>
                 </div>
             </div>

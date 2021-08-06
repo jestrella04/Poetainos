@@ -54,17 +54,16 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <div class="form-check text-center">
-                        <input class="form-check-input"
-                            type="checkbox"
-                            name="remember"
-                            id="remember" {{ old('remember') ? 'checked' : '' }}>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input"
+                        type="checkbox"
+                        name="remember"
+                        id="remember"
+                        {{ old('remember', 'on') ? 'checked' : '' }}>
 
-                        <label class="form-check-label" for="remember">
-                            {{ __('Keep me logged in') }}
-                        </label>
-                    </div>
+                    <label class="form-check-label" for="remember">
+                        {{ __('Keep me logged in') }}
+                    </label>
                 </div>
 
                 <div class="d-grid gap-2 mb-3">
