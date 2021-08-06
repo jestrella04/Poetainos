@@ -21,3 +21,7 @@
 @section('admin-sidebar')
     @include('admin.partials.sidebar')
 @endsection
+
+@section('footer')
+    <footer></footer>
+@endsection

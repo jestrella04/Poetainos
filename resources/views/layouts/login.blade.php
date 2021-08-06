@@ -13,4 +13,6 @@
 
         @yield ('main')
     </main>
+
+    <footer></footer>
 @endsection
