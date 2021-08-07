@@ -72,7 +72,7 @@
         </div>
     @endif
 
-    <div id="embed-comments">
+    <div id="embed-comments" class="text-break">
         <div class="comment-list"></div>
     </div>
 </div>

@@ -1,4 +1,4 @@
-<div class="user-profile">
+<div class="user-profile text-break">
     <div class="profile-header text-center">
         {!! getUserAvatar($user, $size = 'xxl') !!}
 
@@ -55,7 +55,7 @@
 
                 <dd class="col-sm-9">
                     <a href="{{ $user->extra_info['website'] }}" target="_blank" rel="noopener">
-                        {{ $user->extra_info['website'] }}
+                        {{ cropify($user->extra_info['website']) }}
                     </a>
                 </dd>
             @endif

@@ -186,6 +186,72 @@ function linkify($string)
         $emailPattern = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
         $isEmail = preg_match($emailPattern, $matches[0]) ? 'mailto:' : '';
 
-        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="' . $matches[0] . '">' . Str::limit($matches[0], 50) . '</a>';
+        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="' . $matches[0] . '">' . cropify($matches[0]) . '</a>';
     }, $string);
 }
+
+/*
+ * Adapted from William Belle
+ * https://github.com/williambelle/crop-url
+ * Original code licensed under MPL license
+ */
+function cropify($url, $length = 40)
+{
+    if (strlen($url) <= $length) {
+        return $url;
+    }
+
+    // Remove http:// or https://
+    $url = preg_replace('/^https?:\/\//', '', $url);
+
+    // Remove www.
+    $url = preg_replace('/^www\./', '', $url);
+
+    // Replace /foo/bar/foo/ with /…/…/…/
+    $urlLength = strlen($url);
+
+    while ($urlLength > $length) {
+        $url = preg_replace('/(.*[^\/])\\/[^\/…]+\\/([^\/])/', '$1/…/$2', $url);
+
+        if (strlen($url) === $urlLength) {
+            break;
+        } else {
+            $urlLength = strlen($url);
+        }
+    }
+
+    // Replace /…/…/…/ with /…/
+    $url = preg_replace('/\/…\/(?:…\/)+/', '/…/', $url);
+
+    // Replace all params except first
+    while (strlen($url) > $length) {
+        $idx = strrpos($url, '&');
+        if ($idx === -1) {
+            break;
+        }
+
+        $url = substr($url, 0, $idx) . '…';
+    }
+
+    // Replace first param
+    if (strlen($url) > $length) {
+        $idx = strrpos($url, '?');
+
+        if ($idx !== -1) {
+            $url = substr($url, 0, $idx) . '?…';
+        }
+    }
+
+    // Replace endless hyphens
+    while (strlen($url) > $length) {
+        $idx = strrpos($url, '-');
+
+        if ($idx === -1) {
+            break;
+        }
+
+        $url = substr($url, 0, $idx) . '…';
+    }
+
+    return $url;
+};
