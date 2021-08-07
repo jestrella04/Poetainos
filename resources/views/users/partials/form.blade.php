@@ -31,7 +31,7 @@
         </div>
 
         <div class="row mb-3">
-            <div class="offset-3 col-sm-9">
+            <div class="offset-sm-3 col-sm-9">
                 <div class="form-check form-switch">
                     <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" name="avatar-remove" id="avatar-remove" value="1">
