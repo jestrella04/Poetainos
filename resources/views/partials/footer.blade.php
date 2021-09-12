@@ -43,6 +43,7 @@
 
                 <div class="nav flex-column">
                     @foreach (getSiteConfig('social') as $site => $info)
+                        @if (! empty($info['value']))
                     <a class="nav-link"
                         href="{{ getSocialLink($info['value'], $site) }}"
                         target="blank"
@@ -50,6 +51,7 @@
                         <i class="fab fa-{{ $site }} fa-fw" aria-hidden="true"></i>
                         {{ ucfirst($site) }}
                     </a>
+                        @endif
                     @endforeach
                 </div>
             </div>

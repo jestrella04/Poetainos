@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 bootstrap.Tooltip.getInstance(element).hide();
             }
 
-            document.querySelector('#nav-main').scrollIntoView({ behavior: 'smooth' });
+            document.querySelector('body').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Populate and/or show the side menu

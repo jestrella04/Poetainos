@@ -1,8 +1,8 @@
-<nav id="nav-main" class="navbar navbar-dark navbar-expand-lg">
+<nav id="nav-main" class="navbar navbar-dark navbar-expand-lg fixed-top">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <img src="{{ mix('/static/images/logo.svg') }}" width="32" height="32" alt="{{ getSiteConfig('name') }}">
-            @if ('hero' !== $type) {{ getSiteConfig('name') }} @endif
+           {{ getSiteConfig('name') }}
         </a>
 
         <div class="toggler-wrapper">
