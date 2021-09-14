@@ -15,7 +15,6 @@
         <!-- Preload resources -->
         <link rel="preload" href="{{ mix('/static/css/app.css') }}" as="style">
         <link rel="preload" href="{{ mix('/static/js/app.js') }}" as="script">
-        <link rel="preload" href="{{ mix('/static/images/cover.jpg') }}" as="image">
         <link rel="preload" href="{{ mix('/static/images/logo.svg') }}" as="image">
         <link rel="preload" href="{{ mix('/static/images/logo-32.png') }}" as="image">
         <link rel="preload" href="{{ route('pwa.manifest', [], false) }}" as="fetch" crossorigin="anonymous">
