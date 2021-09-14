@@ -2,7 +2,7 @@
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <img src="{{ mix('/static/images/logo.svg') }}" width="32" height="32" alt="{{ getSiteConfig('name') }}">
-           {{ getSiteConfig('name') }}
+            {{ getSiteConfig('name') }}
         </a>
 
         <div class="toggler-wrapper">
@@ -25,13 +25,6 @@
 
         <div id="header-navbar" class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item d-lg-none">
-                    <a class="nav-link" href="{{ route('home') }}">
-                        <i class="fas fa-home fa-fw" aria-hidden="true"></i>
-                        {{ __('Home') }}
-                    </a>
-                </li>
-
                 @auth
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('notifications.index') }}">

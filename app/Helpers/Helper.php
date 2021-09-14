@@ -89,15 +89,24 @@ function getRelatedIdentifiers($table, $slug, $column)
         ->get();
 }
 
+function getReadableNumber($number)
+{
+    if (is_numeric($number) && $number > 999) {
+        return ReadableHumanNumber($number, $showDecimal = true, $decimals = 1);
+    }
+
+    return $number;
+}
+
 function getWritingCounter($writing)
 {
     return [
-        'likes' => ReadableHumanNumber($writing->votes->where('vote', '>', 0)->count()),
-        //'dislikes' => ReadableHumanNumber($writing->votes->where('vote', 0)->count()),
-        'comments' => ReadableHumanNumber($writing->comments->count()),
+        'likes' => getReadableNumber($writing->votes->where('vote', '>', 0)->count()),
+        //'dislikes' => getReadableNumber($writing->votes->where('vote', 0)->count()),
+        'comments' => getReadableNumber($writing->comments->count()),
         'replies' => Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count(),
-        'views' => ReadableHumanNumber($writing->views),
-        'shelf' => ReadableHumanNumber($writing->shelf->count()),
+        'views' => getReadableNumber($writing->views),
+        'shelf' => getReadableNumber($writing->shelf->count()),
         'aura' => number_format($writing->aura, 2),
     ];
 }
@@ -105,15 +114,15 @@ function getWritingCounter($writing)
 function getUserCounter($user)
 {
     return [
-        'writings' => ReadableHumanNumber($user->writings()->count()),
-        'flowers' => ReadableHumanNumber($user->writings()->whereNotNull('home_posted_at')->count()),
-        'comments' => ReadableHumanNumber($user->comments()->count()),
-        'replies' => ReadableHumanNumber($user->replies()->count()),
-        'votes' => ReadableHumanNumber($user->votes()->count()),
-        'views' => ReadableHumanNumber($user->profile_views),
-        'shelf' => ReadableHumanNumber($user->shelf()->count()),
-        'hood' => ReadableHumanNumber($user->hood()->count()),
-        'extendedHood' => ReadableHumanNumber($user->fellowHood($count = true)),
+        'writings' => getReadableNumber($user->writings()->count()),
+        'flowers' => getReadableNumber($user->writings()->whereNotNull('home_posted_at')->count()),
+        'comments' => getReadableNumber($user->comments()->count()),
+        'replies' => getReadableNumber($user->replies()->count()),
+        'votes' => getReadableNumber($user->votes()->count()),
+        'views' => getReadableNumber($user->profile_views),
+        'shelf' => getReadableNumber($user->shelf()->count()),
+        'hood' => getReadableNumber($user->hood()->count()),
+        'extendedHood' => getReadableNumber($user->fellowHood($count = true)),
         'aura' => number_format($user->aura, 2),
     ];
 }
