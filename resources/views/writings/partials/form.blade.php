@@ -140,23 +140,18 @@
 
             <div class="col-sm-10">
                 <input
-                type="file"
-                name="cover"
-                id="cover"
-                class="form-control-file d-none"
-                accept="image/png, image/jpeg"
-                data-wh-target="#selected-file"
-                data-wh-max-size="{{ getSiteConfig('uploads_max_file_size') }}"
-                placeholder="">
+                    type="file"
+                    name="cover"
+                    id="cover"
+                    class="form-control-file d-none"
+                    accept="image/png, image/jpeg"
+                    data-wh-target="#selected-file"
+                    data-wh-max-size="{{ getSiteConfig('uploads_max_file_size') }}"
+                    placeholder="">
 
                 <button id="cover-chooser" data-wh-target="#cover">
-                    <div class="placeholder">
-                        <p>
-                            <strong>{{ __('Click here to select a file') }}</strong>
-                        </p>
-
-                        <p>{{ __('Max file size is :size', ['size' => getSiteConfig('uploads_max_file_size') . 'kb']) }}</p>
-                    </div>
+                    <p class="fw-bold">{{ __('Click here to select a file') }}</p>
+                    <p>{{ __('Max file size is :size', ['size' => getSiteConfig('uploads_max_file_size') . 'kb']) }}</p>
 
                     <span id="selected-file" class="file-info d-none"></span>
                     <span id="selected-error" class="file-info d-none text-danger">{{ __('An error ocurred, please select a different file.') }}</span>
