@@ -87,7 +87,7 @@
                     minlength="3"
                     maxlength="40"
                     placeholder=""
-                    pattern="[A-Za-z0-9]+"
+                    pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                     disabled
                     autocomplete="off">
                 <small id="username-error" class="text-danger d-none"></small>
@@ -206,7 +206,7 @@
                     value="{{ @old('twitter', $user->extra_info['social']['twitter']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z0-9]+"
+                    pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                     placeholder=""
                     autocomplete="off">
                 <small id="twitter-error" class="text-danger d-none"></small>
@@ -224,7 +224,7 @@
                     value="{{ @old('instagram', $user->extra_info['social']['instagram']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z0-9]+"
+                    pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                     placeholder=""
                     autocomplete="off">
                 <small id="instagram-error" class="text-danger d-none"></small>
@@ -242,7 +242,7 @@
                     value="{{ @old('facebook', $user->extra_info['social']['facebook']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z0-9]+"
+                    pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                     placeholder=""
                     autocomplete="off">
                 <small id="facebook-error" class="text-danger d-none"></small>
@@ -260,7 +260,7 @@
                     value="{{ @old('youtube', $user->extra_info['social']['youtube']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z0-9]+"
+                    pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                     placeholder=""
                     autocomplete="off">
                 <small id="youtube-error" class="text-danger d-none"></small>
@@ -278,7 +278,7 @@
                     value="{{ @old('goodreads', $user->extra_info['social']['goodreads']) }}"
                     minlength="3"
                     maxlength="40"
-                    pattern="[A-Za-z0-9]+"
+                    pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                     placeholder=""
                     autocomplete="off">
                 <small id="goodreads-error" class="text-danger d-none"></small>

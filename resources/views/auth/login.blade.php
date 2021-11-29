@@ -23,7 +23,7 @@
                         class="form-control form-control-lg @error('username') is-invalid @enderror"
                         name="username" value="{{ old('username') }}"
                         required
-                        pattern="[-._A-Za-z0-9]+"
+                        pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
                         placeholder="{{ __('Username') }}"
                         autocomplete="off">
 
