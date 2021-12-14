@@ -25,27 +25,27 @@ class AdminController extends Controller
             'counters' => [
                 'users' => [
                     'title' => __('Users'),
-                    'count' => ReadableHumanNumber(User::all()->count()),
+                    'count' => User::all()->count(),
                 ],
                 'writings' => [
                     'title' => __('Writings'),
-                    'count' => ReadableHumanNumber(Writing::all()->count()),
+                    'count' => Writing::all()->count(),
                 ],
                 'comments' => [
                     'title' => __('Comments'),
-                    'count' => ReadableHumanNumber(Comment::all()->count() + Reply::all()->count()),
+                    'count' => Comment::all()->count() + Reply::all()->count(),
                 ],
                 'categories' => [
                     'title' => __('Categories'),
-                    'count' => ReadableHumanNumber(Category::all()->count()),
+                    'count' => Category::all()->count(),
                 ],
                 'tags' => [
                     'title' => __('Tags'),
-                    'count' => ReadableHumanNumber(Tag::all()->count()),
+                    'count' => Tag::all()->count(),
                 ],
                 'likes' => [
                     'title' => __('Likes'),
-                    'count' => ReadableHumanNumber(Vote::all()->count()),
+                    'count' => Vote::all()->count(),
                 ],
             ],
             'params' => $params,
