@@ -9,7 +9,7 @@
         <div class="d-flex flex-wrap">
             @foreach ($counters as $counter)
                 <div class="admin-counter">
-                    <h3>{{ $counter['count'] }}</h3>
+                    <h3>{{ getReadableNumber($counter['count']) }}</h3>
                     <span>{{ __($counter['title']) }}</span>
                 </div>
             @endforeach
