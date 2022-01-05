@@ -17,7 +17,7 @@
 @section('main')
     <div id="writings-main-content" class="main-content">
         @if (isset($params['section']) && 'shelf' === $params['section'] && isset($params['author']))
-            @include('users.profile.banner')
+            @include('users.profile.banner-lite')
 
             <p class="lead text-muted subtitle">
                 @if (auth()->check() && auth()->user()->is($params['author']))

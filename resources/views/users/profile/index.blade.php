@@ -2,9 +2,8 @@
     <div class="profile-header text-center">
         {!! getUserAvatar($user, $size = 'xxl') !!}
 
-        <div class="user-name align-self-center">
-            {{ $user->getName() }}
-        </div>
+        <span class="user-name">{{ $user->getName() }}</span>
+        <span class="username text-muted">{{ '@' . $user->username }}</span>
 
         @if (! empty($user->extra_info['bio']))
             <div class="profile-bio">{{ $user->extra_info['bio'] }}</div>

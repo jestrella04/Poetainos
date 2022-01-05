@@ -149,14 +149,24 @@
 }
 
 #writings-main-content {
-    .user-banner {
+    .user-banner-lite {
+        position: relative;
+
+        span {
+            display: block;
+        }
+
+        span.name {
+            font-weight: 700;
+            font-size: $wh-fs-md;
+            text-decoration: none;
+        }
+
         .avatar {
             margin-bottom: $wh-s-md
         }
 
-        .user-name {
-            font-weight: 700;
-            font-size: $wh-fs-md;
+        .stretched-link:hover {
             text-decoration: none;
         }
     }
@@ -164,6 +174,7 @@
     .subtitle {
         text-align: center;
         text-transform: capitalize;
+        margin: $wh-s-lg 0;
     }
 }
 

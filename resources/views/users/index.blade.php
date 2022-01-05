@@ -10,7 +10,7 @@
     <div id="users-main-content" class="main-content">
         @include('users.partials.toplinks')
 
-        <div id="user-list" class="d-flex flex-wrap justify-content-center">
+        <div id="user-list" class="">
             @forelse ($users as $user)
                 @include('users.profile.banner')
             @empty
