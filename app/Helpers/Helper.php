@@ -145,6 +145,13 @@ function getNotificationMessage($notification)
             ]);
             break;
 
+        case 'App\Notifications\WritingCommentMentioned':
+        case 'App\Notifications\WritingReplyMentioned':
+            $message = __(':name has mentioned you in a comment', [
+                'name' => User::find($notification->data['user_id'])->getName(),
+            ]);
+            break;
+
         case 'App\Notifications\WritingFeatured':
             $message = __('Your writing has been awarded with a Golden Flower');
             break;
@@ -191,12 +198,26 @@ function linkify($string)
 {
     $pattern = '/\(?(?:(http|https):\\/\\/)?(?:((?:[^\W\s]|\.|-|[:]{1})+)@{1})?((?:www.)?(?:[^\W\s]|\.|-)+[\.][^\W\s]{2,4}|localhost(?=\\/)|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::(\d*))?([\\/]?[^\s\?]*[\\/]{1})*(?:\\/?([^\s\n\?\[\]\{\}\#]*(?:(?=\.)){1}|[^\s\n\?\[\]\{\}\.\#]*)?([\.]{1}[^\s\?\#]*)?)?(?:\?{1}([^\s\n\#\[\]]*))?([\#][^\s\n]*)?\)?/';
 
-    return preg_replace_callback($pattern, function ($matches) {
+    $string = preg_replace_callback($pattern, function ($matches) {
         $emailPattern = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
         $isEmail = preg_match($emailPattern, $matches[0]) ? 'mailto:' : '';
 
-        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="' . $matches[0] . '">' . cropify($matches[0]) . '</a>';
+        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="'. $isEmail . $matches[0] . '">' . cropify($matches[0]) . '</a>';
     }, $string);
+
+    // Check for @mentions
+    $mentionPattern = '/\B@[a-zA-Z0-9_-]+/';
+    $string = preg_replace_callback($mentionPattern, function ($matches) {
+        $user = User::where('username', '=', substr($matches[0], 1))->first();
+
+        if (null !== $user) {
+            return '<a href="'.$user->path().'" title="' . $user->getName() . '">@' . $user->username  . '</a>';
+        }
+
+        return $matches[0];
+    }, $string);
+
+    return $string;
 }
 
 /*

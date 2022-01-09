@@ -1,4 +1,4 @@
-<div class="reply d-flex justify-content-center">
+<div id="comment-reply-{{ $reply->id }}" class="reply d-flex justify-content-center">
     <div class="reply-author">
         <a href="{{ $reply->author->path() }}">
             {!! getUserAvatar($reply->author, $size = 'lg') !!}

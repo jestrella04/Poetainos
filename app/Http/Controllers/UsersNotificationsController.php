@@ -45,9 +45,16 @@ class UsersNotificationsController extends Controller
     {
         $notification = auth()->user()->notifications->find($notificationId);
 
-        if($notification) {
+        if ($notification) {
             $notification->markAsRead();
-            return redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'])));
+
+            if (isset($notification->data['url'])) {
+                $redirectUrl = redirect($notification->data['url']);
+            } else {
+                $redirectUrl = redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'])));
+            }
+
+            return $redirectUrl;
         }
 
         return abort(401);

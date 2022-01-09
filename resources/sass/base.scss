@@ -369,3 +369,37 @@ pwa-update::part(offlineToast) {
         left: 0.5rem;
     }
 }
+
+.tribute-container {
+    background-color: $white;
+    color: $body-color;
+    border: 1px solid $gray-400;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: auto;
+    max-height: 15rem;
+    width: min(85%, 15rem);
+    overflow: auto;
+    display: block;
+    z-index: 999999;
+    border-radius: 0.5rem;
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            border-bottom: 1px solid $gray-400;
+        }
+
+        li:hover,
+        li:focus,
+        .highlight {
+            background-color: $gray-300 !important;
+        }
+    }
+}

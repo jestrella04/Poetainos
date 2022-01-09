@@ -21,6 +21,12 @@ export function loadComments(url) {
                 loadMore.attributes['data-wh-href'].value = '';
                 loadMore.parentElement.classList.add('d-none');
             }
+
+            if (location.hash.includes('#comment-')) {
+                document.querySelector(location.hash).scrollIntoView({behavior: 'smooth', block: 'end'});
+            }
+
+            tribute.attach(document.querySelectorAll('.commentbox'));
         })
         .catch(function (error) {
             //

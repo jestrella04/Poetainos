@@ -11,9 +11,9 @@
 
                     <textarea
                         name="comment"
-                        class="form-control autogrow"
-                        placeholder="{{ __('Leave your comment here') }}"
-                        aria-label="{{ __('Leave your comment here') }}"
+                        class="form-control autogrow commentbox"
+                        placeholder="{{ __('Leave your comment here. You can mention other users by using @') }}"
+                        aria-label="{{ __('Leave your comment here. You can mention other users by using @') }}"
                         maxlength="300"
                         required></textarea>
                 </div>

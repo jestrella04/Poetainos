@@ -54,6 +54,7 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/users/edit/{user}', 'UsersController@edit')->name('users.edit');
     Route::put('/users/edit/{user}', 'UsersController@update')->name('users.update');
     Route::delete('/users/delete/{user}', 'UsersController@destroy')->middleware('password.confirm')->name('users.destroy');
+    Route::post('/users/query/{query}', 'UsersController@query')->name('users.query');
 
     // Comments and replies
     Route::post('/replies/create', 'RepliesController@store')->name('replies.store');

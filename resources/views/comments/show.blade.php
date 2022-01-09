@@ -1,4 +1,4 @@
-<div class="comment d-flex justify-content-center">
+<div id="comment-{{ $comment->id }}" class="comment d-flex justify-content-center">
     <div class="comment-author">
         <a href="{{ $comment->author->path() }}">
             {!! getUserAvatar($comment->author, $size = 'xl') !!}
@@ -40,9 +40,9 @@
 
                     <textarea
                         name="reply"
-                        class="form-control autogrow"
-                        placeholder="{{ __('Leave your reply here') }}"
-                        aria-label="{{ __('Leave your reply here') }}"
+                        class="form-control autogrow commentbox"
+                        placeholder="{{ __('Leave your reply here. You can mention other users by using @') }}"
+                        aria-label="{{ __('Leave your reply here. You can mention other users by using @') }}"
                         maxlength="300"
                         required></textarea>
                 </div>

@@ -40,6 +40,22 @@ class UsersController extends Controller
     }
 
     /**
+     * Query list of matching resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function query()
+    {
+        $wildcard = '%'. request('query') .'%';
+
+        return User::where('name', 'like', $wildcard)
+            ->orWhere('username', 'like', $wildcard)
+            ->select('name', 'username')
+            ->take($this->pagination)
+            ->get();
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

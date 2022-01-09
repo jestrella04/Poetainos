@@ -4,7 +4,9 @@ import * as push from './push';
 import SlimSelect from 'slim-select';
 import '@pwabuilder/pwaupdate';
 import '@pwabuilder/pwainstall';
-import autoGrow, { initializeTextAreaAutoGrow } from '@ivanhanak_com/js-textarea-autogrow';
+import autoGrow from '@ivanhanak_com/js-textarea-autogrow';
+import Tribute from 'tributejs';
+import axios from 'axios';
 
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
@@ -84,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    //Initialize popovers
+    // Initialize popovers
     [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(function (popoverTriggerEl) {
         let helpText = popoverTriggerEl.parentElement.querySelector('.help').innerHTML;
         let options = {
@@ -875,4 +877,30 @@ document.addEventListener('DOMContentLoaded', () => {
             autoGrow(element);
         }
     });
+
+    async function getUserList(wildcard, callback) {
+        let response = await axios.post(`users/query/${wildcard}`);
+        callback(response.data);
+    }
+
+    let tribute = new Tribute({
+        trigger: '@',
+        menuShowMinLength: 1,
+        lookup: 'username',
+        fillAttr: 'username',
+        searchOpts: {
+            pre: '<span>',
+            post: '</span>',
+            skip: true
+        },
+        noMatchTemplate: () => '<span class="d-none"></span>',
+        loadingItemTemplate: () => `<div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>`,
+        menuItemTemplate: item => `${item.original.name ?? item.original.username} <span class="text-muted">@${item.original.username}</span>`,
+        values: getUserList
+    });
+
+    tribute.attach(document.querySelectorAll('.commentbox'));
+    window.tribute = tribute; // Hack to make Tribute available when loading comments. Needs rework
 });

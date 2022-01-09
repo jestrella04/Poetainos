@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Comment;
 use App\Notifications\WritingCommented;
+use App\Notifications\WritingCommentMentioned;
+use App\User;
 use Illuminate\Http\Request;
 
 class CommentsController extends Controller
@@ -16,9 +18,9 @@ class CommentsController extends Controller
     public function index($writing)
     {
         $comments = Comment::with('replies')
-        ->where('writing_id', $writing)
-        ->orderBy('created_at', 'desc')
-        ->simplePaginate($this->pagination);
+            ->where('writing_id', $writing)
+            ->orderBy('created_at', 'desc')
+            ->simplePaginate($this->pagination);
 
         $html = view('comments.index', [
             'comments' => $comments,
@@ -64,8 +66,25 @@ class CommentsController extends Controller
         $comment->writing->updateAura();
 
         // Notify author
-        if (! $comment->writing->author->is(auth()->user())) {
+        if (!$comment->writing->author->is(auth()->user())) {
             $comment->writing->author->notify(new WritingCommented($comment->writing, auth()->user()));
+        }
+
+        // Notify @mentions
+        $mentionPattern = '/\B@[a-zA-Z0-9_-]+/';
+        preg_match_all($mentionPattern, $comment->message, $mentions, PREG_PATTERN_ORDER);
+        $mentions = array_unique($mentions[0]);
+
+        foreach ($mentions as $mention) {
+            $mention = User::where('username', '=', substr($mention, 1))->first();
+
+            if (
+                null !== $mention
+                && !$mention->is($comment->writing->author)
+                && !$mention->is(auth()->user())
+            ) {
+                $mention->notify(new WritingCommentMentioned($comment, auth()->user()));
+            }
         }
 
         return view('comments.show', [
