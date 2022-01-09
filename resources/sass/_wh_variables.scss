@@ -29,17 +29,3 @@ $bg-gradient: linear-gradient(180deg, $dark 0%, $primary 100%);
 $bg-gradient-reverse: linear-gradient(180deg, $primary 0%, $dark 100%);
 $bg-gradient-success: linear-gradient(180deg, darken($success, 20%) 0%, $success 100%);
 $bg-gradient-danger: linear-gradient(180deg, darken($danger, 20%) 0%, $danger 100%);
-
-// Slim select
-$height: 30px !default;
-$white: $white !default;
-$font-color: $body-color !default;
-$font-placeholder-color: $gray-600 !default;
-$font-disabled-color: $gray-600 !default;
-$primary-color: $primary !default;
-$border-color: $gray-700 !default;
-$search-highlight-color: #fffb8c !default;
-$border-radius: 4px !default;
-$spacing-l: 8px !default;
-$spacing-m: 6px !default;
-$spacing-s: 4px !default;

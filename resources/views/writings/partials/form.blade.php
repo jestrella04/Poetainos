@@ -37,31 +37,31 @@
             </div>
         </div>
 
-        @if ($mainCategories->count() > 0)
-            <div class="row mb-3">
-                <label for="main-category" class="col-sm-2 col-form-label">{{ __('Main category') }}:</label>
+        <div class="row mb-3">
+            <label for="main-category" class="col-sm-2 col-form-label">{{ __('Main category') }}:</label>
 
-                <div class="col-sm-10">
-                    <select
-                        name="main_category"
-                        id="main-category"
-                        class="form-control form-select"
-                        required>
-                        <option value="" disabled selected>{{ __('Click to select') }}</option>
-                        @foreach ($mainCategories as $category)
-                            <option
-                                value="{{ $category->id }}"
-                                data-wh-descendants="{{ $category->descendants()->depthFirst()->get(['id', 'name'])->toJson() }}"
-                                @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
+            <div class="col-sm-10">
+                <select
+                    name="main_category"
+                    id="main-category"
+                    class="form-control form-select tags-select"
+                    data-placeholder="{{ __('Click to select') }}"
+                    multiple
+                    required
+                    data-max="1"
+                    data-show-all-suggestions="true">
+                    @foreach ($mainCategories as $category)
+                        <option
+                            value="{{ $category->id }}"
+                            @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
 
-                    <small id="main-category-error" class="text-danger d-none"></small>
-                </div>
+                <small id="main-category-error" class="text-danger d-none"></small>
             </div>
-        @endif
+        </div>
 
         <div class="row mb-3">
             <label for="categories" class="col-sm-2 col-form-label">{{ __('Alternative categories') }}:</label>
@@ -70,12 +70,19 @@
                 <select
                     name="categories[]"
                     id="categories"
-                    class="form-control form-select"
+                    class="form-control form-select tags-select"
                     data-placeholder="{{ __('Click to select') }} {{ __('(1 or more)') }}"
-                    data-wh-selected="{{ $writing->categories->pluck('id')->toJson() }}"
                     multiple
-                    required>
-                    <option value="" data-placeholder="true">{{ __('Click to select') }} {{ __('(1 or more)') }}</option>
+                    required
+                    dissabled>
+                    @foreach ($subCategories as $category)
+                    <option
+                        value="{{ $category->id }}"
+                        data-parent-id="{{ $category->parent_id }}"
+                        @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif>
+                        {{ $category->name }}
+                    </option>
+                    @endforeach
                 </select>
 
                 <small id="categories-error" class="text-danger d-none"></small>

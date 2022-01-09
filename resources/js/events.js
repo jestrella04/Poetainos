@@ -1,12 +1,12 @@
 import * as bootstrap from 'bootstrap';
 import * as fx from './functions';
 import * as push from './push';
-import SlimSelect from 'slim-select';
 import '@pwabuilder/pwaupdate';
 import '@pwabuilder/pwainstall';
 import autoGrow from '@ivanhanak_com/js-textarea-autogrow';
 import Tribute from 'tributejs';
 import axios from 'axios';
+import Tags from 'bootstrap5-tags';
 
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
@@ -64,22 +64,22 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    // Set element where to initialize Slim Select
-    let slimSelector = document.querySelector('#writing-form #categories');
+    // Set Tags selector
+    let tagsSelector = '.tags-select';
 
-    // Initialize Slim Select
-    if (null !== slimSelector && undefined !== slimSelector) {
-        var slimSelect = new SlimSelect({
-            select: slimSelector,
-            showSearch: false,
-            closeOnSelect: false,
-            allowDeselectOption: true,
-            hideSelectedOption: true,
-            deselectLabel: '<i class="fas fa-times-circle" aria-hidden="true"></i>',
-        });
+    // Tags does not allow to programatically set certain options (yet)
+    // and need to set them via data attributes
+    // Let's trick Tags a bit
+    document.querySelectorAll(tagsSelector).forEach(tagsEl => {
+        tagsEl.dataset.allowClear = true;
+        tagsEl.dataset.suggestionsThreshold = 0;
+    });
 
-        slimSelect.disable();
-    }
+    // Initialize Tags
+    Tags.init(tagsSelector, {
+        allowClear: true,
+        suggestionsThreshold: 0,
+    });
 
     // Initialize tooltips
     [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(function (tooltipTriggerEl) {
@@ -555,9 +555,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!method) {
                         element.reset();
 
-                        if (null !== slimSelect && undefined !== slimSelect) {
+                        /* if (null !== slimSelect && undefined !== slimSelect) {
                             slimSelect.set([]);
-                        }
+                        } */
                     }
 
                     // Update file helpers
@@ -788,45 +788,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Populate alternative categories
-        if (element.hasAttribute('id') && 'main-category' === element.attributes['id'].value && '' !== element.value) {
-            // Disable alternative categories select box
-            if (null !== slimSelect && undefined !== slimSelect) {
-                slimSelect.disable();
-            }
+        // Update alternative categories
+        if ('main-category' === element.id && '' !== element.value) {
+            let mainCategoryId = element.value;
+            let subCategories = document.querySelector('#categories');
 
-            // Clear previous options
-            if (null !== slimSelect && undefined !== slimSelect) {
-                slimSelect.set([]);
-            }
-
-            document.querySelector('#categories').innerHTML = '';
-
-            let selectedIndex = element.selectedIndex;
-            let currentCategories = JSON.parse(document.querySelector('#categories').attributes['data-wh-selected'].value);
-            let descendants = JSON.parse(element.options[selectedIndex].attributes['data-wh-descendants'].value);
-
-            if (Object.keys(descendants).length > 0) {
-                // Add new options
-                for (let idx in descendants) {
-                    let descendant = descendants[idx];
-                    let option = document.createElement('option');
-                    let targetSelect = document.querySelector('#categories');
-
-                    option.setAttribute('value', descendant.id);
-                    option.innerHTML = descendant.name;
-
-                    if (currentCategories.includes(descendant.id)) {
-                        option.selected = 'selected';
-                    }
-
-                    targetSelect.appendChild(option);
+            Array.from(subCategories.options).forEach(option => {
+                if (mainCategoryId !== option.dataset.parentId) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
                 }
+            });
 
-                if (null !== slimSelect && undefined !== slimSelect) {
-                    slimSelect.enable();
-                }
-            }
+            subCategories.disabled = false;
         }
     });
 

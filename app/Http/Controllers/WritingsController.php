@@ -126,6 +126,7 @@ class WritingsController extends Controller
         }
 
         $mainCategories = Category::whereNull('parent_id')->get();
+        $subCategories = Category::whereNotNull('parent_id')->get();
         $params = [
             'title' => [
                 'update' => getPageTitle([__('Update writing')]),
@@ -136,6 +137,7 @@ class WritingsController extends Controller
         return view('writings.edit', [
             'params' => $params,
             'mainCategories' => $mainCategories,
+            'subCategories' => $subCategories,
             'writing' => $writing,
         ]);
     }
