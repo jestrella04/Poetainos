@@ -67,14 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set Tags selector
     let tagsSelector = '.tags-select';
 
-    // Tags does not allow to programatically set certain options (yet)
-    // and need to set them via data attributes
-    // Let's trick Tags a bit
-    document.querySelectorAll(tagsSelector).forEach(tagsEl => {
-        tagsEl.dataset.allowClear = true;
-        tagsEl.dataset.suggestionsThreshold = 0;
-    });
-
     // Initialize Tags
     Tags.init(tagsSelector, {
         allowClear: true,
@@ -740,6 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen to the on change event on the page and act accordingly
     document.addEventListener('change', (event) => {
         let element = event.target;
+        console.log(element);
 
         // Trigger the cover file validation
         if (element.hasAttribute('id') && 'cover' === element.attributes['id'].value) {
@@ -794,25 +787,19 @@ document.addEventListener('DOMContentLoaded', () => {
             let subCategories = document.querySelector('#categories');
 
             Array.from(subCategories.options).forEach(option => {
-                if (mainCategoryId !== option.dataset.parentId) {
-                    option.disabled = true;
-                } else {
+                option.selected = false;
+
+                if (option.dataset.parentId == mainCategoryId) {
                     option.disabled = false;
+                    option.hidden = false;
+                } else {
+                    option.disabled = true;
+                    option.hidden = true;
                 }
             });
 
-            subCategories.disabled = false;
-        }
-    });
-
-    // Listen to the focusout event on the page and act accordingly
-    document.addEventListener('focusout', (event) => {
-        let element = event.target;
-
-        // Trim start/end commas from entered tags (if any)
-        if (element.hasAttribute('id') && 'tags' === element.attributes['id'].value) {
-            let trimTags = element.value.replace(/^\,+|\,+$/g, '');
-            element.value = trimTags;
+            Tags.getInstance(subCategories).resetSuggestions();
+            //subCategories.disabled = false;
         }
     });
 

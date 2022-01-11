@@ -268,5 +268,6 @@
     "Notifications settings": "Ajustes de notificaciones",
     "If you haven't already, we highly recommend to enable push notifications.": "Si aún no lo has hecho, te recomendamos encarecidamente habilitar las notificaciones push.",
     "These are real time notifications sent to every device you are logged in, so you ever miss anything.": "Estas son notificaciones en tiempo real enviadas a todos los dispositivos en que hayas iniciado sesión, de modo que nunca te pierdas nada.",
-    "Continue reading: :text": "Seguir leyendo: :text"
+    "Continue reading: :text": "Seguir leyendo: :text",
+    "Use comma to separate tags": "Usa una coma para separar las etiquetas"
 }

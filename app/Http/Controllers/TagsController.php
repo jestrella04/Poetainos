@@ -18,6 +18,26 @@ class TagsController extends Controller
     }
 
     /**
+     * Query list of matching resources.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function query()
+    {
+        $wildcard = '%'. request('query') .'%';
+
+        return Tag::where('name', 'like', $wildcard)
+            ->take($this->pagination)
+            ->get()
+            ->map(function($tag, $key) {
+                return [
+                    "value" => $tag['name'],
+                    "label" => $tag['name'],
+                ];
+            });
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

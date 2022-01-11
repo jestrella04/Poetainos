@@ -116,6 +116,7 @@ Route::get('/categories/{category}', 'CategoriesController@show')->name('categor
 
 // Tags
 //Route::get('/tags', 'TagsController@index')->name('tags.index');
+Route::get('/tags/query', 'TagsController@query')->name('tags.query');
 Route::get('/tags/{tag}', 'TagsController@show')->name('tags.show');
 
 // Comments and replies

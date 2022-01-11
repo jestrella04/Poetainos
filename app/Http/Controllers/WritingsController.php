@@ -163,7 +163,7 @@ class WritingsController extends Controller
             'main_category' => 'required|integer|exists:categories,id',
             'categories' => 'nullable|array|exists:categories,id',
             'text' => 'required|string|min:10|max:2000',
-            'tags' => 'nullable|string|min:3|max:50',
+            'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
             'cover' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size')
         ]);
@@ -207,23 +207,19 @@ class WritingsController extends Controller
             array_unshift($categories, request('main_category'));
         }
 
-        $tags = [];
+        $tagsToSync = [];
 
         // Let's grab the entered tags
         if (! empty(request('tags'))) {
-            $rawTags = preg_replace('/\s+/', ' ', request('tags'));
-            $rawTags = preg_replace('/,+/', ',', request('tags'));
-            $rawTags = explode(',', $rawTags);
-
-            foreach ($rawTags as $rawTag) {
-                $rawTag = trim($rawTag);
-
+            foreach (request('tags') as $tag) {
+                $tag = preg_replace('/\s+/', ' ', $tag);
+                $tag = trim($tag);
                 $tag = Tag::firstOrCreate(
-                    ['name' => $rawTag],
-                    ['slug' => slugify('tags', $rawTag)]
+                    ['name' => $tag],
+                    ['slug' => slugify('tags', $tag)]
                 );
 
-                $tags[] = $tag->id;
+                $tagsToSync[] = $tag->id;
             }
         }
 
@@ -231,7 +227,7 @@ class WritingsController extends Controller
         $writing->categories()->sync($categories);
 
         // Persist tags
-        $writing->tags()->sync($tags);
+        $writing->tags()->sync($tagsToSync);
 
         // Update user aura
         $writing->author->updateAura();
