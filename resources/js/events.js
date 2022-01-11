@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update alternative categories
-        if ('main-category' === element.id && '' !== element.value) {
+        if (element.matches('#main-category') && '' !== element.value) {
             let mainCategoryId = element.value;
             let subCategories = document.querySelector('#categories');
 
@@ -798,6 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            Tags.getInstance(subCategories).reset();
             Tags.getInstance(subCategories).resetSuggestions();
             //subCategories.disabled = false;
         }
