@@ -71,7 +71,7 @@
                     class="form-control form-select tags-select"
                     multiple
                     required
-                    dissabled>
+                    disabled>
                     <option selected disabled hidden value="">{{ __('Click to select') }} {{ __('(1 or more)') }}</option>
                     @foreach ($subCategories as $category)
                     <option

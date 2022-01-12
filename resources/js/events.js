@@ -1,3 +1,5 @@
+'use strict';
+
 import * as bootstrap from 'bootstrap';
 import * as fx from './functions';
 import * as push from './push';
@@ -5,7 +7,6 @@ import '@pwabuilder/pwaupdate';
 import '@pwabuilder/pwainstall';
 import autoGrow from '@ivanhanak_com/js-textarea-autogrow';
 import Tribute from 'tributejs';
-import axios from 'axios';
 import Tags from 'bootstrap5-tags';
 
 // PWA Builder goodies
@@ -37,12 +38,12 @@ window.addEventListener('load', () => {
     // alternative categories when editing a writing
     let mainCategory = document.querySelector('#main-category');
 
-    if (!fx.isNil(mainCategory)) {
+    if (!fx.isNil(mainCategory) && !fx.isNilOrEmpty(mainCategory.value)) {
         mainCategory.dispatchEvent(new Event('change', { bubbles: true }));
     }
 });
 
-// Wait for the DOM to be readay
+// Wait for the DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
     // Check for user session
     let userToken = document.querySelector('meta[name="user-token"]');
@@ -57,18 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create the side menu for small screens
     fx.createSideMenu();
 
-    // Hide Whatsapp sharer on Desktop
-    if (!fx.isMobile()) {
-        document.querySelectorAll('.whatsapp-link').forEach(link => {
-            link.classList.add('d-none');
-        })
-    }
-
-    // Set Tags selector
-    let tagsSelector = '.tags-select';
-
     // Initialize Tags
-    Tags.init(tagsSelector, {
+    Tags.init('.tags-select', {
         allowClear: true,
         suggestionsThreshold: 0,
     });
@@ -192,12 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for new user notification events coming from the server
     if (!fx.isNil(userToken)) {
-        Echo.private(`notifications.${userToken}`).listen('NotificationEvent', (payload) => {
-            document.querySelectorAll('.unread').forEach((badge) => {
+        Echo.private(`notifications.${userToken}`).listen('NotificationEvent', payload => {
+            document.querySelectorAll('.unread').forEach(badge => {
                 badge.classList.remove('d-none');
             });
 
-            document.querySelectorAll('.unread-count').forEach((count) => {
+            document.querySelectorAll('.unread-count').forEach(count => {
                 count.innerHTML = payload.notifications.unread;
             });
         });
@@ -411,13 +402,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.matches('.share-link')) {
             event.preventDefault();
 
-            let url = element.attributes['href'].value;
+            let url = element.href;
 
             if (element.matches('.copy-to-clipboard-link')) {
                 navigator.clipboard.writeText(url);
             } else {
                 let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=500,left=100,top=100';
-                let sharer = open(url, 'sharer', params);
+
+                open(url, 'sharer', params);
             }
         }
 
@@ -452,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.matches('.admin-content-delete') || element.matches('.user-content-delete')) {
             event.preventDefault();
 
-            let targetModal = element.attributes['href'].value;
+            let targetModal = element.href;
             let btnDelete = document.querySelector('#btn-modal-delete');
             let warningDelete = document.querySelector('#content-delete-warning');
 
@@ -510,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Opting out of GA tracking
-        if (element.hasAttribute('href') && '#ga-optout' === element.attributes['href'].value) {
+        if (element.hasAttribute('href') && '#ga-optout' === element.href) {
             event.preventDefault();
             let disableStr = `ga-disable-${analytics_id}`;
 
@@ -531,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Initialize form and helpers
             let params = new FormData(element);
-            let url = element.attributes['action'].value;
+            let url = element.action;
 
             // Post the form to the server
             axios.post(url, params)
@@ -585,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Initialize form and helpers
             let params = new FormData(element);
-            let url = element.attributes['action'].value;
+            let url = element.action;
 
             // Post the form to the server
             axios.post(url, params)
@@ -622,7 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             let params = new FormData(element);
-            let url = element.attributes['action'].value;
+            let url = element.action;
             let commentList = document.querySelector('#embed-comments .comment-list');
             let postCommentSuccess = document.querySelector('#post-comment-success');
             let postCommentError = document.querySelector('#post-comment-error');
@@ -658,7 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             let params = new FormData(element);
-            let url = element.attributes['action'].value;
+            let url = element.action;
             let commentReplyList = document.querySelector(`#reply-list-${element.comment_id.value}`);
             let commentReplyError = document.querySelector(`#reply-error-${element.comment_id.value}`);
 
@@ -691,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Initialize form and helpers
             let params = new FormData(element);
-            let url = element.attributes['action'].value;
+            let url = element.action;
 
             // Post the form to the server
             axios.post(url, params)
@@ -779,6 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.matches('#main-category') && !fx.isNilOrEmpty(element.value)) {
             let mainCategoryId = element.value;
             let subCategories = document.querySelector('#categories');
+            let tagsInstance = Tags.getInstance(subCategories);
 
             Array.from(subCategories.options).forEach(option => {
                 option.selected = false;
@@ -792,9 +785,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            Tags.getInstance(subCategories).reset();
-            Tags.getInstance(subCategories).resetSuggestions();
-            //subCategories.disabled = false;
+            subCategories.disabled = false;
+            tagsInstance.reset();
+            tagsInstance.resetSuggestions();
+            tagsInstance.resetState();
         }
     });
 
@@ -807,21 +801,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!fx.isNil(header) && !fx.isNil(jumpToHeader)) {
             if (fx.isInViewport(header)) {
-                jumpToHeader.classList.remove('fade-in')
-                jumpToHeader.classList.add('fade-out')
+                jumpToHeader.classList.remove('fade-in');
+                jumpToHeader.classList.add('fade-out');
             } else {
-                jumpToHeader.classList.remove('fade-out')
-                jumpToHeader.classList.add('fade-in')
+                jumpToHeader.classList.remove('fade-out');
+                jumpToHeader.classList.add('fade-in');
             }
         }
 
         if (!fx.isNil(mainWrapper) && !fx.isNil(jumpToMainNav)) {
             if (fx.isInViewport(mainWrapper)) {
-                jumpToMainNav.classList.remove('fade-in')
-                jumpToMainNav.classList.add('fade-out')
+                jumpToMainNav.classList.remove('fade-in');
+                jumpToMainNav.classList.add('fade-out');
             } else {
-                jumpToMainNav.classList.remove('fade-out')
-                jumpToMainNav.classList.add('fade-in')
+                jumpToMainNav.classList.remove('fade-out');
+                jumpToMainNav.classList.add('fade-in');
             }
         }
     });
