@@ -37,7 +37,7 @@ window.addEventListener('load', () => {
     // alternative categories when editing a writing
     let mainCategory = document.querySelector('#main-category');
 
-    if (null !== mainCategory && undefined !== mainCategory) {
+    if (!fx.isNil(mainCategory)) {
         mainCategory.dispatchEvent(new Event('change', { bubbles: true }));
     }
 });
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for user session
     let userToken = document.querySelector('meta[name="user-token"]');
 
-    if (null !== userToken && undefined !== userToken) {
+    if (!fx.isNil(userToken)) {
         userToken = atob(userToken.content);
     }
 
@@ -95,12 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Disable share dropdown if Share API is supported
     if (navigator.share) {
         [].slice.call(document.querySelectorAll('.dropdown .share')).map(shareBtn => {
-            shareBtn.attributes['data-bs-toggle'].value = '';
+            shareBtn.dataset.bsToggle = '';
         });
     }
 
     // Disable tracking if the opt-out cookie exists.
-    if (null !== window.analytics_id && undefined !== window.analytics_id) {
+    if (!fx.isNil(window.analytics_id)) {
         let disableStr = `ga-disable-${window.analytics_id}`;
 
         if (document.cookie.indexOf(`${disableStr}=true`) > -1) {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let modalForm = document.querySelector('.form-wrapper');
 
     // Working with admin modal forms
-    if (null !== modalForm && modalForm.matches('.modal')) {
+    if (!fx.isNil(modalForm) && modalForm.matches('.modal')) {
         let targetForm = modalForm.querySelector('form');
         let modalTitleElement = modalForm.querySelector('.modal-title');
 
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalForm.addEventListener('show.bs.modal', event => {
             let relatedTarget = event.relatedTarget;
 
-            if (null === relatedTarget) {
+            if (fx.isNil(relatedTarget)) {
                 modalTitleElement.querySelector('.create').classList.add('d-none');
                 modalTitleElement.querySelector('.update').classList.remove('d-none');
             }
@@ -157,12 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Hide the push disable button
-                if (subscription && null !== pushDisable && undefined !== pushDisable) {
+                if (subscription && !fx.isNil(pushDisable)) {
                     pushDisable.classList.remove('d-none');
                 }
 
                 // Hide the push enable button
-                if (!subscription && null !== pushEnable && undefined !== pushEnable) {
+                if (!subscription && !fx.isNil(pushEnable)) {
                     pushEnable.classList.remove('d-none');
                 }
             })
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, false);
 
     // Listen for new user notification events coming from the server
-    if (null !== userToken && undefined !== userToken) {
+    if (!fx.isNil(userToken)) {
         Echo.private(`notifications.${userToken}`).listen('NotificationEvent', (payload) => {
             document.querySelectorAll('.unread').forEach((badge) => {
                 badge.classList.remove('d-none');
@@ -211,15 +211,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.body.classList.remove('overflow-hidden');
 
-        if (null !== overlay && undefined !== overlay) {
+        if (!fx.isNil(overlay)) {
             overlay.classList.add('d-none');
         }
 
-        if (null !== toggler && undefined !== toggler) {
+        if (!fx.isNil(toggler)) {
             toggler.classList.remove('fa-times');
         }
 
-        if (null !== sideMenu && undefined !== sideMenu) {
+        if (!fx.isNil(sideMenu)) {
             sideMenu.forEach(aside => {
                 aside.classList.remove('show');
             });
@@ -273,19 +273,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Populate and/or show the side menu
         if (element.matches('#toggler')) {
-            let targetNav = document.querySelector(element.attributes['data-wh-target'].value);
+            let targetNav = document.querySelector(element.dataset.whTarget);
             let dataSource = null;
             let sourceNav = null;
 
-            if (element.hasAttribute('data-wh-source')) {
-                dataSource = element.attributes['data-wh-source'].value;
+            if ('whSource' in element.dataset) {
+                dataSource = element.dataset.whSource;
             }
 
-            if (null !== dataSource) {
+            if (!fx.isNil(dataSource)) {
                 sourceNav = document.querySelector(dataSource);
             }
 
-            if (null !== sourceNav && '' === targetNav.innerHTML) {
+            if (!fx.isNil(sourceNav) && fx.isEmpty(targetNav.innerHTML)) {
                 targetNav.innerHTML = sourceNav.innerHTML;
             }
 
@@ -302,9 +302,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Dynamically load comments for a writing
-        if (null !== element.parentElement && undefined !== element.parentElement) {
+        if (!fx.isNil(element.parentElement)) {
             if (element.parentElement.matches['#load-more']) {
-                let url = element.attributes['data-wh-href'].value;
+                let url = element.dataset.whHref;
 
                 fx.loadComments(url);
             }
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show/hide the comment reply form
         if (element.matches('.badge-reply')) {
-            let target = element.attributes['data-wh-target'].value;
+            let target = element.dataset.whTarget;
             let targetForm = document.querySelector(target);
             targetForm.classList.toggle('d-none');
 
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trigger the cover chooser
         if (element.matches('#cover-chooser')) {
             event.preventDefault();
-            let fileChooser = document.querySelector(element.attributes['data-wh-target'].value);
+            let fileChooser = document.querySelector(element.dataset.whTarget);
 
             fileChooser.click();
         }
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trigger the avatar chooser
         if (element.matches('.avatar-chooser')) {
             event.preventDefault();
-            let fileChooser = document.querySelector(element.attributes['data-wh-target'].value);
+            let fileChooser = document.querySelector(element.dataset.whTarget);
 
             fileChooser.click();
         }
@@ -343,10 +343,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Liking a writing
             if (element.matches('.like')) {
-                if (element.hasAttribute('data-wh-target') && element.hasAttribute('data-wh-id') && element.hasAttribute('data-wh-value')) {
-                    let url = element.attributes['data-wh-target'].value;
-                    let id = element.attributes['data-wh-id'].value;
-                    let value = element.attributes['data-wh-value'].value;
+                if ('whTarget' in element.dataset && 'whId' in element.dataset && 'whValue' in element.dataset) {
+                    let url = element.dataset.whTarget;
+                    let id = element.dataset.whId;
+                    let value = element.dataset.whValue;
                     let params = new FormData();
 
                     params.append('id', id);
@@ -373,9 +373,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Adding to shelf
             if (element.matches('.shelf')) {
-                if (element.hasAttribute('data-wh-target') && element.hasAttribute('data-wh-id')) {
-                    let url = element.attributes['data-wh-target'].value;
-                    let id = element.attributes['data-wh-id'].value;
+                if ('whTarget' in element.dataset && 'whId' in element.dataset) {
+                    let url = element.dataset.whTarget;
+                    let id = element.dataset.whId;
                     let params = new FormData();
 
                     params.append('id', id);
@@ -401,8 +401,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Share button (if Share API is supported)
             if (element.matches('.share') && navigator.share) {
                 navigator.share({
-                    title: element.attributes['data-wh-writing-title'].value,
-                    url: element.attributes['data-wh-url'].value
+                    title: element.dataset.whWritingTitle,
+                    url: element.dataset.whUrl
                 });
             }
         }
@@ -425,10 +425,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.matches('.admin-edit')) {
             event.preventDefault();
 
-            let targetModal = document.querySelector(element.attributes['data-wh-target-modal'].value);
-            let targetModel = element.attributes['data-wh-target-model'].value;
-            let targetForm = document.querySelector(element.attributes['data-wh-target-form'].value);
-            let targetData = JSON.parse(element.attributes['data-wh-target-form-data'].value);
+            let targetModal = document.querySelector(element.dataset.whTargetModal);
+            let targetModel = element.dataset.whTargetModel;
+            let targetForm = document.querySelector(element.dataset.whTargetForm);
+            let targetData = JSON.parse(element.dataset.whTargetFormData);
 
             if ('category' === targetModel) {
                 targetForm.id.value = targetData.id;
@@ -456,17 +456,17 @@ document.addEventListener('DOMContentLoaded', () => {
             let btnDelete = document.querySelector('#btn-modal-delete');
             let warningDelete = document.querySelector('#content-delete-warning');
 
-            if (null !== warningDelete && element.hasAttribute('data-wh-warning')) {
-                warningDelete.innerHTML = element.attributes['data-wh-warning'].value;
+            if (!fx.isNil(warningDelete) && 'whWarning' in element.dataset) {
+                warningDelete.innerHTML = element.dataset.whWarning;
                 warningDelete.parentElement.classList.remove('d-none');
             }
 
-            if (null !== btnDelete && element.hasAttribute('data-wh-target')) {
-                btnDelete.attributes['data-wh-delete-url'].value = element.attributes['data-wh-target'].value;
+            if (!fx.isNil(btnDelete) && 'whTarget' in element.dataset) {
+                btnDelete.dataset.whDeleteUrl = element.dataset.whTarget;
             }
 
-            if (null !== btnDelete && element.hasAttribute('data-wh-redirect')) {
-                btnDelete.attributes['data-wh-redirect-url'].value = element.attributes['data-wh-redirect'].value;
+            if (!fx.isNil(btnDelete) && 'whRedirect' in element.dataset) {
+                btnDelete.dataset.whRedirectUrl = element.dataset.whRedirect;
             }
 
             fx.showModal(targetModal, {
@@ -476,20 +476,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Deleting a record
         if (element.matches('#btn-modal-delete')) {
-            let url = element.attributes['data-wh-delete-url'].value;
-            let redirect = element.attributes['data-wh-redirect-url'].value;
+            let url = element.dataset.whDeleteUrl;
+            let redirect = element.dataset.whRedirectUrl;
             let params = new FormData();
 
             params.append('_method', 'delete');
 
-            if (null !== redirect && '' !== redirect) {
+            if (!fx.isNilOrEmpty(redirect)) {
                 params.append('redirect', true);
             }
 
             // Post the form to the server
             axios.post(url, params)
                 .then(response => {
-                    if (null !== redirect && '' !== redirect) {
+                    if (!fx.isNilOrEmpty(redirect)) {
                         location.assign(redirect);
                     } else {
                         fx.showToast({
@@ -542,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!method) {
                         element.reset();
 
-                        /* if (null !== slimSelect && undefined !== slimSelect) {
+                        /* if (!fx.isNil(slimSelect)) {
                             slimSelect.set([]);
                         } */
                     }
@@ -638,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     postCommentSuccess.classList.remove('d-none');
                     postCommentError.classList.add('d-none');
 
-                    if (null !== commentsEmpty && undefined !== commentsEmpty) {
+                    if (!fx.isNil(commentsEmpty)) {
                         commentsEmpty.classList.add('d-none');
                     }
                 })
@@ -732,11 +732,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.matches('#cover')) {
             const file = element.files[0];
             const fileSizeKb = parseInt(file.size / 1024);
-            const maxFileSizeKb = element.attributes['data-wh-max-size'].value;
-            let info = document.querySelector(element.attributes['data-wh-target'].value);
+            const maxFileSizeKb = element.dataset.whMaxSize;
+            let info = document.querySelector(element.dataset.whTarget);
             let error = element.parentElement.querySelector('#selected-error');
 
-            if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
+            if (!fx.isNilOrEmpty(file) && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
                 info.textContent = `${file.name} [ ${fileSizeKb} kb]`;
                 info.classList.remove('d-none');
                 error.classList.add('d-none');
@@ -752,10 +752,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.matches('#avatar')) {
             const file = element.files[0];
             const fileSizeKb = parseInt(file.size / 1024);
-            const maxFileSizeKb = element.attributes['data-wh-max-size'].value;
+            const maxFileSizeKb = element.dataset.whMaxSize;
             let error = document.querySelector('#avatar-error');
 
-            if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
+            if (!fx.isNilOrEmpty(file) && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
                 fx.readImage(file, fx.previewAvatar);
                 error.classList.add('d-none');
             } else {
@@ -776,7 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update alternative categories
-        if (element.matches('#main-category') && '' !== element.value) {
+        if (element.matches('#main-category') && !fx.isNilOrEmpty(element.value)) {
             let mainCategoryId = element.value;
             let subCategories = document.querySelector('#categories');
 
@@ -805,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let jumpToMainNav = document.querySelector('#jump-to-nav');
         let jumpToHeader = document.querySelector('#back-to-top-wrapper');
 
-        if (null !== header && null !== jumpToHeader) {
+        if (!fx.isNil(header) && !fx.isNil(jumpToHeader)) {
             if (fx.isInViewport(header)) {
                 jumpToHeader.classList.remove('fade-in')
                 jumpToHeader.classList.add('fade-out')
@@ -815,7 +815,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (null !== mainWrapper && null !== jumpToMainNav) {
+        if (!fx.isNil(mainWrapper) && !fx.isNil(jumpToMainNav)) {
             if (fx.isInViewport(mainWrapper)) {
                 jumpToMainNav.classList.remove('fade-in')
                 jumpToMainNav.classList.add('fade-out')

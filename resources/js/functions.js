@@ -15,10 +15,10 @@ export function loadComments(url) {
             embedComments.insertAdjacentHTML('afterbegin', response.data.comments);
 
             if (null !== response.data.next && '' !== response.data.next) {
-                loadMore.attributes['data-wh-href'].value = response.data.next;
+                loadMore.dataset.whHref = response.data.next;
                 loadMore.parentElement.classList.remove('d-none');
             } else {
-                loadMore.attributes['data-wh-href'].value = '';
+                loadMore.dataset.whHref = '';
                 loadMore.parentElement.classList.add('d-none');
             }
 
@@ -165,4 +165,20 @@ export function isInViewport(el) {
     const horInView = (rect.left <= windowWidth) && ((rect.left + rect.width) >= 0);
 
     return (vertInView && horInView);
+}
+
+export function isNil(value) {
+    return null == value;
+}
+
+export function isEmpty(value) {
+    return '' === value;
+}
+
+export function isNilOrEmpty(value) {
+    if (null == value || '' === value) {
+        return true;
+    }
+
+    return false;
 }
