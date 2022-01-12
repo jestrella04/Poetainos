@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hide Whatsapp sharer on Desktop
     if (!fx.isMobile()) {
-        document.querySelectorAll('.whatsapp-link').forEach(function (link) {
+        document.querySelectorAll('.whatsapp-link').forEach(link => {
             link.classList.add('d-none');
         })
     }
@@ -74,12 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize tooltips
-    [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(function (tooltipTriggerEl) {
+    [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(tooltipTriggerEl => {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
     // Initialize popovers
-    [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(function (popoverTriggerEl) {
+    [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]')).map(popoverTriggerEl => {
         let helpText = popoverTriggerEl.parentElement.querySelector('.help').innerHTML;
         let options = {
             delay: 100,
@@ -94,16 +94,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Disable share dropdown if Share API is supported
     if (navigator.share) {
-        [].slice.call(document.querySelectorAll('.dropdown .share')).map(function (shareBtn) {
+        [].slice.call(document.querySelectorAll('.dropdown .share')).map(shareBtn => {
             shareBtn.attributes['data-bs-toggle'].value = '';
         });
     }
 
     // Disable tracking if the opt-out cookie exists.
     if (null !== window.analytics_id && undefined !== window.analytics_id) {
-        let disableStr = 'ga-disable-' + window.analytics_id;
+        let disableStr = `ga-disable-${window.analytics_id}`;
 
-        if (document.cookie.indexOf(disableStr + '=true') > -1) {
+        if (document.cookie.indexOf(`${disableStr}=true`) > -1) {
             window[disableStr] = true;
         }
     }
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let modalTitleElement = modalForm.querySelector('.modal-title');
 
         // Change title if updating
-        modalForm.addEventListener('show.bs.modal', (event) => {
+        modalForm.addEventListener('show.bs.modal', event => {
             let relatedTarget = event.relatedTarget;
 
             if (null === relatedTarget) {
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Do some cleaning when the modal is closed
-        modalForm.addEventListener('hidden.bs.modal', function () {
+        modalForm.addEventListener('hidden.bs.modal', () => {
             // Reset title
             modalTitleElement.querySelector('.create').classList.remove('d-none');
             modalTitleElement.querySelector('.update').classList.add('d-none');
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fx.resetAdminFormCreate(targetForm);
 
             // Hide all the error helpers
-            targetForm.querySelectorAll('.text-danger').forEach(function (helper) {
+            targetForm.querySelectorAll('.text-danger').forEach(helper => {
                 helper.innerHTML = '';
                 helper.classList.add('d-none');
             });
@@ -172,17 +172,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Listen to the toast show event and act accordingly
-    document.querySelector('.toast').addEventListener('show.bs.toast', (event) => {
+    document.querySelector('.toast').addEventListener('show.bs.toast', event => {
         event.target.closest('.toast-wrapper').classList.add('show');
     }, false);
 
     // Listen to the toast hidden event and act accordingly
-    document.querySelector('.toast').addEventListener('hidden.bs.toast', (event) => {
+    document.querySelector('.toast').addEventListener('hidden.bs.toast', event => {
         event.target.closest('.toast-wrapper').classList.remove('show');
     }, false);
 
     // Reset toast look/info when closed
-    document.querySelector('#toast-reuse').addEventListener('hidden.bs.toast', (event) => {
+    document.querySelector('#toast-reuse').addEventListener('hidden.bs.toast', event => {
         // Set default look & feel
         event.target.classList.remove('success', 'danger');
 
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Listen to the window resize event and act accordingly
-    window.addEventListener('resize', function () {
+    window.addEventListener('resize', () => {
         let overlay = document.querySelector('#side-menu-overlay');
         let toggler = document.querySelector('#toggler i');
         let sideMenu = document.querySelectorAll('.side-menu');
@@ -220,14 +220,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (null !== sideMenu && undefined !== sideMenu) {
-            sideMenu.forEach(function (aside) {
+            sideMenu.forEach(aside => {
                 aside.classList.remove('show');
             });
         }
     });
 
     // Listen to the on click event on the page and act accordingly
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
         let element = event.target;
 
         // Bubble up click event on certain elements
@@ -238,10 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Enable push notifications
-        if (element.classList.contains('push-enable')) {
+        if (element.matches('.push-enable')) {
             event.preventDefault();
             push.subscribe();
-            document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
+            document.querySelectorAll('.btn-push').forEach(pushBtn => {
                 pushBtn.classList.add('d-none');
             });
 
@@ -250,10 +250,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Disable push notifications
-        if (element.classList.contains('push-disable')) {
+        if (element.matches('.push-disable')) {
             event.preventDefault();
             push.unsubscribe();
-            document.querySelectorAll('.btn-push').forEach(function (pushBtn) {
+            document.querySelectorAll('.btn-push').forEach(pushBtn => {
                 pushBtn.classList.add('d-none');
             });
 
@@ -262,9 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Scroll to the main nav
-        if (element.classList.contains('jump-to-nav')) {
+        if (element.matches('.jump-to-nav')) {
             // Check if triggered from footer btn and hide tooltip
-            if (element.hasAttribute('id') && 'back-to-top' === element.attributes['id'].value) {
+            if (element.matches('#back-to-top')) {
                 bootstrap.Tooltip.getInstance(element).hide();
             }
 
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Populate and/or show the side menu
-        if (element.hasAttribute('id') && 'toggler' === element.attributes['id'].value) {
+        if (element.matches('#toggler')) {
             let targetNav = document.querySelector(element.attributes['data-wh-target'].value);
             let dataSource = null;
             let sourceNav = null;
@@ -297,13 +297,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Hide the side menu when clicking off bounds
-        if (element.hasAttribute('id') && 'side-menu-overlay' === element.attributes['id'].value) {
+        if (element.matches('#side-menu-overlay')) {
             document.querySelector('#toggler').click();
         }
 
         // Dynamically load comments for a writing
         if (null !== element.parentElement && undefined !== element.parentElement) {
-            if (element.parentElement.hasAttribute('id') && 'load-more' === element.parentElement.attributes['id'].value) {
+            if (element.parentElement.matches['#load-more']) {
                 let url = element.attributes['data-wh-href'].value;
 
                 fx.loadComments(url);
@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Show/hide the comment reply form
-        if (element.classList.contains('badge-reply')) {
+        if (element.matches('.badge-reply')) {
             let target = element.attributes['data-wh-target'].value;
             let targetForm = document.querySelector(target);
             targetForm.classList.toggle('d-none');
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Trigger the cover chooser
-        if (element.hasAttribute('id') && 'cover-chooser' === element.attributes['id'].value) {
+        if (element.matches('#cover-chooser')) {
             event.preventDefault();
             let fileChooser = document.querySelector(element.attributes['data-wh-target'].value);
 
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Trigger the avatar chooser
-        if (element.classList.contains('avatar-chooser')) {
+        if (element.matches('.avatar-chooser')) {
             event.preventDefault();
             let fileChooser = document.querySelector(element.attributes['data-wh-target'].value);
 
@@ -338,11 +338,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Counters
-        if (element.classList.contains('btn-counter')) {
+        if (element.matches('.btn-counter')) {
             event.preventDefault();
 
             // Liking a writing
-            if (element.classList.contains('like')) {
+            if (element.matches('.like')) {
                 if (element.hasAttribute('data-wh-target') && element.hasAttribute('data-wh-id') && element.hasAttribute('data-wh-value')) {
                     let url = element.attributes['data-wh-target'].value;
                     let id = element.attributes['data-wh-id'].value;
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     params.append('value', value);
 
                     axios.post(url, params)
-                        .then(function (response) {
+                        .then(response => {
                             let created = response.data.created;
                             let count = response.data.count;
 
@@ -362,17 +362,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                 element.querySelector('.counter').textContent = count;
                             }
                         })
-                        .catch(function (error) {
+                        .catch(error => {
                             //
                         })
-                        .then(function () {
+                        .then(() => {
                             //
                         });
                 }
             }
 
             // Adding to shelf
-            if (element.classList.contains('shelf')) {
+            if (element.matches('.shelf')) {
                 if (element.hasAttribute('data-wh-target') && element.hasAttribute('data-wh-id')) {
                     let url = element.attributes['data-wh-target'].value;
                     let id = element.attributes['data-wh-id'].value;
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     params.append('id', id);
 
                     axios.post(url, params)
-                        .then(function (response) {
+                        .then(response => {
                             let count = response.data.count;
 
                             if (count > 0) {
@@ -389,17 +389,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                 element.querySelector('.counter').textContent = count;
                             }
                         })
-                        .catch(function (error) {
+                        .catch(error => {
                             //
                         })
-                        .then(function () {
+                        .then(() => {
                             //
                         });
                 }
             }
 
             // Share button (if Share API is supported)
-            if (element.classList.contains('share') && navigator.share) {
+            if (element.matches('.share') && navigator.share) {
                 navigator.share({
                     title: element.attributes['data-wh-writing-title'].value,
                     url: element.attributes['data-wh-url'].value
@@ -408,12 +408,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Share links
-        if (element.classList.contains('share-link')) {
+        if (element.matches('.share-link')) {
             event.preventDefault();
 
             let url = element.attributes['href'].value;
 
-            if (element.classList.contains('copy-to-clipboard-link')) {
+            if (element.matches('.copy-to-clipboard-link')) {
                 navigator.clipboard.writeText(url);
             } else {
                 let params = 'scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=500,left=100,top=100';
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Admin edit link
-        if (element.classList.contains('admin-edit')) {
+        if (element.matches('.admin-edit')) {
             event.preventDefault();
 
             let targetModal = document.querySelector(element.attributes['data-wh-target-modal'].value);
@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Deleting a record (confirmation prompt)
-        if (element.classList.contains('admin-content-delete') || element.classList.contains('user-content-delete')) {
+        if (element.matches('.admin-content-delete') || element.matches('.user-content-delete')) {
             event.preventDefault();
 
             let targetModal = element.attributes['href'].value;
@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Deleting a record
-        if (element.hasAttribute('id') && 'btn-modal-delete' === element.attributes['id'].value) {
+        if (element.matches('#btn-modal-delete')) {
             let url = element.attributes['data-wh-delete-url'].value;
             let redirect = element.attributes['data-wh-redirect-url'].value;
             let params = new FormData();
@@ -488,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Post the form to the server
             axios.post(url, params)
-                .then(function (response) {
+                .then(response => {
                     if (null !== redirect && '' !== redirect) {
                         location.assign(redirect);
                     } else {
@@ -498,13 +498,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 })
-                .catch(function (error) {
+                .catch(error => {
                     fx.showToast({
                         'message': error.response.data.message,
                         'theme': 'danger'
                     });
                 })
-                .then(function () {
+                .then(() => {
                     //
                 });
         }
@@ -512,25 +512,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Opting out of GA tracking
         if (element.hasAttribute('href') && '#ga-optout' === element.attributes['href'].value) {
             event.preventDefault();
-            let disableStr = 'ga-disable-' + analytics_id;
+            let disableStr = `ga-disable-${analytics_id}`;
 
-            document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+            document.cookie = `${disableStr}=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/`;
             window[disableStr] = true;
             alert('Google Analytics tracking disabled');
         }
     });
 
     // Listen to the on submit event on the page and act accordingly
-    document.addEventListener('submit', (event) => {
+    document.addEventListener('submit', event => {
         let element = event.target;
-        let id = '';
-
-        if (element.hasAttribute('id')) {
-            id = element.attributes['id'].value;
-        }
 
         // Post the writing create/update form
-        if ('writing-form' === id) {
+        if (element.matches('#writing-form')) {
             event.preventDefault();
             fx.handleForm(element, 'submit');
 
@@ -540,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Post the form to the server
             axios.post(url, params)
-                .then(function (response) {
+                .then(response => {
                     let method = element.elements['_method'] || false;
 
                     // Form posted successfully, let's reset it
@@ -562,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         'message': response.data.message
                     });
                 })
-                .catch(function (error) {
+                .catch(error => {
                     // Oh no, something went wrong
                     let errors = error.response.data.errors;
 
@@ -575,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         'message': error.response.data.message
                     });
                 })
-                .then(function () {
+                .then(() => {
                     fx.handleForm(element, 'response');
 
                     // Scroll back to the form header
@@ -584,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Post the user profile update form
-        if ('profile-form' === id) {
+        if (element.matches('#profile-form')) {
             event.preventDefault();
             fx.handleForm(element, 'submit');
 
@@ -594,14 +589,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Post the form to the server
             axios.post(url, params)
-                .then(function (response) {
+                .then(response => {
                     // Show toast
                     fx.showToast({
                         'message': response.data.message,
                         'theme': 'success'
                     });
                 })
-                .catch(function (error) {
+                .catch(error => {
                     // Oh no, something went wrong
                     let errors = error.response.data.errors;
 
@@ -614,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         'theme': 'danger'
                     });
                 })
-                .then(function () {
+                .then(() => {
                     fx.handleForm(element, 'response');
 
                     // Scroll back to the form header
@@ -623,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Post the comment form
-        if ('post-comment-form' === id) {
+        if (element.matches('#post-comment-form')) {
             event.preventDefault();
 
             let params = new FormData(element);
@@ -637,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('cursor-wait');
 
             axios.post(url, params)
-                .then(function (response) {
+                .then(response => {
                     element.reset();
                     commentList.insertAdjacentHTML('beforeend', response.data);
                     postCommentSuccess.classList.remove('d-none');
@@ -647,41 +642,41 @@ document.addEventListener('DOMContentLoaded', () => {
                         commentsEmpty.classList.add('d-none');
                     }
                 })
-                .catch(function (error) {
+                .catch(error => {
                     postCommentError.textContent = error.response.data.errors.comment[0];
                     postCommentSuccess.classList.add('d-none');
                     postCommentError.classList.remove('d-none');
                 })
-                .then(function () {
+                .then(() => {
                     // Display the standard cursor
                     document.body.classList.remove('cursor-wait');
                 });
         }
 
         // Post the comment reply form
-        if (element.classList.contains('reply-form')) {
+        if (element.matches('.reply-form')) {
             event.preventDefault();
 
             let params = new FormData(element);
             let url = element.attributes['action'].value;
-            let commentReplyList = document.querySelector('#reply-list-' + element.comment_id.value);
-            let commentReplyError = document.querySelector('#reply-error-' + element.comment_id.value);
+            let commentReplyList = document.querySelector(`#reply-list-${element.comment_id.value}`);
+            let commentReplyError = document.querySelector(`#reply-error-${element.comment_id.value}`);
 
             // Display the wait cursor
             document.body.classList.add('cursor-wait');
 
             axios.post(url, params)
-                .then(function (response) {
+                .then(response => {
                     element.reset();
                     commentReplyList.insertAdjacentHTML('beforeend', response.data);
                     element.classList.add('d-none');
                     commentReplyError.classList.add('d-none');
                 })
-                .catch(function (error) {
+                .catch(error => {
                     commentReplyError.textContent = error.response.data.errors.reply[0];
                     commentReplyError.classList.remove('d-none');
                 })
-                .then(function () {
+                .then(() => {
                     // Display the standard cursor
                     document.body.classList.remove('cursor-wait');
                 });
@@ -690,7 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let adminForms = ['admin-settings-form', 'admin-types-form', 'admin-categories-form', 'admin-pages-form'];
 
         // Save data from admin panel
-        if (adminForms.includes(id)) {
+        if (adminForms.includes(element.id)) {
             event.preventDefault();
             fx.handleForm(element, 'submit');
 
@@ -700,7 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Post the form to the server
             axios.post(url, params)
-                .then(function (response) {
+                .then(response => {
                     // Reset form
                     if ('create' === response.data.action) {
                         element.reset.click();
@@ -711,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         'theme': 'success'
                     });
                 })
-                .catch(function (error) {
+                .catch(error => {
                     // Oh no, something went wrong
                     let errors = error.response.data.errors;
 
@@ -723,19 +718,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         'theme': 'danger'
                     });
                 })
-                .then(function () {
+                .then(() => {
                     fx.handleForm(element, 'response');
                 });
         }
     });
 
     // Listen to the on change event on the page and act accordingly
-    document.addEventListener('change', (event) => {
+    document.addEventListener('change', event => {
         let element = event.target;
         console.log(element);
 
         // Trigger the cover file validation
-        if (element.hasAttribute('id') && 'cover' === element.attributes['id'].value) {
+        if (element.matches('#cover')) {
             const file = element.files[0];
             const fileSizeKb = parseInt(file.size / 1024);
             const maxFileSizeKb = element.attributes['data-wh-max-size'].value;
@@ -743,7 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let error = element.parentElement.querySelector('#selected-error');
 
             if (null !== file && '' !== file && fileSizeKb <= maxFileSizeKb && fx.isImage(file)) {
-                info.textContent = file.name + ' [' + fileSizeKb + 'kb]';
+                info.textContent = `${file.name} [ ${fileSizeKb} kb]`;
                 info.classList.remove('d-none');
                 error.classList.add('d-none');
             } else {
@@ -755,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Trigger the avatar file validation
-        if (element.hasAttribute('id') && 'avatar' === element.attributes['id'].value) {
+        if (element.matches('#avatar')) {
             const file = element.files[0];
             const fileSizeKb = parseInt(file.size / 1024);
             const maxFileSizeKb = element.attributes['data-wh-max-size'].value;
@@ -772,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Trigger the avatar delete checkbox validation
-        if (element.hasAttribute('id') && 'avatar-remove' === element.attributes['id'].value) {
+        if (element.matches('#avatar-remove')) {
             if (element.checked) {
                 let avatarInput = document.querySelector('#avatar');
 
@@ -805,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Listen to the window scroll event and act accordingly
-    window.addEventListener('scroll', (event) => {
+    window.addEventListener('scroll', event => {
         let header = document.querySelector('header');
         let mainWrapper = document.querySelector('.main-wrapper');
         let jumpToMainNav = document.querySelector('#jump-to-nav');
@@ -833,10 +828,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Listen to the input event and act accordingly
-    document.addEventListener('input', (event) => {
+    document.addEventListener('input', event => {
         let element = event.target;
 
-        if (element.classList.contains('autogrow')) {
+        if (element.matches('.autogrow')) {
             autoGrow(element);
         }
     });
