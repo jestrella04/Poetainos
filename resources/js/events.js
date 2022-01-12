@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let modalForm = document.querySelector('.form-wrapper');
 
     // Working with admin modal forms
-    if (null !== modalForm && modalForm.classList.contains('modal')) {
+    if (null !== modalForm && modalForm.matches('.modal')) {
         let targetForm = modalForm.querySelector('form');
         let modalTitleElement = modalForm.querySelector('.modal-title');
 
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let targetForm = document.querySelector(target);
             targetForm.classList.toggle('d-none');
 
-            if (!targetForm.classList.contains('d-none')) {
+            if (!targetForm.matches('.d-none')) {
                 targetForm.querySelector('.form-control').focus();
             }
         }
@@ -727,7 +727,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen to the on change event on the page and act accordingly
     document.addEventListener('change', event => {
         let element = event.target;
-        console.log(element);
 
         // Trigger the cover file validation
         if (element.matches('#cover')) {
