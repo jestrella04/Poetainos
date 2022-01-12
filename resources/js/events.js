@@ -829,11 +829,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    async function getUserList(wildcard, callback) {
-        let response = await axios.post(`users/query/${wildcard}`);
-        callback(response.data);
-    }
-
     let tribute = new Tribute({
         trigger: '@',
         menuShowMinLength: 1,
@@ -849,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <span class="visually-hidden">Loading...</span>
                                     </div>`,
         menuItemTemplate: item => `${item.original.name ?? item.original.username} <span class="text-muted">@${item.original.username}</span>`,
-        values: getUserList
+        values: fx.getUserList
     });
 
     tribute.attach(document.querySelectorAll('.commentbox'));

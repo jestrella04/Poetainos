@@ -173,3 +173,8 @@ export function isNilOrEmpty(value) {
 
     return false;
 }
+
+export async function getUserList(wildcard, callback) {
+    let response = await axios.post(`users/query/${wildcard}`);
+    callback(response.data);
+}
