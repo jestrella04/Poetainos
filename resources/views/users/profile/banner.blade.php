@@ -1,11 +1,12 @@
 @php
-    if (isset($params['author'])) $user = $params['author']
+    if (isset($params['author'])) $user = $params['author'];
+    $count = getUserCounter($user);
 @endphp
 
 <div class="user-banner">
-        <div class="user-header d-flex">
+        <div class="user-header d-flex flex-wrap">
             <div>{!! getUserAvatar($user, $size = 'xl') !!}</div>
-            <div>
+            <div class="flex-grow-1">
                 <a href="{{ $user->path() }}" class="stretched-link">
                     <span class="name">{{ $user->getName() }}</span>
                 </a>

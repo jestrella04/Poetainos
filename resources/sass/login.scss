@@ -1,7 +1,4 @@
 .login-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-
     .logo,
     .login {
         width: 100%;
@@ -37,13 +34,6 @@
                     @media (min-width: 992px) {
                         width: 128px;
                         height: 128px;
-                    }
-                }
-
-                h1 {
-                    @media (max-width: 992px) {
-                        font-size: $wh-fs-xl;
-                        margin-bottom: 0;
                     }
                 }
             }

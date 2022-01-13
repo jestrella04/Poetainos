@@ -1,5 +1,5 @@
 <div class="writing-body">
-    <blockquote class="blockquote">
+    <blockquote>
         @if ( $params['single_entry'] ?? false)
             {!! nl2br(e($writing->text)) !!}
         @else

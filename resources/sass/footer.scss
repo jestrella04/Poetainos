@@ -1,6 +1,6 @@
 #footer {
+    @extend .smaller;
     margin-top: auto;
-    font-size: $wh-fs-sm;
     background: $bg-gradient;
     color: $white;
     padding: $wh-s-lg;

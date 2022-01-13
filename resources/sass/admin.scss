@@ -1,7 +1,6 @@
 .settings-json-input,
 #logview textarea {
     font-family: monospace;
-    font-size: $wh-fs-sm;
 }
 
 .admin-main-wrapper {
@@ -46,8 +45,6 @@
             a.btn {
                 padding: 0;
                 margin-left: 0.5rem;
-                font-size: initial;
-                line-height: initial;
 
                 i {
                     opacity: 0.85;

@@ -1,6 +1,3 @@
-// Default font size
-$wh-body-font-size: 20px;
-
 // Avatars
 $avatar-sizes: (
     "xxl": 96px,
@@ -16,13 +13,6 @@ $wh-s-xl: 2rem;
 $wh-s-lg: 1rem;
 $wh-s-md: 0.6rem;
 $wh-s-sm: 0.3rem;
-
-// Custom font sizes
-$wh-fs-xxl: 2.4rem;
-$wh-fs-xl: 2.0rem;
-$wh-fs-lg: 1.6rem;
-$wh-fs-md: 1.2rem;
-$wh-fs-sm: 0.8rem;
 
 // Gradients
 $bg-gradient: linear-gradient(180deg, $dark 0%, $primary 100%);
