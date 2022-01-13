@@ -7,8 +7,6 @@
 
     <div class="container-fluid admin-main-wrapper">
         <div class="d-flex flex-wrap flex-lg-nowrap">
-            @yield('admin-sidebar')
-
             <main role="main" class="flex-grow-1">
                 @yield ('main')
             </main>
@@ -18,4 +16,5 @@
     @yield('jumbo-down')
 
     @yield('footer')
+    @yield('offcanvas')
 @endsection

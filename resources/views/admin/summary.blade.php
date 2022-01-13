@@ -6,11 +6,13 @@
             <h3 class="all-caps">{{ __('Summary') }}</h3>
         </div>
 
-        <div class="d-flex flex-wrap">
+        <div class="d-flex flex-wrap justify-content-center">
             @foreach ($counters as $counter)
-                <div class="admin-counter">
-                    <h3>{{ getReadableNumber($counter['count']) }}</h3>
-                    <span>{{ __($counter['title']) }}</span>
+                <div class="flex-fill admin-counter">
+                    <div>
+                        <p class="h4">{{ getReadableNumber($counter['count']) }}</p>
+                        <span class="lead smaller">{{ __($counter['title']) }}</span>
+                    </div>
                 </div>
             @endforeach
         </div>

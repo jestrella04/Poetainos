@@ -233,11 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('body').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Hide the side menu when clicking off bounds
-        if (element.matches('#side-menu-overlay')) {
-            document.querySelector('#toggler').click();
-        }
-
         // Dynamically load comments for a writing
         if (!fx.isNil(element.parentElement)) {
             if (element.parentElement.matches['#load-more']) {
