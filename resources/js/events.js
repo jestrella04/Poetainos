@@ -768,27 +768,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update alternative categories
-        if (element.matches('#main-category') && !fx.isNilOrEmpty(element.value)) {
-            let mainCategoryId = element.value;
+        if (element.matches('#main-category')) {
             let subCategories = document.querySelector('#categories');
             let tagsInstance = Tags.getInstance(subCategories);
 
-            Array.from(subCategories.options).forEach(option => {
-                option.selected = false;
+            if (fx.isNilOrEmpty(element.value)) {
+                subCategories.disabled = true;
+                tagsInstance.resetState();
+                tagsInstance.reset();
+            } else {
+                let mainCategoryDescendants = JSON.parse(element.options[element.selectedIndex].dataset.whDescendants);
 
-                if (option.dataset.parentId == mainCategoryId) {
-                    option.disabled = false;
-                    option.hidden = false;
-                } else {
-                    option.disabled = true;
-                    option.hidden = true;
-                }
-            });
+                Array.from(subCategories.options).forEach(option => {
+                    let parentId = parseInt(option.dataset.parentId);
+                    option.selected = false;
 
-            subCategories.disabled = false;
-            tagsInstance.reset();
-            tagsInstance.resetSuggestions();
-            tagsInstance.resetState();
+                    if (mainCategoryDescendants.includes(parentId)) {
+                        option.disabled = false;
+                        option.hidden = false;
+                    } else {
+                        option.disabled = true;
+                        option.hidden = true;
+                    }
+                });
+
+                subCategories.disabled = false;
+                tagsInstance.resetState();
+                tagsInstance.resetSuggestions();
+                tagsInstance.reset();
+            }
         }
     });
 

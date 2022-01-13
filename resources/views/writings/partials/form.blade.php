@@ -52,6 +52,7 @@
                     @foreach ($mainCategories as $category)
                         <option
                             value="{{ $category->id }}"
+                            data-wh-descendants="{{ $category->descendantsAndSelf()->depthFirst()->pluck('id')->toJson() }}"
                             @if (in_array($category->id, $writing->categories->pluck('id')->toArray())) {{ 'selected' }} @endif
                         >{{ $category->name }}</option>
                     @endforeach
