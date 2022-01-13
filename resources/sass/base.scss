@@ -47,6 +47,12 @@ hr {
         margin-left: $wh-s-xxl;
     }
 
+    .sidebar-toggle {
+        i {
+            transition: all 0.5s;
+        }
+    }
+
     .block {
         .block-title {
             @extend .lead;
@@ -160,6 +166,10 @@ hr {
 
 .all-caps {
     text-transform: uppercase;
+}
+
+.rotate {
+    transform: rotate(180deg);
 }
 
 .form-wrapper {

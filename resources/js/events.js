@@ -510,6 +510,11 @@ document.addEventListener('DOMContentLoaded', () => {
             window[disableStr] = true;
             alert('Google Analytics tracking disabled');
         }
+
+        // Toggle main sidebar
+        if (element.closest('.sidebar-toggle')) {
+            element.closest('.sidebar-toggle').querySelector('i').classList.toggle('rotate');
+        }
     });
 
     // Listen to the on submit event on the page and act accordingly
