@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.matches('.admin-content-delete') || element.matches('.user-content-delete')) {
             event.preventDefault();
 
-            let targetModal = element.href;
+            let targetModal = element.attributes['href'].value;
             let btnDelete = document.querySelector('#btn-modal-delete');
             let warningDelete = document.querySelector('#content-delete-warning');
 

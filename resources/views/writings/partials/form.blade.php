@@ -160,7 +160,7 @@
                     data-wh-max-size="{{ getSiteConfig('uploads_max_file_size') }}"
                     placeholder="">
 
-                <button id="cover-chooser" data-wh-target="#cover">
+                <button id="cover-chooser" data-wh-target="#cover" class="smaller">
                     <p class="fw-bold">{{ __('Click here to select a file') }}</p>
                     <p>{{ __('Max file size is :size', ['size' => getSiteConfig('uploads_max_file_size') . 'kb']) }}</p>
 
