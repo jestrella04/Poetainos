@@ -52,12 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
         userToken = atob(userToken.content);
     }
 
-    // Enable scrolling on the document
-    document.body.classList.remove('overflow-hidden');
-
-    // Create the side menu for small screens
-    fx.createSideMenu();
-
     // Initialize Tags
     Tags.init('.tags-select', {
         allowClear: true,
@@ -194,29 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Listen to the window resize event and act accordingly
-    window.addEventListener('resize', () => {
-        let overlay = document.querySelector('#side-menu-overlay');
-        let toggler = document.querySelector('#toggler i');
-        let sideMenu = document.querySelectorAll('.side-menu');
-
-        document.body.classList.remove('overflow-hidden');
-
-        if (!fx.isNil(overlay)) {
-            overlay.classList.add('d-none');
-        }
-
-        if (!fx.isNil(toggler)) {
-            toggler.classList.remove('fa-times');
-        }
-
-        if (!fx.isNil(sideMenu)) {
-            sideMenu.forEach(aside => {
-                aside.classList.remove('show');
-            });
-        }
-    });
-
     // Listen to the on click event on the page and act accordingly
     document.addEventListener('click', event => {
         let element = event.target;
@@ -260,31 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             document.querySelector('body').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Populate and/or show the side menu
-        if (element.matches('#toggler')) {
-            let targetNav = document.querySelector(element.dataset.whTarget);
-            let dataSource = null;
-            let sourceNav = null;
-
-            if ('whSource' in element.dataset) {
-                dataSource = element.dataset.whSource;
-            }
-
-            if (!fx.isNil(dataSource)) {
-                sourceNav = document.querySelector(dataSource);
-            }
-
-            if (!fx.isNil(sourceNav) && fx.isEmpty(targetNav.innerHTML)) {
-                targetNav.innerHTML = sourceNav.innerHTML;
-            }
-
-            document.querySelector('#side-menu-overlay').classList.toggle('d-none');
-            targetNav.classList.toggle('show');
-            element.querySelector('i').classList.toggle('fa-times');
-            element.querySelector('.icon-badge').classList.toggle('rotate');
-            document.body.classList.toggle('overflow-hidden');
         }
 
         // Hide the side menu when clicking off bounds

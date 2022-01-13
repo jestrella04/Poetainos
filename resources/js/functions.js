@@ -38,19 +38,6 @@ export function loadComments(url) {
         });
 }
 
-export function createSideMenu() {
-    let overlay = document.createElement('div');
-    let sideMenu = document.createElement('div');
-
-    overlay.id = 'side-menu-overlay';
-    sideMenu.id = 'user-side-menu';
-    overlay.classList.add('d-none');
-    sideMenu.classList.add('side-menu');
-
-    document.body.insertAdjacentElement('afterbegin', sideMenu);
-    document.body.insertAdjacentElement('afterbegin', overlay);
-}
-
 export function readImage(file, callback) {
     let reader = new FileReader();
 

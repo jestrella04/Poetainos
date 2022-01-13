@@ -57,10 +57,11 @@
         @yield('scripts')
     </head>
 
-    <body class="d-flex flex-column overflow-hidden">
+    <body class="d-flex flex-column">
         @include('partials.noscript')
         @include('partials.toast')
 
         @yield('body')
+        @yield('offcanvas')
     </body>
 </html>
