@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let element = event.target;
 
         // Bubble up click event on certain elements
-        let bubble = element.closest('a, label, button, .btn, .avatar-chooser') || false;
+        let bubble = element.closest('a, label, button, .badge, .avatar-chooser') || false;
 
         if (bubble) {
             element = bubble;
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Counters
-        if (element.matches('.btn-counter')) {
+        if (element.closest('.stats')) {
             event.preventDefault();
 
             // Liking a writing
