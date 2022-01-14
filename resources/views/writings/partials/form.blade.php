@@ -45,9 +45,7 @@
                     name="main_category"
                     id="main-category"
                     class="form-control form-select tags-select"
-                    multiple
-                    required
-                    data-max="1">
+                    required>
                     <option selected disabled hidden value="">{{ __('Click to select') }}</option>
                     @foreach ($mainCategories as $category)
                         <option

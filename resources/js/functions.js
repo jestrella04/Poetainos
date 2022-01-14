@@ -165,3 +165,9 @@ export async function getUserList(wildcard, callback) {
     let response = await axios.post(`users/query/${wildcard}`);
     callback(response.data);
 }
+
+export function clearSelections(selectElement) {
+    Array.from(selectElement.options).forEach(option => {
+        option.selected = false;
+    });
+}

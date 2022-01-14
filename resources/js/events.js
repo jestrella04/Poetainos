@@ -721,13 +721,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fx.isNilOrEmpty(element.value)) {
                 subCategories.disabled = true;
                 tagsInstance.resetState();
-                tagsInstance.reset();
+                fx.clearSelections(subCategories);
+                tagsInstance.removeActiveSelection();
             } else {
                 let mainCategoryDescendants = JSON.parse(element.options[element.selectedIndex].dataset.whDescendants);
 
+                fx.clearSelections(subCategories);
+
                 Array.from(subCategories.options).forEach(option => {
                     let parentId = parseInt(option.dataset.parentId);
-                    option.selected = false;
 
                     if (mainCategoryDescendants.includes(parentId)) {
                         option.disabled = false;
@@ -741,7 +743,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 subCategories.disabled = false;
                 tagsInstance.resetState();
                 tagsInstance.resetSuggestions();
-                tagsInstance.reset();
+                //tagsInstance.reset();
+                fx.clearSelections(subCategories);
             }
         }
     });
