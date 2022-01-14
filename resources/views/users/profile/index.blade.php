@@ -125,9 +125,7 @@
             @endif
         </dl>
 
-        <div class="text-center">
-            @include('users.profile.stats')
-        </div>
+        @include('users.profile.stats')
     </div>
 
     <div class="profile-footer">

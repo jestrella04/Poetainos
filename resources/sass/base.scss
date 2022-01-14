@@ -100,43 +100,30 @@ hr {
 }
 
 .stats {
-    text-align: center;
+    width: min(20rem, 100%);
+    margin: auto;
 
-    button {
-        @media (max-width: 576px) {
-            margin-bottom: $wh-s-sm;
+    .badge {
+        @extend .bg-light, .text-dark;
+        font-weight: normal;
+    }
+
+    .badge.click {
+        cursor: pointer !important;
+    }
+
+    .badge.like:hover,
+    .voted {
+        i {
+            color: $danger !important;
         }
     }
-}
 
-.btn-counter {
-    background-color: $gray-100 !important;
-    cursor: default !important;
-}
-
-.btn-counter:focus {
-    box-shadow: 0 0 0 0.2rem rgba($gray-400, 0.25);
-}
-
-.btn-counter.click {
-    cursor: pointer !important;
-}
-
-.btn-counter.click:hover {
-    background-color: $gray-200 !important;
-}
-
-.btn-counter.like:hover,
-.voted {
-    i {
-        color: $danger !important;
-    }
-}
-
-.btn-counter.shelf:hover,
-.shelved {
-    i {
-        color: $indigo !important;
+    .badge.shelf:hover,
+    .shelved {
+        i {
+            color: $indigo !important;
+        }
     }
 }
 

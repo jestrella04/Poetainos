@@ -107,7 +107,7 @@ function getWritingCounter($writing)
         'replies' => Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count(),
         'views' => getReadableNumber($writing->views),
         'shelf' => getReadableNumber($writing->shelf->count()),
-        'aura' => number_format($writing->aura, 2),
+        'aura' => intval($writing->aura),
     ];
 }
 
@@ -123,7 +123,7 @@ function getUserCounter($user)
         'shelf' => getReadableNumber($user->shelf()->count()),
         'hood' => getReadableNumber($user->hood()->count()),
         'extendedHood' => getReadableNumber($user->fellowHood($count = true)),
-        'aura' => number_format($user->aura, 2),
+        'aura' => intval($user->aura),
     ];
 }
 

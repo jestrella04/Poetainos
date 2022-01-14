@@ -31,20 +31,12 @@
             border: 1px solid $gray-300;
             border-radius: $wh-s-sm;
 
-            button {
-                @extend .smaller;
-            }
-
             .user-header {
                 position: relative;
             }
 
-            span {
-                display: block;
-            }
-
-            span.name {
-                font-weight: 700;
+            .profile-bio {
+                margin: $wh-s-sm 0;
             }
 
             .stretched-link:hover {
@@ -108,9 +100,9 @@ hr.banner {
         margin-bottom: $wh-s-sm;
     }
 
-    .user-stats {
+    /* .user-stats {
         margin-bottom: $wh-s-xl;
-    }
+    } */
 
     .profile-footer {
         text-align: center;
