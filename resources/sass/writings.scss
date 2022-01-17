@@ -12,11 +12,6 @@
 
     .writing-meta {
         text-transform: uppercase;
-        font-size: 0.85rem;
-
-        @include media-breakpoint-up(md) {
-            font-size: 0.95rem;
-        }
 
         i {
             opacity: 0.7;
@@ -158,7 +153,6 @@
 
         span.name {
             font-weight: 700;
-            font-size: $wh-fs-md;
             text-decoration: none;
         }
 
@@ -187,7 +181,6 @@
             border: 1px solid $gray-400;
             border-radius: 0.5rem;
             cursor: pointer;
-            font-size: $wh-fs-sm;
             width: 100%;
 
             p {

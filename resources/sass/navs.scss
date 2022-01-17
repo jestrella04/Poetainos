@@ -1,15 +1,10 @@
-nav, .nav {
-    font-size: $wh-fs-sm;
-}
-
 #nav-main {
+    @extend .smaller, .lead;
     padding-top: $wh-s-md;
     padding-bottom: $wh-s-md;
     background: $bg-gradient-reverse;
 
     .navbar-brand {
-        font-weight: 700;
-
         img {
             transition: transform .5s;
             margin-right: $wh-s-sm;
@@ -66,7 +61,6 @@ nav, .nav {
 
         .nav-link {
             color: $white;
-            font-weight: 700;
         }
 
         i {

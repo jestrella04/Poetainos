@@ -8,20 +8,20 @@
     }
 @endphp
 
-<div class="stats writing-stats">
+<div class="d-flex flex-wrap justify-content-evenly stats writing-stats">
     @if (isset($writing->home_posted_at))
-        <button
-            class="btn btn-sm btn-counter"
+        <span
+            class="badge"
             title="{{ __('Awarded a Golden Flower') }}"
             data-bs-toggle="tooltip"
             data-bs-placement="top">
             <i class="fas fa-fan fa-fw" style="color:goldenrod" aria-hidden="true"></i>
             <span class="visually-hidden">{{ __('Awarded a Golden Flower') }}</span>
-        </button>
+        </span>
     @endif
 
-    <button
-        class="btn btn-sm btn-counter @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
+    <span
+        class="badge @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
         @if (auth()->check() && $voted > 0)
         title="{{ __('Liked it') }}"
         @elseif (auth()->check() && null === $voted)
@@ -38,9 +38,9 @@
         data-bs-placement="top">
         <i class="fa fa-heart fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['likes'] }}</span>
-    </button>
+    </span>
 
-    {{-- <button class="btn btn-sm btn-counter @auth {{ 'dislike' }} @endauth @if ($voted = 0) {{ 'voted' }} @endif"
+    {{-- <span class="badge @auth {{ 'dislike' }} @endauth @if ($voted = 0) {{ 'voted' }} @endif"
         @if (auth()->check())
         title="{{ __('Dislike it') }}"
         @else
@@ -55,28 +55,28 @@
         @endif>
         <i class="fa fa-heart-broken fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['downvotes'] }}</span>
-    </button> --}}
+    </span> --}}
 
-    <button
-        class="btn btn-sm btn-counter"
+    <span
+        class="badge"
         title="{{ __('Comments') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['comments'] + $count['replies'] }}</span>
-    </button>
+    </span>
 
-    <button
-        class="btn btn-sm btn-counter"
+    <span
+        class="badge"
         title="{{ __('Views') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-book-reader fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['views'] }}</span>
-    </button>
+    </span>
 
-    <button
-        class="btn btn-sm btn-counter @if (isset($userId) && $userId !== $writing->author->id) {{ 'click shelf' }} @endif @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
+    <span
+        class="badge @if (isset($userId) && $userId !== $writing->author->id) {{ 'click shelf' }} @endif @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
         @if (auth()->check() && $shelved === $writing->id)
         title="{{ __('On my shelf') }}"
         @elseif (auth()->check() && $userId !== $writing->author->id && null === $shelved)
@@ -92,22 +92,21 @@
         data-bs-placement="top">
         <i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['shelf'] }}</span>
-    </button>
+    </span>
 
-    <button
-        class="btn btn-sm btn-counter"
+    <span
+        class="badge"
         title="{{ __('Aura') }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-dove fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['aura'] }}</span>
-    </button>
+    </span>
 
     <div class="dropdown dropdown-counter d-inline">
         <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Share writing') }}">
-            <button
-                class="btn btn-sm btn-counter click share"
-                role="button"
+            <span
+                class="badge click share"
                 id="dropdown-share-{{ $writing->id }}"
                 data-wh-url="{{ $writing->path() }}"
                 data-wh-writing-title="{{ $writing->title }}"
@@ -116,7 +115,7 @@
                 aria-haspopup="true"
                 aria-expanded="false">
                 <i class="fa fa-share-alt fa-fw" aria-hidden="true"></i>
-            </button>
+            </span>
 
             <div class="dropdown-menu" aria-labelledby="dropdown-share-{{ $writing->id }}">
                 @foreach ($writing->shareLinks() as $serviceName => $serviceData)
@@ -135,16 +134,15 @@
     @if (auth()->check() && (auth()->user()->can('update', $writing) || auth()->user()->can('delete', $writing)))
         <div class="dropdown dropdown-counter d-inline">
             <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Actions') }}">
-                <button
-                    class="btn btn-sm btn-counter click owner"
-                    role="button"
+                <span
+                    class="badge click owner"
                     id="dropdown-owner"
                     data-bs-toggle="dropdown"
                     aria-label="{{ __('Actions') }}"
                     aria-haspopup="true"
                     aria-expanded="false">
                     <i class="fas fa-ellipsis-v fa-fw" aria-hidden="true"></i>
-                </button>
+                </span>
 
                 <div class="dropdown-menu" aria-labelledby="dropdown-owner">
                     <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">{{ __('Edit / Delete') }}</a>

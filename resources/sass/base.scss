@@ -1,5 +1,5 @@
 html {
-    font-size: $wh-body-font-size !important;
+    font-size: clamp(1.13rem, 0.98rem + 0.73vw, 1.50rem) !important;
 }
 
 html,
@@ -7,12 +7,8 @@ body {
     height: 100%;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
     font-weight: 700;
 }
 
@@ -20,6 +16,10 @@ hr {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
+}
+
+.smaller {
+    font-size: 0.8rem;
 }
 
 .main-wrapper {
@@ -47,10 +47,16 @@ hr {
         margin-left: $wh-s-xxl;
     }
 
+    .sidebar-toggle {
+        i {
+            transition: all 0.5s;
+        }
+    }
+
     .block {
         .block-title {
-            font-size: $wh-fs-md;
-            font-weight: 700;
+            @extend .lead;
+            font-size: 1rem;
             text-transform: uppercase;
             margin-bottom: $wh-s-lg;
         }
@@ -70,8 +76,6 @@ hr {
 
     .title {
         margin-bottom: $wh-s-lg;
-        font-size: $wh-fs-md;
-        font-weight: 700;
         text-transform: uppercase;
     }
 
@@ -90,49 +94,36 @@ hr {
 }
 
 .top-links {
-    font-size: $wh-fs-lg;
+    @extend .smaller, .lead;
     margin-bottom: $wh-s-xxl;
     text-transform: capitalize;
 }
 
 .stats {
-    text-align: center;
+    width: min(20rem, 100%);
+    margin: auto;
 
-    button {
-        @media (max-width: 576px) {
-            margin-bottom: $wh-s-sm;
+    .badge {
+        @extend .bg-light, .text-dark;
+        font-weight: normal;
+    }
+
+    .badge.click {
+        cursor: pointer !important;
+    }
+
+    .badge.like:hover,
+    .voted {
+        i {
+            color: $danger !important;
         }
     }
-}
 
-.btn-counter {
-    background-color: $gray-100 !important;
-    cursor: default !important;
-}
-
-.btn-counter:focus {
-    box-shadow: 0 0 0 0.2rem rgba($gray-400, 0.25);
-}
-
-.btn-counter.click {
-    cursor: pointer !important;
-}
-
-.btn-counter.click:hover {
-    background-color: $gray-200 !important;
-}
-
-.btn-counter.like:hover,
-.voted {
-    i {
-        color: $danger !important;
-    }
-}
-
-.btn-counter.shelf:hover,
-.shelved {
-    i {
-        color: $indigo !important;
+    .badge.shelf:hover,
+    .shelved {
+        i {
+            color: $indigo !important;
+        }
     }
 }
 
@@ -164,6 +155,10 @@ hr {
     text-transform: uppercase;
 }
 
+.rotate {
+    transform: rotate(180deg);
+}
+
 .form-wrapper {
     .title {
         margin-bottom: $wh-s-xl;
@@ -174,7 +169,6 @@ hr {
         max-width: 25rem;
         margin: 0 auto $wh-s-xl;
         text-align: center;
-        font-size: $wh-fs-sm;
 
         p {
             margin-bottom: 0;
@@ -192,46 +186,6 @@ hr {
 
 .d-title {
     text-transform: capitalize;
-}
-
-.ss-main {
-    .ss-multi-selected.ss-disabled {
-        background-color: transparent !important;
-
-        .ss-values {
-            .ss-disabled {
-                color: $gray-600 !important;
-            }
-        }
-    }
-
-    .ss-multi-selected {
-        border: 0 !important;
-        padding: 0 !important;
-
-        .ss-add {
-            display: none !important;
-        }
-
-        .ss-values {
-            padding: 0 !important;
-
-            .ss-value {
-                padding: 0.2rem 0.6rem !important;
-
-                .ss-value-text {
-                    font-size: 0.7rem !important;
-                }
-            }
-        }
-    }
-
-    .ss-content {
-        margin: 0 !important;
-        margin-top: 4px !important;
-        border: 1px solid $gray-500;
-        border-radius: 0.3rem;
-    }
 }
 
 .fade-in {

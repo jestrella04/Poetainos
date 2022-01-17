@@ -1,6 +1,6 @@
 <div class="user-profile text-break">
     <div class="profile-header text-center">
-        {!! getUserAvatar($user, $size = 'xxl') !!}
+        {!! getUserAvatar($user, $size = 'xxl', $classList = ['mx-auto']) !!}
 
         <span class="user-name">{{ $user->getName() }}</span>
         <span class="username text-muted">{{ '@' . $user->username }}</span>
@@ -125,9 +125,7 @@
             @endif
         </dl>
 
-        <div class="text-center">
-            @include('users.profile.stats')
-        </div>
+        @include('users.profile.stats')
     </div>
 
     <div class="profile-footer">

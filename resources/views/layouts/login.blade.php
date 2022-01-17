@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('body')
-    <main role="main" class="login-wrapper">
+    <main role="main" class="login-wrapper d-flex flex-wrap flex-lg-row-reverse">
         <div class="logo">
             <div>
                 <a href="{{ route('home') }}">

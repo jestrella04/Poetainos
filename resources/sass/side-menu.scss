@@ -1,29 +1,11 @@
-#side-menu-overlay {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 9997;
-    width: 100%;
-    background-color: rgba($dark, 0.5);
-    cursor: pointer;
-
-    @media (min-width: 992px) {
-        display: none;
-    }
-}
-
-.side-menu {
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    position: fixed;
-    top: 0;
-    left: 0;
+.offcanvas-sidebar {
     z-index: 9999;
-    width: 15rem;
     background: $bg-gradient;
-    padding: 2rem 0;
+    color: $white;
+
+    .offcanvas-body {
+        padding: 0;
+    }
 
     .nav-item:first-child {
         border-top: 1px solid rgba($light, .05);
@@ -36,7 +18,7 @@
         button {
             text-transform: capitalize !important;
             color: $white;
-            padding: 1rem;
+            padding: 0.6em 0 0.6rem 1rem;
         }
 
         button,
@@ -53,45 +35,9 @@
         }
     }
 
-    .nav-item.active {
-        a {
-            font-weight: 700;
-        }
-    }
-
     .nav-item.active,
     .nav-item:hover,
     .nav-item:focus {
         background-color: rgba($light, .05);
-    }
-}
-
-#user-side-menu,
-#admin-side-menu {
-    transform: translateX(-15rem);
-    transition: transform 250ms ease-in-out;
-
-    @media (min-width: 992px) {
-        transform: translateX(-15rem) !important;
-    }
-}
-
-#user-side-menu.show,
-#admin-side-menu.show {
-    transform: translateX(0) !important;
-}
-
-#user-side-menu {
-    @media (min-width: 992px) {
-        transform: translateX(-15rem) !important;
-    }
-}
-
-#admin-side-menu {
-    @media (min-width: 992px) {
-        transform: translateX(0) !important;
-        overflow: hidden;
-        position: sticky;
-        height: 100vh;
     }
 }

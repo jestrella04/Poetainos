@@ -52,7 +52,7 @@
             </script>
         @endsection
 
-        <h3 class="all-caps">{{ __('Comments') }}</h3>
+        <p class="all-caps lead">{{ __('Comments') }}</p>
 
         <div id="load-more" class="d-none">
             <div class="d-grid gap-2">

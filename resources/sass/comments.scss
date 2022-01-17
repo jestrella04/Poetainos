@@ -17,6 +17,10 @@
         overflow: hidden;
     }
 
+    .reply-form .commentbox {
+        margin-top: $wh-s-md;
+    }
+
     #post-comment + hr {
         margin: $wh-s-xxl auto;
 
@@ -46,7 +50,6 @@
             .comment-body {
                 .author {
                     text-transform: uppercase;
-                    font-size: $wh-fs-sm;
                     margin-bottom:$wh-s-sm;
 
                     small:first-child {
@@ -89,7 +92,6 @@
                 .reply-body {
                     .author {
                         text-transform: uppercase;
-                        font-size: $wh-fs-sm;
                         margin-bottom: $wh-s-sm;
 
                         small:first-child {

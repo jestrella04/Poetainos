@@ -1,6 +1,5 @@
 .avatar-chooser {
     cursor: pointer;
-    font-size: 1rem !important;
 
     i {
         opacity: 0.6;
@@ -36,12 +35,8 @@
                 position: relative;
             }
 
-            span {
-                display: block;
-            }
-
-            span.name {
-                font-weight: 700;
+            .profile-bio {
+                margin: $wh-s-sm 0;
             }
 
             .stretched-link:hover {
@@ -86,7 +81,6 @@ hr.banner {
         }
 
         .user-name {
-            font-size: $wh-fs-md;
             font-weight: 700;
         }
 
@@ -106,9 +100,9 @@ hr.banner {
         margin-bottom: $wh-s-sm;
     }
 
-    .user-stats {
+    /* .user-stats {
         margin-bottom: $wh-s-xl;
-    }
+    } */
 
     .profile-footer {
         text-align: center;
@@ -137,7 +131,7 @@ hr.banner {
 #profile-form-wrapper {
     #profile-form {
         .form-check {
-            font-size: $wh-fs-sm span {
+            font-size: span {
                 vertical-align: middle;
             }
         }

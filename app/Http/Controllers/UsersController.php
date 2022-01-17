@@ -40,7 +40,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Query list of matching resource.
+     * Query list of matching resources.
      *
      * @return \Illuminate\Http\Response
      */

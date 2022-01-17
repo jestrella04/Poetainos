@@ -107,7 +107,7 @@ function getWritingCounter($writing)
         'replies' => Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count(),
         'views' => getReadableNumber($writing->views),
         'shelf' => getReadableNumber($writing->shelf->count()),
-        'aura' => number_format($writing->aura, 2),
+        'aura' => intval($writing->aura),
     ];
 }
 
@@ -123,16 +123,20 @@ function getUserCounter($user)
         'shelf' => getReadableNumber($user->shelf()->count()),
         'hood' => getReadableNumber($user->hood()->count()),
         'extendedHood' => getReadableNumber($user->fellowHood($count = true)),
-        'aura' => number_format($user->aura, 2),
+        'aura' => intval($user->aura),
     ];
 }
 
-function getUserAvatar(User $user, $size = 'md')
+function getUserAvatar(User $user, $size = 'md', $classList = [])
 {
+    $classList[] = 'avatar';
+    $classList[] = 'avatar-' . $size;
+    $classList = implode(' ', $classList);
+
     if (!empty($user->avatarPath())) {
-        return '<img class="avatar avatar-' . $size . '" src="' . e($user->avatarPath()) . '" alt="' . e($user->getName()) . '" loading="lazy">' . PHP_EOL;
+        return '<img class="' . $classList . '" src="' . e($user->avatarPath()) . '" alt="' . e($user->getName()) . '" loading="lazy">' . PHP_EOL;
     } else {
-        return '<span class="avatar avatar-' . $size . '">' . e($user->initials()) . '</span>' . PHP_EOL;
+        return '<span class="' . $classList . '">' . e($user->initials()) . '</span>' . PHP_EOL;
     }
 }
 
