@@ -37,9 +37,14 @@ window.addEventListener('load', () => {
     // Dispatch change event to enforce the app loads
     // alternative categories when editing a writing
     let mainCategory = document.querySelector('#main-category');
+    let subCategories = document.querySelector('#categories');
+    let tagsInstance = Tags.getInstance(subCategories);
 
     if (!fx.isNil(mainCategory) && !fx.isNilOrEmpty(mainCategory.value)) {
-        mainCategory.dispatchEvent(new Event('change', { bubbles: true }));
+        subCategories.disabled = false;
+        fx.subCategoriesUpdate(subCategories, mainCategory);
+        tagsInstance.resetSuggestions();
+        tagsInstance.resetState();
     }
 });
 
@@ -271,10 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Counters
         if (element.closest('.stats')) {
-            event.preventDefault();
-
             // Liking a writing
             if (element.matches('.like')) {
+                event.preventDefault();
+
                 if ('whTarget' in element.dataset && 'whId' in element.dataset && 'whValue' in element.dataset) {
                     let url = element.dataset.whTarget;
                     let id = element.dataset.whId;
@@ -305,6 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Adding to shelf
             if (element.matches('.shelf')) {
+                event.preventDefault();
+
                 if ('whTarget' in element.dataset && 'whId' in element.dataset) {
                     let url = element.dataset.whTarget;
                     let id = element.dataset.whId;
@@ -332,6 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Share button (if Share API is supported)
             if (element.matches('.share') && navigator.share) {
+                event.preventDefault();
+
                 navigator.share({
                     title: element.dataset.whWritingTitle,
                     url: element.dataset.whUrl
@@ -480,9 +489,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!method) {
                         element.reset();
 
-                        /* if (!fx.isNil(slimSelect)) {
-                            slimSelect.set([]);
-                        } */
+                        let subCategories = document.querySelector('#categories');
+                        let tagsInstance = Tags.getInstance(subCategories);
+
+                        subCategories.disabled = true;
+                        tagsInstance.resetState();
                     }
 
                     // Update file helpers
@@ -718,34 +729,18 @@ document.addEventListener('DOMContentLoaded', () => {
             let subCategories = document.querySelector('#categories');
             let tagsInstance = Tags.getInstance(subCategories);
 
+            fx.clearSelections(subCategories);
+
             if (fx.isNilOrEmpty(element.value)) {
                 subCategories.disabled = true;
-                tagsInstance.resetState();
-                fx.clearSelections(subCategories);
-                tagsInstance.removeActiveSelection();
             } else {
-                let mainCategoryDescendants = JSON.parse(element.options[element.selectedIndex].dataset.whDescendants);
-
-                fx.clearSelections(subCategories);
-
-                Array.from(subCategories.options).forEach(option => {
-                    let parentId = parseInt(option.dataset.parentId);
-
-                    if (mainCategoryDescendants.includes(parentId)) {
-                        option.disabled = false;
-                        option.hidden = false;
-                    } else {
-                        option.disabled = true;
-                        option.hidden = true;
-                    }
-                });
-
+                fx.subCategoriesUpdate(subCategories, element);
                 subCategories.disabled = false;
-                tagsInstance.resetState();
-                tagsInstance.resetSuggestions();
-                //tagsInstance.reset();
-                fx.clearSelections(subCategories);
             }
+
+            tagsInstance.removeAll();
+            tagsInstance.resetSuggestions();
+            tagsInstance.resetState();
         }
     });
 

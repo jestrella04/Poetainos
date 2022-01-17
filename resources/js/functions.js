@@ -171,3 +171,19 @@ export function clearSelections(selectElement) {
         option.selected = false;
     });
 }
+
+export function subCategoriesUpdate(subCategoriesElement, mainCategoryElement) {
+    let mainCategoryDescendants = JSON.parse(mainCategoryElement.options[mainCategoryElement.selectedIndex].dataset.whDescendants);
+
+    Array.from(subCategoriesElement.options).forEach(option => {
+        let parentId = parseInt(option.dataset.parentId);
+
+        if (mainCategoryDescendants.includes(parentId)) {
+            option.disabled = false;
+            option.hidden = false;
+        } else {
+            option.disabled = true;
+            option.hidden = true;
+        }
+    });
+}
