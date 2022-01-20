@@ -22,7 +22,7 @@
         "@pwabuilder/pwaupdate": "^0.2.0",
         "axios": "^0.21.1",
         "bootstrap": "^5.0.1",
-        "bootstrap5-tags": "^1.4.7",
+        "bootstrap5-tags": "^1.4.17",
         "bootswatch": "^5.0.1",
         "cross-env": "^7.0.3",
         "laravel-echo": "^1.11.0",
