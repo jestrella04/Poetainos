@@ -13,5 +13,6 @@
         @include('blocks.alt-categories')
         @include('blocks.pop-tags')
         @include('blocks.featured-authors')
+        <hr class="d-lg-none mb-5">
     </div>
 </aside>

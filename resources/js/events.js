@@ -305,6 +305,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         .then(() => {
                             //
                         });
+                } else {
+                    // User is not logged in
+                    window.location.href = 'login';
                 }
             }
 

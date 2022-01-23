@@ -9,16 +9,16 @@
         <div class="flex-fill">
             <div class="d-flex flex-column">
                 <div class="writing-meta">
-                    <small>
+                    <span>
                         <i class="fas fa-user fa-fw" aria-hidden="true"></i>
                         {{ __('by') }}
                         {{ $writing->author->getName() }}
-                    </small>
+                    </span>
 
-                    <small>
+                    <span>
                         <i class="fas fa-calendar fa-fw" aria-hidden="true"></i>
                         {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
-                    </small>
+                    </span>
                 </div>
 
                 <h2 class="writing-title">

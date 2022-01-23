@@ -21,7 +21,7 @@
     @endif
 
     <span
-        class="badge @auth {{ 'click like' }} @endauth @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
+        class="badge click like @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
         @if (auth()->check() && $voted > 0)
         title="{{ __('Liked it') }}"
         @elseif (auth()->check() && null === $voted)

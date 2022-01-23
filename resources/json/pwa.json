@@ -45,7 +45,7 @@
     "start_url": "/",
     "display": "standalone",
     "orientation": "any",
-    "lang": "Spanish; Castilian",
+    "lang": "es",
     "categories": [
         "books",
         "literature",

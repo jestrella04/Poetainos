@@ -11,13 +11,10 @@
     word-break: break-word;
 
     .writing-meta {
+        @extend .smaller, .lead;
         text-transform: uppercase;
 
-        i {
-            opacity: 0.7;
-        }
-
-        small:first-child {
+        span:first-child {
             margin-right: $wh-s-md;
         }
     }
