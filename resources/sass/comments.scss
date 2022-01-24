@@ -49,15 +49,12 @@
 
             .comment-body {
                 .author {
+                    @extend .smaller, .lead;
                     text-transform: uppercase;
                     margin-bottom:$wh-s-sm;
 
-                    small:first-child {
-                        margin-right: $wh-s-sm
-                    }
-
-                    i {
-                        opacity: 0.85;
+                    span:first-child {
+                        margin-right: $wh-s-md;
                     }
                 }
 
@@ -91,15 +88,12 @@
 
                 .reply-body {
                     .author {
+                        @extend .smaller, .lead;
                         text-transform: uppercase;
                         margin-bottom: $wh-s-sm;
 
-                        small:first-child {
-                            margin-right: $wh-s-sm;
-                        }
-
-                        i {
-                            opacity: 0.85;
+                        span:first-child {
+                            margin-right: $wh-s-md;
                         }
                     }
                 }
