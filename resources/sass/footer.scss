@@ -1,5 +1,4 @@
 #footer {
-    @extend .smaller;
     margin-top: auto;
     background: $bg-gradient;
     color: $white;
@@ -15,7 +14,7 @@
 
     .footer-column {
         .column-title {
-            font-weight: 300;
+            @extend .smaller, .lead;
             text-transform: uppercase;
         }
 
