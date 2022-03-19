@@ -57,11 +57,11 @@ class Writing extends Model
 
     public function excerpt()
     {
-        if (strlen($this->text) < 400) {
+        if (mb_strlen($this->text) < 400) {
             return $this->text;
         }
 
-        return substr($this->text, 0, 400) . '...';
+        return mb_substr($this->text, 0, 400) . '...';
     }
 
     public function comments()
