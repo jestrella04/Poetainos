@@ -12,6 +12,9 @@ sudo chmod -R 0777 storage/
 # git clean -df
 git pull origin master
 
+# Move Composer to $PATH
+mv composer.phar /usr/local/bin/composer
+
 # Install/update composer dependecies
 composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 

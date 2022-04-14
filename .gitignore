@@ -19,3 +19,5 @@ yarn-error.log
 /laradock
 ./idea
 /.vscode
+composer-setup.php
+composer.phar
