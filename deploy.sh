@@ -16,7 +16,7 @@ git pull origin master
 sh ./getcomposer.sh
 
 # Move Composer to $PATH
-mv composer.phar /usr/local/bin/composer
+sudo mv composer.phar /usr/local/bin/composer
 
 # Install/update composer dependecies
 composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
