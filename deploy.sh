@@ -13,7 +13,7 @@ sudo chmod -R 0777 storage/
 git pull origin master
 
 # Get latest Composer
-sh getcomposer.sh
+sh ./getcomposer.sh
 
 # Move Composer to $PATH
 mv composer.phar /usr/local/bin/composer
