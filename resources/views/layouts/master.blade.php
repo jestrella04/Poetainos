@@ -29,7 +29,7 @@
         <link rel="alternate icon" href="{{ mix('/static/images/logo-32.png') }}" sizes="32x32" type="image/png">
         <link rel="stylesheet" href="{{ mix('/static/css/app.css') }}" type="text/css">
         <!-- PWA Support -->
-        <meta name="theme-color" content="#2F3BA2" />
+        <meta name="theme-color" content="#593196" />
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <meta name="apple-mobile-web-app-title" content="{{ getSiteConfig('name') }}">
