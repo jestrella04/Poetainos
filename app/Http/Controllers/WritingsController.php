@@ -165,7 +165,9 @@ class WritingsController extends Controller
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
-            'cover' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size')
+            'cover' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size'),
+            'service_agreement' => 'sometimes|required|accepted',
+            'privacy_agreement' => 'sometimes|required|accepted',
         ]);
 
         // Process the uploaded cover, if any
@@ -231,6 +233,11 @@ class WritingsController extends Controller
 
         // Update user aura
         $writing->author->updateAura();
+
+        // Persist user agreements to avoid asking again
+        if (!empty(request('service_agreement') && !empty('privacy_agreement'))) {
+            $writing->author->acceptAgreements();
+        }
 
         // Set response message and trigger notification
         if (isset($action) && 'update' === $action) {

@@ -289,3 +289,14 @@ function cropify($url, $length = 40)
 
     return $url;
 };
+
+function isTruthy($string)
+{
+    $string = strtolower($string);
+
+    if (!empty($string) && in_array($string, [1, "1", true, "true", "on", "yes"], true)) {
+        return true;
+    }
+
+    return false;
+}

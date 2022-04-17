@@ -503,6 +503,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     element.querySelector('#selected-file').classList.add('d-none');
                     element.querySelector('#selected-error').classList.add('d-none');
 
+                    // Remove the agreements section
+                    let agreements = document.querySelector('#agreements');
+
+                    if (!fx.isNilOrEmpty(agreements)) {
+                        agreements.remove();
+                    }
+
                     // Show toast
                     fx.showToast({
                         'theme': 'success',

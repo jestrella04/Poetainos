@@ -55,6 +55,8 @@ class RegisterController extends Controller
             'username' => ['required', 'string', 'min:3', 'max:45', 'unique:users', 'regex:/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/'],
             'email' => ['required', 'string', 'email', 'max:45', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'],
+            'service_agreement' => ['required', 'accepted'],
+            'privacy_agreement' => ['required', 'accepted'],
         ]);
     }
 
@@ -71,6 +73,12 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'password_updated_at' => Carbon::now(),
+            'extra_info' => [
+                'agreement' => [
+                    'terms_of_use' => $data['service_agreement'],
+                    'privacy_policy' => $data['privacy_agreement'],
+                ]
+            ]
         ]);
     }
 

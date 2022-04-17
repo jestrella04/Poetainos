@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'password_updated_at',
+        'extra_info',
     ];
 
     /**
@@ -222,5 +223,26 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return false;
+    }
+
+    public function isInAgreement()
+    {
+        $terms = $this->extra_info['agreement']['terms_of_use'] ?? false;
+        $privacy = $this->extra_info['agreement']['privacy_policy'] ?? false;
+
+        if (isTruthy($terms) && isTruthy($privacy)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function acceptAgreements()
+    {
+        $info = $this->extra_info;
+        $info['agreement']['terms_of_use'] = 'on';
+        $info['agreement']['privacy_policy'] = 'on';
+
+        $this->update(['extra_info' => $info]);
     }
 }
