@@ -1,5 +1,6 @@
 <?php
 
+use App\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -28,11 +29,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('users', 'AdminController@users')->name('users');
     Route::get('writings', 'AdminController@writings')->name('writings');
     Route::get('tools', 'AdminController@tools')->name('tools');
+    Route::get('complaints', 'AdminController@index')->name('complaints'); //
 
     Route::put('settings/edit', 'SettingsController@update')->name('settings.edit');
     Route::put('categories/edit', 'CategoriesController@update')->name('categories.edit');
     Route::put('tags/edit', 'TagsController@update')->name('tags.edit');
     Route::put('pages/edit', 'PagesController@update')->name('pages.edit');
+    Route::put('complaints', 'AdminController@index')->name('complaints.edit'); //
 
     Route::delete('categories/delete/{category}', 'CategoriesController@destroy')->name('categories.destroy');
     Route::delete('tags/delete/{tag}', 'TagsController@destroy')->name('tags.destroy');
@@ -55,6 +58,8 @@ Route::middleware(['verified'])->group(function () {
     Route::put('/users/edit/{user}', 'UsersController@update')->name('users.update');
     Route::delete('/users/delete/{user}', 'UsersController@destroy')->middleware('password.confirm')->name('users.destroy');
     Route::post('/users/query/{query}', 'UsersController@query')->name('users.query');
+    Route::get('/users/block/{user}', 'UsersController@promptBeforeBlock')->name('users.block.confirm');
+    Route::post('/users/block/{user}', 'UsersController@blockUser')->name('users.block.confirmed');
 
     // Comments and replies
     Route::post('/replies/create', 'RepliesController@store')->name('replies.store');
@@ -73,6 +78,10 @@ Route::middleware(['verified'])->group(function () {
     // Push Subscriptions
     Route::post('subscriptions', 'PushNotificationsController@update')->name('push.update');
     Route::post('subscriptions/delete', 'PushNotificationsController@destroy')->name('push.delete');
+
+    // Complaints
+    Route::get('/complaints/{type}/{id}/create', 'ComplaintsController@create')->name('complaints.create');
+    Route::post('/complaints/store', 'ComplaintsController@store')->name('complaints.store');
 });
 
 /* Public routes */

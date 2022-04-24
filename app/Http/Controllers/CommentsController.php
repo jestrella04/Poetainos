@@ -17,8 +17,15 @@ class CommentsController extends Controller
      */
     public function index($writing)
     {
+        $filter = [0];
+
+        if (auth()->check()) {
+            $filter = User::find(auth()->user()->id)->blocked()->pluck('blocked_user_id');
+        }
+
         $comments = Comment::with('replies')
             ->where('writing_id', $writing)
+            ->whereNotIn('user_id', $filter)
             ->orderBy('created_at', 'desc')
             ->simplePaginate($this->pagination);
 

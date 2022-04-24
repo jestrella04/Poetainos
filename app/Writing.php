@@ -228,4 +228,9 @@ class Writing extends Model
         $likers = $this->votes()->where('vote', '>', 0)->pluck('user_id');
         return User::whereIn('id', $likers);
     }
+
+    public function complaints()
+    {
+        return $this->morphMany(Complaint::class, 'complainable');
+    }
 }

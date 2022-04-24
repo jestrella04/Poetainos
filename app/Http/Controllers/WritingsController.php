@@ -23,15 +23,23 @@ class WritingsController extends Controller
     public function index()
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $filter = [0];
+
+        if (auth()->check()) {
+            $filter = User::find(auth()->user()->id)->blocked()->pluck('blocked_user_id');
+        }
 
         if ('latest' === $sort) {
-            $writings = Writing::latest()
+            $writings = Writing::whereNotIn('user_id', $filter)
+            ->latest()
             ->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = Writing::orderBy('views', 'desc')
+            $writings = Writing::whereNotIn('user_id', $filter)
+            ->orderBy('views', 'desc')
             ->simplePaginate($this->pagination);
         } elseif ('likes' === $sort) {
-            $writings = Writing::withCount('votes')
+            $writings = Writing::whereNotIn('user_id', $filter)
+            ->withCount('votes')
             ->orderBy('votes_count', 'desc')
             ->simplePaginate($this->pagination);
         }

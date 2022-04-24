@@ -51,7 +51,7 @@ class ContactsController extends Controller
         $message = request('message');
 
         // Schedule email notification
-        $admins = User::whereIn('role_id', Role::where('name', 'master')->get('id')->toArray())->get();
+        $admins = [getSiteConfig('emails.admin')];
         Notification::send($admins, new ContactFormSubmitted($name, $email, $subject, $message));
 
         // Set session flash message

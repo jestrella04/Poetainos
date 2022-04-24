@@ -272,5 +272,21 @@
     "Use comma to separate tags": "Usa una coma para separar las etiquetas",
     "I accept the terms of use": "Acepto las condiciones de uso",
     "I accept the privacy policy": "Acepto las políticas de privacidad",
-    "You need to agree to our terms of service before publishing. Don't worry, you'll only do it once.": "Es necesario que aceptes nuestros términos de uso antes de publicar. Descuida, solo te lo pediremos esta vez."
+    "You need to agree to our terms of service before publishing. Don't worry, you'll only do it once.": "Es necesario que aceptes nuestros términos de uso antes de publicar. Descuida, solo te lo pediremos esta vez.",
+    "Report writing": "Denunciar texto",
+    "Block writer": "Bloquear autor",
+    "Complaint": "Denunciar",
+    "Post Complaint": "Enviar Denuncia",
+    "Why do you want to report this content?": "¿Por qué quieres reportar este contenido?",
+    "Tell us a little bit more...": "Cuéntanos un poco más...",
+    "We received your complaint request successfully and will be processing it soon.": "Hemos recivido tu solicitud de denuncia y la estaremos procesando en breve.",
+    "If you block a user you will not be able to see any of their writings or comments.": "Si bloqueas a un usuario no podrás ver ningún texto o comentario suyo.",
+    "Are you sure you want to block :name?": "¿Estás seguro que quieres bloquear al usuario :name?",
+    "User blocked successfully": "Usuario bloqueado con éxito",
+    "Block": "Bloquear",
+    "Action required: content at your site received a complaint from a user.": "Accion requerida: se recibió una denuncia de contenido en tu sitio.",
+    "Your action is required.": "Se requiere una acción de tu parte.",
+    "User generated content (UGC) at :site just received a new complaint from a user.": "El contenido generado por usuario (UGC por sus siglas en inglés) ha recibido una denuncia de parte de un usuario.",
+    "Please login to the admin panel or click the link below to manage all user complaints.": "Por favor accede al panel de administración o presiona el enlace para administrar todas las denuncias de usuarios.",
+    "Manage Complaints": "Administrar Denuncias"
 }

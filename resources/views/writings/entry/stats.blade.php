@@ -145,7 +145,21 @@
                 </span>
 
                 <div class="dropdown-menu" aria-labelledby="dropdown-owner">
-                    <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">{{ __('Edit / Delete') }}</a>
+                    <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">
+                        {{ __('Edit / Delete') }}
+                    </a>
+
+                    @if (! auth()->user()->is($writing->author))
+                        <a class="dropdown-item init-complaint"
+                            href="{{ route('complaints.create', ['type' => 'writings', 'id' => $writing->id]) }}">
+                            {{ __('Report writing') }}
+                        </a>
+
+                        <a class="dropdown-item init-block-user"
+                            href="{{ route('users.block.confirm', ['user' => $writing->author->username]) }}">
+                            {{ __('Block writer') }}
+                        </a>
+                    @endif
                 </div>
             </span>
         </div>

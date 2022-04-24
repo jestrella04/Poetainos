@@ -245,4 +245,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $this->update(['extra_info' => $info]);
     }
+
+    public function block($userToBlock)
+    {
+        return BlockedUser::firstOrCreate([
+            'user_id' => $this->id,
+            'blocked_user_id' => $userToBlock->id,
+        ]);
+    }
+
+    public function blocked()
+    {
+        return $this->hasMany(BlockedUser::class);
+    }
 }

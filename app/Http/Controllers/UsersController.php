@@ -230,4 +230,33 @@ class UsersController extends Controller
             'message' => __('User deleted successfully')
         ];
     }
+
+    /**
+     * Display confirmation before blocking another user.
+     *
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function promptBeforeBlock(User $user)
+    {
+        return view('users.partials.blockauthor', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Block another user.
+     *
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function blockUser(User $user)
+    {
+        $blockingUser = User::find(auth()->user()->id);
+        $blockingUser->block($user);
+
+        return [
+            'message' => __('User blocked successfully')
+        ];
+    }
 }

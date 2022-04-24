@@ -468,6 +468,74 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.closest('.sidebar-toggle')) {
             element.closest('.sidebar-toggle').querySelector('i').classList.toggle('rotate');
         }
+
+        // Firing the content complaint modal
+        if (element.matches('.init-complaint')) {
+            event.preventDefault();
+            document.querySelectorAll('.modal-complaint').forEach(e => e.remove());
+
+            axios.get(element.href)
+            .then(response => {
+                document.body.insertAdjacentHTML('beforeend', response.data);
+            })
+            .catch(error => {
+                //
+            })
+            .then(() => {
+                let complaintModalElement = document.querySelector('.modal-complaint');
+                let complaintModal = new bootstrap.Modal(complaintModalElement);
+                complaintModal.show();
+            });
+        }
+
+        // Firing the block user modal
+        if (element.matches('.init-block-user')) {
+            event.preventDefault();
+            document.querySelectorAll('.modal-complaint').forEach(e => e.remove());
+
+            axios.get(element.href)
+            .then(response => {
+                document.body.insertAdjacentHTML('beforeend', response.data);
+            })
+            .catch(error => {
+                //
+            })
+            .then(() => {
+                let complaintModalElement = document.querySelector('.modal-complaint');
+                let complaintModal = new bootstrap.Modal(complaintModalElement);
+                complaintModal.show();
+            });
+        }
+
+        // Blocking a user
+        if (element.matches('.block-user-submit')) {
+            event.preventDefault();
+
+            let url = element.dataset.href;
+
+            // Post the form to the server
+            axios.post(url)
+                .then(response => {
+                    // Show toast
+                    fx.showToast({
+                        'theme': 'success',
+                        'message': response.data.message
+                    });
+                })
+                .catch(error => {
+                    // Show toast
+                    fx.showToast({
+                        'theme': 'danger',
+                        'message': error.response.data.message
+                    });
+                })
+                .then(() => {
+                    // Hide complaint modal
+                    let complaintModal = bootstrap.Modal.getInstance(document.querySelector('.modal-complaint'));
+                    complaintModal.hide();
+                    //complaintModal.dispose();
+                });
+        }
     });
 
     // Listen to the on submit event on the page and act accordingly
@@ -675,6 +743,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     fx.showToast({
                         'message': error.response.data.message,
                         'theme': 'danger'
+                    });
+                })
+                .then(() => {
+                    fx.handleForm(element, 'response');
+                });
+        }
+
+        // Post the complaint form
+        if (element.matches('.form-post-complaint')) {
+            event.preventDefault();
+            fx.handleForm(element, 'submit');
+
+            // Initialize form and helpers
+            let params = new FormData(element);
+            let url = element.action;
+
+            // Post the form to the server
+            axios.post(url, params)
+                .then(response => {
+                    // Show toast
+                    fx.showToast({
+                        'theme': 'success',
+                        'message': response.data.message
+                    });
+
+                    // Hide complaint modal
+                    let complaintModal = bootstrap.Modal.getInstance(document.querySelector('.modal-complaint'));
+                    complaintModal.hide();
+                    //complaintModal.dispose();
+                })
+                .catch(error => {
+                    // Show toast
+                    fx.showToast({
+                        'theme': 'danger',
+                        'message': error.response.data.message
                     });
                 })
                 .then(() => {
