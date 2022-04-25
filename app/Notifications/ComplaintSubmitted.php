@@ -56,7 +56,7 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
             ->subject($this->subject)
             ->greeting($this->greeting)
             ->line($this->message)
-            ->action($this->action, $this->url);
+            ->action($this->action, $this->link);
     }
 
     /**

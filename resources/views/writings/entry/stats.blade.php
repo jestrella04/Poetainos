@@ -131,37 +131,37 @@
 
     </div>
 
-    @if (auth()->check() && (auth()->user()->can('update', $writing) || auth()->user()->can('delete', $writing)))
-        <div class="dropdown dropdown-counter d-inline">
-            <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Actions') }}">
-                <span
-                    class="badge click owner"
-                    id="dropdown-owner"
-                    data-bs-toggle="dropdown"
-                    aria-label="{{ __('Actions') }}"
-                    aria-haspopup="true"
-                    aria-expanded="false">
-                    <i class="fas fa-ellipsis-v fa-fw" aria-hidden="true"></i>
-                </span>
+    <div class="dropdown dropdown-counter d-inline">
+        <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Actions') }}">
+            <span
+                class="badge click owner"
+                id="dropdown-owner"
+                data-bs-toggle="dropdown"
+                aria-label="{{ __('Actions') }}"
+                aria-haspopup="true"
+                aria-expanded="false">
+                <i class="fas fa-ellipsis-v fa-fw" aria-hidden="true"></i>
+            </span>
 
-                <div class="dropdown-menu" aria-labelledby="dropdown-owner">
+            <div class="dropdown-menu" aria-labelledby="dropdown-owner">
+                @if (auth()->check() && (auth()->user()->can('update', $writing) || auth()->user()->can('delete', $writing)))
                     <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">
                         {{ __('Edit / Delete') }}
                     </a>
+                @endif
 
-                    @if (! auth()->user()->is($writing->author))
-                        <a class="dropdown-item init-complaint"
-                            href="{{ route('complaints.create', ['type' => 'writings', 'id' => $writing->id]) }}">
-                            {{ __('Report writing') }}
-                        </a>
+                <a class="dropdown-item init-complaint"
+                    href="{{ route('complaints.create', ['type' => 'writings', 'id' => $writing->id]) }}">
+                    {{ __('Report writing') }}
+                </a>
 
-                        <a class="dropdown-item init-block-user"
-                            href="{{ route('users.block.confirm', ['user' => $writing->author->username]) }}">
-                            {{ __('Block writer') }}
-                        </a>
-                    @endif
-                </div>
-            </span>
-        </div>
-    @endif
+                @if (auth()->check() && ! auth()->user()->is($writing->author))
+                    <a class="dropdown-item init-block-user"
+                        href="{{ route('users.block.confirm', ['user' => $writing->author->username]) }}">
+                        {{ __('Block writer') }}
+                    </a>
+                @endif
+            </div>
+        </span>
+    </div>
 </div>

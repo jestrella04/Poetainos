@@ -78,10 +78,6 @@ Route::middleware(['verified'])->group(function () {
     // Push Subscriptions
     Route::post('subscriptions', 'PushNotificationsController@update')->name('push.update');
     Route::post('subscriptions/delete', 'PushNotificationsController@destroy')->name('push.delete');
-
-    // Complaints
-    Route::get('/complaints/{type}/{id}/create', 'ComplaintsController@create')->name('complaints.create');
-    Route::post('/complaints/store', 'ComplaintsController@store')->name('complaints.store');
 });
 
 /* Public routes */
@@ -138,3 +134,7 @@ Route::post('/contact', 'ContactsController@store')->name('contact.store');
 // Redirects
 Route::redirect('/home', '/');
 Route::redirect('/writings', '/');
+
+// Complaints
+Route::get('/complaints/{type}/{id}/create', 'ComplaintsController@create')->name('complaints.create');
+Route::post('/complaints/store', 'ComplaintsController@store')->name('complaints.store');
