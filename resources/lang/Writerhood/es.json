@@ -284,9 +284,9 @@
     "Are you sure you want to block :name?": "¿Estás seguro que quieres bloquear al usuario :name?",
     "User blocked successfully": "Usuario bloqueado con éxito",
     "Block": "Bloquear",
-    "Action required: content at your site received a complaint from a user.": "Accion requerida: se recibió una denuncia de contenido en tu sitio.",
+    "[:site] Action required: content at your site received a complaint from a user.": "[:site] Acción requerida: se recibió una denuncia de contenido en tu sitio.",
     "Your action is required.": "Se requiere una acción de tu parte.",
-    "User generated content (UGC) at :site just received a new complaint from a user.": "El contenido generado por usuario (UGC por sus siglas en inglés) ha recibido una denuncia de parte de un usuario.",
+    "User generated content (UGC) at :site just received a new complaint from a user.": "El contenido generado por usuario (CGU) ha recibido una denuncia de parte de un usuario.",
     "Please login to the admin panel or click the link below to manage all user complaints.": "Por favor accede al panel de administración o presiona el enlace para administrar todas las denuncias de usuarios.",
     "Manage Complaints": "Administrar Denuncias"
 }

@@ -80,8 +80,8 @@ class ComplaintsController extends Controller
         $complaint->save();
 
         // Schedule email notification
-        $recipients = [getSiteConfig('emails.admin')];
-        Notification::send($recipients, new ComplaintSubmitted());
+        $recipients = getSiteConfig('emails.admin');
+        Notification::route('mail', $recipients)->notify(new ComplaintSubmitted);
 
         return [
             'message' => __('We received your complaint request successfully and will be processing it soon.'),
