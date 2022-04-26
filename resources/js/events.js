@@ -161,6 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
+    // Check if app is installed
+    if (isInstalled) {
+        // Hide big the footer
+        document.querySelector('footer').classList.add('d-none');
+
+        // Show app footer
+        document.querySelector('application-footer').classList.remove('d-none')
+    }
+
     // Listen to the toast show event and act accordingly
     document.querySelector('.toast').addEventListener('show.bs.toast', event => {
         event.target.closest('.toast-wrapper').classList.add('show');
@@ -303,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             //
                         })
                         .then(() => {
-                            //
+                            fx.animateCSS(element, 'heartBeat');
                         });
                 } else {
                     // User is not logged in
@@ -335,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             //
                         })
                         .then(() => {
-                            //
+                            fx.animateCSS(element, 'heartBeat');
                         });
                 }
             }

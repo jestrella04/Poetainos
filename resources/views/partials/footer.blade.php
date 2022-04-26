@@ -1,3 +1,12 @@
+<application-footer class="d-none">
+    <div class="container">
+        <p class="fw-lighter fs-6 text-center">
+            {{ getSiteConfig('name') }}
+            &copy; 2020. {{ __('All rights reserved.') }}
+        </p>
+    </div>
+</application-footer>
+
 <footer id="footer">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-md-between">

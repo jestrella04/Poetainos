@@ -16,18 +16,7 @@
         @include('writings.entry.stats')
         @include('writings.entry.likers')
     @else
-        <div class="d-flex flex-column flex-md-row">
-            <div class="btn-read-more">
-                <a
-                    href="{{ $writing->path() }}"
-                    class="btn btn-primary btn-sm"
-                    aria-label="{{ __('Continue reading: :text', ['text' => $writing->title]) }}">
-                    {{ __('Read more') }}
-                </a>
-            </div>
-
-            @include('writings.entry.stats')
-        </div>
+        @include('writings.entry.stats')
     @endif
 </div>
 

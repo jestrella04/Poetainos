@@ -25,7 +25,7 @@ export function loadComments(url) {
             }
 
             if (location.hash.includes('#comment-')) {
-                document.querySelector(location.hash).scrollIntoView({behavior: 'smooth', block: 'end'});
+                document.querySelector(location.hash).scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
 
             tribute.attach(document.querySelectorAll('.commentbox'));
@@ -97,11 +97,11 @@ export function handleFormErrors(errors) {
 
 export function resetAdminFormCreate(form) {
     form.id.value = '-1';
-    if ('object' === typeof(form.name)) form.name.value = '';
-    if ('object' === typeof(form.parent)) form.parent.value = '';
-    if ('object' === typeof(form.description)) form.description.value = '';
-    if ('object' === typeof(form.title)) form.title.value = '';
-    if ('object' === typeof(form.text)) form.text.value = '';
+    if ('object' === typeof (form.name)) form.name.value = '';
+    if ('object' === typeof (form.parent)) form.parent.value = '';
+    if ('object' === typeof (form.description)) form.description.value = '';
+    if ('object' === typeof (form.title)) form.title.value = '';
+    if ('object' === typeof (form.text)) form.text.value = '';
 }
 
 export function showModal(targetModal, options = {}) {
@@ -187,3 +187,20 @@ export function subCategoriesUpdate(subCategoriesElement, mainCategoryElement) {
         }
     });
 }
+
+export const animateCSS = (node, animation, prefix = 'animate__') =>
+    // We create a Promise and return it
+    new Promise((resolve, reject) => {
+        const animationName = `${prefix}${animation}`;
+
+        node.classList.add(`${prefix}animated`, animationName);
+
+        // When the animation ends, we clean the classes and resolve the Promise
+        function handleAnimationEnd(event) {
+            event.stopPropagation();
+            node.classList.remove(`${prefix}animated`, animationName);
+            resolve('Animation ended');
+        }
+
+        node.addEventListener('animationend', handleAnimationEnd, { once: true });
+    });

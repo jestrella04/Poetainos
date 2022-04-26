@@ -57,7 +57,9 @@ class Writing extends Model
 
     public function excerpt()
     {
-        if (mb_strlen($this->text) < 400) {
+        $len = mb_strlen($this->text);
+
+        if ($len < 400) {
             return $this->text;
         }
 

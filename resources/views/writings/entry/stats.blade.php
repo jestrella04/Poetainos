@@ -22,13 +22,7 @@
 
     <span
         class="badge click like @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
-        @if (auth()->check() && $voted > 0)
-        title="{{ __('Liked it') }}"
-        @elseif (auth()->check() && null === $voted)
-        title="{{ __('Like it') }}"
-        @else
-        title="{{ __('Likes') }}"
-        @endif
+        title="{{ __(':count Likes', ['count' => $count['likes']]) }}"
         @if (auth()->check() && empty($vote))
         data-wh-target="{{ route('votes.store') }}"
         data-wh-id="{{ $writing->id }}"
@@ -59,7 +53,7 @@
 
     <span
         class="badge"
-        title="{{ __('Comments') }}"
+        title="{{ __(':count Comments', ['count' => $count['comments'] + $count['replies']]) }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
@@ -68,7 +62,7 @@
 
     <span
         class="badge"
-        title="{{ __('Views') }}"
+        title="{{ __(':count Views', ['count' => $count['views']]) }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-book-reader fa-fw" aria-hidden="true"></i>
@@ -77,13 +71,7 @@
 
     <span
         class="badge @if (isset($userId) && $userId !== $writing->author->id) {{ 'click shelf' }} @endif @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
-        @if (auth()->check() && $shelved === $writing->id)
-        title="{{ __('On my shelf') }}"
-        @elseif (auth()->check() && $userId !== $writing->author->id && null === $shelved)
-        title="{{ __('Add to my shelf') }}"
-        @else
-        title="{{ __('Shelved') }}"
-        @endif
+        title="{{ __(':count Shelved', ['count' => $count['shelf']]) }}"
         @if (auth()->check())
         data-wh-target="{{ route('shelves.store') }}"
         data-wh-id="{{ $writing->id }}"
@@ -96,7 +84,7 @@
 
     <span
         class="badge"
-        title="{{ __('Aura') }}"
+        title="{{ __('Aura: :aura', ['aura' => $count['aura']]) }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-dove fa-fw" aria-hidden="true"></i>

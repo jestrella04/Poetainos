@@ -33,5 +33,8 @@
         "sass": "^1.32.8",
         "sass-loader": "^8.0.0",
         "tributejs": "^5.1.3"
+    },
+    "dependencies": {
+        "animate.css": "^4.1.1"
     }
 }
