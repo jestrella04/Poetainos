@@ -1,6 +1,18 @@
+<div id="back-to-top-wrapper" class="fade-out">
+    <button
+        id="back-to-top"
+        class="btn btn-primary jump-to-nav"
+        title="{{ __('Back to top') }}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="left"
+        aria-label="{{ __('Back to top') }}">
+        <i class="fas fa-chevron-up" aria-hidden="true"></i>
+    </button>
+</div>
+
 <application-footer class="d-none">
     <div class="container">
-        <p class="fw-lighter fs-6 text-center">
+        <p class="fw-lighter text-center smaller">
             {{ getSiteConfig('name') }}
             &copy; 2020. {{ __('All rights reserved.') }}
         </p>
@@ -65,17 +77,5 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="back-to-top-wrapper" class="fade-out">
-        <button
-            id="back-to-top"
-            class="btn btn-primary jump-to-nav"
-            title="{{ __('Back to top') }}"
-            data-bs-toggle="tooltip"
-            data-bs-placement="left"
-            aria-label="{{ __('Back to top') }}">
-            <i class="fas fa-chevron-up" aria-hidden="true"></i>
-        </button>
     </div>
 </footer>
