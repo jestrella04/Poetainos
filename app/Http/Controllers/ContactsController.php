@@ -51,8 +51,8 @@ class ContactsController extends Controller
         $message = request('message');
 
         // Schedule email notification
-        $admins = [getSiteConfig('emails.admin')];
-        Notification::send($admins, new ContactFormSubmitted($name, $email, $subject, $message));
+        $recipients = getSiteConfig('emails.admin');
+        Notification::route('mail', $recipients)->notify(new ContactFormSubmitted($name, $email, $subject, $message));
 
         // Set session flash message
         $flash = __('Your message was successfully scheduled, and will be sent shortly.');
