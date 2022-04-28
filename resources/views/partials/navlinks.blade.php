@@ -52,11 +52,11 @@
         <li class="nav-item d-none d-lg-block">
             <div class="dropdown">
                 <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <div class="icon-badge">
+                    <div class="position-relative">
                         {!! getUserAvatar(auth()->user(), $size = 'md') !!}
 
                         @php $display = (auth()->check() && auth()->user()->unreadNotifications->count() > 0) ? '' : 'd-none' @endphp
-                        <span class="translate-middle p-2 border border-light rounded-circle unread {{ $display }}">
+                        <span class="badge-indicator border border-light bg-primary unread {{ $display }}">
                             <span class="visually-hidden">{{ __('Unread notifications') }}</span>
                         </span>
                     </div>
