@@ -254,8 +254,25 @@ class User extends Authenticatable implements MustVerifyEmail
         ]);
     }
 
-    public function blocked()
+    public function getBlockedAuthors($asArrayOfIds = false)
     {
-        return $this->hasMany(BlockedUser::class);
+        $collection = $this->hasMany(BlockedUser::class);
+
+        if ($asArrayOfIds) {
+            $collection = $collection->pluck('blocked_user_id')->toArray();
+        }
+
+        return $collection;
+    }
+
+    public function isAuthorBlocked(User $author)
+    {
+        $blocked = $this->getBlockedAuthors($asArrayOfIds = true);
+
+        if (in_array($author->id, $blocked)) {
+            return true;
+        }
+
+        return false;
     }
 }

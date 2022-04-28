@@ -7,8 +7,18 @@ body {
     height: 100%;
 }
 
-h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
     font-weight: 700;
 }
 
@@ -32,7 +42,7 @@ hr {
     margin-bottom: $wh-s-xl;
 }
 
-.main-content + .main-pagination {
+.main-content+.main-pagination {
     margin-top: $wh-s-xxl;
 }
 
@@ -205,7 +215,7 @@ hr {
     overflow: hidden;
 }
 
-.fade-out > * {
+.fade-out>* {
     margin-top: -10000px;
     transition: margin-top 0s 1s;
 }
@@ -277,14 +287,13 @@ hr {
     margin-bottom: $wh-s-xl;
 }
 
-.icon-badge {
-    position: relative;
-
-    span.unread {
-        position: absolute;
-        left: 80% !important;
-        background-color: $primary;
-    }
+.badge-indicator {
+    @extend .position-absolute;
+    @extend .top-0;
+    @extend .start-100;
+    @extend .translate-middle;
+    @extend .rounded-pill;
+    @extend .p-2;
 }
 
 pwa-install {

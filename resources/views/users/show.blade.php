@@ -16,7 +16,11 @@
 
 @section('main')
     <div id="users-main-content" class="main-content">
-        @include('users.profile.index')
+        @if (auth()->check() && auth()->user()->isAuthorBlocked($user))
+            @include('partials.blocked')
+        @else
+            @include('users.profile.index')
+        @endif
     </div>
 @endsection
 

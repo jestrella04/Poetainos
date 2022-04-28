@@ -20,7 +20,7 @@ class CommentsController extends Controller
         $filter = [0];
 
         if (auth()->check()) {
-            $filter = User::find(auth()->user()->id)->blocked()->pluck('blocked_user_id');
+            $filter = User::find(auth()->user()->id)->getBlockedAuthors()->pluck('blocked_user_id');
         }
 
         $comments = Comment::with('replies')

@@ -14,10 +14,11 @@
                 aria-controls="offcanvas-sidebar-user"
                 aria-label="{{ __('Toggle sidebar') }}">
 
-                <div class="icon-badge">
+                <div class="position-relative">
                     @php $display = (auth()->check() && auth()->user()->unreadNotifications->count() > 0) ? '' : 'd-none' @endphp
                     <i class="fa fa-bars" aria-hidden="true"></i>
-                    <span class="translate-middle p-2 border border-light rounded-circle unread {{ $display }}">
+
+                    <span class="badge-indicator border border-light bg-primary unread {{ $display }}">
                         <span class="visually-hidden">{{ __('Unread notifications') }}</span>
                     </span>
                 </div>

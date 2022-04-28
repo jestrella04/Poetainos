@@ -16,7 +16,11 @@
 
 @section('main')
     <div id="writings-main-content" class="main-content">
-        @include('writings.entry.index')
+        @if (auth()->check() && auth()->user()->isAuthorBlocked($writing->author))
+            @include('partials.blocked')
+        @else
+            @include('writings.entry.index')
+        @endif
     </div>
 @endsection
 

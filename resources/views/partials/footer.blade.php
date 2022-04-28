@@ -10,13 +10,8 @@
     </button>
 </div>
 
-<application-footer class="d-none">
-    <div class="container">
-        <p class="fw-lighter text-center smaller">
-            {{ getSiteConfig('name') }}
-            &copy; 2020. {{ __('All rights reserved.') }}
-        </p>
-    </div>
+<application-footer class="d-nones">
+    {{-- @include('partials.navbar-footer') --}}
 </application-footer>
 
 <footer id="footer">
