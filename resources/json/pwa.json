@@ -42,7 +42,7 @@
             "url": "{{url.random}}"
         }
     ],
-    "start_url": "/",
+    "start_url": "/login",
     "display": "standalone",
     "orientation": "any",
     "lang": "es",
