@@ -10,7 +10,7 @@
     </button>
 </div>
 
-<application-footer class="d-nones">
+<application-footer class="d-none">
     {{-- @include('partials.navbar-footer') --}}
 </application-footer>
 
