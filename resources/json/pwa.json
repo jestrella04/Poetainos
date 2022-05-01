@@ -42,7 +42,7 @@
             "url": "{{url.random}}"
         }
     ],
-    "start_url": "/login",
+    "start_url": "/socialite",
     "display": "standalone",
     "orientation": "any",
     "lang": "es",
