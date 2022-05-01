@@ -1,3 +1,11 @@
+@if (Route::current()->getName() !== 'writings.create')
+    <a href="{{ route('writings.create') }}"
+        class="btn btn-primary btn-fixed-br rounded-circle"
+        aria-label="{{ __('Publish') }}">
+        <i class="fas fa-plus" aria-hidden="true"></i>
+    </a>
+@endif
+
 <footer id="footer">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-md-between">

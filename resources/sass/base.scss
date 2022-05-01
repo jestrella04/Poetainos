@@ -373,3 +373,14 @@ pwa-update::part(offlineToast) {
         }
     }
 }
+
+.btn-fixed-br {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9997;
+
+    @media (min-width: 992px) {
+        display: none;
+    }
+}
