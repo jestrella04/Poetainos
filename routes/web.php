@@ -98,7 +98,7 @@ Route::get('/login/{service}/callback', 'SocialAuthController@handleProviderCall
 Route::get('/offline', 'HomeController@offline')->name('offline');
 Route::get('/search', 'SearchController@show')->name('search');
 Route::get('/explore','HomeController@explore')->name('explore');
-Route::get('/socialite','HomeController@socialite')->name('socialite');
+Route::get('/socialite','HomeController@socialite')->name('socialite')->middleware('guest');
 
 // Writings
 Route::get('/', 'WritingsController@index')->name('home');
