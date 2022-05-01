@@ -28,7 +28,7 @@
         </div>
 
         <div class="offcanvas-body">
-            @include('partials.navlinks')
+            @include('partials.navlinks-sidebar')
         </div>
     </div>
 @endsection

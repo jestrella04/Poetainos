@@ -16,7 +16,7 @@ class Admin
     public function handle($request, Closure $next)
     {
         if (! $request->user()->isAllowed('admin')) {
-            return redirect(route('login'));
+            return redirect(route('socialite'));
         }
 
         return $next($request);

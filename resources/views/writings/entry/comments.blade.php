@@ -27,15 +27,7 @@
                 <p>{{ __('Please login to your account before you can comment.') }}</p>
 
                 <div class="socialite">
-                    @include('partials.socialite')
-
-                    <a href="{{ route('login') }}"
-                        class="btn btn-success"
-                        title="{{ __('Login with email') }}"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top">
-                        <i class="fas fa-fw fa-at" aria-hidden="true"></i>
-                    </a>
+                    @include('partials.socialite-simple')
                 </div>
             </div>
         @endauth

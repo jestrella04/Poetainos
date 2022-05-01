@@ -1,8 +1,23 @@
 @php $filter = request('filter') ?? 'unread' @endphp
 
 <div id="notification-top-links" class="top-links">
-    <nav class="nav nav-pills justify-content-center">
-        <a class="nav-item nav-link {{ 'unread' === $filter ? 'active' : '' }}" href="{{ url()->current() }}?filter=unread">{{ __('Unread') }}</a>
-        <a class="nav-item nav-link {{ 'all' === $filter ? 'active' : '' }}" href="{{ url()->current() }}?filter=all">{{ __('All') }}</a>
-    </nav>
+    <div class="nav nav-tabs nav-fill">
+        <a @class([
+            'nav-item',
+            'nav-link',
+            'active' => 'unread' === $filter,
+        ]) href="{{ url()->current() }}?filter=unread"
+        title="{{ __('Unread') }}">
+            {{ __('Unread') }}
+        </a>
+
+        <a @class([
+            'nav-item',
+            'nav-link',
+            'active' => 'all' === $filter,
+        ]) href="{{ url()->current() }}?filter=all"
+        title="{{ __('All') }}">
+            {{ __('All') }}
+        </a>
+    </div>
 </div>

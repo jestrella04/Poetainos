@@ -6,16 +6,17 @@
     <div id="login" class="login">
         <div class="form-wrapper">
             <div class="header">
-                <h4 class="all-caps">{{ __('Login to the hood') }}</h4>
-                <p class="text-muted">{{ __('Long time no see you') }}</p>
-            </div>
-
-            <div class="social">
-                @include('partials.socialite')
+                <h4 class="block-title">{{ __('Welcome to the hood') }}</h4>
             </div>
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
+
+                <input class="form-check-input"
+                        type="hidden"
+                        name="remember"
+                        id="remember"
+                        value="on">
 
                 <div class="form-floating mb-3">
                     <input id="username"
@@ -54,36 +55,28 @@
                     @enderror
                 </div>
 
-                <div class="form-check form-switch mb-3">
-                    <input class="form-check-input"
-                        type="checkbox"
-                        name="remember"
-                        id="remember"
-                        {{ old('remember', 'on') ? 'checked' : '' }}>
-
-                    <label class="form-check-label" for="remember">
-                        {{ __('Keep me logged in') }}
-                    </label>
-                </div>
-
                 <div class="d-grid gap-2 mb-3">
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <button type="submit" class="btn btn-lg btn-primary">
                         {{ __('Login') }}
                     </button>
-
-                    <a href="{{ route('register') }}" class="btn btn-dark btn-lg">
-                        {{ __('Create account') }}
-                    </a>
                 </div>
 
-                @if (Route::has('password.request'))
-                    <div class=" text-center">
-                        <a class="btn btn-link" href="{{ route('password.request') }}">
-                            <small>{{ __('Forgot your password?') }}</small>
-                        </a>
-                    </div>
-                @endif
+                <div class="d-grid gap-2">
+                    <a href="{{ route('register') }}" class="btn btn-sm btn-link">
+                        {{ __('Don\'t you have an account?') }}
+                    </a>
+
+                    <a href="{{ route('password.request') }}" class="btn btn-sm btn-link">
+                        {{ __('Forgot your password?') }}
+                    </a>
+                </div>
             </form>
+
+            <div class="text-center mt-5">
+                <a href="{{ route('socialite') }}" class="btn btn-sm btn-outline-secondary" aria-label="{{ __('Go back') }}">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </div>
         </div>
     </div>
 @endsection

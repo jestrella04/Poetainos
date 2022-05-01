@@ -6,8 +6,7 @@
     <div id="reset-password" class="login">
         <div class="form-wrapper">
             <div class="header">
-                <h4 class="all-caps">{{ __('You are almost done') }}</h4>
-                <p class="text-muted">{{ __('Please set your new password') }}</p>
+                <h4 class="block-title">{{ __('Please set your new password') }}</h4>
             </div>
 
             <form method="POST" action="{{ route('password.update') }}">

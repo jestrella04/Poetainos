@@ -33,7 +33,11 @@ hr {
 }
 
 .main-wrapper {
-    padding-top: 6rem;
+    padding-top: 4rem;
+
+    @media (min-width: 992px) {
+        padding-top: 6rem;
+    }
 }
 
 .main-content:not(#admin-main-content),
@@ -56,26 +60,18 @@ hr {
     @media (min-width: 992px) {
         margin-left: $wh-s-xxl;
     }
+}
 
-    .sidebar-toggle {
-        i {
-            transition: all 0.5s;
-        }
-    }
+.block-title {
+    @extend .lead;
+    font-size: 1rem;
+    text-transform: uppercase;
+    margin-bottom: $wh-s-lg;
+}
 
-    .block {
-        .block-title {
-            @extend .lead;
-            font-size: 1rem;
-            text-transform: uppercase;
-            margin-bottom: $wh-s-lg;
-        }
-
-        .writing-tag,
-        .writing-category {
-            margin-bottom: $wh-s-sm;
-        }
-    }
+.writing-tag,
+.writing-category {
+    margin-bottom: $wh-s-sm;
 }
 
 .empty {
@@ -105,8 +101,20 @@ hr {
 
 .top-links {
     @extend .smaller, .lead;
-    margin-bottom: $wh-s-xxl;
+    margin-bottom: $wh-s-xl;
     text-transform: capitalize;
+
+    @media (min-width: 992px) {
+        margin-bottom: $wh-s-xxl;
+    }
+
+    .active {
+        color: $primary !important;
+    }
+
+    i {
+        margin-right: $wh-s-sm;
+    }
 }
 
 .stats {
@@ -288,12 +296,7 @@ hr {
 }
 
 .badge-indicator {
-    @extend .position-absolute;
-    @extend .top-0;
-    @extend .start-100;
-    @extend .translate-middle;
-    @extend .rounded-pill;
-    @extend .p-2;
+    @extend .position-absolute, .top-0, .start-100, .translate-middle, .badge, .rounded-pill;
 }
 
 pwa-install {
@@ -364,16 +367,5 @@ pwa-update::part(offlineToast) {
         .highlight {
             background-color: $gray-300 !important;
         }
-    }
-}
-
-#back-to-top-wrapper {
-    position: fixed;
-    right: 1rem;
-    bottom: 1rem;
-    /* z-index: 99999; */
-
-    @include media-breakpoint-up(lg) {
-        right: 2rem;
     }
 }

@@ -1,4 +1,6 @@
 .login-wrapper {
+    height: 100%;
+
     .logo,
     .login {
         width: 100%;
@@ -11,35 +13,19 @@
     }
 
     .logo {
-        background: $bg-gradient;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: $bg-gradient-reverse;
 
-        div {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        img {
+            width: 96px;
+            height: 96px;
+            margin-bottom: $wh-s-lg;
 
             @media (min-width: 992px) {
-                height: 100%;
-            }
-
-            a {
-                color: $white;
-
-                img {
-                    width: 64px;
-                    height: 64px;
-                    margin-bottom: $wh-s-lg;
-
-                    @media (min-width: 992px) {
-                        width: 128px;
-                        height: 128px;
-                    }
-                }
-            }
-
-            a:hover {
-                color: $light;
+                width: 256px;
+                height: 256px;
             }
         }
     }
@@ -49,15 +35,22 @@
         justify-content: center;
         align-items: center;
 
+        @media (max-width: 992px) {
+            background-color: $dark;
+
+            .header {
+                color: $light;
+            }
+
+            .btn-link,
+            .form-check-label {
+                color: $light !important;
+            }
+        }
+
         .form-wrapper {
             width: 100%;
             max-width: 25rem;
-
-            form {
-                .btn {
-                    text-transform: capitalize;
-                }
-            }
         }
 
         .header,
@@ -69,24 +62,5 @@
         .email-confirmed {
             margin-top: $wh-s-lg;
         }
-
-        .social {
-            text-align: center;
-            margin-bottom: $wh-s-lg;
-
-            .btn-blue {
-                background-color: $blue;
-                border-color: $blue;
-            }
-        }
-    }
-}
-
-.socialite {
-    margin: $wh-s-lg auto;
-
-    .btn-blue {
-        background-color: $blue;
-        border-color: $blue;
     }
 }

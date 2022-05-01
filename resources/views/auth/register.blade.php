@@ -6,12 +6,7 @@
     <div id="register" class="login">
         <div class="form-wrapper">
             <div class="header">
-                <h4 class="all-caps">{{ __('Join the hood') }}</h4>
-                <p class="text-muted">{{ __('Creating an account is fast and easy') }}</p>
-            </div>
-
-            <div class="social">
-                @include('partials.socialite')
+                <h4 class="block-title">{{ __('Welcome to the hood') }}</h4>
             </div>
 
             <form method="POST" action="{{ route('register') }}">
@@ -151,10 +146,14 @@
                     <button type="submit" class="btn btn-primary btn-lg">
                         {{ __('Create account') }}
                     </button>
-
-                    <a href="{{ route('login') }}" class="btn btn-dark btn-lg">{{ __('Login') }}</a>
                 </div>
             </form>
+
+            <div class="text-center mt-5">
+                <a href="{{ route('socialite') }}" class="btn btn-sm btn-outline-secondary" aria-label="{{ __('Go back') }}">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </div>
         </div>
     </div>
 @endsection

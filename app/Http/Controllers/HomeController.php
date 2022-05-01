@@ -12,4 +12,18 @@ class HomeController extends Controller
             ]
         ]);
     }
+
+    public function explore()
+    {
+        return view('explore.index', [
+            'params' => [
+                'title' => getPageTitle([__('Explore')])
+            ]
+        ]);
+    }
+
+    public function socialite()
+    {
+        return view('auth.social');
+    }
 }

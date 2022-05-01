@@ -6,8 +6,7 @@
     <div id="confirm-password" class="login">
         <div class="form-wrapper">
             <div class="header">
-                <h4 class="all-caps">{{ __('Confirm Password') }}</h4>
-                <p class="text-muted">{{ __('Please confirm your password before continuing.') }}</p>
+                <h4 class="block-title">{{ __('Please confirm your password before continuing.') }}</h4>
             </div>
 
             <form method="POST" action="{{ route('password.confirm') }}">

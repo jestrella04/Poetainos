@@ -1,19 +1,3 @@
-<div id="back-to-top-wrapper" class="fade-out">
-    <button
-        id="back-to-top"
-        class="btn btn-primary jump-to-nav"
-        title="{{ __('Back to top') }}"
-        data-bs-toggle="tooltip"
-        data-bs-placement="left"
-        aria-label="{{ __('Back to top') }}">
-        <i class="fas fa-chevron-up" aria-hidden="true"></i>
-    </button>
-</div>
-
-<application-footer class="d-none">
-    {{-- @include('partials.navbar-footer') --}}
-</application-footer>
-
 <footer id="footer">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-md-between">

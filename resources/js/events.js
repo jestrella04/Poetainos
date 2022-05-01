@@ -165,9 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isInstalled) {
         // Hide big the footer
         document.querySelector('footer').classList.add('d-none');
+    }
 
-        // Show app footer
-        document.querySelector('application-footer').classList.remove('d-none')
+    // Animate logo on login page
+    let loginLogo = document.querySelector('.login-logo');
+
+    if (!fx.isNilOrEmpty(loginLogo)) {
+        fx.animateCSS(loginLogo, 'backInUp');
     }
 
     // Listen to the toast show event and act accordingly
@@ -238,12 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Scroll to the main nav
-        if (element.matches('.jump-to-nav')) {
-            // Check if triggered from footer btn and hide tooltip
-            if (element.matches('#back-to-top')) {
-                bootstrap.Tooltip.getInstance(element).hide();
-            }
-
+        if (element.matches('.jump-to-top')) {
+            event.preventDefault();
             document.querySelector('body').scrollIntoView({ behavior: 'smooth' });
         }
 

@@ -1,10 +1,12 @@
-#nav-main {
+#nav-desktop {
     @extend .smaller, .lead;
     padding-top: $wh-s-md;
     padding-bottom: $wh-s-md;
     background: $bg-gradient-reverse;
 
     .navbar-brand {
+        color: $white;
+
         img {
             transition: transform .5s;
             margin-right: $wh-s-sm;
@@ -15,38 +17,6 @@
         img {
             transform: scale(1.3);
         }
-    }
-
-    #toggler {
-        position: relative;
-        box-sizing: border-box;
-        z-index: 9996;
-        background-color: transparent;
-        padding: $wh-s-sm $wh-s-md;
-
-        .icon-badge {
-            transition: all 0.5s;
-
-            span.unread {
-                left: 100% !important;
-            }
-        }
-
-        .icon-badge.rotate {
-            transform: rotate(180deg);
-
-            span {
-                opacity: 0;
-            }
-        }
-
-        i {
-            color: $white;
-        }
-    }
-
-    #toggler:focus {
-        outline: 1px solid $primary;
     }
 
     .navbar-nav {
@@ -99,5 +69,15 @@
         @media (min-width: 992px) {
             display: none;
         }
+    }
+}
+
+#nav-mobile {
+    padding-top: $wh-s-md;
+    padding-bottom: $wh-s-md;
+    background: $bg-gradient-reverse;
+
+    .mobile-nav-link {
+        color: $light;
     }
 }

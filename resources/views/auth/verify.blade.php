@@ -12,8 +12,7 @@
             @endif
 
             <div class="header">
-                <h4 class="all-caps">{{ __('You are almost done') }}</h4>
-                <p class="lead">{{ __('Please verify your email address') }}</p>
+                <h4 class="block-title">{{ __('Please verify your email address') }}</h4>
             </div>
 
             <div class="info">
