@@ -16,6 +16,8 @@
 
 @section('main')
     <div id="writings-main-content" class="main-content">
+        @include('writings.partials.toplinks')
+
         @if (isset($params['section']) && 'shelf' === $params['section'] && isset($params['author']))
             @include('users.profile.banner-lite')
 
@@ -28,8 +30,6 @@
             </p>
             <hr class="banner">
         @endif
-
-        @include('writings.partials.toplinks')
 
         <div id="writing-list">
             @forelse ($writings as $writing)

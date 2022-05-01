@@ -196,12 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for new user notification events coming from the server
     if (!fx.isNil(userToken)) {
         Echo.private(`notifications.${userToken}`).listen('NotificationEvent', payload => {
-            document.querySelectorAll('.unread').forEach(badge => {
+            document.querySelectorAll('.unread-count').forEach(badge => {
+                badge.querySelector('.count').innerHTML = payload.notifications.unread;
                 badge.classList.remove('d-none');
-            });
-
-            document.querySelectorAll('.unread-count').forEach(count => {
-                count.innerHTML = payload.notifications.unread;
+                fx.animateCSS(badge, 'heartBeat');
             });
         });
     }

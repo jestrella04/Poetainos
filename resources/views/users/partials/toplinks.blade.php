@@ -24,7 +24,7 @@
             'nav-item',
             'nav-link',
             'active' => 'popular' === $sort,
-        ]) href="{{ url()->current() }}?sort=likes"
+        ]) href="{{ url()->current() }}?sort=popular"
         title="{{ __('Popular') }}">
             <i class="fa-solid fa-fire-flame-curved" aria-hidden="true"></i>
             <span class="d-none d-md-inline-block">{{ __('Popular') }}</span>

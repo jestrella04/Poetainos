@@ -41,9 +41,14 @@
         aria-label="{{ __('Notifications') }}">
         <i class="fas fa-bell fa-fw" aria-hidden="true"></i>
 
-        @php $display = (auth()->check() && auth()->user()->unreadNotifications->count() > 0) ? '' : 'd-none' @endphp
-        <span class="badge-indicator bg-danger unread {{ $display }}">
-            {{ auth()->user()->unreadNotifications->count() ?: '' }}
+        <span @class([
+            'badge',
+            'badge-indicator',
+            'bg-danger',
+            'unread-count',
+            'd-none' => auth()->user()->unreadNotifications->count() == 0,
+            ])>
+            <span class="count">{{ auth()->user()->unreadNotifications->count() }}</span>
             <span class="visually-hidden">{{ __('unread notifications') }}</span>
         </span>
     </a>

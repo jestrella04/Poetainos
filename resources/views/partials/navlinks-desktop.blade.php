@@ -30,26 +30,40 @@
     @auth
         <li class="nav-item">
             <div class="dropdown">
-                <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <div class="position-relative">
-                        {!! getUserAvatar(auth()->user(), $size = 'md') !!}
+                <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {!! getUserAvatar(auth()->user(), $size = 'md') !!}
 
-                        @php $display = (auth()->check() && auth()->user()->unreadNotifications->count() > 0) ? '' : 'd-none' @endphp
-                        <span class="badge-indicator border border-light bg-primary unread {{ $display }}">
-                            <span class="visually-hidden">{{ __('unread notifications') }}</span>
-                        </span>
-                    </div>
+                    <span @class([
+                        'badge',
+                        'badge-indicator',
+                        'bg-danger',
+                        'unread-count',
+                        'd-none' => auth()->user()->unreadNotifications->count() == 0,
+                        ])>
+                        <span class="count">{{ auth()->user()->unreadNotifications->count() }}</span>
+                        <span class="visually-hidden">{{ __('unread notifications') }}</span>
+                    </span>
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-end">
                     @if (auth()->user()->isAllowed('admin'))
                         <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
                     @endif
+
                     <a class="dropdown-item" href="{{ route('notifications.index') }}">
                         {{ __('Notifications') }}
 
-                        <span class="badge bg-dark ms-3 unread-count">{{ auth()->user()->unreadNotifications->count() ?: '' }}</span>
-                        <span class="visually-hidden">{{ __('Unread notifications') }}</span>
+                        <span @class([
+                            'badge',
+                            'rounded-pill',
+                            'bg-danger',
+                            'ms-3',
+                            'unread-count',
+                            'd-none' => auth()->user()->unreadNotifications->count() == 0,
+                            ])>
+                            <span class="count">{{ auth()->user()->unreadNotifications->count() }}</span>
+                            <span class="visually-hidden">{{ __('unread notifications') }}</span>
+                        </span>
                     </a>
                     <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>
                     <a class="dropdown-item" href="{{ auth()->user()->writingsPath() }}">{{ __('My writings') }}</a>
