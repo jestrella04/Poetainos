@@ -8,9 +8,11 @@
     <i class="fas fa-wand-magic-sparkles fa-fw" aria-hidden="true"></i>
 </a>
 
-<a class="mobile-nav-link btn-sm jump-to-top" href="#">
+<a class="mobile-nav-link btn-sm jump-to-top ontop" href="#">
     <i class="fas fa-arrow-turn-up fa-fw d-none" aria-hidden="true"></i>
-    <img src="{{ mix('/static/images/logo.svg') }}" width="24" height="24"
+    <img src="{{ mix('/static/images/logo.svg') }}"
+        width="24"
+        height="24"
         alt="{{ getSiteConfig('name') }}">
 </a>
 

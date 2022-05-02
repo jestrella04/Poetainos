@@ -866,28 +866,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen to the window scroll event and act accordingly
     window.addEventListener('scroll', event => {
-        let header = document.querySelector('header');
-        let mainWrapper = document.querySelector('.main-wrapper');
-        let jumpToMainNav = document.querySelector('#jump-to-nav');
-        let jumpToHeader = document.querySelector('#back-to-top-wrapper');
+        let jumpToMainNav = document.querySelector('.jump-to-top');
 
-        if (!fx.isNil(header) && !fx.isNil(jumpToHeader)) {
-            if (fx.isInViewport(header)) {
-                jumpToHeader.classList.remove('fade-in');
-                jumpToHeader.classList.add('fade-out');
-            } else {
-                jumpToHeader.classList.remove('fade-out');
-                jumpToHeader.classList.add('fade-in');
-            }
-        }
+        if (!fx.isNilOrEmpty(jumpToMainNav)) {
+            let scrollPosition = window.scrollY;
+            let icon = jumpToMainNav.querySelector('i');
+            let logo = jumpToMainNav.querySelector('img')
 
-        if (!fx.isNil(mainWrapper) && !fx.isNil(jumpToMainNav)) {
-            if (fx.isInViewport(mainWrapper)) {
-                jumpToMainNav.classList.remove('fade-in');
-                jumpToMainNav.classList.add('fade-out');
+            if (0 == scrollPosition) {
+                jumpToMainNav.classList.add('ontop');
+                icon.classList.add('d-none');
+                logo.classList.remove('d-none');
+                fx.animateCSS(logo, 'fadeIn');
             } else {
-                jumpToMainNav.classList.remove('fade-out');
-                jumpToMainNav.classList.add('fade-in');
+                icon.classList.remove('d-none');
+                logo.classList.add('d-none');
+
+                if (jumpToMainNav.classList.contains('ontop')) {
+                    jumpToMainNav.classList.remove('ontop');
+                    fx.animateCSS(icon, 'fadeIn');
+                }
             }
         }
     });
