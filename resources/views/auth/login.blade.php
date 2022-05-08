@@ -55,7 +55,7 @@
                     @enderror
                 </div>
 
-                <div class="form-check form-switch mb-3">
+                {{-- <div class="form-check form-switch mb-3">
                     <input id="service-agreement"
                         type="checkbox"
                         class="form-check-input"
@@ -83,7 +83,7 @@
                     <a href="pages/politicas-de-privacidad">
                         <i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>
                     </a>
-                </div>
+                </div> --}}
 
                 <div class="d-grid gap-2 mb-3">
                     <button type="submit" class="btn btn-lg btn-primary">
