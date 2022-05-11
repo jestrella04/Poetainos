@@ -29,13 +29,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('users', 'AdminController@users')->name('users');
     Route::get('writings', 'AdminController@writings')->name('writings');
     Route::get('tools', 'AdminController@tools')->name('tools');
-    Route::get('complaints', 'AdminController@index')->name('complaints'); //
+    Route::get('complaints', 'AdminController@complaints')->name('complaints');
 
     Route::put('settings/edit', 'SettingsController@update')->name('settings.edit');
     Route::put('categories/edit', 'CategoriesController@update')->name('categories.edit');
     Route::put('tags/edit', 'TagsController@update')->name('tags.edit');
     Route::put('pages/edit', 'PagesController@update')->name('pages.edit');
-    Route::put('complaints', 'AdminController@index')->name('complaints.edit'); //
+    Route::put('complaints', 'ComplaintsController@update')->name('complaints.edit');
 
     Route::delete('categories/delete/{category}', 'CategoriesController@destroy')->name('categories.destroy');
     Route::delete('tags/delete/{tag}', 'TagsController@destroy')->name('tags.destroy');

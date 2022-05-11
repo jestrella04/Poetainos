@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Comment;
+use App\Complaint;
 use App\Page;
 use App\Reply;
 use App\Setting;
@@ -154,6 +155,20 @@ class AdminController extends Controller
         ];
 
         return view('admin.tools', [
+            'params' => $params,
+        ]);
+    }
+
+    public function complaints() {
+        $params = [
+            'title' => getPageTitle([
+                __('Complaints'),
+                __('Administration'),
+            ]),
+        ];
+
+        return view('admin.complaints', [
+            'complaints' => Complaint::simplePaginate($this->pagination),
             'params' => $params,
         ]);
     }
