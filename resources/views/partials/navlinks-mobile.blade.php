@@ -33,9 +33,9 @@
         </span>
     </a>
 @else
-    <a class="mobile-nav-link btn-sm" href="{{ route('notifications.index') }}" title="{{ __('Notifications') }}"
-        aria-label="{{ __('Notifications') }}" disabled>
-        <i class="fas fa-bell fa-fw" aria-hidden="true"></i>
+    <a class="mobile-nav-link btn-sm" href="{{ route('socialite') }}" title="{{ __('Login') }}"
+        aria-label="{{ __('Login') }}" disabled>
+        <i class="fas fa-user fa-fw" aria-hidden="true"></i>
     </a>
 @endauth
 

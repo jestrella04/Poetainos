@@ -22,4 +22,10 @@
         <i class="fas fa-fw fa-at" aria-hidden="true"></i>
         {{ __('Continue with Email') }}
     </a>
+
+    <a href="{{ route('home') }}"
+        class="btn btn-primary">
+        <i class="fas fa-fw fa-ghost" aria-hidden="true"></i>
+        {{ __('Continue as a guest') }}
+    </a>
 </div>

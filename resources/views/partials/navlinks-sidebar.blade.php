@@ -1,10 +1,5 @@
 <ul class="navbar-nav ms-auto">
     @auth
-        {{-- <form class="d-inline" method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="btn dropdown-item">{{ __('Logout') }}</button>
-        </form> --}}
-
         <li class="nav-item">
             <a class="nav-link " href="{{ auth()->user()->path() }}">
                 <i class="fas fa-user fa-fw" aria-hidden="true"></i>
@@ -25,21 +20,38 @@
                 {{ __('My shelf') }}
             </a>
         </li>
-    @endauth
 
-    @if (auth()->check() && auth()->user()->isAllowed('admin'))
+        @if (auth()->user()->isAllowed('admin'))
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.index') }}">
+                    <i class="fas fa-cogs fa-fw" aria-hidden="true"></i>
+                    {{ __('Administration') }}
+                </a>
+            </li>
+        @endif
+
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.index') }}">
-                <i class="fas fa-cogs fa-fw" aria-hidden="true"></i>
-                {{ __('Administration') }}
+            <form class="d-inline" method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn dropdown-item">
+                    <i class="fa-solid fa-right-from-bracket fa-fw" aria-hidden="true"></i>
+                    {{ __('Logout') }}
+                </button>
+            </form>
+        </li>
+    @else
+        <li class="nav-item {{ Route::current()->getName() === 'login' ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('socialite') }}">
+                <i class="fas fa-user fa-fw" aria-hidden="true"></i>
+                {{ __('Login') }}
             </a>
         </li>
-    @endif
+    @endauth
 
-    <li class="nav-item">
-        <a class="nav-link" href="{{ route('writings.random') }}">
-            <i class="fas fa-random fa-fw" aria-hidden="true"></i>
-            {{ __('Random') }}
+    <li class="nav-item {{ Route::current()->getName() === 'users.index' ? 'active' : '' }}">
+        <a class="nav-link " href="{{ route('users.index') }}">
+            <i class="fas fa-users fa-fw" aria-hidden="true"></i>
+            {{ __('Writers') }}
         </a>
     </li>
 
@@ -50,21 +62,12 @@
         </a>
     </li>
 
-    <li class="nav-item {{ Route::current()->getName() === 'users.index' ? 'active' : '' }}">
-        <a class="nav-link " href="{{ route('users.index') }}">
-            <i class="fas fa-users fa-fw" aria-hidden="true"></i>
-            {{ __('Writers') }}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('writings.random') }}">
+            <i class="fas fa-random fa-fw" aria-hidden="true"></i>
+            {{ __('Random') }}
         </a>
     </li>
-
-    @guest
-        <li class="nav-item {{ Route::current()->getName() === 'login' ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('socialite') }}">
-                <i class="fas fa-user fa-fw" aria-hidden="true"></i>
-                {{ __('Login') }}
-            </a>
-        </li>
-    @endguest
 
     <li class="nav-item {{ Route::current()->getName() === 'contact.create' ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('contact.create') }}">

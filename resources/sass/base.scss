@@ -378,7 +378,7 @@ pwa-update::part(offlineToast) {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    z-index: 9997;
+    z-index: 999;
 
     @media (min-width: 992px) {
         display: none;
