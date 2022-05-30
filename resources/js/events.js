@@ -543,6 +543,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     //complaintModal.dispose();
                 });
         }
+
+        // Check if alternative categories are selected
+        if (element.matches('.submit-writing')) {
+            let mainCatSelectBox = document.querySelector('#main-category');
+            let altCatsSelectBox = document.querySelector('#categories');
+
+            if (0 === altCatsSelectBox.selectedOptions.length) {
+                mainCatSelectBox.scrollIntoView();
+                fx.handleFormErrors({
+                    categories: [altCatsSelectBox.validationMessage]
+                });
+            }
+        }
     });
 
     // Listen to the on submit event on the page and act accordingly
@@ -608,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     fx.handleForm(element, 'response');
 
                     // Scroll back to the form header
-                    document.querySelector('#writing-form-wrapper .title').scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    document.querySelector('#writing-form-wrapper .block-title').scrollIntoView({ behavior: 'smooth', block: 'end' });
                 });
         }
 

@@ -1,11 +1,11 @@
 <div id="writing-form-wrapper" class="form-wrapper">
-    <h2 class="title all-caps">
+    <div class="block-title">
         @if ($writing->exists)
-            {{ $params['title']['update'] }}
+            {{ __('Update writing') }}
         @else
-        {{ $params['title']['create'] }}
+            {{ __('Publish a writing') }}
         @endif
-    </h2>
+    </div>
 
     @if ($writing->exists)
         @php $update = route('writings.update', $writing) @endphp
@@ -226,7 +226,7 @@
                 <button
                     type="submit"
                     id="submit"
-                    class="btn btn-primary btn-lg">
+                    class="btn btn-primary btn-lg submit-writing">
                     @if ($writing->exists)
                         {{ __('Save changes') }}
                     @else

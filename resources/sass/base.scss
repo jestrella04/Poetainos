@@ -379,6 +379,7 @@ pwa-update::part(offlineToast) {
     bottom: 1rem;
     right: 1rem;
     z-index: 999;
+    font-size: 1.15rem;
 
     @media (min-width: 992px) {
         display: none;

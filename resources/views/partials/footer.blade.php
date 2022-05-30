@@ -1,8 +1,9 @@
 @if (Route::current()->getName() !== 'writings.create')
     <a href="{{ route('writings.create') }}"
-        class="btn btn-primary btn-fixed-br rounded-circle"
+        class="btn-fixed-br fa-stack"
         aria-label="{{ __('Publish') }}">
-        <i class="fas fa-plus" aria-hidden="true"></i>
+        <i class="fas fa-circle fa-stack-2x text-primary" aria-hidden="true"></i>
+        <i class="fas fa-pen-nib fa-stack-1x fa-inverse" aria-hidden="true"></i>
     </a>
 @endif
 
