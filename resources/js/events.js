@@ -313,8 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             fx.animateCSS(element, 'heartBeat');
                         });
                 } else {
-                    // User is not logged in
-                    window.location.href = 'login';
+                    // User is not logged in - login
+                    window.location.href = 'socialite';
                 }
             }
 
