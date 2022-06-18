@@ -100,30 +100,74 @@ function getReadableNumber($number)
 
 function getWritingCounter($writing)
 {
+    $repliesCount = Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count();
+    $commentsCount = $writing->comments->count() + $repliesCount;
+
     return [
-        'likes' => getReadableNumber($writing->votes->where('vote', '>', 0)->count()),
-        //'dislikes' => getReadableNumber($writing->votes->where('vote', 0)->count()),
-        'comments' => getReadableNumber($writing->comments->count()),
-        'replies' => Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count(),
-        'views' => getReadableNumber($writing->views),
-        'shelf' => getReadableNumber($writing->shelf->count()),
-        'aura' => intval($writing->aura),
+        'likes' => [
+            'counter' => $writing->votes->where('vote', '>', 0)->count(),
+            'readable' => getReadableNumber($writing->votes->where('vote', '>', 0)->count()),
+        ],
+        'comments' => [
+            'counter' => $commentsCount,
+            'readable' => getReadableNumber($commentsCount),
+        ],
+        'views' => [
+            'counter' => $writing->views,
+            'readable' => getReadableNumber($writing->views),
+        ],
+        'shelf' => [
+            'counter' => $writing->shelf->count(),
+            'readable' => getReadableNumber($writing->shelf->count()),
+        ],
+        'aura' => [
+            'counter' => $writing->aura,
+            'readable' => intval($writing->aura),
+        ]
     ];
 }
 
 function getUserCounter($user)
 {
+    $commentsCount = $user->comments()->count() + $user->replies()->count();
+
     return [
-        'writings' => getReadableNumber($user->writings()->count()),
-        'flowers' => getReadableNumber($user->writings()->whereNotNull('home_posted_at')->count()),
-        'comments' => getReadableNumber($user->comments()->count()),
-        'replies' => getReadableNumber($user->replies()->count()),
-        'votes' => getReadableNumber($user->votes()->count()),
-        'views' => getReadableNumber($user->profile_views),
-        'shelf' => getReadableNumber($user->shelf()->count()),
-        'hood' => getReadableNumber($user->hood()->count()),
-        'extendedHood' => getReadableNumber($user->fellowHood($count = true)),
-        'aura' => intval($user->aura),
+        'writings' => [
+            'counter' => $user->writings()->count(),
+            'readable' => getReadableNumber($user->writings()->count()),
+        ],
+        'flowers' => [
+            'counter' => $user->writings()->whereNotNull('home_posted_at')->count(),
+            'readable' => getReadableNumber($user->writings()->whereNotNull('home_posted_at')->count()),
+        ],
+        'comments' => [
+            'counter' => $commentsCount,
+            'readable' => getReadableNumber($commentsCount),
+        ],
+        'votes' => [
+            'counter' => $user->votes()->count(),
+            'readable' => getReadableNumber($user->votes()->count()),
+        ],
+        'views' => [
+            'counter' => $user->profile_views,
+            'readable' => getReadableNumber($user->profile_views),
+        ],
+        'shelf' => [
+            'counter' => $user->shelf()->count(),
+            'readable' => getReadableNumber($user->shelf()->count()),
+        ],
+        'hood' => [
+            'counter' => $user->hood()->count(),
+            'readable' => getReadableNumber($user->hood()->count()),
+        ],
+        'extendedHood' => [
+            'counter' => $user->fellowHood($count = true),
+            'readable' => getReadableNumber($user->fellowHood($count = true)),
+        ],
+        'aura' => [
+            'counter' => $user->aura,
+            'readable' => intval($user->aura),
+        ]
     ];
 }
 

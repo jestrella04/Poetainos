@@ -22,7 +22,7 @@
 
     <span
         class="badge click like @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
-        title="{{ __(':count Likes', ['count' => $count['likes']]) }}"
+        title="{{ __(':count Likes', ['count' => $count['likes']['counter']]) }}"
         @if (auth()->check() && empty($vote))
         data-wh-target="{{ route('votes.store') }}"
         data-wh-id="{{ $writing->id }}"
@@ -31,47 +31,30 @@
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-heart fa-fw" aria-hidden="true"></i>
-        <span class="counter">{{ $count['likes'] }}</span>
+        <span class="counter">{{ $count['likes']['readable'] }}</span>
     </span>
-
-    {{-- <span class="badge @auth {{ 'dislike' }} @endauth @if ($voted = 0) {{ 'voted' }} @endif"
-        @if (auth()->check())
-        title="{{ __('Dislike it') }}"
-        @else
-        title="{{ __('Dislikes') }}"
-        @endif
-        @if (auth()->check() && empty($vote))
-        data-wh-target="{{ route('votes.store') }}"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        data-wh-id="{{ $writing->id }}"
-        data-wh-value="0"
-        @endif>
-        <i class="fa fa-heart-broken fa-fw" aria-hidden="true"></i>
-        <span class="counter">{{ $count['downvotes'] }}</span>
-    </span> --}}
 
     <span
         class="badge"
-        title="{{ __(':count Comments', ['count' => $count['comments'] + $count['replies']]) }}"
+        title="{{ __(':count Comments', ['count' => $count['comments']['counter']]) }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
-        <span class="counter">{{ $count['comments'] + $count['replies'] }}</span>
+        <span class="counter">{{ $count['comments']['readable'] }}</span>
     </span>
 
     <span
         class="badge"
-        title="{{ __(':count Views', ['count' => $count['views']]) }}"
+        title="{{ __(':count Views', ['count' => $count['views']['counter']]) }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-book-reader fa-fw" aria-hidden="true"></i>
-        <span class="counter">{{ $count['views'] }}</span>
+        <span class="counter">{{ $count['views']['readable'] }}</span>
     </span>
 
     <span
         class="badge @if (isset($userId) && $userId !== $writing->author->id) {{ 'click shelf' }} @endif @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
-        title="{{ __(':count Shelved', ['count' => $count['shelf']]) }}"
+        title="{{ __(':count Shelved', ['count' => $count['shelf']['counter']]) }}"
         @if (auth()->check())
         data-wh-target="{{ route('shelves.store') }}"
         data-wh-id="{{ $writing->id }}"
@@ -79,16 +62,16 @@
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>
-        <span class="counter">{{ $count['shelf'] }}</span>
+        <span class="counter">{{ $count['shelf']['readable'] }}</span>
     </span>
 
     <span
         class="badge"
-        title="{{ __('Aura: :aura', ['aura' => $count['aura']]) }}"
+        title="{{ __('Aura: :aura', ['aura' => $count['aura']['counter']]) }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fa fa-dove fa-fw" aria-hidden="true"></i>
-        <span class="counter">{{ $count['aura'] }}</span>
+        <span class="counter">{{ $count['aura']['readable'] }}</span>
     </span>
 
     <div class="dropdown dropdown-counter d-inline">
