@@ -41,4 +41,22 @@
     .nav-item:focus {
         background-color: rgba($light, .05);
     }
+
+    #legal-frame-links {
+        li {
+            margin-left: 1rem;
+
+            a {
+                padding: 0.3rem;
+            }
+        }
+
+        li:first-child {
+            margin-top: 0.3rem;
+        }
+
+        li:last-child {
+            margin-bottom: 0.3rem;
+        }
+    }
 }

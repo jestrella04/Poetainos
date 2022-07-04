@@ -1,9 +1,8 @@
 @if (Route::current()->getName() !== 'writings.create')
     <a href="{{ route('writings.create') }}"
-        class="btn-fixed-br fa-stack"
+        class="btn btn-primary btn-fixed-br"
         aria-label="{{ __('Publish') }}">
-        <i class="fas fa-circle fa-stack-2x text-primary" aria-hidden="true"></i>
-        <i class="fas fa-pen-nib fa-stack-1x fa-inverse" aria-hidden="true"></i>
+        <i class="fas fa-pen-nib" aria-hidden="true"></i>
     </a>
 @endif
 
@@ -26,7 +25,7 @@
                     @foreach (App\Page::all() as $page)
                     <a class="nav-link" href="{{ route('pages.show', $page->slug ) }}">{{ $page->title }}</a>
                     @endforeach
-                    <a class="nav-link" href="{{ route('contact.create') }}">{{ __('Contact form') }}</a>
+                    <a class="nav-link" href="{{ route('contact.create') }}">{{ __('Contact us') }}</a>
                 </div>
             </div>
 

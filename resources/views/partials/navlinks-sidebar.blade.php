@@ -33,7 +33,7 @@
         <li class="nav-item">
             <form class="d-inline" method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="btn dropdown-item">
+                <button type="submit" class="btn">
                     <i class="fa-solid fa-right-from-bracket fa-fw" aria-hidden="true"></i>
                     {{ __('Logout') }}
                 </button>
@@ -74,5 +74,30 @@
             <i class="fas fa-envelope fa-fw" aria-hidden="true"></i>
             {{ __('Contact us') }}
         </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('pages.show', 'preguntas-frecuentes' ) }}">
+            <i class="fas fa-circle-question fa-fw" aria-hidden="true"></i>
+            {{ __('FAQ') }}
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <button class="btn"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#legal-frame-links"
+            aria-expanded="false"
+            aria-controls="legal-frame-links">
+            <i class="fas fa-scale-balanced fa-fw" aria-hidden="true"></i>
+            {{ __('Legal Frame') }}
+        </button>
+
+        <ul id="legal-frame-links" class="collapse">
+            <li><a class="nav-link" href="{{ route('pages.show', 'sobre-nosotros' ) }}">{{ __('About us') }}</a></li>
+            <li><a class="nav-link" href="{{ route('pages.show', 'condiciones-de-uso' ) }}">{{ __('Terms of use') }}</a></li>
+            <li><a class="nav-link" href="{{ route('pages.show', 'politicas-de-privacidad' ) }}">{{ __('Privacy policy') }}</a></li>
+        </ul>
     </li>
 </ul>

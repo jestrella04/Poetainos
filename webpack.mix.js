@@ -32,3 +32,9 @@ mix.js('resources/js/pwabuilder-sw.js', 'public')
 if (mix.inProduction()) {
     mix.version();
 }
+
+mix.webpackConfig({
+    stats: {
+        children: true,
+    },
+});
