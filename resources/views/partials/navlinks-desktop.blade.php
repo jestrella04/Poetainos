@@ -1,4 +1,11 @@
 <ul class="navbar-nav ms-auto">
+    {{-- <li class="nav-item {{ Route::current()->getName() === 'explore' ? 'active' : '' }}">
+        <a class="nav-link " href="{{ route('explore') }}">
+            <i class="fas fa-wand-magic-sparkles fa-fw" aria-hidden="true"></i>
+            {{ __('Explore') }}
+        </a>
+    </li> --}}
+
     <li class="nav-item {{ Route::current()->getName() === 'users.index' ? 'active' : '' }}">
         <a class="nav-link " href="{{ route('users.index') }}">
             <i class="fas fa-users fa-fw" aria-hidden="true"></i>

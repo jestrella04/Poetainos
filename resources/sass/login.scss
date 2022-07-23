@@ -62,5 +62,16 @@
         .email-confirmed {
             margin-top: $wh-s-lg;
         }
+
+        .social {
+            .btn {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+
+                span:nth-child(2) {
+                    text-align: left !important;
+                }
+            }
+        }
     }
 }
