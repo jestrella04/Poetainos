@@ -1,4 +1,4 @@
-.writing-entry + hr {
+.writing-entry + .writing-comments {
     margin: $wh-s-xxl auto;
 
     @media (max-width: 576px) {
@@ -10,32 +10,23 @@
     overflow-wrap: break-word;
     word-break: break-word;
 
-    .writing-meta {
+    .card-subtitle {
         @extend .smaller, .lead;
         text-transform: uppercase;
+        margin-bottom: $wh-s-lg;
 
         span:first-child {
             margin-right: $wh-s-md;
         }
     }
 
-    .writing-title {
+    .card-title {
         text-transform: uppercase;
-        margin-bottom: 0;
+        //margin-bottom: 0;
 
         a,
         a:hover{
             text-decoration: none;
-        }
-    }
-
-    .writing-heading {
-        margin-bottom: $wh-s-lg;
-
-        p {
-            span {
-                margin-right: $wh-s-xl;
-            }
         }
     }
 
@@ -47,28 +38,21 @@
     }
 
     .writing-cover {
-        border-radius: 0.3rem;
-        overflow: hidden;
         margin-right: auto;
         margin-left: auto;
-        margin-bottom: $wh-s-lg;
-
-        img {
-            transition: transform .5s, filter .5s ease-in-out;
-        }
-
-        img:hover {
-            transform: scale(1.1);
-        }
     }
 
     .writing-author {
-        @media (min-width: 768px) {
-            margin-right: $wh-s-lg;
-        }
+        text-align: center;
+    }
 
-        @media (max-width: 768px) {
-            margin-bottom: $wh-s-lg;
+    .writing-cover + .writing-author {
+        margin-top: -48px; // xxl / 2
+    }
+
+    .cover {
+        .writing-author:first-child {
+            margin-top: $wh-s-lg;
         }
     }
 
@@ -80,16 +64,6 @@
         .btn {
             text-align: left;
             padding-left: 0;
-
-            i {
-                opacity: .5;
-            }
-        }
-
-        .btn:hover {
-            i {
-                opacity: .8;
-            }
         }
     }
 
@@ -141,31 +115,9 @@
 }
 
 #writings-main-content {
-    .user-banner-lite {
-        position: relative;
-
-        span {
-            display: block;
-        }
-
-        span.name {
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .avatar {
-            margin-bottom: $wh-s-md
-        }
-
-        .stretched-link:hover {
-            text-decoration: none;
-        }
-    }
-
     .subtitle {
+        @extend .text-muted;
         text-align: center;
-        text-transform: capitalize;
-        margin: $wh-s-lg 0;
     }
 }
 

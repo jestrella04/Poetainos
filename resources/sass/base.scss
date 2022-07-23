@@ -36,7 +36,7 @@ hr {
     padding-top: 4rem;
 
     @media (min-width: 992px) {
-        padding-top: 6rem;
+        padding-top: 5rem;
     }
 }
 
@@ -103,10 +103,6 @@ hr {
     @extend .smaller, .lead;
     margin-bottom: $wh-s-xl;
     text-transform: capitalize;
-
-    @media (min-width: 992px) {
-        margin-bottom: $wh-s-xxl;
-    }
 
     .active {
         color: $primary !important;

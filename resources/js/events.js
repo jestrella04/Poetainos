@@ -8,6 +8,7 @@ import '@pwabuilder/pwainstall';
 import autoGrow from '@ivanhanak_com/js-textarea-autogrow';
 import Tribute from 'tributejs';
 import Tags from 'bootstrap5-tags';
+import Masonry from 'masonry-layout';
 
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
@@ -80,6 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         return new bootstrap.Popover(popoverTriggerEl, options);
+    });
+
+    // Initialize Masonry
+    [].slice.call(document.querySelectorAll('.masonry')).map(masonryTriggerEl => {
+        return new Masonry(masonryTriggerEl);
     });
 
     // Disable share dropdown if Share API is supported
