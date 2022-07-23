@@ -14,7 +14,7 @@ const installComponent = document.createElement('pwa-install');
 const updateComponent = document.createElement('pwa-update');
 const isInstalled = installComponent.getInstalledStatus();
 
-document.querySelector('footer').appendChild(installComponent);
+//document.querySelector('footer').appendChild(installComponent);
 document.querySelector('footer').appendChild(updateComponent);
 
 // Customizing displayed messages
