@@ -4,7 +4,7 @@
             <div class="btn-group" role="group">
                 {{-- Previous Page Link --}}
                 @if ($paginator->onFirstPage())
-                    <a class="btn btn-primary disabled"
+                    <a class="btn btn-primary pagination-prev disabled"
                         title="{{ __('Previous') }}"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
@@ -13,7 +13,7 @@
                         <i class="fa fa-chevron-left fa-fw" aria-hidden="true"></i>
                     </a>
                 @else
-                    <a class="btn btn-primary"
+                    <a class="btn btn-primary pagination-prev"
                         href="{{ $paginator->previousPageUrl() }}"
                         title="{{ __('Previous') }}"
                         data-bs-toggle="tooltip"
@@ -30,7 +30,7 @@
 
                 {{-- Next Page Link --}}
                 @if ($paginator->hasMorePages())
-                    <a class="btn btn-primary"
+                    <a class="btn btn-primary pagination-next"
                         href="{{ $paginator->nextPageUrl() }}"
                         title="{{ __('Next') }}"
                         data-bs-toggle="tooltip"
@@ -40,7 +40,7 @@
                         <i class="fa fa-chevron-right fa-fw" aria-hidden="true"></i>
                     </a>
                 @else
-                    <a class="btn btn-primary disabled"
+                    <a class="btn btn-primary pagination-next disabled"
                         href="{{ $paginator->nextPageUrl() }}"
                         title="{{ __('Next') }}"
                         data-bs-toggle="tooltip"

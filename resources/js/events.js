@@ -9,6 +9,8 @@ import autoGrow from '@ivanhanak_com/js-textarea-autogrow';
 import Tribute from 'tributejs';
 import Tags from 'bootstrap5-tags';
 import Masonry from 'masonry-layout';
+import imagesLoaded from 'imagesloaded';
+import InfiniteScroll from 'infinite-scroll';
 
 // PWA Builder goodies
 const installComponent = document.createElement('pwa-install');
@@ -84,8 +86,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize Masonry
-    [].slice.call(document.querySelectorAll('.masonry')).map(masonryTriggerEl => {
-        return new Masonry(masonryTriggerEl);
+    document.querySelectorAll('.masonry').forEach(masonryElement => {
+        new Masonry(masonryElement);
+    });
+
+    // Enable infinite scroll
+    InfiniteScroll.imagesLoaded = imagesLoaded;
+    document.querySelectorAll('.infinite-scroll').forEach(infiniteScrollElement => {
+        // Check if there's a pagination element
+        let pagination = document.querySelector('.main-pagination');
+
+        if (!fx.isNilOrEmpty(pagination)) {
+            new InfiniteScroll(infiniteScrollElement, {
+                path: '.pagination-next',
+                append: '.writing-entry-container',
+                //history: 'push',
+                hideNav: '.main-pagination',
+                outlayer: Masonry.data(infiniteScrollElement),
+            });
+        }
     });
 
     // Disable share dropdown if Share API is supported
@@ -169,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if app is installed
     if (isInstalled) {
-        // Hide big the footer
+        // Hide the footer
         document.querySelector('footer').classList.add('d-none');
     }
 

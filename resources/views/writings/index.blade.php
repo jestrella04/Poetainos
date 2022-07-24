@@ -29,9 +29,9 @@
         @include('writings.partials.toplinks')
 
         <div id="writing-list">
-            <div class="row masonry" data-masonry='{"percentPosition": true }'>
+            <div class="row masonry infinite-scroll" data-masonry='{"percentPosition": true }'>
                 @forelse ($writings as $writing)
-                    <div class="col-sm-6 col-lg-4 mb-4">
+                    <div class="col-sm-6 col-lg-4 mb-4 writing-entry-container">
                         @include('writings.entry.index')
                     </div>
                 @empty
