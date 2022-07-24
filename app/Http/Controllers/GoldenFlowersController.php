@@ -31,6 +31,7 @@ class GoldenFlowersController extends Controller
         }
 
         $params = [
+            'head_msg' => __('You are browsing the library of writings awarded with a Golden Flower.'),
             'title' => getPageTitle([__('Golden Flowers')]),
         ];
 

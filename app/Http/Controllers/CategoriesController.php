@@ -51,6 +51,7 @@ class CategoriesController extends Controller
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
 
         $params = [
+            'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]),
             'title' => getPageTitle([
                 $category->name,
                 __('Categories')

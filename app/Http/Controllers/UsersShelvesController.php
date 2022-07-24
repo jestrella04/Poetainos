@@ -10,14 +10,18 @@ class UsersShelvesController extends Controller
     public function index(User $user)
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $head_msg = __('You are browsing the library of writings bookmarked by @:user.', ['user' => $user['username']]);
+
+        if (auth()->check() && auth()->user()->is($user)) {
+            $head_msg = __('You are browsing the library of writings you have saved to your shelf.');
+        }
 
         $params = [
-            'section' => 'shelf',
+            'head_msg' => $head_msg,
             'title' => getPageTitle([
                 __('Shelf'),
                 $user->getName()
                 ]),
-            'author' => $user,
             'empty-head' => __('This shelf is empty'),
             'empty-msg' => __("We're afraid that :name has not added any writings to the shelf yet.", ['name' => $user->firstName()]),
             'empty-icon' => 'user-clock'

@@ -16,14 +16,8 @@
 
 @section('main')
     <div id="writings-main-content" class="main-content">
-        @if (isset($params['section']) && 'shelf' === $params['section'] && isset($params['author']))
-            <p class="subtitle">
-                @if (auth()->check() && auth()->user()->is($params['author']))
-                    {{ __('You are browsing the library of writings you have saved to your shelf.') }}
-                @else
-                    {{ __('You are browsing the library of writings bookmarked by @:user.', ['user' => $params['author']['username']]) }}
-                @endif
-            </p>
+        @if (isset($params['head_msg']))
+            <p class="subtitle">{{ $params['head_msg'] }}</p>
         @endif
 
         @include('writings.partials.toplinks')

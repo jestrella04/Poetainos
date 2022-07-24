@@ -69,6 +69,7 @@ class TagsController extends Controller
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
 
         $params = [
+            'head_msg' => __('You are browsing the library of writings tagged with ":tag".', ['tag' => $tag->name]),
             'title' => getPageTitle([
                 $tag->name,
                 __('Tags'),
