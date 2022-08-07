@@ -1,8 +1,9 @@
-$enable-rounded: true !default;
+//$enable-rounded: true !default;
+$primary: #593196;
 
-@import "~bootswatch/dist/pulse/variables";
+//@import "~bootswatch/dist/pulse/variables";
 @import "~bootstrap/scss/bootstrap";
-@import "~bootswatch/dist/pulse/bootswatch";
+//@import "~bootswatch/dist/pulse/bootswatch";
 @import "~@fortawesome/fontawesome-free/scss/fontawesome";
 @import "~@fortawesome/fontawesome-free/scss/brands";
 @import "~@fortawesome/fontawesome-free/scss/regular";
