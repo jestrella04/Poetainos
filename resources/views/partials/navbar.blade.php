@@ -1,7 +1,7 @@
 <nav id="nav-desktop" class="navbar navbar-expand fixed-top d-none d-lg-flex">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
-            <img src="{{ mix('/static/images/logo.svg') }}" width="32" height="32" alt="{{ getSiteConfig('name') }}">
+            <img src="{{ mix('/static/images/logo.svg') }}" class="logo-shadow" width="32" height="32" alt="">
             {{ getSiteConfig('name') }}
         </a>
 

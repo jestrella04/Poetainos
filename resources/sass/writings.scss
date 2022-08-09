@@ -11,12 +11,13 @@
     word-break: break-word;
 
     .card-subtitle {
-        @extend .smaller, .lead;
+        @extend .smaller, .lead, .text-muted;
         text-transform: uppercase;
         margin-bottom: $wh-s-lg;
 
-        span:first-child {
-            margin-right: $wh-s-md;
+        span {
+            white-space: nowrap;
+            padding: 0 $wh-s-sm;
         }
     }
 
@@ -69,6 +70,10 @@
 
     .writing-body {
         font-style: italic;
+
+        .writing-read-more {
+            cursor: pointer;
+        }
     }
 
     .writing-footer {

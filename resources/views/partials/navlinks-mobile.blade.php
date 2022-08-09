@@ -8,12 +8,13 @@
     <i class="fas fa-wand-magic-sparkles fa-fw" aria-hidden="true"></i>
 </a>
 
-<a class="mobile-nav-link btn-sm jump-to-top ontop" href="#">
+<a class="mobile-nav-link btn-sm jump-to-top ontop" href="#" aria-label="{{ __('Scroll back to top')}}">
     <i class="fas fa-arrow-turn-up fa-fw d-none" aria-hidden="true"></i>
     <img src="{{ mix('/static/images/logo.svg') }}"
+        class="logo-shadow"
         width="24"
         height="24"
-        alt="{{ getSiteConfig('name') }}">
+        alt="">
 </a>
 
 @auth

@@ -12,9 +12,7 @@
     @if (isset($writing->home_posted_at))
         <span
             class="badge"
-            title="{{ __('Awarded a Golden Flower') }}"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top">
+            title="{{ __('Awarded a Golden Flower') }}">
             <i class="fas fa-fan fa-fw" style="color:goldenrod" aria-hidden="true"></i>
             <span class="visually-hidden">{{ __('Awarded a Golden Flower') }}</span>
         </span>
@@ -27,27 +25,21 @@
         data-wh-target="{{ route('votes.store') }}"
         data-wh-id="{{ $writing->id }}"
         data-wh-value="1"
-        @endif
-        data-bs-toggle="tooltip"
-        data-bs-placement="top">
+        @endif>
         <i class="fa fa-heart fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['likes']['readable'] }}</span>
     </span>
 
     <span
         class="badge"
-        title="{{ __(':count Comments', ['count' => $count['comments']['counter']]) }}"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top">
+        title="{{ __(':count Comments', ['count' => $count['comments']['counter']]) }}">
         <i class="fa fa-comment fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['comments']['readable'] }}</span>
     </span>
 
     <span
         class="badge"
-        title="{{ __(':count Views', ['count' => $count['views']['counter']]) }}"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top">
+        title="{{ __(':count Views', ['count' => $count['views']['counter']]) }}">
         <i class="fa fa-book-reader fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['views']['readable'] }}</span>
     </span>
@@ -58,24 +50,20 @@
         @if (auth()->check())
         data-wh-target="{{ route('shelves.store') }}"
         data-wh-id="{{ $writing->id }}"
-        @endif
-        data-bs-toggle="tooltip"
-        data-bs-placement="top">
+        @endif>
         <i class="fa fa-bookmark fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['shelf']['readable'] }}</span>
     </span>
 
     <span
         class="badge"
-        title="{{ __('Aura: :aura', ['aura' => $count['aura']['counter']]) }}"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top">
+        title="{{ __('Aura: :aura', ['aura' => $count['aura']['counter']]) }}">
         <i class="fa fa-dove fa-fw" aria-hidden="true"></i>
         <span class="counter">{{ $count['aura']['readable'] }}</span>
     </span>
 
     <div class="dropdown dropdown-counter d-inline">
-        <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Share writing') }}">
+        <span title="{{ __('Share writing') }}">
             <span
                 class="badge click share"
                 id="dropdown-share-{{ $writing->id }}"
@@ -84,7 +72,7 @@
                 data-bs-toggle="dropdown"
                 aria-label="{{ __('Share writing :writing', ['writing' => $writing->title]) }}"
                 aria-haspopup="true"
-                aria-expanded="false">
+                role="button">
                 <i class="fa fa-share-alt fa-fw" aria-hidden="true"></i>
             </span>
 
@@ -103,18 +91,17 @@
     </div>
 
     <div class="dropdown dropdown-counter d-inline">
-        <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Actions') }}">
+        <span title="{{ __('Actions') }}">
             <span
                 class="badge click owner"
-                id="dropdown-owner"
                 data-bs-toggle="dropdown"
                 aria-label="{{ __('Actions') }}"
                 aria-haspopup="true"
-                aria-expanded="false">
+                role="button">
                 <i class="fas fa-ellipsis-v fa-fw" aria-hidden="true"></i>
             </span>
 
-            <div class="dropdown-menu" aria-labelledby="dropdown-owner">
+            <div class="dropdown-menu" aria-label="{{ __('Actions') }}">
                 @if (auth()->check() && (auth()->user()->can('update', $writing) || auth()->user()->can('delete', $writing)))
                     <a class="dropdown-item" href="{{ route('writings.edit', $writing) }}">
                         {{ __('Edit / Delete') }}

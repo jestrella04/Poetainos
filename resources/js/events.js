@@ -581,6 +581,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
+
+        // Open the writing link (hidden read more)
+        if (element.matches('.writing-read-more')) {
+            window.location.href = element.dataset.link;
+        }
     });
 
     // Listen to the on submit event on the page and act accordingly

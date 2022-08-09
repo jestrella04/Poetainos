@@ -377,9 +377,22 @@ pwa-update::part(offlineToast) {
     z-index: 999;
 	border-radius: 100%;
 	text-align: center;
-    box-shadow: 0 0 0.3rem rgba($dark, 0.7);;
+    box-shadow: 0 0 0.3rem rgba($dark, 0.7);
+    width: 2.7rem;
+    height: 2.7rem;
+    line-height: 2.7rem !important;
+    padding: 0 !important;
+
+    i {
+        font-size: 120%;
+        //vertical-align: middle;
+    }
 
     @media (min-width: 992px) {
         display: none;
     }
+}
+
+.logo-shadow {
+    filter: drop-shadow(0 0 2px rgba($light,0.5));
 }

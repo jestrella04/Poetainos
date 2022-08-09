@@ -1,11 +1,11 @@
 <div class="card-body">
-    <h2 class="card-title text-center">
+    <p class="h4 card-title text-center">
         @if ( $params['single_entry'] ?? false )
             {{ $writing->title }}
         @else
             <a href="{{ $writing->path() }}">{{ $writing->title }}</a>
         @endif
-    </h2>
+    </p>
 
     <p class="card-subtitle text-center">
         <span>
@@ -21,19 +21,13 @@
     </p>
 
     <div class="card-text writing-body">
-        <blockquote class="position-relative">
+        <blockquote>
             @if ($params['single_entry'] ?? false)
                 {!! nl2br(e($writing->text)) !!}
             @else
+            <div class="writing-read-more" data-link="{{ $writing->path() }}">
                 {!! nl2br(e($writing->excerpt())) !!}
-
-                <a href="{{ $writing->path() }}"
-                    @if (mb_strlen($writing->text) > 400)
-                    title="{{ __(':chars more characters.', ['chars' => mb_strlen($writing->text) - 400]) }}"
-                    @endif
-                    class="stretched-link">
-                    {{-- {{ __('Continue reading') }} --}}
-                </a>
+            </div>
             @endif
         </blockquote>
     </div>
