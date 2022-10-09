@@ -39,7 +39,7 @@ class PostRandomFeaturedAuthor extends Command
      */
     public function handle()
     {
-        $user = User::where('aura', '>', 0)
+        $user = User::with('writings')
             ->orderBy('aura', 'desc')
             ->take(50)
             ->get()
