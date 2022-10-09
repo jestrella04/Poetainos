@@ -8,7 +8,7 @@
         "hot": "mix watch --hot",
         "prod": "npm run production",
         "production": "mix --production",
-        "workspace-start": "cd laradock && docker-compose up -d nginx mariadb workspace && docker-compose exec workspace bash",
+        "workspace-start": "cd laradock && docker-compose up -d nginx mariadb workspace && docker-compose exec --user=laradock workspace bash",
         "workspace-stop": "cd laradock && docker-compose stop",
         "workspace-restart": "npm run workspace-stop && npm run workspace-start",
         "translate": "php artisan translatable:export es",
