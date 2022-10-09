@@ -68,6 +68,7 @@
                     name="categories[]"
                     id="categories"
                     class="form-control form-select tags-select"
+                    data-max="2"
                     multiple
                     required
                     disabled>
