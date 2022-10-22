@@ -121,7 +121,7 @@
                     id="text"
                     rows="15"
                     minlength="10"
-                    maxlength="2000"
+                    maxlength="4000"
                     required>{{ old('text', $writing->text) }}</textarea>
                 <small id="text-error" class="text-danger d-none"></small>
             </div>
