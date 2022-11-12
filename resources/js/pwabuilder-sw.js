@@ -14,13 +14,21 @@ self.addEventListener("message", (event) => {
 
 self.addEventListener('install', async (event) => {
     event.waitUntil(
-        caches.open(CACHE).then((cache) => cache.add(offlineFallbackPage))
+        caches.open(CACHE)
+            .then((cache) => cache.add(offlineFallbackPage))
     );
 });
 
 if (workbox.navigationPreload.isSupported()) {
     workbox.navigationPreload.enable();
 }
+
+workbox.routing.registerRoute(
+    new RegExp('/*'),
+    new workbox.strategies.StaleWhileRevalidate({
+        cacheName: CACHE
+    })
+);
 
 self.addEventListener('fetch', (event) => {
     if (event.request.mode === 'navigate') {
@@ -34,7 +42,9 @@ self.addEventListener('fetch', (event) => {
 
                 const networkResp = await fetch(event.request);
                 return networkResp;
-            } catch (error) {
+            }
+
+            catch (error) {
                 const cache = await caches.open(CACHE);
                 const cachedResp = await cache.match(offlineFallbackPage);
                 return cachedResp;
@@ -42,7 +52,6 @@ self.addEventListener('fetch', (event) => {
         })());
     }
 });
-
 
 // Webpush notifications manager
 (() => {
