@@ -285,6 +285,14 @@
             </div>
         </div>
 
+        @if (auth()->user()->is($user) && ! auth()->user()->isInAgreement())
+        <div class="row mb-3" id="agreements">
+            <div class="offset-sm-3 col-sm-9 d-grid gap-2">
+                @include('partials.agreement-form')
+            </div>
+        </div>
+        @endif
+
         <div class="row mb-3">
             <div class="offset-sm-3 col-sm-9 d-grid gap-2">
                 <a class="btn btn-link btn-sm mb-1"

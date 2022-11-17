@@ -153,6 +153,8 @@ class UsersController extends Controller
             'goodreads' => 'nullable|string|min:3|max:40',
             'avatar' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size'),
             'avatar-remove' => 'nullable|boolean',
+            'service_agreement' => 'sometimes|required|accepted',
+            'privacy_agreement' => 'sometimes|required|accepted',
         ]);
 
         // Working with avatars
@@ -191,15 +193,27 @@ class UsersController extends Controller
             'occupation' => request('occupation') ?? '',
         ];
 
-        // Persist to database
+        // Check if already accepted agreements
+        if ($user->isInAgreement()) {
+            $extraInfo['agreement']['terms_of_use'] = 'on';
+            $extraInfo['agreement']['privacy_policy'] = 'on';
+        }
+
+        // Check if a user role is set
         if (! empty(request('role'))) {
             $user->role_id = request('role');
         }
 
+        // Persist to database
         $user->name = request('name');
         $user->email = request('email');
         $user->extra_info = $extraInfo;
         $user->save();
+
+        // Persist user agreements to avoid asking again
+        if (!empty(request('service_agreement') && !empty(request('privacy_agreement')))) {
+            $user->acceptAgreements();
+        }
 
         // Set response data
         $response = $user->toArray();

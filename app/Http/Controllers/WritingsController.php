@@ -243,7 +243,7 @@ class WritingsController extends Controller
         $writing->author->updateAura();
 
         // Persist user agreements to avoid asking again
-        if (!empty(request('service_agreement') && !empty('privacy_agreement'))) {
+        if (!empty(request('service_agreement') && !empty(request('privacy_agreement')))) {
             $writing->author->acceptAgreements();
         }
 

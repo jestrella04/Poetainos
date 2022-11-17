@@ -667,6 +667,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Post the form to the server
             axios.post(url, params)
                 .then(response => {
+                    // Remove the agreements section
+                    let agreements = document.querySelector('#agreements');
+
+                    if (!fx.isNilOrEmpty(agreements)) {
+                        agreements.remove();
+                    }
+
                     // Show toast
                     fx.showToast({
                         'message': response.data.message,
