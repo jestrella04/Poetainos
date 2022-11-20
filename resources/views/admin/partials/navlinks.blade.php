@@ -55,6 +55,13 @@
         </a>
     </li>
 
+    <li class="nav-item {{ Route::current()->getName() === 'admin.complaints' ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.complaints') }}">
+            <i class="fas fa-fw fa-scale-balanced" aria-hidden="true"></i>
+            {{ __('Complaints') }}
+        </a>
+    </li>
+
     <li class="nav-item {{ Route::current()->getName() === 'admin.tools' ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('admin.tools') }}">
             <i class="fas fa-fw fa-tools" aria-hidden="true"></i>
