@@ -64,7 +64,7 @@ class CategoryFeaturedRandom extends Notification
 
     public function toTwitter($notifiable)
     {
-        $msg = __('Dive into the heart of the ":category" category and discover a plethora of amazing writings.', [
+        $msg = __('Discover all the beauty we have for you under the ":category" category.', [
             'category' => $this->category->name,
         ]);
 
