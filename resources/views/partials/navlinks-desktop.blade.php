@@ -57,7 +57,7 @@
                         <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
                     @endif
 
-                    <a class="dropdown-item" href="{{ route('notifications.index') }}">
+                    <a class="dropdown-item" href="{{ route('notifications.list.unread') }}">
                         {{ __('Notifications') }}
 
                         <span @class([

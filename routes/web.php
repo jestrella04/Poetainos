@@ -71,7 +71,8 @@ Route::middleware(['verified'])->group(function () {
     Route::post('/hoods/store', 'HoodsController@store')->name('hoods.store');
 
     // Notifications
-    Route::get('/notifications', 'UsersNotificationsController@index')->name('notifications.index');
+    Route::get('/notifications/list/unread', 'UsersNotificationsController@listUnread')->name('notifications.list.unread');
+    Route::get('/notifications/list/all', 'UsersNotificationsController@listAll')->name('notifications.list.all');
     Route::get('/notifications/read/{notification}', 'UsersNotificationsController@read')->name('notifications.read');
     Route::post('/notifications/read/all', 'UsersNotificationsController@clear')->name('notifications.clear');
 

@@ -18,7 +18,7 @@
 </a>
 
 @auth
-    <a class="mobile-nav-link btn-sm position-relative" href="{{ route('notifications.index') }}" title="{{ __('Notifications') }}"
+    <a class="mobile-nav-link btn-sm position-relative" href="{{ route('notifications.list.unread') }}" title="{{ __('Notifications') }}"
         aria-label="{{ __('Notifications') }}">
         <i class="fas fa-bell fa-fw" aria-hidden="true"></i>
 

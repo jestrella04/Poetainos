@@ -1,12 +1,10 @@
-@php $filter = request('filter') ?? 'unread' @endphp
-
 <div id="notification-top-links" class="top-links">
     <div class="nav nav-tabs nav-fill">
         <a @class([
             'nav-item',
             'nav-link',
-            'active' => 'unread' === $filter,
-        ]) href="{{ url()->current() }}?filter=unread"
+            'active' => Route::current()->getName() === 'notifications.list.unread',
+        ]) href="{{ route('notifications.list.unread') }}"
         title="{{ __('Unread') }}">
             {{ __('Unread') }}
         </a>
@@ -14,8 +12,8 @@
         <a @class([
             'nav-item',
             'nav-link',
-            'active' => 'all' === $filter,
-        ]) href="{{ url()->current() }}?filter=all"
+            'active' => Route::current()->getName() ==='notifications.list.all',
+        ]) href="{{ route('notifications.list.all') }}"
         title="{{ __('All') }}">
             {{ __('All') }}
         </a>

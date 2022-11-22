@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Writing;
-use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
 
 class UsersNotificationsController extends Controller
 {
-    public function index()
-    {
+    public function listUnread() {
         $user = auth()->user();
-        $filter = request('filter') ?? 'unread';
+        $notifications = \App\User::find($user->id)->unreadNotifications()->paginate($this->pagination);
+        return $this->list($notifications);
+    }
 
-        if ('all' === $filter) {
-            $notifications = $user->notifications;
-        } else {
-            $notifications = $user->unreadNotifications;
-        }
+    public function listAll() {
+        $user = auth()->user();
+        $notifications = \App\User::find($user->id)->notifications()->paginate($this->pagination);
+        return $this->list($notifications);
+    }
 
+    private function list($notifications)
+    {
         $params = [
             'title' => getPageTitle([
                 __('My notifications'),
@@ -27,7 +27,7 @@ class UsersNotificationsController extends Controller
         ];
 
         return view('notifications.index', [
-            'user' => $user,
+            'user' => auth()->user(),
             'notifications' => $notifications,
             'params' => $params,
         ]);
@@ -38,7 +38,7 @@ class UsersNotificationsController extends Controller
         $user = auth()->user();
         $user->unreadNotifications->markAsRead();
 
-        return redirect(route('notifications.index'));
+        return redirect(route('notifications.list.unread'));
     }
 
     public function read($notificationId)

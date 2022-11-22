@@ -94,9 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
     InfiniteScroll.imagesLoaded = imagesLoaded;
     document.querySelectorAll('.infinite-scroll').forEach(infiniteScrollElement => {
         // Check if there's a pagination element
-        let pagination = document.querySelector('.main-pagination');
+        let mainPagination = document.querySelector('.main-pagination');
+        let notificationsPagination = document.querySelector('#notifications-pagination');
 
-        if (!fx.isNilOrEmpty(pagination)) {
+        if (!fx.isNilOrEmpty(mainPagination)) {
             new InfiniteScroll(infiniteScrollElement, {
                 path: '.pagination-next',
                 append: '.writing-entry-container',
@@ -104,6 +105,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 hideNav: '.main-pagination',
                 outlayer: Masonry.data(infiniteScrollElement),
             });
+        }
+
+        if (!fx.isNilOrEmpty(notificationsPagination)) {
+            new InfiniteScroll(infiniteScrollElement, {
+                path: '.page-link[rel=\'next\']',
+                append: '.user-notification',
+                button: '#pagination-load-more',
+                hideNav: '#notifications-pagination',
+                // using button, disable loading on scroll
+                scrollThreshold: false,
+                //status: '.page-load-status',
+              });
         }
     });
 

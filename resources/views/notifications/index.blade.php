@@ -57,6 +57,7 @@
                 </form>
             </div>
 
+            <div class="notifications-list infinite-scroll">
             @forelse ($notifications as $notification)
                 @include('notifications.show')
             @empty
@@ -65,6 +66,17 @@
                 @section('empty-icon', 'bell')
                 @include('partials.empty')
             @endforelse
+            </div>
+
+            <div id="notifications-pagination" class="mt-4">
+                {{ $notifications->links()}}
+            </div>
+
+            @if ($notifications->hasMorePages())
+            <div class="d-flex justify-content-center">
+                <button id="pagination-load-more" class="btn btn-light">{{ __('Load More') }}</button>
+            </div>
+            @endif
         </div>
     </div>
 @endsection
