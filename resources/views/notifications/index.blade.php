@@ -73,6 +73,7 @@
             </div>
 
             @if ($notifications->hasMorePages())
+            @include('partials.loading')
             <div class="d-flex justify-content-center">
                 <button id="pagination-load-more" class="btn btn-light">{{ __('Load More') }}</button>
             </div>

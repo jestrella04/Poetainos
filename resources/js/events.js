@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 //history: 'push',
                 hideNav: '.main-pagination',
                 outlayer: Masonry.data(infiniteScrollElement),
+                status: '.loading-content',
             });
         }
 
@@ -115,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 hideNav: '#notifications-pagination',
                 // using button, disable loading on scroll
                 scrollThreshold: false,
-                //status: '.page-load-status',
+                status: '.loading-content',
               });
         }
     });

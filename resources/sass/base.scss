@@ -286,6 +286,10 @@ hr {
             }
         }
     }
+
+    .user-notification:last-child {
+        margin-bottom: $wh-s-xl;
+    }
 }
 
 .home-head {
@@ -396,4 +400,14 @@ pwa-update::part(offlineToast) {
 
 .logo-shadow {
     filter: drop-shadow(0 0 2px rgba($light,0.5));
+}
+
+.infinite-scroll-request,
+.infinite-scroll-last,
+.infinite-scroll-error {
+    display: none;
+}
+
+.loading-content p {
+    @extend .smaller, .lead;
 }

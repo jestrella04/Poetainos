@@ -48,6 +48,10 @@
     </div>
 
     {{ $writings->withQueryString()->links() }}
+
+    @if ($writings->withQueryString()->hasMorePages())
+        @include('partials.loading')
+    @endif
 @endsection
 
 {{-- @section('sidebar')
