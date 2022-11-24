@@ -100,9 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!fx.isNilOrEmpty(mainPagination)) {
             new InfiniteScroll(infiniteScrollElement, {
                 path: '.pagination-next',
-                append: '.writing-entry-container',
-                //history: 'push',
+                append: '.entry-container',
+                button: '#pagination-load-more',
                 hideNav: '.main-pagination',
+                scrollThreshold: false,
                 outlayer: Masonry.data(infiniteScrollElement),
                 status: '.loading-content',
             });
@@ -114,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 append: '.user-notification',
                 button: '#pagination-load-more',
                 hideNav: '#notifications-pagination',
-                // using button, disable loading on scroll
                 scrollThreshold: false,
                 status: '.loading-content',
               });

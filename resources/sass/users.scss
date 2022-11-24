@@ -21,31 +21,27 @@
 
 #users-main-content {
     #user-list {
-        .user-banner:not(:last-child) {
-            margin-bottom: $wh-s-md;
+        .card-body {
+            position: relative;
         }
 
-        .user-banner {
-            padding: $wh-s-lg;
-            background-color: $gray-100;
-            border: 1px solid $gray-300;
-            border-radius: $wh-s-sm;
+        .card-footer {
+            padding: 0;
 
-            .user-header {
-                position: relative;
+            .badge {
+                padding: $wh-s-sm;
+                text-align: center;
+                background-color: transparent !important;
+                border-radius: 0;
+
+                i {
+                    display: block;
+                    margin-bottom: $wh-s-sm;
+                }
             }
 
-            .profile-bio {
-                margin: $wh-s-sm 0;
-            }
-
-            .stretched-link:hover {
-                text-decoration: none;
-            }
-
-            .avatar {
-                margin-right: $wh-s-md;
-                margin-bottom: $wh-s-sm;
+            .badge:not(:last-child) {
+                @extend .border-end;
             }
         }
     }

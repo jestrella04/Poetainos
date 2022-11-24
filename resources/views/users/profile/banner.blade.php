@@ -1,22 +1,25 @@
 @php
-    if (isset($params['author'])) $user = $params['author'];
+    if (isset($params['author'])) {
+        $user = $params['author'];
+    }
     $count = getUserCounter($user);
+    $userList = true;
 @endphp
 
-<div class="user-banner">
-    <div class="user-header d-flex flex-wrap">
-        <div>{!! getUserAvatar($user, $size = 'xl') !!}</div>
-        <div class="flex-grow-1">
-            <a href="{{ $user->path() }}" class="stretched-link">
-                <span class="d-block">{{ $user->getName() }}</span>
-            </a>
-            <span class="d-block text-muted">{{ '@' . $user->username }}</span>
-        </div>
+<div class="card">
+    <div class="card-body text-center">
+        {!! getUserAvatar($user, $size = 'xl') !!}
+        <p class="card-title">
+            <a href="{{ $user->path() }}" class="stretched-link">{{ $user->getName() }}</a>
+        </p>
+        <p class="card-subtitle mb-2 text-muted">{{ '@' . $user->username }}</p>
+
+        @if (!empty($user->extra_info['bio']))
+            <p class="card-text smaller lead">{{ $user->extra_info['bio'] }}</p>
+        @endif
     </div>
 
-    @if (! empty($user->extra_info['bio']))
-    <p class="profile-bio smaller">{{ $user->extra_info['bio'] }}</p>
-    @endif
-
-    @include('users.profile.stats')
+    <div class="card-footer">
+        @include('users.profile.stats')
+    </div>
 </div>
