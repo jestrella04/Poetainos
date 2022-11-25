@@ -85,7 +85,8 @@ class UsersController extends Controller
     public function show(User $user)
     {
         $params = [
-            'single_entry' => true,
+            'users_single_entry' => true,
+            'writings_single_entry' => false,
             'title' => getPageTitle([
                 $user->getName(),
                 __('Writers'),

@@ -1,9 +1,17 @@
+#writing-list {
+    margin-bottom: $wh-s-lg;
+}
+
 .writing-entry + .writing-comments {
     margin: $wh-s-xxl auto;
 
     @media (max-width: 576px) {
         margin: $wh-s-xl auto;
     }
+}
+
+.writing-entry-container:not(:last-child) {
+    margin-bottom: $wh-s-lg;
 }
 
 .writing-entry {

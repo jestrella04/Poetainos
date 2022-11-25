@@ -68,7 +68,10 @@
                 class="badge click share"
                 id="dropdown-share-{{ $writing->id }}"
                 data-wh-url="{{ $writing->path() }}"
-                data-wh-writing-title="{{ $writing->title }}"
+                data-wh-title="{{ getPageTitle([
+                    $writing->title,
+                    $writing->author->getName(),
+                ])}}"
                 data-bs-toggle="dropdown"
                 aria-label="{{ __('Share writing :writing', ['writing' => $writing->title]) }}"
                 aria-haspopup="true"

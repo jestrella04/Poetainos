@@ -19,34 +19,6 @@
     }
 }
 
-#users-main-content {
-    #user-list {
-        .card-body {
-            position: relative;
-        }
-
-        .card-footer {
-            padding: 0;
-
-            .badge {
-                padding: $wh-s-sm;
-                text-align: center;
-                background-color: transparent !important;
-                border-radius: 0;
-
-                i {
-                    display: block;
-                    margin-bottom: $wh-s-sm;
-                }
-            }
-
-            .badge:not(:last-child) {
-                @extend .border-end;
-            }
-        }
-    }
-}
-
 .writing-likers {
     .author-link {
         position: relative;
@@ -66,14 +38,55 @@ hr.banner {
     margin-bottom: $wh-s-xl;
 }
 
-.user-profile {
+#user-list {
     margin-bottom: $wh-s-lg;
 
-    .profile-header {
+    .entry-container:not(:last-child) {
+        margin-bottom: $wh-s-md;
+    }
+
+    .card-body {
+        position: relative;
+    }
+
+    .card-footer {
+        padding: 0;
+
+        .badge {
+            padding: $wh-s-sm;
+            text-align: center;
+            background-color: transparent !important;
+            border-radius: 0;
+
+            i {
+                display: block;
+                margin-bottom: $wh-s-sm;
+            }
+        }
+
+        .badge:not(:last-child) {
+            @extend .border-end;
+        }
+    }
+}
+
+#user-profile {
+    margin-bottom: $wh-s-lg;
+
+    .dropdown {
+        position: absolute;
+        right: 1rem;
+    }
+
+    #profile-header {
         margin-bottom: $wh-s-lg;
 
         span {
             display: block;
+        }
+
+        .avatar {
+            margin-bottom: $wh-s-sm;
         }
 
         .user-name {
@@ -92,34 +105,48 @@ hr.banner {
         }
     }
 
-    .avatar {
-        margin-bottom: $wh-s-sm;
-    }
-
-    .user-stats {
-        margin-bottom: $wh-s-lg;
-    }
-
-    .profile-footer {
+    #profile-social-links {
         text-align: center;
-        margin-left: auto;
-        margin-right: auto;
+        width: 25rem;
+        max-width: 100%;
+        margin: 0 auto;
+    }
 
-        .actions {
-            .btn {
-                margin: 0.15rem;
-                text-transform: capitalize;
+    #profile-stats,
+    #profile-social-links:not(:empty),
+    #profile-more-info:not(:empty) {
+        margin-bottom: $wh-s-xl;
+    }
 
-                i {
-                    margin-right: $wh-s-sm;
-                }
+    #profile-stats {
+        .stats {
+            width: 100%;
+        }
+
+        .badge {
+            padding: $wh-s-sm;
+            text-align: center;
+            background-color: transparent !important;
+            border-radius: 0;
+
+            i {
+                display: block;
+                margin-bottom: $wh-s-sm;
             }
+        }
 
-            @media (max-width: 576px) {
-                .btn {
-                    display: block;
-                }
-            }
+        .badge:not(:last-child) {
+            @extend .border-end;
+        }
+    }
+
+    #profile-writings {
+        .profile-writing-entry {
+            position: relative;
+        }
+
+        .profile-writing-entry:first-child {
+            margin-bottom: $wh-s-lg;
         }
     }
 }

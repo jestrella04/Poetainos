@@ -320,6 +320,18 @@ document.addEventListener('DOMContentLoaded', () => {
             fileChooser.click();
         }
 
+        // Share button (if Share API is supported)
+        if (element.matches('.share')) {
+            event.preventDefault();
+
+            if (navigator.share) {
+                navigator.share({
+                    title: element.dataset.whTitle,
+                    url: element.dataset.whUrl
+                });
+            }
+        }
+
         // Counters
         if (element.closest('.stats')) {
             // Liking a writing
@@ -384,16 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             fx.animateCSS(element, 'heartBeat');
                         });
                 }
-            }
-
-            // Share button (if Share API is supported)
-            if (element.matches('.share') && navigator.share) {
-                event.preventDefault();
-
-                navigator.share({
-                    title: element.dataset.whWritingTitle,
-                    url: element.dataset.whUrl
-                });
             }
         }
 

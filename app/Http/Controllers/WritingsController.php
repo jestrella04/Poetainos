@@ -85,7 +85,7 @@ class WritingsController extends Controller
     public function show(Writing $writing)
     {
         $params = [
-            'single_entry' => true,
+            'writings_single_entry' => true,
             'title' => getPageTitle([
                 $writing->title,
                 $writing->author->getName(),

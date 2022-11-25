@@ -44,7 +44,7 @@ hr {
 .main-content:not(#admin-main-content),
 .sidebar-toggle,
 .block {
-    margin-bottom: $wh-s-xl;
+    margin-bottom: $wh-s-lg;
 }
 
 .main-content+.main-pagination {
@@ -271,9 +271,12 @@ hr {
         }
     }
 
+    .notifications-list {
+        margin-bottom: $wh-s-lg;
+    }
+
     .user-notification {
         position: relative;
-        margin-bottom: $wh-s-md;
 
         .card-body {
             padding: $wh-s-md $wh-s-lg;
@@ -288,8 +291,8 @@ hr {
         }
     }
 
-    .user-notification:last-child {
-        margin-bottom: $wh-s-xl;
+    .user-notification:not(:last-child) {
+        margin-bottom: $wh-s-md;
     }
 }
 
@@ -407,6 +410,10 @@ pwa-update::part(offlineToast) {
 .infinite-scroll-last,
 .infinite-scroll-error {
     display: none;
+}
+
+.infinite-scroll-request {
+    margin-bottom: $wh-s-xxl;
 }
 
 .loading-content p {

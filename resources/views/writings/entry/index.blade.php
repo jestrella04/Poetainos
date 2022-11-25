@@ -3,6 +3,6 @@
     @include('writings.entry.body')
 </div>
 
-@if ($params['single_entry'] ?? false)
+@if ($params['writings_single_entry'] ?? false)
     @include('writings.entry.comments')
 @endif

@@ -166,6 +166,10 @@
     "My writings": "Mis textos",
     "View writings": "Ver textos",
     "View shelf": "Ver estante",
+    "View my writings": "Ver mis textos",
+    "View my shelf": "Ver mi estante",
+    "Share profile": "Compartir perfil",
+    "Block user": "Bloquear usuario",
     ":count Writings": ":count Textos",
     ":count Golden Flowers": ":count Flores de Oro",
     ":count Profile views": ":count Visitas al perfil",
@@ -307,5 +311,8 @@
     "Load More": "Cargar Más",
     "Loading...": "Cargando...",
     "It's a shame, we have no more content to show.": "Es una pena, no tenemos más contenido que mostarte.",
-    "It's a shame, we can't show more content at the moment.": "Es una pena, en este momento no podemos mostrate más contenido."
+    "It's a shame, we can't show more content at the moment.": "Es una pena, en este momento no podemos mostrate más contenido.",
+    "Latest writings:": "Últimos textos",
+    "More information:": "Más información",
+    "View all": "Ver todos"
 }
