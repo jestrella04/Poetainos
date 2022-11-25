@@ -121,13 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Disable share dropdown if Share API is supported
-    if (navigator.share) {
-        [].slice.call(document.querySelectorAll('.dropdown .share')).map(shareBtn => {
-            shareBtn.dataset.bsToggle = '';
-        });
-    }
-
     // Disable tracking if the opt-out cookie exists.
     if (!fx.isNil(window.analytics_id)) {
         let disableStr = `ga-disable-${window.analytics_id}`;
@@ -321,13 +314,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Share button (if Share API is supported)
-        if (element.matches('.share')) {
+        if (element.matches('.sharer')) {
             event.preventDefault();
 
             if (navigator.share) {
                 navigator.share({
                     title: element.dataset.whTitle,
                     url: element.dataset.whUrl
+                });
+            } else {
+                document.querySelectorAll('.modal-sharer').forEach(e => e.remove());
+
+                axios.get(element.href)
+                .then(response => {
+                    document.body.insertAdjacentHTML('beforeend', response.data);
+                })
+                .catch(error => {
+                    //
+                })
+                .then(() => {
+                    let sharerModalElement = document.querySelector('.modal-sharer');
+                    let sharerModal = new bootstrap.Modal(sharerModalElement);
+                    sharerModal.show();
                 });
             }
         }
@@ -361,7 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             //
                         })
                         .then(() => {
-                            fx.animateCSS(element, 'heartBeat');
+                            fx.animateCSS(element.querySelector('i'), 'heartBeat');
+                            fx.animateCSS(element.querySelector('.counter'), 'fadeIn');
                         });
                 } else {
                     // User is not logged in - login
@@ -393,7 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             //
                         })
                         .then(() => {
-                            fx.animateCSS(element, 'heartBeat');
+                            fx.animateCSS(element.querySelector('i'), 'heartBeat');
+                            fx.animateCSS(element.querySelector('.counter'), 'fadeIn');
                         });
                 }
             }

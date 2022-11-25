@@ -45,7 +45,11 @@
         @include('writings.entry.footer')
         @include('writings.entry.stats')
         @include('writings.entry.likers')
-    @else
-        @include('writings.entry.stats')
     @endif
 </div>
+
+@if (! ($params['writings_single_entry'] ?? false))
+    <div class="card-footer">
+        @include('writings.entry.stats')
+    </div>
+@endif

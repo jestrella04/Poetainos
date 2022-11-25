@@ -26,4 +26,15 @@ class HomeController extends Controller
     {
         return view('auth.social');
     }
+
+    public function sharer()
+    {
+        $title = request('title');
+        $url = request('url');
+
+        return view('partials.sharer',  [
+            'title' => $title,
+            'url' => $url,
+        ]);
+    }
 }

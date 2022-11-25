@@ -141,3 +141,6 @@ Route::redirect('/writings', '/');
 // Complaints
 Route::get('/complaints/{type}/{id}/create', 'ComplaintsController@create')->name('complaints.create');
 Route::post('/complaints/store', 'ComplaintsController@store')->name('complaints.store');
+
+// Sharer
+Route::get('/sharer', 'HomeController@sharer')->name('sharer');

@@ -1,49 +1,6 @@
 <div id="user-profile" class="card text-break">
     <div class="card-body">
-        <div class="dropdown">
-            <a class="btn btn-sm btn-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-ellipsis-v fa-fw" aria-hidden="true"></i>
-            </a>
-
-            <ul class="dropdown-menu">
-                <a href="#" class="dropdown-item share" data-wh-title="{{ $params['title'] }}"
-                    data-wh-url="{{ $user->path() }}">
-                    {{ __('Share profile') }}
-                </a>
-                @can('update', $user)
-                    <a href="{{ route('users.edit', $user) }}" class="dropdown-item">
-                        {{ __('Update profile') }}
-                    </a>
-                @endcan
-                @if ($user->writings()->count() > 0)
-                    <a href="{{ $user->writingsPath() }}" class="dropdown-item">
-                        @if (auth()->check() &&
-                            auth()->user()->is($user))
-                            {{ __('View my writings') }}
-                        @else
-                            {{ __('View writings') }}
-                        @endif
-                    </a>
-                @endif
-                @if ($user->Shelf()->count() > 0)
-                    <a href="{{ $user->shelfPath() }}" class="dropdown-item">
-                        @if (auth()->check() &&
-                            auth()->user()->is($user))
-                            {{ __('View my shelf') }}
-                        @else
-                            {{ __('View shelf') }}
-                        @endif
-                    </a>
-                @endif
-                @if (auth()->check() &&
-                    !auth()->user()->is($user))
-                    <a href="{{ route('users.block.confirm', ['user' => $user->username]) }}"
-                        class="dropdown-item init-block-user">
-                        {{ __('Block user') }}
-                    </a>
-                @endif
-            </ul>
-        </div>
+        @include('users.profile.dropdown')
 
         <div id="profile-header" class="text-center">
             {!! getUserAvatar($user, $size = 'xxl', $classList = ['mx-auto']) !!}

@@ -18,6 +18,17 @@
     overflow-wrap: break-word;
     word-break: break-word;
 
+    .dropstart {
+        @extend .smaller;
+        padding: 0.25rem 0.35rem;
+        border-radius: 50%;
+        background-color: rgba($light, 0.35);
+        backdrop-filter: blur(10px);
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+
     .card-subtitle {
         @extend .smaller, .lead, .text-muted;
         text-transform: uppercase;
@@ -37,6 +48,10 @@
         a:hover{
             text-decoration: none;
         }
+    }
+
+    .card-footer {
+        padding: 0;
     }
 
     .writing-cover,

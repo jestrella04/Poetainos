@@ -115,13 +115,29 @@ hr {
 }
 
 .stats {
-    width: min(20rem, 100%);
-    margin: auto;
+    width: 100%;
+
+    .badge:not(:last-child) {
+        @extend .border-end;
+    }
 
     .badge {
-        background-color: $light;
+        padding: $wh-s-sm;
         color: $gray-800;
         font-weight: normal;
+        padding: $wh-s-sm;
+        text-align: center !important;
+        background-color: transparent !important;
+        border-radius: 0;
+
+        i {
+            display: block;
+            margin-bottom: $wh-s-sm;
+        }
+    }
+
+    .badge:not(:last-child) {
+        @extend .border-end;
     }
 
     .badge.click {
@@ -418,4 +434,18 @@ pwa-update::part(offlineToast) {
 
 .loading-content p {
     @extend .smaller, .lead;
+}
+
+.modal-sharer {
+    .modal-body {
+        text-align: center;
+
+        p {
+            margin-bottom: $wh-s-sm;
+        }
+
+        .social-links {
+            padding: $wh-s-xl $wh-s-lg;
+        }
+    }
 }

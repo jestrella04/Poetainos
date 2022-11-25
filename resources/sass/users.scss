@@ -51,29 +51,13 @@ hr.banner {
 
     .card-footer {
         padding: 0;
-
-        .badge {
-            padding: $wh-s-sm;
-            text-align: center;
-            background-color: transparent !important;
-            border-radius: 0;
-
-            i {
-                display: block;
-                margin-bottom: $wh-s-sm;
-            }
-        }
-
-        .badge:not(:last-child) {
-            @extend .border-end;
-        }
     }
 }
 
 #user-profile {
     margin-bottom: $wh-s-lg;
 
-    .dropdown {
+    .dropstart {
         position: absolute;
         right: 1rem;
     }
@@ -116,28 +100,6 @@ hr.banner {
     #profile-social-links:not(:empty),
     #profile-more-info:not(:empty) {
         margin-bottom: $wh-s-xl;
-    }
-
-    #profile-stats {
-        .stats {
-            width: 100%;
-        }
-
-        .badge {
-            padding: $wh-s-sm;
-            text-align: center;
-            background-color: transparent !important;
-            border-radius: 0;
-
-            i {
-                display: block;
-                margin-bottom: $wh-s-sm;
-            }
-        }
-
-        .badge:not(:last-child) {
-            @extend .border-end;
-        }
     }
 
     #profile-writings {
