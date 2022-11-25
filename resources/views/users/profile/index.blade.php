@@ -65,27 +65,27 @@
         </div>
 
         @if ($user->writings()->count() > 0)
-            <div class="d-flex justify-content-between smaller text-muted all-caps">
-                <p>{{ __('Latest writings:') }}</p>
-                <a href="{{ $user->writingsPath() }}" class="btn btn-sm text-muted">{{ __('View all') }}</a>
+            <div class="d-flex justify-content-between align-items-center smaller text-muted all-caps">
+                <div>{{ __('Latest writings:') }}</div>
+                <div>
+                    <a href="{{ $user->writingsPath() }}" class="btn btn-sm text-muted">{{ __('View all') }}</a>
+                </div>
             </div>
 
             <div id="profile-writings" class="row p-2">
-                @foreach ($user->writings()->take(2)->get() as $writing)
+                @foreach ($user->writings()->latest()->take(2)->get() as $writing)
                     <div class="col-lg-6 profile-writing-entry">
-                        <p class="h4 text-center">
+                        <p class="h4 writing-title">
                             <a href="{{ $writing->path() }}" class="stretched-link">{{ $writing->title }}</a>
                         </p>
 
-                        <p class="text-center">
+                        <p class="writing-subtitle">
                             <i class="fas fa-calendar fa-fw" aria-hidden="true"></i>
                             {{ Carbon\Carbon::parse($writing->created_at)->diffForHumans() }}
                         </p>
 
                         <blockquote>
-                            <div class="writing-read-more" data-link="{{ $writing->path() }}">
-                                {!! nl2br(e($writing->excerpt())) !!}
-                            </div>
+                            {!! nl2br(e($writing->excerpt())) !!}
                         </blockquote>
                     </div>
                 @endforeach
