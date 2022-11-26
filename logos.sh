@@ -12,3 +12,4 @@ inkscape --export-background-opacity=0 --export-width=192 --export-type=png --ex
 inkscape --export-background-opacity=0 --export-width=196 --export-type=png --export-filename=logo-196.png logo.svg
 inkscape --export-background-opacity=0 --export-width=256 --export-type=png --export-filename=logo-256.png logo.svg
 inkscape --export-background-opacity=0 --export-width=512 --export-type=png --export-filename=logo-512.png logo.svg
+inkscape --export-background-opacity=0 --export-width=512 --export-type=png --export-filename=logo-maskable.png logo-maskable.svg
