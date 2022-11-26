@@ -18,6 +18,9 @@ class ResourcesController extends Controller
         $json = str_replace('{{url.publish}}', route('writings.create'), $json);
         $json = str_replace('{{url.featured}}', route('writings.awards'), $json);
         $json = str_replace('{{url.random}}', route('writings.random'), $json);
+        $json = str_replace('{{play_store_url}}', config('services.google.play_store.url'), $json);
+        $json = str_replace('{{play_store_id}}', config('services.google.play_store.id'), $json);
+        $json = str_replace('{{iarc_rating_id}}', config('services.compliance.iarc_rating_id'), $json);
 
         return $json;
     }
