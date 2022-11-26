@@ -9,6 +9,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
+use NotificationChannels\FacebookPoster\FacebookPosterChannel;
+use NotificationChannels\FacebookPoster\FacebookPosterPost;
 
 class AuthorFeaturedRandom extends Notification
 {
@@ -22,6 +24,9 @@ class AuthorFeaturedRandom extends Notification
     public function __construct(User $user)
     {
         $this->user = $user;
+        $this->msg = __(':author is one of our most prominent authors.');
+        $this->msg = $this->msg . ' ' . __('You are invited to discover all the magic present in their writings. #poetry');
+        $this->url = $this->user->writingsPath();
     }
 
     /**
@@ -32,7 +37,7 @@ class AuthorFeaturedRandom extends Notification
      */
     public function via($notifiable)
     {
-        return [TwitterChannel::class];
+        return [TwitterChannel::class, FacebookPosterChannel::class];
     }
 
     /**
@@ -64,13 +69,12 @@ class AuthorFeaturedRandom extends Notification
 
     public function toTwitter($notifiable)
     {
-        $msg = __(':author is one of our most prominent authors.', [
-            'author' => $this->user->getTwitterUsername(),
-        ]);
-
-        $msg = $msg . ' ' . __('You are invited to discover all the magic present in their writings. #poetry');
-        $msg = $msg . ' ' . $this->user->writingsPath();
-
+        $msg = str_replace(':author', $this->user->getTwitterUsername(), $this->msg) . ' ' . $this->url;
         return new TwitterStatusUpdate($msg);
+    }
+
+    public function toFacebookPoster($notifiable) {
+        $msg = str_replace(':author', $this->user->getName(), $this->msg);
+        return (new FacebookPosterPost($msg))->withLink($this->url);
     }
 }

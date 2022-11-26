@@ -67,4 +67,8 @@ return [
     'compliance' => [
         'iarc_rating_id' => env('IARC_RATING_ID'),
     ],
+    'facebook_poster' => [
+        'page_id' => env('FACEBOOK_PAGE_ID'),
+        'access_token' => env('FACEBOOK_ACCESS_TOKEN'),
+    ],
 ];

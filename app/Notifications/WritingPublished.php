@@ -9,6 +9,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
+use NotificationChannels\FacebookPoster\FacebookPosterChannel;
+use NotificationChannels\FacebookPoster\FacebookPosterPost;
 
 class WritingPublished extends Notification implements ShouldQueue
 {
@@ -24,6 +26,11 @@ class WritingPublished extends Notification implements ShouldQueue
     public function __construct(Writing $writing)
     {
         $this->writing = $writing;
+        $this->msg = __('":title" by :author has just been published on our site.', [
+            'title' => $this->writing->title,
+        ]);
+        $this->msg = $this->msg . ' ' . __('Go read it, what are you waiting for? #poetry');
+        $this->url = $this->writing->path();
     }
 
     /**
@@ -34,7 +41,7 @@ class WritingPublished extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return [TwitterChannel::class];
+        return [TwitterChannel::class, FacebookPosterChannel::class];
     }
 
     /**
@@ -53,15 +60,13 @@ class WritingPublished extends Notification implements ShouldQueue
 
     public function toTwitter($notifiable)
     {
-        $msg = __('":title" by :author has just been published on our site.', [
-            'title' => $this->writing->title,
-            'author' => $this->writing->author->getTwitterUsername()
-        ]);
-
-        $msg = $msg . ' ' . __('Go read it, what are you waiting for? #poetry');
-        $msg = $msg . ' ' . $this->writing->path();
-
+        $msg = str_replace(':author', $this->user->getTwitterUsername(), $this->msg) . ' ' . $this->url;
         return new TwitterStatusUpdate($msg);
+    }
+
+    public function toFacebookPoster($notifiable) {
+        $msg = str_replace(':author', $this->user->getName(), $this->msg);
+        return (new FacebookPosterPost($msg))->withLink($this->url);
     }
 
     /**

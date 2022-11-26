@@ -9,6 +9,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
+use NotificationChannels\FacebookPoster\FacebookPosterChannel;
+use NotificationChannels\FacebookPoster\FacebookPosterPost;
 
 class CategoryFeaturedRandom extends Notification
 {
@@ -22,6 +24,10 @@ class CategoryFeaturedRandom extends Notification
     public function __construct(Category $category)
     {
         $this->category = $category;
+        $this->msg = __('Discover all the beauty we have for you under the ":category" category.', [
+            'category' => $this->category->name,
+        ]);
+        $this->url = $this->category->path();
     }
 
     /**
@@ -32,7 +38,7 @@ class CategoryFeaturedRandom extends Notification
      */
     public function via($notifiable)
     {
-        return [TwitterChannel::class];
+        return [TwitterChannel::class, FacebookPosterChannel::class];
     }
 
     /**
@@ -64,12 +70,11 @@ class CategoryFeaturedRandom extends Notification
 
     public function toTwitter($notifiable)
     {
-        $msg = __('Discover all the beauty we have for you under the ":category" category.', [
-            'category' => $this->category->name,
-        ]);
-
-        $msg = $msg . ' ' . $this->category->path();
-
+        $msg = $this->msg . ' ' . $this->url;
         return new TwitterStatusUpdate($msg);
+    }
+
+    public function toFacebookPoster($notifiable) {
+        return (new FacebookPosterPost($this->msg))->withLink($this->url);
     }
 }
