@@ -110,8 +110,12 @@
             }
 
             .badge {
-                padding: 0.4rem 0.6rem !important;
-                font-weight: normal;
+                text-decoration: none;
+            }
+
+            .badge:hover {
+                text-decoration: none;
+                color: $white;
             }
         }
 
