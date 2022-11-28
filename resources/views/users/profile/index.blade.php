@@ -24,44 +24,47 @@
         <div id="profile-more-info">
             <p class="smaller text-muted all-caps">{{ __('More information:') }}</p>
 
-            <div class="d-flex">
-                <div class="pe-3">
-                    <i class="fas fa-calendar-check fa-fw" aria-hidden="true" title="{{ __('Registered') }}"></i>
+            <div class="row">
+                <div class="col-sm-4">
+                    <i class="fas fa-calendar-check fa-fw" aria-hidden="true"></i>
+                    {{ __('Registered') }}
                 </div>
 
-                <div class="flex-grow-1">{{ Carbon\Carbon::parse($user->created_at)->diffForHumans() }}</div>
+                <div class="col-sm-8">{{ Carbon\Carbon::parse($user->created_at)->diffForHumans() }}</div>
             </div>
 
-
-            @if (!empty($user->extra_info['location']))
-                <div class="d-flex">
-                    <div class="pe-3">
-                        <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true" title="{{ __('Location') }}"></i>
+            <div class="row">
+                @if (!empty($user->extra_info['location']))
+                    <div class="col-sm-4">
+                        <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i>
+                        {{ __('Location') }}
                     </div>
 
-                    <div class="flex-grow-1">{{ $user->extra_info['location'] }}</div>
-                </div>
-            @endif
+                    <div class="col-sm-8">{{ $user->extra_info['location'] }}</div>
+                @endif
+            </div>
 
-            @if (!empty($user->extra_info['occupation']))
-                <div class="d-flex">
-                    <div class="pe-3">
-                        <i class="fas fa-fw fa-toolbox" aria-hidden="true" title="{{ __('Occupation') }}"></i>
+            <div class="row">
+                @if (!empty($user->extra_info['occupation']))
+                    <div class="col-sm-4">
+                        <i class="fas fa-fw fa-toolbox" aria-hidden="true"></i>
+                        {{ __('Occupation') }}
                     </div>
 
-                    <div class="flex-grow-1">{{ $user->extra_info['occupation'] }}</div>
-                </div>
-            @endif
+                    <div class="col-sm-8">{{ $user->extra_info['occupation'] }}</div>
+                @endif
+            </div>
 
-            @if (!empty($user->extra_info['interests']))
-                <div class="d-flex">
-                    <div class="pe-3">
-                        <i class="fas fa-fw fa-tv" aria-hidden="true" title="{{ __('Interests') }}"></i>
+            <div class="row">
+                @if (!empty($user->extra_info['interests']))
+                    <div class="col-sm-4">
+                        <i class="fas fa-fw fa-tv" aria-hidden="true"></i>
+                        {{ __('Interests') }}
                     </div>
 
-                    <div class="flex-grow-1">{{ $user->extra_info['interests'] }}</div>
-                </div>
-            @endif
+                    <div class="col-sm-8">{{ $user->extra_info['interests'] }}</div>
+                @endif
+            </div>
         </div>
 
         @if ($user->writings()->count() > 0)

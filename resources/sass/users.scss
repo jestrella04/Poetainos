@@ -96,9 +96,12 @@ hr.banner {
         margin: 0 auto;
     }
 
+    #profile-social-links > span {
+        margin-bottom: $wh-s-lg;
+    }
+
     #profile-stats,
-    #profile-social-links:not(:empty),
-    #profile-more-info:not(:empty) {
+    #profile-more-info {
         margin-bottom: $wh-s-xl;
     }
 
