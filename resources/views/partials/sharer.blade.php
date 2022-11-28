@@ -11,7 +11,7 @@
             <div class="modal-body">
                 <p class="smaller text-muted">{{ $title }}</p>
                 <p class="smaller text-muted">{{ cropify($url) }}</p>
-                <div class="social-links d-flex">
+                <div class="social-links d-flex flex-wrap">
                     @foreach (shareLinks($title, $url) as $serviceName => $serviceData)
                         <span class="flex-fill">
                             <a class="{{ $serviceData['class'] }}" href="{{ $serviceData['url'] }}" rel="noopener"
