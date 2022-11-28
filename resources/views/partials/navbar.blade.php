@@ -12,7 +12,7 @@
 </nav>
 
 <nav id="nav-mobile" class="navbar fixed-bottom d-lg-none">
-    <div class="container d-flex justify-content-between">
+    <div class="container d-flex">
         @include('partials.navlinks-mobile')
     </div>
 </nav>
