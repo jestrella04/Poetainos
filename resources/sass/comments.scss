@@ -4,17 +4,11 @@
         margin-bottom: $wh-s-lg;
     }
 
-    #post-comment-form,
-    .reply-form {
-        .form-group {
-            margin-bottom: $wh-s-sm;
-        }
-    }
-
     #post-comment-form textarea,
     .reply-form textarea {
         resize: none;
         overflow: hidden;
+        margin-bottom: $wh-s-sm;
     }
 
     .reply-form .commentbox {
@@ -34,67 +28,81 @@
     }
 
     .comment-list {
+        position: relative;
         max-width: 100%;
 
+        .comment-tl {
+            height: 100%;
+            position: absolute;
+            z-index: -9999;
+            top: 0;
+            left: 22px;
+            bottom: 0;
+            width: 5px;
+            background-color: $primary;
+        }
         .comment {
             margin-bottom: $wh-s-sm;
-            border: 1px solid $gray-300;
-            background-color: $gray-100;
-            border-radius: 0.5rem;
-            padding: 0.5rem;
 
-            .comment-author {
-                margin-right: $wh-s-lg;
+            .meta {
+                @extend .smaller, .lead, .text-muted;
+                margin-bottom: $wh-s-md;
+                text-transform: uppercase;
+
+                span {
+                    white-space: nowrap;
+                }
+
+                span:first-child {
+                    margin-right: $wh-s-md;
+                }
             }
 
             .comment-body {
-                .author {
-                    @extend .smaller, .lead;
-                    text-transform: uppercase;
-                    margin-bottom:$wh-s-sm;
-
-                    span:first-child {
-                        margin-right: $wh-s-md;
-                    }
-                }
+                @extend .border, .rounded, .bg-light;
+                padding: $wh-s-md;
+                margin-left: $wh-s-md;
 
                 .message {
-                    .badge {
-                        cursor: pointer;
-                        margin-left: $wh-s-sm;
-                        opacity: 0.85;
-                    }
+                    margin-bottom: $wh-s-md;
+                }
 
-                    .badge:hover {
-                        opacity: 1;
+                .buttons {
+                    button {
+                        @extend .smaller;
+                        padding: 0.15rem 0.25rem;
                     }
                 }
             }
         }
 
         .reply-list {
-            padding-left: 3rem;
+            padding-left: 60px;
 
             .reply {
                 margin-bottom: $wh-s-sm;
-                border: 1px solid $gray-300;
-                background-color: $gray-100;
-                border-radius: 0.5rem;
-                padding: 0.5rem;
 
-                .reply-author {
-                    margin-right: $wh-s-lg;
+                .meta {
+                    @extend .smaller, .lead, .text-muted;
+                    margin-bottom: $wh-s-md;
+                    text-transform: uppercase;
+
+                    span {
+                        white-space: nowrap;
+                    }
+
+                    span:first-child {
+                        margin-right: $wh-s-md;
+                    }
                 }
 
                 .reply-body {
-                    .author {
-                        @extend .smaller, .lead;
-                        text-transform: uppercase;
-                        margin-bottom: $wh-s-sm;
+                    @extend .border, .rounded, .bg-light;
+                    padding: $wh-s-md;
+                    margin-left: $wh-s-md;
 
-                        span:first-child {
-                            margin-right: $wh-s-md;
-                        }
+                    .message {
+                        margin-bottom: $wh-s-md;
                     }
                 }
             }

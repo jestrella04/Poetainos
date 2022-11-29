@@ -5,7 +5,6 @@
                 @csrf
                 <input type="hidden" name="writing_id" value="{{ $writing->id }}">
 
-                <div class="mb-3">
                     <small id="post-comment-success" class="form-text d-none text-success">{{ __('Comment posted successfully') }}</small>
                     <small id="post-comment-error" class="form-text d-none text-danger"></small>
 
@@ -16,7 +15,6 @@
                         aria-label="{{ __('Leave your comment here. You can mention other users by using @') }}"
                         maxlength="300"
                         required></textarea>
-                </div>
 
                 <div class="d-grid gap-2">
                     <button class="btn btn-primary">{{ __('Post Comment') }}</button>

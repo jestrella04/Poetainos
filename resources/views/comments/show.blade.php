@@ -1,15 +1,14 @@
-<div id="comment-{{ $comment->id }}" class="comment d-flex justify-content-center">
-    <div class="comment-author">
+<div id="comment-{{ $comment->id }}" class="d-flex comment">
+    <div class="flex-shrink-0">
         <a href="{{ $comment->author->path() }}">
-            {!! getUserAvatar($comment->author, $size = 'xl') !!}
+            {!! getUserAvatar($comment->author, $size = 'lg') !!}
         </a>
     </div>
 
-    <div class="comment-body flex-grow-1">
-        <div class="author">
+    <div class="flex-grow-1 comment-body">
+        <div class="meta">
             <span>
                 <i class="fa fa-user" aria-hidden="true"></i>
-                {{ __('by') }}
                 {{ $comment->author->getName() }}
             </span>
 
@@ -21,11 +20,15 @@
 
         <div class="message">
             {!! linkify($comment->message) !!}
+        </div>
 
+        <div class="buttons d-flex justify-content-end">
+            {{-- <button class="btn btn-sm btn-link">Like</button> --}}
             @auth
-                <span class="badge bg-primary badge-reply" data-wh-target="#reply-form-{{ $comment->id }}">
+                <button type="button" class="btn btn-light badge-reply" data-wh-target="#reply-form-{{ $comment->id }}">
+                    <i class="fas fa-reply" aria-hidden="true"></i>
                     {{ __('Reply') }}
-                </span>
+                </button>
             @endauth
         </div>
 
@@ -34,20 +37,16 @@
                 @csrf
                 <input type="hidden" name="writing_id" value="{{ $comment->writing->id }}">
                 <input type="hidden" name="comment_id" value="{{ $comment->id }}">
+                <small id="reply-error-{{ $comment->id }}" class="form-text d-none text-danger"></small>
+                <textarea
+                    name="reply"
+                    class="form-control autogrow commentbox"
+                    placeholder="{{ __('Leave your reply here. You can mention other users by using @') }}"
+                    aria-label="{{ __('Leave your reply here. You can mention other users by using @') }}"
+                    maxlength="300"
+                    required></textarea>
 
-                <div class="mb-3">
-                    <small id="reply-error-{{ $comment->id }}" class="form-text d-none text-danger"></small>
-
-                    <textarea
-                        name="reply"
-                        class="form-control autogrow commentbox"
-                        placeholder="{{ __('Leave your reply here. You can mention other users by using @') }}"
-                        aria-label="{{ __('Leave your reply here. You can mention other users by using @') }}"
-                        maxlength="300"
-                        required></textarea>
-                </div>
-
-                <div class="d-grid gap-2 mb-3">
+                <div class="d-grid">
                     <button class="btn btn-primary">{{ __('Post Reply') }}</button>
                 </div>
             </form>

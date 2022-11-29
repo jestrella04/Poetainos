@@ -1,15 +1,14 @@
-<div id="comment-reply-{{ $reply->id }}" class="reply d-flex justify-content-center">
-    <div class="reply-author">
+<div id="comment-reply-{{ $reply->id }}" class="d-flex reply">
+    <div class="flex-shrink-0">
         <a href="{{ $reply->author->path() }}">
-            {!! getUserAvatar($reply->author, $size = 'lg') !!}
+            {!! getUserAvatar($reply->author, $size = 'md') !!}
         </a>
     </div>
 
-    <div class="reply-body flex-grow-1">
-        <div class="author">
+    <div class="flex-grow-1 reply-body">
+        <div class="meta">
             <span>
                 <i class="fa fa-user" aria-hidden="true"></i>
-                {{ __('by') }}
                 {{ $reply->author->getName() }}
             </span>
 
@@ -19,6 +18,8 @@
             </span>
         </div>
 
-        <div class="message">{!! linkify($reply->message) !!}</div>
+        <div class="message">
+            {!! linkify($reply->message) !!}
+        </div>
     </div>
 </div>
