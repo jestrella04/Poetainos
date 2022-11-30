@@ -61,9 +61,9 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/users/block/{user}', 'UsersController@promptBeforeBlock')->name('users.block.confirm');
     Route::post('/users/block/{user}', 'UsersController@blockUser')->name('users.block.confirmed');
 
-    // Comments and replies
-    Route::post('/replies/create', 'RepliesController@store')->name('replies.store');
+    // Comments
     Route::post('/comments/create', 'CommentsController@store')->name('comments.store');
+    Route::delete('/comments/delete/{comment}', 'CommentsController@destroy')->name('comments.destroy');
 
     // Other user tasks
     Route::post('/votes/store', 'VotesController@store')->name('votes.store');
@@ -127,7 +127,7 @@ Route::get('/categories/{category}', 'CategoriesController@show')->name('categor
 Route::get('/tags/query', 'TagsController@query')->name('tags.query');
 Route::get('/tags/{tag}', 'TagsController@show')->name('tags.show');
 
-// Comments and replies
+// Comments
 Route::get('/comments/{writing}', 'CommentsController@index')->name('comments.index');
 
 // Contact form

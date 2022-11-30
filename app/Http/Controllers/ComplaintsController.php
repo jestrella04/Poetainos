@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Comment;
 use App\Complaint;
 use App\Notifications\ComplaintSubmitted;
-use App\Reply;
 use App\User;
 use App\Writing;
 use Illuminate\Http\Request;
@@ -69,8 +68,6 @@ class ComplaintsController extends Controller
             $complaint->complainable()->associate(Writing::find($id));
         } elseif ('comments' == request('complainable_type')) {
             $complaint->complainable()->associate(Comment::find($id));
-        } elseif ('replies' == request('complainable_type')) {
-            $complaint->complainable()->associate(Reply::find($id));
         } elseif ('users' == request('complainable_type')) {
             $complaint->complainable()->associate(User::find($id));
         }

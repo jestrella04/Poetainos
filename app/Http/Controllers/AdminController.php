@@ -6,7 +6,6 @@ use App\Category;
 use App\Comment;
 use App\Complaint;
 use App\Page;
-use App\Reply;
 use App\Setting;
 use App\Tag;
 use App\User;
@@ -34,7 +33,7 @@ class AdminController extends Controller
                 ],
                 'comments' => [
                     'title' => __('Comments'),
-                    'count' => Comment::all()->count() + Reply::all()->count(),
+                    'count' => Comment::all()->count(),
                 ],
                 'categories' => [
                     'title' => __('Categories'),

@@ -16,11 +16,13 @@
             class="dropdown-item sharer" data-wh-title="{{ $sharer['title'] }}" data-wh-url="{{ $sharer['url'] }}">
             {{ __('Share profile') }}
         </a>
+
         @can('update', $user)
             <a href="{{ route('users.edit', $user) }}" class="dropdown-item">
                 {{ __('Update profile') }}
             </a>
         @endcan
+
         @if ($user->writings()->count() > 0)
             <a href="{{ $user->writingsPath() }}" class="dropdown-item">
                 @if (auth()->check() &&
@@ -31,6 +33,7 @@
                 @endif
             </a>
         @endif
+
         @if ($user->Shelf()->count() > 0)
             <a href="{{ $user->shelfPath() }}" class="dropdown-item">
                 @if (auth()->check() &&
@@ -41,6 +44,12 @@
                 @endif
             </a>
         @endif
+
+        <a class="dropdown-item init-complaint"
+            href="{{ route('complaints.create', ['type' => 'users', 'id' => $user->id]) }}">
+            {{ __('Report user') }}
+        </a>
+
         @if (auth()->check() &&
             !auth()->user()->is($user))
             <a href="{{ route('users.block.confirm', ['user' => $user->username]) }}"

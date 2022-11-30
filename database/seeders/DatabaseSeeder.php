@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             $user->writings()->save(factory(App\Writing::class)->make());
             $user->votes()->save(factory(App\Vote::class)->make());
             $user->comments()->save(factory(App\Comment::class)->make());
-            $user->replies()->save(factory(App\Reply::class)->make());
         });
 
         factory(App\Writing::class, $count)->create()->each(function ($writing) {

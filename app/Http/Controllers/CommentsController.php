@@ -60,12 +60,19 @@ class CommentsController extends Controller
         request()->validate([
             'comment' => 'required|min:2|max:300',
             'writing_id' => 'required|exists:writings,id',
+            'reply_to' => 'nullable|exists:users,username',
         ]);
+
+        $message = request('comment');
+
+        if (null !== request('reply_to')) {
+            $message = '@' . request('reply_to') . ' ' . $message;
+        }
 
         $comment = Comment::create([
             'user_id' => auth()->user()->id,
             'writing_id' => request('writing_id'),
-            'message' => request('comment')
+            'message' => $message,
         ]);
 
         // Update aura

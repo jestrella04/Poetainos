@@ -2,10 +2,6 @@
 
 namespace App\Providers;
 
-use App\Comment;
-use App\Reply;
-use App\User;
-use App\Writing;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 

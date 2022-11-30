@@ -1,7 +1,7 @@
 <div class="writing-comments">
     <div id="post-comment" class="main-content">
         @auth
-            <form id="post-comment-form" action="{{ route('comments.store') }}" method="POST">
+            <form id="post-comment-form" class="comment-form" action="{{ route('comments.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="writing_id" value="{{ $writing->id }}">
 

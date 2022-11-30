@@ -1,7 +1,6 @@
 <?php
 
 use App\Comment;
-use App\Reply;
 use App\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -100,8 +99,7 @@ function getReadableNumber($number)
 
 function getWritingCounter($writing)
 {
-    $repliesCount = Reply::whereIn('comment_id', Comment::where('writing_id', $writing->id)->pluck('id')->toArray())->count();
-    $commentsCount = $writing->comments->count() + $repliesCount;
+    $commentsCount = $writing->comments->count();
 
     return [
         'likes' => [

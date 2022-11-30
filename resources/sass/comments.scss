@@ -4,14 +4,13 @@
         margin-bottom: $wh-s-lg;
     }
 
-    #post-comment-form textarea,
-    .reply-form textarea {
+    .comment-form textarea {
         resize: none;
         overflow: hidden;
         margin-bottom: $wh-s-sm;
     }
 
-    .reply-form .commentbox {
+    .comment-form .commentbox {
         margin-top: $wh-s-md;
     }
 
@@ -41,9 +40,12 @@
             width: 5px;
             background-color: $primary;
         }
-        .comment {
-            margin-bottom: $wh-s-sm;
 
+        .comment:not(:last-child) {
+            margin-bottom: $wh-s-md;
+        }
+
+        .comment {
             .meta {
                 @extend .smaller, .lead, .text-muted;
                 margin-bottom: $wh-s-md;
@@ -58,6 +60,10 @@
                 }
             }
 
+            .menu {
+                @extend .smaller, .lead, .text-muted;
+            }
+
             .comment-body {
                 @extend .border, .rounded, .bg-light;
                 padding: $wh-s-md;
@@ -68,41 +74,8 @@
                 }
 
                 .buttons {
-                    button {
-                        @extend .smaller;
-                        padding: 0.15rem 0.25rem;
-                    }
-                }
-            }
-        }
-
-        .reply-list {
-            padding-left: 60px;
-
-            .reply {
-                margin-bottom: $wh-s-sm;
-
-                .meta {
-                    @extend .smaller, .lead, .text-muted;
-                    margin-bottom: $wh-s-md;
-                    text-transform: uppercase;
-
-                    span {
-                        white-space: nowrap;
-                    }
-
-                    span:first-child {
-                        margin-right: $wh-s-md;
-                    }
-                }
-
-                .reply-body {
-                    @extend .border, .rounded, .bg-light;
-                    padding: $wh-s-md;
-                    margin-left: $wh-s-md;
-
-                    .message {
-                        margin-bottom: $wh-s-md;
+                    .badge-reply {
+                        cursor: pointer;
                     }
                 }
             }

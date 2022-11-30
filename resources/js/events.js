@@ -288,13 +288,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show/hide the comment reply form
         if (element.matches('.badge-reply')) {
-            let target = element.dataset.whTarget;
-            let targetForm = document.querySelector(target);
-            targetForm.classList.toggle('d-none');
+            document.querySelectorAll('.comment-form').forEach(commentForm => {
+                if (! commentForm.matches('#post-comment-form')) {
+                    commentForm.classList.add('d-none');
+                }
+            });
 
-            if (!targetForm.matches('.d-none')) {
-                targetForm.querySelector('.form-control').focus();
-            }
+            let targetForm = document.querySelector(element.dataset.whTarget);
+            targetForm.classList.remove('d-none');
+            targetForm.querySelector('.form-control').focus();
         }
 
         // Trigger the cover chooser
@@ -728,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Post the comment form
-        if (element.matches('#post-comment-form')) {
+        if (element.matches('.comment-form')) {
             event.preventDefault();
 
             let params = new FormData(element);
@@ -756,35 +758,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     postCommentError.textContent = error.response.data.errors.comment[0];
                     postCommentSuccess.classList.add('d-none');
                     postCommentError.classList.remove('d-none');
-                })
-                .then(() => {
-                    // Display the standard cursor
-                    document.body.classList.remove('cursor-wait');
-                });
-        }
-
-        // Post the comment reply form
-        if (element.matches('.reply-form')) {
-            event.preventDefault();
-
-            let params = new FormData(element);
-            let url = element.action;
-            let commentReplyList = document.querySelector(`#reply-list-${element.comment_id.value}`);
-            let commentReplyError = document.querySelector(`#reply-error-${element.comment_id.value}`);
-
-            // Display the wait cursor
-            document.body.classList.add('cursor-wait');
-
-            axios.post(url, params)
-                .then(response => {
-                    element.reset();
-                    commentReplyList.insertAdjacentHTML('beforeend', response.data);
-                    element.classList.add('d-none');
-                    commentReplyError.classList.add('d-none');
-                })
-                .catch(error => {
-                    commentReplyError.textContent = error.response.data.errors.reply[0];
-                    commentReplyError.classList.remove('d-none');
                 })
                 .then(() => {
                     // Display the standard cursor
