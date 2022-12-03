@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\ContactFormSubmitted;
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 

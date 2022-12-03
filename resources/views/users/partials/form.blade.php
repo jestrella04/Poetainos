@@ -47,7 +47,7 @@
                 <div class="col-sm-9">
                     <select class="form-control form-select" name="role" id="role">
                         <option value="">{{ __('User') }}</option>
-                        @foreach (App\Role::all() as $role)
+                        @foreach (App\Models\Role::all() as $role)
                             <option value="{{ $role->id }}" @if ($user->role_id === $role->id) {{ 'selected' }} @endif>
                                 {{ $role->name }}
                             </option>

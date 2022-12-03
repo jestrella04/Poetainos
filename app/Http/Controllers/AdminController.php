@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
-use App\Comment;
-use App\Complaint;
-use App\Page;
-use App\Setting;
-use App\Tag;
-use App\User;
-use App\Vote;
-use App\Writing;
+use App\Models\Category;
+use App\Models\Comment;
+use App\Models\Complaint;
+use App\Models\Page;
+use App\Models\Setting;
+use App\Models\Tag;
+use App\Models\User;
+use App\Models\Vote;
+use App\Models\Writing;
 
 class AdminController extends Controller
 {

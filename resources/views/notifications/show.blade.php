@@ -2,15 +2,15 @@
     <div class="card-body">
         <div class="d-flex justify-content-center">
             <div class="avatar-wrapper">
-                @if (isset($notification->data['user_id']) && $user = App\User::findOrFail($notification->data['user_id']))
+                @if (isset($notification->data['user_id']) && $user = App\Models\User::findOrFail($notification->data['user_id']))
                     {!! getUserAvatar($user, $size = 'lg') !!}
                 @else
-                    <img class="avatar avatar-lg" src="{{ mix('/static/images/logo.svg') }}" alt="{{ getSiteConfig('name') }}" loading="lazy">
+                    <img class="avatar avatar-lg" src="{{ Vite::asset('resources/images/logo.svg') }}" alt="{{ getSiteConfig('name') }}" loading="lazy">
                 @endif
             </div>
 
             <div class="flex-grow-1">
-                @if ($writing = App\Writing::findOrFail($notification->data['writing_id']))
+                @if ($writing = App\Models\Writing::findOrFail($notification->data['writing_id']))
                     <a href="{{ route('notifications.read', $notification) }}" class="stretched-link">
                         {{ $writing->title }}
                     </a>

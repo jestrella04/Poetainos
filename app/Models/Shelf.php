@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Vote extends Model
+class Shelf extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,7 +12,7 @@ class Vote extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'writing_id', 'vote',
+        'user_id', 'writing_id',
     ];
 
      /**
@@ -21,14 +21,4 @@ class Vote extends Model
      * @var bool
      */
     public $timestamps = false;
-
-    public function writing()
-    {
-        return $this->belongsTo(Writing::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

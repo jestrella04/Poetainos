@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\WritingShelved;
-use App\Shelf;
-use App\User;
-use App\Writing;
+use App\Models\Shelf;
+use App\Models\User;
+use App\Models\Writing;
 use Illuminate\Http\Request;
 
 class ShelvesController extends Controller

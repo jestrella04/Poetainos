@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\WritingLiked;
-use App\User;
-use App\Vote;
-use App\Writing;
+use App\Models\User;
+use App\Models\Vote;
+use App\Models\Writing;
 use Illuminate\Http\Request;
 
 class VotesController extends Controller
@@ -82,7 +82,7 @@ class VotesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Vote  $vote
+     * @param  \App\Models\Vote  $vote
      * @return \Illuminate\Http\Response
      */
     public function show(Vote $vote)
@@ -93,7 +93,7 @@ class VotesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Vote  $vote
+     * @param  \App\Models\Vote  $vote
      * @return \Illuminate\Http\Response
      */
     public function edit(Vote $vote)
@@ -105,7 +105,7 @@ class VotesController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Vote  $vote
+     * @param  \App\Models\Vote  $vote
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Vote $vote)
@@ -116,7 +116,7 @@ class VotesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Vote  $vote
+     * @param  \App\Models\Vote  $vote
      * @return \Illuminate\Http\Response
      */
     public function destroy(Vote $vote)

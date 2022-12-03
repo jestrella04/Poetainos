@@ -1,2 +1,5 @@
-require('./base');
-require('./events');
+import.meta.glob([
+    '../images/**',
+]);
+import './base';
+import './events';

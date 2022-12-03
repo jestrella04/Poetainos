@@ -3,10 +3,10 @@
 
     if (auth()->check()) {
         $userId = auth()->user()->id;
-        $voted = App\Vote::where('user_id', $userId)
+        $voted = App\Models\Vote::where('user_id', $userId)
             ->where('writing_id', $writing->id)
             ->value('vote');
-        $shelved = App\Shelf::where('user_id', $userId)
+        $shelved = App\Models\Shelf::where('user_id', $userId)
             ->where('writing_id', $writing->id)
             ->value('writing_id');
     }

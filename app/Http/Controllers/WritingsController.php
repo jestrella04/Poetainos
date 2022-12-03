@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
+use App\Models\Category;
 use App\Notifications\WritingPublished;
-use App\Tag;
-use App\User;
-use App\Vote;
-use App\Writing;
+use App\Models\Tag;
+use App\Models\User;
+use App\Models\Vote;
+use App\Models\Writing;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use Carbon\Carbon;
@@ -79,7 +79,7 @@ class WritingsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Writing  $writing
+     * @param  \App\Models\Writing  $writing
      * @return \Illuminate\Http\Response
      */
     public function show(Writing $writing)
@@ -123,7 +123,7 @@ class WritingsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Writing  $writing
+     * @param  \App\Models\Writing  $writing
      * @return \Illuminate\Http\Response
      */
     public function edit(Writing $writing)
@@ -154,7 +154,7 @@ class WritingsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Writing  $writing
+     * @param  \App\Models\Writing  $writing
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Writing $writing)
@@ -280,7 +280,7 @@ class WritingsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Writing  $writing
+     * @param  \App\Models\Writing  $writing
      * @return \Illuminate\Http\Response
      */
     public function destroy(Writing $writing)

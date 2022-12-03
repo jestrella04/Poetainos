@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\User;
-use App\Vote;
-use App\Writing;
+use App\Models\User;
+use App\Models\Vote;
+use App\Models\Writing;
 use Faker\Generator as Faker;
 
 $factory->define(Vote::class, function (Faker $faker) {

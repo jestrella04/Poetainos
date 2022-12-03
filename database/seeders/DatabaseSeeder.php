@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,18 +16,18 @@ class DatabaseSeeder extends Seeder
     {
         $count = 10;
 
-        factory(App\User::class, $count)->create()->each(function ($user) {
-            $user->writings()->save(factory(App\Writing::class)->make());
-            $user->votes()->save(factory(App\Vote::class)->make());
-            $user->comments()->save(factory(App\Comment::class)->make());
+        factory(App\Models\User::class, $count)->create()->each(function ($user) {
+            $user->writings()->save(factory(App\Models\Writing::class)->make());
+            $user->votes()->save(factory(App\Models\Vote::class)->make());
+            $user->comments()->save(factory(App\Models\Comment::class)->make());
         });
 
-        factory(App\Writing::class, $count)->create()->each(function ($writing) {
-            $writing->categories()->save(factory(App\Category::class)->make());
-            $writing->tags()->save(factory(App\Tag::class)->make());
+        factory(App\Models\Writing::class, $count)->create()->each(function ($writing) {
+            $writing->categories()->save(factory(App\Models\Category::class)->make());
+            $writing->tags()->save(factory(App\Models\Tag::class)->make());
         });
 
-        //factory(App\Hood::class, $count)->make();
-        //factory(App\Shelf::class, $count)->make();
+        //factory(App\Models\Hood::class, $count)->make();
+        //factory(App\Models\Shelf::class, $count)->make();
     }
 }

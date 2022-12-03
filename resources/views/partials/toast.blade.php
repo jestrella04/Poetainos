@@ -3,7 +3,7 @@
         @if ($message = session('flash'))
             <div id="toast-flash" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
-                    <img src="{{ mix('/static/images/logo.svg') }}" width="20" height="20" alt="">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" width="20" height="20" alt="">
                     <strong class="me-auto">{{ getSiteConfig('name')}}</strong>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="{{ __('Close') }}"></button>
                 </div>
@@ -16,7 +16,7 @@
 
         <div id="toast-reuse" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <img src="{{ mix('/static/images/logo.svg') }}" width="20" height="20" alt="">
+                <img src="{{ Vite::asset('resources/images/logo.svg') }}" width="20" height="20" alt="">
                 <strong class="me-auto">{{ getSiteConfig('name')}}</strong>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="{{ __('Close') }}"></button>
             </div>

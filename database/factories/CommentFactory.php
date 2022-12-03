@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Comment;
-use App\User;
-use App\Writing;
+use App\Models\Comment;
+use App\Models\User;
+use App\Models\Writing;
 use Faker\Generator as Faker;
 
 $factory->define(Comment::class, function (Faker $faker) {

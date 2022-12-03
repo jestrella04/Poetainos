@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Comment extends Model
+class Reply extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,17 +12,12 @@ class Comment extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'writing_id', 'message',
+        'user_id', 'comment_id', 'message',
     ];
 
-    public function replies()
+    public function comment()
     {
-        return $this->hasMany(Reply::class);
-    }
-
-    public function writing()
-    {
-        return $this->belongsTo(Writing::class);
+        return $this->belongsTo(Comment::class);
     }
 
     public function author()
