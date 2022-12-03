@@ -1,17 +1,17 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryWriting extends Model
+class TagWriting extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'category_writing';
+    protected $table = 'tag_writing';
 
      /**
      * Indicates if the model should be timestamped.

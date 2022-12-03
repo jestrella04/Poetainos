@@ -10,7 +10,7 @@
 
 <a class="flex-fill jump-to-top ontop" href="#" aria-label="{{ __('Scroll back to top')}}">
     <i class="fas fa-arrow-turn-up fa-fw d-none" aria-hidden="true"></i>
-    <img src="{{ mix('/static/images/logo.svg') }}"
+    <img src="{{ Vite::asset('resources/images/logo.svg') }}"
         class="logo-shadow"
         width="24"
         height="24"

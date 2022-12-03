@@ -43,7 +43,7 @@
                                 id="parent"
                                 class="form-control form-select">
                                 <option value="">{{ __('None') }}</option>
-                                @foreach (App\Category::tree()->breadthFirst()->get() as $category)
+                                @foreach (App\Models\Category::tree()->breadthFirst()->get() as $category)
                                     <option value="{{ $category->id }}">{{ ucfirst($category->name) }}</option>
                                 @endforeach
                             </select>

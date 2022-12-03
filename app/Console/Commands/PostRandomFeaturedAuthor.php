@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Notifications\AuthorFeaturedRandom;
-use App\User;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class PostRandomFeaturedAuthor extends Command

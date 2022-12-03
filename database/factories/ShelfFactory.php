@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Shelf;
-use App\User;
-use App\Writing;
+use App\Models\Shelf;
+use App\Models\User;
+use App\Models\Writing;
 use Faker\Generator as Faker;
 
 $factory->define(Shelf::class, function (Faker $faker) {

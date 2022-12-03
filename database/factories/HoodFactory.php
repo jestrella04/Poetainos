@@ -2,8 +2,8 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Hood;
-use App\User;
+use App\Models\Hood;
+use App\Models\User;
 use Faker\Generator as Faker;
 
 $factory->define(Hood::class, function (Faker $faker) {

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Comment;
-use App\Complaint;
+use App\Models\Comment;
+use App\Models\Complaint;
 use App\Notifications\ComplaintSubmitted;
-use App\User;
-use App\Writing;
+use App\Models\User;
+use App\Models\Writing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 

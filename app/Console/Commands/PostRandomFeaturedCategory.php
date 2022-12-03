@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Category;
+use App\Models\Category;
 use App\Notifications\CategoryFeaturedRandom;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Notification;

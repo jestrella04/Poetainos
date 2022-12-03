@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
-use App\User;
-use App\Writing;
+use App\Models\User;
+use App\Models\Writing;
 use App\Events\NotificationEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

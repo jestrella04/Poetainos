@@ -1,9 +1,9 @@
 /node_modules
+/public/build
 /public/hot
 /public/storage
 /public/static/*
 /public/sitemap.xml
-/public/pwabuilder-sw.js
 /public/robots.txt
 /public/mix-manifest.json
 /public/.well-known/*
@@ -11,9 +11,11 @@
 /vendor
 .env
 .env.backup
+.env.production
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
+auth.json
 npm-debug.log
 yarn-error.log
 /laradock

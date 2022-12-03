@@ -22,7 +22,7 @@
                 <p class="column-title">{{ __('Links') }}</p>
 
                 <div class="nav flex-column">
-                    @foreach (App\Page::all() as $page)
+                    @foreach (App\Models\Page::all() as $page)
                     <a class="nav-link" href="{{ route('pages.show', $page->slug ) }}">{{ $page->title }}</a>
                     @endforeach
                     <a class="nav-link" href="{{ route('contact.create') }}">{{ __('Contact us') }}</a>

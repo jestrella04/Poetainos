@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Writing;
+use App\Models\Writing;
 use Illuminate\Http\Request;
 
 class GoldenFlowersController extends Controller

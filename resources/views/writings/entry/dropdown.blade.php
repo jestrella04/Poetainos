@@ -13,7 +13,7 @@
 
     <div class="dropdown-menu">
         <a href="{{ route('sharer', ['title' => $sharer['title'], 'url' => $sharer['url']]) }}"
-            class="dropdown-item sharer"
+            class="dropdown-item sharer" rel="nofollow"
             aria-label="{{ __('Share writing :writing', ['writing' => $writing->title]) }}"
             data-wh-title="{{ $sharer['title'] }}" data-wh-url="{{ $sharer['url'] }}">
             {{ __('Share writing') }}
@@ -27,7 +27,7 @@
         @endif
 
         <a class="dropdown-item init-complaint"
-            href="{{ route('complaints.create', ['type' => 'writings', 'id' => $writing->id]) }}">
+            href="{{ route('complaints.create', ['type' => 'writings', 'id' => $writing->id]) }}" rel="nofollow">
             {{ __('Report writing') }}
         </a>
 

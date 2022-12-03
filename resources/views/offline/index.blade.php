@@ -5,7 +5,7 @@
 @section('body')
 <main role="main" class="offline-wrapper">
     <div id="offline">
-        <img src="{{ mix('/static/images/logo.svg') }}" alt="">
+        <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="">
         <h1>{{ getSiteConfig('name') }}</h1>
         <p class="lead">{{ __('Oh no, it seems you are offline!') }}</p>
 

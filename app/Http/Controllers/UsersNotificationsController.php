@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Writing;
+use App\Models\Writing;
 
 class UsersNotificationsController extends Controller
 {
     public function listUnread() {
         $user = auth()->user();
-        $notifications = \App\User::find($user->id)->unreadNotifications()->paginate($this->pagination);
+        $notifications = \App\Models\User::find($user->id)->unreadNotifications()->paginate($this->pagination);
         return $this->list($notifications);
     }
 
     public function listAll() {
         $user = auth()->user();
-        $notifications = \App\User::find($user->id)->notifications()->paginate($this->pagination);
+        $notifications = \App\Models\User::find($user->id)->notifications()->paginate($this->pagination);
         return $this->list($notifications);
     }
 

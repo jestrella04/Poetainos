@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
-use App\Setting;
+use App\Models\Setting;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -71,6 +71,6 @@ class AppServiceProvider extends ServiceProvider
     protected function registerResources(): void
     {
         // Loading project's custom language strings
-        $this->loadJSONTranslationsFrom(resource_path('lang/Writerhood'));
+        $this->loadJSONTranslationsFrom(base_path('lang/Writerhood'));
     }
 }
