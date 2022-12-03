@@ -51,8 +51,8 @@ php artisan generate:assetlinks
 # Install node modules
 npm install
 
-# Build assets using Laravel Mix
-npm run production
+# Build assets using Vite
+npm run build
 
 # Turn off maintenance mode
 php artisan up
