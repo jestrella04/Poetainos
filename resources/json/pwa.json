@@ -1,52 +1,52 @@
 {
-    "name": "{{name}}",
-    "gcm_sender_id": "{{gcm_sender_id}}",
-    "short_name": "{{name}}",
-    "description": "{{description}}",
+    "name": "",
+    "gcm_sender_id": "",
+    "short_name": "",
+    "description": "",
     "icons": [
         {
-            "src": "/build/assets/logo.svg",
+            "src": "resources/images/logo.svg",
             "sizes": "any",
             "type": "image/svg-xml",
             "purpose": "any"
         },
         {
-            "src": "/build/assets/logo-maskable.png",
+            "src": "resources/images/logo-maskable.png",
             "sizes": "any",
             "type": "image/svg-xml",
             "purpose": "maskable"
         },
         {
-            "src": "/build/assets/logo-144.png",
+            "src": "resources/images/logo-144.png",
             "sizes": "144x144",
             "type": "image/png"
         },
         {
-            "src": "/build/assets/logo-192.png",
+            "src": "resources/images/logo-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/build/assets/logo-512.png",
+            "src": "resources/images/logo-512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
     ],
     "shortcuts": [
         {
-            "name": "{{publish}}",
-            "short_name": "{{publish}}",
-            "url": "{{url.publish}}"
+            "name": "publish",
+            "short_name": "",
+            "url": ""
         },
         {
-            "name": "{{featured}}",
-            "short_name": "{{featured}}",
-            "url": "{{url.featured}}"
+            "name": "featured",
+            "short_name": "",
+            "url": ""
         },
         {
-            "name": "{{random}}",
-            "short_name": "{{random}}",
-            "url": "{{url.random}}"
+            "name": "random",
+            "short_name": "",
+            "url": ""
         }
     ],
     "start_url": "/socialite",
@@ -67,9 +67,9 @@
     "related_applications": [
       {
         "platform": "play",
-        "url": "{{play_store_url}}",
-        "id": "{{play_store_id}}"
+        "url": "",
+        "id": ""
       }
     ],
-    "iarc_rating_id": "{{iarc_rating_id}}"
+    "iarc_rating_id": ""
 }

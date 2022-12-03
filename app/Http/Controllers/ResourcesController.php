@@ -3,24 +3,51 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Vite;
 
 class ResourcesController extends Controller
 {
     public function pwaManifest()
     {
-        $json = file_get_contents(base_path('resources/json/pwa.json'));
-        $json = str_replace('{{name}}', getSiteConfig('name'), $json);
-        $json = str_replace('{{gcm_sender_id}}', config('webpush.gcm.sender_id'), $json);
-        $json = str_replace('{{description}}', getSiteConfig('slogan'), $json);
-        $json = str_replace('{{publish}}', __('Publish'), $json);
-        $json = str_replace('{{featured}}', __('Golden Flowers'), $json);
-        $json = str_replace('{{random}}', __('Random'), $json);
-        $json = str_replace('{{url.publish}}', route('writings.create'), $json);
-        $json = str_replace('{{url.featured}}', route('writings.awards'), $json);
-        $json = str_replace('{{url.random}}', route('writings.random'), $json);
-        $json = str_replace('{{play_store_url}}', config('services.google.play_store.url'), $json);
-        $json = str_replace('{{play_store_id}}', config('services.google.play_store.id'), $json);
-        $json = str_replace('{{iarc_rating_id}}', config('services.compliance.iarc_rating_id'), $json);
+        $json = json_decode(file_get_contents(base_path('resources/json/pwa.json')));
+
+        $json->name = getSiteConfig('name');
+        $json->gcm_sender_id = config('webpush.gcm.sender_id');
+        $json->short_name = getSiteConfig('name');
+        $json->description = getSiteConfig('slogan');
+
+        foreach ($json->icons as $icon) {
+            $icon->src = Vite::asset($icon->src);
+        }
+
+        foreach ($json->shortcuts as $shortcut) {
+            if ("publish" === $shortcut->name) {
+                $shortcut->name = __('Publish');
+                $shortcut->short_name = __('Publish');
+                $shortcut->url = route('writings.create');
+            }
+
+            if ("featured" === $shortcut->name) {
+                $shortcut->name = __('Golden Flowers');
+                $shortcut->short_name = __('Golden Flowers');
+                $shortcut->url = route('writings.awards');
+            }
+
+            if ("random" === $shortcut->name) {
+                $shortcut->name = __('Random');
+                $shortcut->short_name = __('Random');
+                $shortcut->url = route('writings.random');
+            }
+        }
+
+        foreach ($json->related_applications as $app) {
+            if ("play" === $app->platform) {
+                $app->url = config('services.google.play_store.url');
+                $app->id = config('services.google.play_store.id');
+            }
+        }
+
+        $json->iarc_rating_id = config('services.compliance.iarc_rating_id');
 
         return $json;
     }
