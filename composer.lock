@@ -1435,16 +1435,16 @@
         },
         {
             "name": "laravel-notification-channels/twitter",
-            "version": "v6.1.0",
+            "version": "v6.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel-notification-channels/twitter.git",
-                "reference": "c9f7c02c8aaea3ae7a5c58f0e31d6d4ccb557e69"
+                "reference": "d9692d7500fed22904a727f78a6524c70c969b52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel-notification-channels/twitter/zipball/c9f7c02c8aaea3ae7a5c58f0e31d6d4ccb557e69",
-                "reference": "c9f7c02c8aaea3ae7a5c58f0e31d6d4ccb557e69",
+                "url": "https://api.github.com/repos/laravel-notification-channels/twitter/zipball/d9692d7500fed22904a727f78a6524c70c969b52",
+                "reference": "d9692d7500fed22904a727f78a6524c70c969b52",
                 "shasum": ""
             },
             "require": {
@@ -1488,9 +1488,9 @@
             "homepage": "https://github.com/laravel-notification-channels/twitter",
             "support": {
                 "issues": "https://github.com/laravel-notification-channels/twitter/issues",
-                "source": "https://github.com/laravel-notification-channels/twitter/tree/v6.1.0"
+                "source": "https://github.com/laravel-notification-channels/twitter/tree/v6.2.0"
             },
-            "time": "2022-08-09T08:00:36+00:00"
+            "time": "2022-12-01T14:02:16+00:00"
         },
         {
             "name": "laravel-notification-channels/webpush",
@@ -2249,16 +2249,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.10.4",
+            "version": "3.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "a7790f3dd1b27af81d380e6b2afa77c16ab7e181"
+                "reference": "7e423e5dd240a60adfab9bde058d7668863b7731"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/a7790f3dd1b27af81d380e6b2afa77c16ab7e181",
-                "reference": "a7790f3dd1b27af81d380e6b2afa77c16ab7e181",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/7e423e5dd240a60adfab9bde058d7668863b7731",
+                "reference": "7e423e5dd240a60adfab9bde058d7668863b7731",
                 "shasum": ""
             },
             "require": {
@@ -2320,7 +2320,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.10.4"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.11.0"
             },
             "funding": [
                 {
@@ -2336,7 +2336,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-11-26T19:48:01+00:00"
+            "time": "2022-12-02T14:39:57+00:00"
         },
         {
             "name": "league/glide",
@@ -2772,16 +2772,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.63.0",
+            "version": "2.64.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "ad35dd71a6a212b98e4b87e97389b6fa85f0e347"
+                "reference": "889546413c97de2d05063b8cb7b193c2531ea211"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/ad35dd71a6a212b98e4b87e97389b6fa85f0e347",
-                "reference": "ad35dd71a6a212b98e4b87e97389b6fa85f0e347",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/889546413c97de2d05063b8cb7b193c2531ea211",
+                "reference": "889546413c97de2d05063b8cb7b193c2531ea211",
                 "shasum": ""
             },
             "require": {
@@ -2792,7 +2792,7 @@
                 "symfony/translation": "^3.4 || ^4.0 || ^5.0 || ^6.0"
             },
             "require-dev": {
-                "doctrine/dbal": "^2.0 || ^3.0",
+                "doctrine/dbal": "^2.0 || ^3.1.4",
                 "doctrine/orm": "^2.7",
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "kylekatarnls/multi-tester": "^2.0",
@@ -2870,7 +2870,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-10-30T18:34:28+00:00"
+            "time": "2022-11-26T17:36:00+00:00"
         },
         {
             "name": "nette/schema",
