@@ -8,7 +8,7 @@ const offlineFallbackPage = "offline";
 
 
 self.addEventListener("message", (event) => {
-    if (event.data && event.data.type === "SKIP_WAITING") {
+    if (event.origin == location.host && event.data && event.data.type === "SKIP_WAITING") {
         self.skipWaiting();
     }
 });
