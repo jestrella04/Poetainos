@@ -70,7 +70,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function avatarPath()
     {
         if (! empty($this->extra_info['avatar'])) {
-            $path = '/static/storage/' . $this->extra_info['avatar'];
+            $path = '/storage/' . $this->extra_info['avatar'];
 
             if (is_file(public_path($path))) {
                 return $path;
