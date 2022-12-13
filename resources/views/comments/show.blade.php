@@ -59,14 +59,14 @@
                 <small id="reply-error-{{ $comment->id }}" class="form-text d-none text-danger"></small>
                 <textarea
                     name="comment"
-                    class="form-control autogrow commentbox"
+                    class="form-control autogrow commentbox smaller"
                     placeholder="{{ __('Use the @ symbol to tag other users') }}"
                     aria-label="{{ __('Use the @ symbol to tag other users') }}"
                     maxlength="300"
                     required></textarea>
 
                 <div class="d-grid">
-                    <button class="btn btn-primary">{{ __('Post Reply') }}</button>
+                    <button class="btn btn-primary btn-sm">{{ __('Post Reply') }}</button>
                 </div>
             </form>
         @endauth

@@ -288,15 +288,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show/hide the comment reply form
         if (element.matches('.badge-reply')) {
-            document.querySelectorAll('.comment-form').forEach(commentForm => {
-                if (! commentForm.matches('#post-comment-form')) {
-                    commentForm.classList.add('d-none');
-                }
-            });
-
             let targetForm = document.querySelector(element.dataset.whTarget);
             targetForm.classList.toggle('d-none');
             targetForm.querySelector('.form-control').focus();
+
+            document.querySelectorAll('.comment-form').forEach(commentForm => {
+                if (! commentForm.matches('#post-comment-form') && !commentForm.matches('#' + targetForm.id)) {
+                    commentForm.classList.add('d-none');
+                }
+            });
         }
 
         // Trigger the cover chooser
