@@ -119,6 +119,7 @@ class CommentLiked extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
+            'writing_id' => $this->comment->writing->id,
             'comment_id' => $this->comment->id,
             'user_id' => $this->user->id,
         ];

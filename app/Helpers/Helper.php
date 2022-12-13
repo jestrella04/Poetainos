@@ -220,6 +220,11 @@ function getNotificationMessage($notification)
             ]);
             break;
 
+        case 'App\Notifications\CommentLiked':
+            $message = __(':name has liked your comment', [
+                'name' => User::find($notification->data['user_id'])->getName(),
+            ]);
+            break;
         default:
             $message = false;
     }
