@@ -11,6 +11,7 @@ use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use Illuminate\Support\Facades\Vite;
 
 class WritingFeatured extends Notification implements ShouldQueue
 {
@@ -45,7 +46,7 @@ class WritingFeatured extends Notification implements ShouldQueue
             'footer' => __('Thank you for being part of the hood!'),
             'url' => route('writings.show', $this->writing),
             'action' => __('View writing'),
-            'icon' => asset('/static/images/logo-192.png'),
+            'icon' => Vite::asset('resources/images/logo-192.png'),
             'tag' => getSiteConfig('name'),
         ];
     }

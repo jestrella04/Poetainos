@@ -1,15 +1,8 @@
 @php
     $count = getWritingCounter($writing);
-
-    if (auth()->check()) {
-        $userId = auth()->user()->id;
-        $voted = App\Models\Vote::where('user_id', $userId)
-            ->where('writing_id', $writing->id)
-            ->value('vote');
-        $shelved = App\Models\Shelf::where('user_id', $userId)
-            ->where('writing_id', $writing->id)
-            ->value('writing_id');
-    }
+    $liked = isWritingLiked($writing);
+    $shelved = isWritingShelved($writing);
+    $userId = auth()->check() ? auth()->user()->id : null;
 @endphp
 
 <div class="d-flex stats writing-stats">
@@ -21,11 +14,11 @@
         </span>
     @endif
 
-    <span class="badge flex-fill click like @if (isset($voted) && $voted > 0) {{ 'voted' }} @endif"
+    <span @class(['badge', 'flex-fill', 'click', 'likeable', 'liked' => $liked > 0])
         title="{{ __(':count Likes', ['count' => $count['likes']['counter']]) }}"
-        @if (auth()->check() && empty($vote)) data-wh-target="{{ route('votes.store') }}"
-        data-wh-id="{{ $writing->id }}"
-        data-wh-value="1" @endif>
+        data-wh-target-guest="{{ route('socialite') }}"
+        data-wh-target-store="{{ route('likes.store', ['type' => 'writing', 'id' => $writing->id]) }}"
+        data-wh-target-delete="{{ route('likes.destroy', ['type' => 'writing', 'id' => $writing->id]) }}">
         <i class="fa fa-heart" aria-hidden="true"></i>
         <span class="counter">{{ $count['likes']['readable'] }}</span>
     </span>
@@ -40,11 +33,15 @@
         <span class="counter">{{ $count['views']['readable'] }}</span>
     </span>
 
-    <span
-        class="badge flex-fill @if (isset($userId) && $userId !== $writing->author->id) {{ 'click shelf' }} @endif @if (isset($shelved) && $shelved === $writing->id) {{ 'shelved' }} @endif"
-        title="{{ __(':count Shelved', ['count' => $count['shelf']['counter']]) }}"
-        @if (auth()->check()) data-wh-target="{{ route('shelves.store') }}"
-        data-wh-id="{{ $writing->id }}" @endif>
+    <span @class([
+            'badge',
+            'flex-fill',
+            'click shelf' => auth()->guest() || (isset($userId) && $userId !== $writing->author->id),
+            'shelved' => $shelved > 0])
+        data-wh-target-guest="{{ route('socialite') }}"
+        data-wh-target-store="{{ route('shelves.store', $writing) }}"
+        data-wh-target-delete="{{ route('shelves.destroy', $writing) }}"
+        title="{{ __(':count Shelved', ['count' => $count['shelf']['counter']]) }}">
         <i class="fa fa-bookmark" aria-hidden="true"></i>
         <span class="counter">{{ $count['shelf']['readable'] }}</span>
     </span>

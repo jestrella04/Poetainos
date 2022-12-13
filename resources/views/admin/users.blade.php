@@ -70,7 +70,7 @@
                                     <a href="#delete-modal"
                                         class="admin-content-delete btn"
                                         data-wh-target="{{ route('admin.users.destroy', $user) }}"
-                                        data-wh-warning="{{ __('Deleting a user will also delete all writings, votes, shelf, comments and replies tied to that user') }}.">
+                                        data-wh-warning="{{ __('Deleting a user will also delete all writings, likes, shelf, comments and replies tied to that user') }}.">
                                         <i class="fas fa-fw fa-trash" aria-hidden="true"></i>
                                     </a>
                                 </td>

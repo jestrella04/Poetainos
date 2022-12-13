@@ -74,6 +74,12 @@
                 }
 
                 .buttons {
+                    .likeable:hover, .liked {
+                        i {
+                            color: $danger !important;
+                        }
+                    }
+
                     .badge-reply {
                         cursor: pointer;
                     }

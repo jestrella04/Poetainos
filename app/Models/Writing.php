@@ -71,9 +71,9 @@ class Writing extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function votes()
+    public function likes()
     {
-        return $this->hasMany(Vote::class);
+        return $this->morphMany(Like::class, 'likeable');
     }
 
     public function tags()
@@ -122,28 +122,28 @@ class Writing extends Model
         $auraHome = getSiteConfig('aura.min_at_home');
 
         // Count user content
-        $upvotes = $this->votes->where('vote', '>', 0)->count();
-        $downvotes = $this->votes->where('vote', 0)->count();
+        $uplikes = $this->likes->where('like', '>', 0)->count();
+        $downlikes = $this->likes->where('like', 0)->count();
         $replies = Reply::whereIn('comment_id', Comment::where('writing_id', $this->id)->pluck('id')->toArray())->count();
         $comments = $this->comments->count() + $replies;
         $shelf = $this->shelf->count();
         $views = $this->views;
 
         // Get points from settings
-        $pointsUpvotes = getSiteConfig('aura.points.writing.upvote');
-        $pointsDownvotes = getSiteConfig('aura.points.writing.downvote');
+        $pointsUplikes = getSiteConfig('aura.points.writing.uplike');
+        $pointsDownlikes = getSiteConfig('aura.points.writing.downlike');
         $pointsComments = getSiteConfig('aura.points.writing.comment');
         $pointsShelf = getSiteConfig('aura.points.writing.shelf');
         $pointsViews = getSiteConfig('aura.points.writing.views');
-        $basePoints = $pointsUpvotes + $pointsDownvotes + $pointsComments + $pointsShelf + $pointsViews;
+        $basePoints = $pointsUplikes + $pointsDownlikes + $pointsComments + $pointsShelf + $pointsViews;
 
         // Calculate points as per settings
-        $pointsUpvotes = $pointsUpvotes * $upvotes;
-        $pointsDownvotes = $pointsDownvotes * $downvotes;
+        $pointsUplikes = $pointsUplikes * $uplikes;
+        $pointsDownlikes = $pointsDownlikes * $downlikes;
         $pointsComments = $pointsComments * $comments;
         $pointsShelf = $pointsShelf * $shelf;
         $pointsViews = $pointsViews * $views;
-        $totalPoints = $pointsUpvotes + $pointsDownvotes + $pointsComments + $pointsShelf + $pointsViews;
+        $totalPoints = $pointsUplikes + $pointsDownlikes + $pointsComments + $pointsShelf + $pointsViews;
 
         // Do the math
         $auraNew = ($totalPoints / $basePoints) * (1 + ($basePoints / 100));
@@ -189,7 +189,7 @@ class Writing extends Model
 
     public function likers()
     {
-        $likers = $this->votes()->where('vote', '>', 0)->pluck('user_id');
+        $likers = $this->likes()->pluck('user_id');
         return User::whereIn('id', $likers);
     }
 

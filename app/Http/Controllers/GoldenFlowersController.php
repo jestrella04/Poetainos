@@ -25,8 +25,8 @@ class GoldenFlowersController extends Controller
             ->orderBy('views', 'desc')
             ->simplePaginate($this->pagination);
         } elseif ('likes' === $sort) {
-            $writings = Writing::withCount('votes')
-            ->orderBy('votes_count', 'desc')
+            $writings = Writing::withCount('likes')
+            ->orderBy('likes_count', 'desc')
             ->simplePaginate($this->pagination);
         }
 

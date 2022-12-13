@@ -144,8 +144,8 @@ hr {
         cursor: pointer !important;
     }
 
-    .badge.like:hover,
-    .voted {
+    .likeable:hover,
+    .liked {
         i {
             color: $danger !important;
         }
@@ -393,6 +393,12 @@ pwa-update::part(offlineToast) {
             background-color: $gray-300 !important;
         }
     }
+}
+
+.btn-xs {
+    --bs-btn-padding-y: .15rem;
+    --bs-btn-padding-x: .35rem;
+    --bs-btn-font-size: .75rem;
 }
 
 .btn-fixed-br {

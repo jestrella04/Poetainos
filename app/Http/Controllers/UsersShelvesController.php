@@ -37,8 +37,8 @@ class UsersShelvesController extends Controller
             ->simplePaginate($this->pagination);
         } elseif ('likes' === $sort) {
             $writings = $user->shelf()
-            ->withCount('votes')
-            ->orderBy('votes_count', 'desc')
+            ->withCount('likes')
+            ->orderBy('likes_count', 'desc')
             ->simplePaginate($this->pagination);
         }
 

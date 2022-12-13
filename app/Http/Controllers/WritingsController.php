@@ -6,7 +6,7 @@ use App\Models\Category;
 use App\Notifications\WritingPublished;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\Vote;
+use App\Models\Like;
 use App\Models\Writing;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
@@ -39,8 +39,8 @@ class WritingsController extends Controller
             ->simplePaginate($this->pagination);
         } elseif ('likes' === $sort) {
             $writings = Writing::whereNotIn('user_id', $filter)
-            ->withCount('votes')
-            ->orderBy('votes_count', 'desc')
+            ->withCount('likes')
+            ->orderBy('likes_count', 'desc')
             ->simplePaginate($this->pagination);
         }
 
@@ -256,11 +256,11 @@ class WritingsController extends Controller
             // Share on social media
             $writing->author->notify(new WritingPublished($writing));
 
-            // Add a vote automatically from the poster
-            Vote::create([
+            // Add a like automatically from the poster
+            Like::create([
                 'writing_id' => $writing->id,
                 'user_id' => $writing->author->id,
-                'vote' => 1,
+                'like' => 1,
             ]);
         }
 

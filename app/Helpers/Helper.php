@@ -2,9 +2,13 @@
 
 use App\Models\Comment;
 use App\Models\User;
+use App\Models\Writing;
+use App\Models\Shelf;
+use App\Models\Like;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 function getSiteConfig($path = '')
 {
@@ -99,24 +103,22 @@ function getReadableNumber($number)
 
 function getWritingCounter($writing)
 {
-    $commentsCount = $writing->comments->count();
-
     return [
         'likes' => [
-            'counter' => $writing->votes->where('vote', '>', 0)->count(),
-            'readable' => getReadableNumber($writing->votes->where('vote', '>', 0)->count()),
+            'counter' => $writing->likes()->count(),
+            'readable' => getReadableNumber($writing->likes()->count()),
         ],
         'comments' => [
-            'counter' => $commentsCount,
-            'readable' => getReadableNumber($commentsCount),
+            'counter' => $writing->comments()->count(),
+            'readable' => getReadableNumber($writing->comments()->count()),
         ],
         'views' => [
             'counter' => $writing->views,
             'readable' => getReadableNumber($writing->views),
         ],
         'shelf' => [
-            'counter' => $writing->shelf->count(),
-            'readable' => getReadableNumber($writing->shelf->count()),
+            'counter' => $writing->shelf()->count(),
+            'readable' => getReadableNumber($writing->shelf()->count()),
         ],
         'aura' => [
             'counter' => $writing->aura,
@@ -127,8 +129,6 @@ function getWritingCounter($writing)
 
 function getUserCounter($user)
 {
-    $commentsCount = $user->comments()->count() + $user->replies()->count();
-
     return [
         'writings' => [
             'counter' => $user->writings()->count(),
@@ -139,12 +139,12 @@ function getUserCounter($user)
             'readable' => getReadableNumber($user->writings()->whereNotNull('home_posted_at')->count()),
         ],
         'comments' => [
-            'counter' => $commentsCount,
-            'readable' => getReadableNumber($commentsCount),
+            'counter' => $user->comments()->count(),
+            'readable' => getReadableNumber($user->comments()->count()),
         ],
-        'votes' => [
-            'counter' => $user->votes()->count(),
-            'readable' => getReadableNumber($user->votes()->count()),
+        'likes' => [
+            'counter' => $user->likes()->count(),
+            'readable' => getReadableNumber($user->likes()->count()),
         ],
         'views' => [
             'counter' => $user->profile_views,
@@ -248,7 +248,7 @@ function linkify($string)
         $emailPattern = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
         $isEmail = preg_match($emailPattern, $matches[0]) ? 'mailto:' : '';
 
-        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="'. $isEmail . $matches[0] . '">' . cropify($matches[0]) . '</a>';
+        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="' . $isEmail . $matches[0] . '">' . cropify($matches[0]) . '</a>';
     }, $string);
 
     // Check for @mentions
@@ -257,7 +257,7 @@ function linkify($string)
         $user = User::where('username', '=', substr($matches[0], 1))->first();
 
         if (null !== $user) {
-            return '<a href="'.$user->path().'" title="' . $user->getName() . '">@' . $user->username  . '</a>';
+            return '<a href="' . $user->path() . '" title="' . $user->getName() . '">@' . $user->username  . '</a>';
         }
 
         return $matches[0];
@@ -376,5 +376,64 @@ function shareLinks($title, $url)
             'class' => 'share-link copy-to-clipboard-link',
             'icon' => 'far fa-fw fa-clone',
         ],
+    ];
+}
+
+function isWritingLiked(Writing $writing)
+{
+    if (auth()->check()) {
+        $liked = Like::where('user_id', auth()->user()->id)
+            ->whereHasMorph('likeable', [Writing::class], function (Builder $query) use ($writing) {
+                $query->where('id', $writing->id);
+            })->count();
+
+        if ($liked > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function isCommentLiked(Comment $comment)
+{
+    if (auth()->check()) {
+        $liked = Like::where('user_id', auth()->user()->id)
+            ->whereHasMorph('likeable', [Comment::class], function (Builder $query) use ($comment) {
+                $query->where('id', $comment->id);
+            })->count();
+
+        if ($liked > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function isWritingShelved(Writing $writing)
+{
+    if (auth()->check()) {
+        $shelved = Shelf::where('user_id', auth()->user()->id)
+            ->where('writing_id', $writing->id)
+            ->count();
+
+        if ($shelved > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function getCommentLikeCounter(Comment $comment)
+{
+    $count = Like::whereHasMorph('likeable', [Comment::class], function (Builder $query) use ($comment) {
+        $query->where('id', $comment->id);
+    })->count();
+
+    return [
+        'counter' => $count,
+        'readable' => getReadableNumber($count),
     ];
 }
