@@ -9,7 +9,7 @@ use App\Models\Page;
 use App\Models\Setting;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\Vote;
+use App\Models\Like;
 use App\Models\Writing;
 
 class AdminController extends Controller
@@ -45,7 +45,7 @@ class AdminController extends Controller
                 ],
                 'likes' => [
                     'title' => __('Likes'),
-                    'count' => Vote::all()->count(),
+                    'count' => Like::all()->count(),
                 ],
             ],
             'params' => $params,

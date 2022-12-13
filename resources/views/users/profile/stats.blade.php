@@ -32,11 +32,11 @@
 
     <span
         class="badge flex-fill"
-        title="{{ __(':count Likes', ['count' => $count['votes']['counter']]) }}"
+        title="{{ __(':count Likes', ['count' => $count['likes']['counter']]) }}"
         data-bs-toggle="tooltip"
         data-bs-placement="top">
         <i class="fas fa-heart" aria-hidden="true"></i>
-        <span class="counter">{{ $count['votes']['readable'] }}</span>
+        <span class="counter">{{ $count['likes']['readable'] }}</span>
     </span>
 
     <span

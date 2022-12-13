@@ -29,4 +29,9 @@ class Comment extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
 }

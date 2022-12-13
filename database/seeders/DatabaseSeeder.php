@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
 
         factory(App\Models\User::class, $count)->create()->each(function ($user) {
             $user->writings()->save(factory(App\Models\Writing::class)->make());
-            $user->votes()->save(factory(App\Models\Vote::class)->make());
+            $user->likes()->save(factory(App\Models\Like::class)->make());
             $user->comments()->save(factory(App\Models\Comment::class)->make());
         });
 

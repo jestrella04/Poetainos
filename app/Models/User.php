@@ -154,9 +154,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Reply::class);
     }
 
-    public function votes()
+    public function likes()
     {
-        return $this->hasMany(Vote::class);
+        return $this->hasMany(Like::class);
     }
 
     public function incrementViews()
@@ -168,7 +168,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         // Count user content
         $writings = $this->writings->count();
-        $votes = $this->votes->count();
+        $likes = $this->likes->count();
         $comments = $this->comments->count() + $this->replies->count();
         $shelf = $this->shelf->count();
         $views = $this->profile_views;
@@ -177,23 +177,23 @@ class User extends Authenticatable implements MustVerifyEmail
 
         // Get points from settings
         $pointsWritings = getSiteConfig('aura.points.user.writing');
-        $pointsVotes = getSiteConfig('aura.points.user.vote');
+        $pointsLikes = getSiteConfig('aura.points.user.like');
         $pointsComments = getSiteConfig('aura.points.user.comment');
         $pointsShelf = getSiteConfig('aura.points.user.shelf');
         $pointsViews = getSiteConfig('aura.points.user.views');
         $pointsHood = getSiteConfig('aura.points.user.hood');
         $pointsExtendedHood = getSiteConfig('aura.points.user.extended_hood');
-        $basePoints = $pointsWritings + $pointsVotes + $pointsComments + $pointsShelf + $pointsViews + $pointsHood + $pointsExtendedHood;
+        $basePoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsHood + $pointsExtendedHood;
 
         // Calculate points as per settings
         $pointsWritings = $pointsWritings * $writings;
-        $pointsVotes = $pointsVotes * $votes;
+        $pointsLikes = $pointsLikes * $likes;
         $pointsComments = $pointsComments * $comments;
         $pointsShelf = $pointsShelf * $shelf;
         $pointsViews = $pointsViews * $views;
         $pointsHood = $pointsHood * $hood;
         $pointsExtendedHood = $pointsExtendedHood * $extendedHood;
-        $totalPoints = $pointsWritings + $pointsVotes + $pointsComments + $pointsShelf + $pointsViews + $pointsHood + $pointsExtendedHood;
+        $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsHood + $pointsExtendedHood;
 
         // Do the math
         $aura = ($totalPoints / $basePoints) * (1 + ($basePoints / 100));

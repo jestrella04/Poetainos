@@ -75,7 +75,7 @@ class SocialAuthController extends Controller
         } else {
             $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
             $message .= __('You have now unlocked full access to the site.');
-            $message .= __('Go ahead and vote, comment, reply, find the muses and publish your writings.');
+            $message .= __('Go ahead and like, comment, reply, find the muses and publish your writings.');
         }
 
         // Set flash message

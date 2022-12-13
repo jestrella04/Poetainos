@@ -178,7 +178,7 @@
                     class="user-content-delete btn btn-link btn-sm text-danger"
                     data-wh-target="{{ route('writings.destroy', $writing) }}"
                     data-wh-redirect="{{ route('home') }}"
-                    data-wh-warning="{{ __('Deleting a writing will also delete all votes, shelves, comments and replies tied to that writing') }}.">
+                    data-wh-warning="{{ __('Deleting a writing will also delete all likes, shelves, comments and replies tied to that writing') }}.">
                     {{ __('Delete this writing?') }}
                 </a>
             </div>

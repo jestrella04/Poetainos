@@ -1,3 +1,8 @@
+@php
+    $count = getCommentLikeCounter($comment);
+    $liked = isCommentLiked($comment);
+@endphp
+
 <div id="comment-{{ $comment->id }}" class="d-flex comment">
     <div class="flex-shrink-0">
         <a href="{{ $comment->author->path() }}">
@@ -24,18 +29,21 @@
             </div>
         </div>
 
-        <div class="message">
+        <div class="message smaller">
             {!! linkify($comment->message) !!}
         </div>
 
-        <div class="buttons d-flex justify-content-between">
-            {{-- <button type="button" class="btn btn-light">
+        <div class="buttons d-flex justify-content-between stats">
+            <span @class(['btn', 'btn-light', 'btn-xs', 'likeable', 'liked' => $liked > 0])
+                data-wh-target-guest="{{ route('socialite') }}"
+                data-wh-target-store="{{ route('likes.store', ['type' => 'comment', 'id' => $comment->id]) }}"
+                data-wh-target-delete="{{ route('likes.destroy', ['type' => 'comment', 'id' => $comment->id]) }}">
                 <i class="fas fa-heart" aria-hidden="true"></i>
-                0
-            </button> --}}
+                <span class="counter">{{ $count['readable'] }}</span>
+            </span>
 
             @auth
-                <span class="badge bg-primary badge-reply" data-wh-target="#reply-form-{{ $comment->id }}">
+                <span class="btn btn-light btn-xs badge-reply" data-wh-target="#reply-form-{{ $comment->id }}">
                     <i class="fas fa-reply" aria-hidden="true"></i>
                     {{ __('Reply') }}
                 </span>

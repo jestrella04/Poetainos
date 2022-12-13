@@ -55,36 +55,6 @@
                     @enderror
                 </div>
 
-                {{-- <div class="form-check form-switch mb-3">
-                    <input id="service-agreement"
-                        type="checkbox"
-                        class="form-check-input"
-                        name="service_agreement"
-                        required
-                        role="switch">
-
-                    <label class="form-check-label" for="service-agreement">{{ __('I accept the terms of use') }}.</label>
-
-                    <a href="pages/condiciones-de-uso">
-                        <i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>
-                    </a>
-                </div>
-
-                <div class="form-check form-switch mb-3">
-                    <input id="privacy-agreement"
-                        type="checkbox"
-                        class="form-check-input"
-                        name="privacy_agreement"
-                        required
-                        role="switch">
-
-                    <label class="form-check-label" for="privacy-agreement">{{ __('I accept the privacy policy') }}.</label>
-
-                    <a href="pages/politicas-de-privacidad">
-                        <i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>
-                    </a>
-                </div> --}}
-
                 <div class="d-grid gap-2 mb-3">
                     <button type="submit" class="btn btn-lg btn-primary">
                         {{ __('Login') }}

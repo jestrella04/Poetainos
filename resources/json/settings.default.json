@@ -40,13 +40,13 @@
         },
         "points": {
             "writing": {
-                "upvote": {
+                "uplike": {
                     "value": 200,
-                    "description": "How many points a writing will earn every time it gets a new upvote."
+                    "description": "How many points a writing will earn every time it gets a new uplike."
                 },
-                "downvote": {
+                "downlike": {
                     "value": 1,
-                    "description": "How many points a writing will earn every time it gets a new downvote."
+                    "description": "How many points a writing will earn every time it gets a new downlike."
                 },
                 "comment": {
                     "value": 100,
@@ -66,9 +66,9 @@
                     "value": 300,
                     "description": "How many points a user will earn every time he posts a new writing."
                 },
-                "vote": {
+                "like": {
                     "value": 10,
-                    "description": "How many points a user will earn every time he posts a new vote for an existing writing."
+                    "description": "How many points a user will earn every time he posts a new like for an existing writing."
                 },
                 "comment": {
                     "value": 100,

@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let element = event.target;
 
         // Bubble up click event on certain elements
-        let bubble = element.closest('a, label, button, .badge, .avatar-chooser') || false;
+        let bubble = element.closest('a, label, button, .btn, .badge, .avatar-chooser') || false;
 
         if (bubble) {
             element = bubble;
@@ -344,68 +344,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Counters
         if (element.closest('.stats')) {
-            // Liking a writing
-            if (element.matches('.like')) {
+            // Managing likeables
+            if (element.matches('.likeable') || element.matches('.liked')) {
                 event.preventDefault();
 
-                if ('whTarget' in element.dataset && 'whId' in element.dataset && 'whValue' in element.dataset) {
-                    let url = element.dataset.whTarget;
-                    let id = element.dataset.whId;
-                    let value = element.dataset.whValue;
+                if ('whTargetStore' in element.dataset && 'whTargetDelete' in element.dataset) {
+                    let url = element.matches('.liked') ? element.dataset.whTargetDelete : element.dataset.whTargetStore;
+                    let method = element.matches('.liked') ? 'delete' : 'post';
                     let params = new FormData();
+                    let count;
 
-                    params.append('id', id);
-                    params.append('value', value);
+                    params.append('_method', method);
 
                     axios.post(url, params)
                         .then(response => {
-                            let created = response.data.created;
-                            let count = response.data.count;
+                            count = response.data.count;
 
-                            if (created > 0) {
-                                element.classList.add('voted');
-                                element.querySelector('.counter').textContent = count;
+                            if ('post' == method) {
+                                element.classList.add('liked');
+                            } else {
+                                element.classList.remove('liked');
                             }
                         })
                         .catch(error => {
-                            //
+                            if (403 === error.response.status) {
+                                location.href = element.dataset.whTargetGuest;
+                            }
                         })
                         .then(() => {
-                            fx.animateCSS(element.querySelector('i'), 'heartBeat');
-                            fx.animateCSS(element.querySelector('.counter'), 'fadeIn');
+                            if (! fx.isNilOrEmpty(count)) {
+                                element.querySelector('.counter').textContent = count;
+                                fx.animateCSS(element.querySelector('i'), 'heartBeat');
+                                fx.animateCSS(element.querySelector('.counter'), 'fadeIn');
+                            }
                         });
-                } else {
-                    // User is not logged in - login
-                    window.location.href = 'socialite';
                 }
             }
 
-            // Adding to shelf
-            if (element.matches('.shelf')) {
+            // Managing shelf
+            if (element.matches('.shelf') || element.matches('.shelved')) {
                 event.preventDefault();
 
-                if ('whTarget' in element.dataset && 'whId' in element.dataset) {
-                    let url = element.dataset.whTarget;
-                    let id = element.dataset.whId;
+                if ('whTargetStore' in element.dataset && 'whTargetDelete' in element.dataset) {
+                    let url = element.matches('.shelved') ? element.dataset.whTargetDelete : element.dataset.whTargetStore;
+                    let method = element.matches('.shelved') ? 'delete' : 'post';
                     let params = new FormData();
+                    let count;
 
-                    params.append('id', id);
+                    params.append('_method', method);
 
                     axios.post(url, params)
                         .then(response => {
-                            let count = response.data.count;
+                            count = response.data.count;
 
-                            if (count > 0) {
+                            if ('post' == method) {
                                 element.classList.add('shelved');
-                                element.querySelector('.counter').textContent = count;
+                            } else {
+                                element.classList.remove('shelved');
                             }
                         })
                         .catch(error => {
-                            //
+                            if (403 === error.response.status) {
+                                location.href = element.dataset.whTargetGuest;
+                            }
                         })
                         .then(() => {
-                            fx.animateCSS(element.querySelector('i'), 'heartBeat');
-                            fx.animateCSS(element.querySelector('.counter'), 'fadeIn');
+                            if (! fx.isNilOrEmpty(count)) {
+                                element.querySelector('.counter').textContent = count;
+                                fx.animateCSS(element.querySelector('i'), 'heartBeat');
+                                fx.animateCSS(element.querySelector('.counter'), 'fadeIn');
+                            }
                         });
                 }
             }

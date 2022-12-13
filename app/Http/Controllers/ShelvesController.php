@@ -16,35 +16,46 @@ class ShelvesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Writing $writing)
     {
-        request()->validate([
-            'id' => 'required|integer|exists:writings,id',
-        ]);
-
-        $writingId = request('id');
         $userId = auth()->user()->id;
 
         // Check existence
-        $old = Shelf::where('user_id', $userId)->where('writing_id', $writingId)->count();
+        $old = Shelf::where('user_id', $userId)->where('writing_id', $writing->id)->count();
 
         if (0 === $old) {
             Shelf::create([
-                'writing_id' => $writingId,
+                'writing_id' => $writing->id,
                 'user_id' => $userId,
             ]);
 
             // Update aura
             User::find($userId)->updateAura();
-            Writing::find($writingId)->updateAura();
+            Writing::find($writing->id)->updateAura();
 
             // Notify author
-            if (! Writing::find($writingId)->author->is(auth()->user())) {
-                Writing::find($writingId)->author->notify(new WritingShelved(Writing::find($writingId), auth()->user()));
+            if (! Writing::find($writing->id)->author->is(auth()->user())) {
+                Writing::find($writing->id)->author->notify(new WritingShelved(Writing::find($writing->id), auth()->user()));
             }
         }
 
-        $count = ReadableHumanNumber(Shelf::where('writing_id', $writingId)->count());
+        $count = ReadableHumanNumber(Shelf::where('writing_id', $writing->id)->count());
+
+        return [
+            'count' => $count,
+        ];
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Writing  $writing
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Writing $writing)
+    {
+        User::find(auth()->user()->id)->shelf()->detach($writing->id);
+        $count = ReadableHumanNumber(Shelf::where('writing_id', $writing->id)->count());
 
         return [
             'count' => $count,

@@ -63,9 +63,13 @@ Route::middleware(['verified'])->group(function () {
     Route::post('/comments/create', 'App\Http\Controllers\CommentsController@store')->name('comments.store');
     Route::delete('/comments/delete/{comment}', 'App\Http\Controllers\CommentsController@destroy')->name('comments.destroy');
 
+    // Likes
+    Route::post('/likes/{type}/{id}/store', 'App\Http\Controllers\LikesController@store')->name('likes.store');
+    Route::delete('/likes/{type}/{id}/delete', 'App\Http\Controllers\LikesController@destroy')->name('likes.destroy');
+
     // Other user tasks
-    Route::post('/votes/store', 'App\Http\Controllers\VotesController@store')->name('votes.store');
-    Route::post('/shelves/store', 'App\Http\Controllers\ShelvesController@store')->name('shelves.store');
+    Route::post('/shelves/{writing}/store', 'App\Http\Controllers\ShelvesController@store')->name('shelves.store');
+    Route::delete('/shelves/{writing}/delete', 'App\Http\Controllers\ShelvesController@destroy')->name('shelves.destroy');
     Route::post('/hoods/store', 'App\Http\Controllers\HoodsController@store')->name('hoods.store');
 
     // Notifications
@@ -98,6 +102,7 @@ Route::get('/offline', 'App\Http\Controllers\HomeController@offline')->name('off
 Route::get('/search', 'App\Http\Controllers\SearchController@show')->name('search');
 Route::get('/explore','App\Http\Controllers\HomeController@explore')->name('explore');
 Route::get('/socialite','App\Http\Controllers\HomeController@socialite')->name('socialite')->middleware('guest');
+Route::get('/sharer', 'App\Http\Controllers\HomeController@sharer')->name('sharer');
 
 // Writings
 Route::get('/', 'App\Http\Controllers\WritingsController@index')->name('home');
@@ -139,6 +144,3 @@ Route::redirect('/writings', '/');
 // Complaints
 Route::get('/complaints/{type}/{id}/create', 'App\Http\Controllers\ComplaintsController@create')->name('complaints.create');
 Route::post('/complaints/store', 'App\Http\Controllers\ComplaintsController@store')->name('complaints.store');
-
-// Sharer
-Route::get('/sharer', 'App\Http\Controllers\HomeController@sharer')->name('sharer');

@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Models\Comment;
 use App\Models\User;
+use App\Models\Comment;
 use App\Events\NotificationEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,7 +13,7 @@ use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
 use Illuminate\Support\Facades\Vite;
 
-class WritingCommentMentioned extends Notification implements ShouldQueue
+class CommentLiked extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -36,12 +36,12 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
                 'site' => getSiteConfig('name')
             ]),
             'greeting' => __('Hello!'),
-            'body' => __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', [
+            'body' => __('Isn\'t it amazing?, :name likes your comment at :site.', [
                 'name' => $this->user->getName(),
                 'site' => getSiteConfig('name')
             ]),
             'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('writings.show', $this->comment->writing) . '#comment-' . $this->comment->id,
+            'url' => route('comments.show', $this->comment),
             'action' => __('View comment'),
             'icon' => Vite::asset('resources/images/logo-192.png'),
             'tag' => getSiteConfig('name'),
@@ -56,7 +56,7 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', 'broadcast', WebPushChannel::class];
+        return ['database', 'broadcast', WebPushChannel::class];
     }
 
     /**
@@ -68,11 +68,9 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject($this->notification['title'])
-            ->greeting($this->notification['greeting'])
-            ->line($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->line($this->notification['footer']);
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -121,9 +119,8 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'writing_id' => $this->comment->writing->id,
+            'comment_id' => $this->comment->id,
             'user_id' => $this->user->id,
-            'url' => $this->notification['url']
         ];
     }
 }
