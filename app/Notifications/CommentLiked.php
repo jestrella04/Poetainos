@@ -41,7 +41,7 @@ class CommentLiked extends Notification implements ShouldQueue
                 'site' => getSiteConfig('name')
             ]),
             'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('comments.show', $this->comment),
+            'url' => $this->comment->writing->path(),
             'action' => __('View comment'),
             'icon' => Vite::asset('resources/images/logo-192.png'),
             'tag' => getSiteConfig('name'),
