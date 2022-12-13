@@ -14,12 +14,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::rename('votes', 'likes');
+        /* Schema::rename('votes', 'likes');
         Schema::table('likes', function (Blueprint $table) {
             $table->string("likeable_type")->after('id');
             $table->unsignedInteger("likeable_id")->after('likeable_type');
             $table->index(["likeable_type", "likeable_id"]);
-        });
+        }); */
 
         DB::table('likes')->update(['likeable_type' => 'App\Models\Writing']);
         DB::statement('UPDATE `likes` SET `likeable_id` = `writing_id`');
