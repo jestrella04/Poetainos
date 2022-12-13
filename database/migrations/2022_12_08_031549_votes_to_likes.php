@@ -19,8 +19,6 @@ return new class extends Migration
             $table->string("likeable_type")->after('id');
             $table->unsignedInteger("likeable_id")->after('likeable_type');
             $table->index(["likeable_type", "likeable_id"]);
-
-            $table->unique(['likeable_type', 'likeable_id', 'user_id']);
         });
 
         DB::table('likes')->update(['likeable_type' => 'App\Models\Writing']);
@@ -28,6 +26,10 @@ return new class extends Migration
         DB::statement('ALTER TABLE `likes` DROP FOREIGN KEY `votes_writing_id_foreign`');
         DB::statement('ALTER TABLE `likes` DROP INDEX `votes_writing_id_user_id_unique`');
         DB::statement('ALTER TABLE `likes` DROP COLUMN `writing_id`');
+
+        Schema::table('likes', function (Blueprint $table) {
+            $table->unique(['likeable_type', 'likeable_id', 'user_id']);
+        });
     }
 
     /**
