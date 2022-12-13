@@ -118,32 +118,28 @@ class Writing extends Model
         // Get the old aura
         $auraOld = $this->aura;
 
-        // What's the minimun to be featured at home?
+        // What's the minimum to be featured at home?
         $auraHome = getSiteConfig('aura.min_at_home');
 
         // Count user content
-        $uplikes = $this->likes->where('like', '>', 0)->count();
-        $downlikes = $this->likes->where('like', 0)->count();
-        $replies = Reply::whereIn('comment_id', Comment::where('writing_id', $this->id)->pluck('id')->toArray())->count();
-        $comments = $this->comments->count() + $replies;
-        $shelf = $this->shelf->count();
+        $likes = $this->likes()->count();
+        $comments = $this->comments()->count();
+        $shelf = $this->shelf()->count();
         $views = $this->views;
 
         // Get points from settings
-        $pointsUplikes = getSiteConfig('aura.points.writing.uplike');
-        $pointsDownlikes = getSiteConfig('aura.points.writing.downlike');
+        $pointsLikes = getSiteConfig('aura.points.writing.upvote');
         $pointsComments = getSiteConfig('aura.points.writing.comment');
         $pointsShelf = getSiteConfig('aura.points.writing.shelf');
         $pointsViews = getSiteConfig('aura.points.writing.views');
-        $basePoints = $pointsUplikes + $pointsDownlikes + $pointsComments + $pointsShelf + $pointsViews;
+        $basePoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
 
         // Calculate points as per settings
-        $pointsUplikes = $pointsUplikes * $uplikes;
-        $pointsDownlikes = $pointsDownlikes * $downlikes;
+        $pointsLikes = $pointsLikes * $likes;
         $pointsComments = $pointsComments * $comments;
         $pointsShelf = $pointsShelf * $shelf;
         $pointsViews = $pointsViews * $views;
-        $totalPoints = $pointsUplikes + $pointsDownlikes + $pointsComments + $pointsShelf + $pointsViews;
+        $totalPoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
 
         // Do the math
         $auraNew = ($totalPoints / $basePoints) * (1 + ($basePoints / 100));

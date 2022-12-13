@@ -264,7 +264,7 @@ class WritingsController extends Controller
             ]);
         }
 
-        // Apend link
+        // Append link
         $message .= ' <a href="{url}">' . __('Take a look for yourself') . '</a>';
 
         // Set response data
