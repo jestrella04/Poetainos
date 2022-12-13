@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             let targetForm = document.querySelector(element.dataset.whTarget);
-            targetForm.classList.remove('d-none');
+            targetForm.classList.toggle('d-none');
             targetForm.querySelector('.form-control').focus();
         }
 
