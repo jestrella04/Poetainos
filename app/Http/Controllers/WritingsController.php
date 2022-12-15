@@ -257,11 +257,11 @@ class WritingsController extends Controller
             $writing->author->notify(new WritingPublished($writing));
 
             // Add a like automatically from the poster
-            Like::create([
-                'writing_id' => $writing->id,
-                'user_id' => $writing->author->id,
-                'like' => 1,
-            ]);
+            $like = new Like;
+            $like->user_id = auth()->user()->id;
+            $like->vote = 1;
+            $like->likeable()->associate(Writing::find($writing->id));
+            $like->save();
         }
 
         // Append link
