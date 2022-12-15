@@ -11,6 +11,8 @@ use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\FacebookPoster\FacebookPosterChannel;
+use NotificationChannels\FacebookPoster\FacebookPosterPost;
 use Illuminate\Support\Facades\Vite;
 
 class WritingFeatured extends Notification implements ShouldQueue
@@ -35,7 +37,7 @@ class WritingFeatured extends Notification implements ShouldQueue
                 'title' => $this->writing->title,
                 'site' => getSiteConfig('name'),
             ]),
-            'body_twitter' => [
+            'body_social' => [
                 __('":title" by :author has been awarded with a #GoldenFlower.', [
                     'title' => $this->writing->title,
                     'author' => $this->writing->author->getTwitterUsername()
@@ -44,7 +46,7 @@ class WritingFeatured extends Notification implements ShouldQueue
                 $this->writing->path(),
             ],
             'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('writings.show', $this->writing),
+            'url' => $this->writing->path(),
             'action' => __('View writing'),
             'icon' => Vite::asset('resources/images/logo-192.png'),
             'tag' => getSiteConfig('name'),
@@ -59,7 +61,7 @@ class WritingFeatured extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database', TwitterChannel::class, WebPushChannel::class];
+        return ['mail', 'database', TwitterChannel::class, FacebookPosterChannel::class, WebPushChannel::class];
     }
 
     /**
@@ -80,9 +82,18 @@ class WritingFeatured extends Notification implements ShouldQueue
 
     public function toTwitter($notifiable)
     {
-        $msg = implode(' ', $this->notification['body_twitter']);
+        $msg = implode(' ', $this->notification['body_social']);
+        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $msg);
+        $msg = $msg . ' ' . $this->notification['url'];
 
         return new TwitterStatusUpdate($msg);
+    }
+
+    public function toFacebookPoster($notifiable) {
+        $msg = implode(' ', $this->notification['body_social']);
+        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $msg);
+
+        return (new FacebookPosterPost($msg))->withLink($this->notification['url']);
     }
 
     /**

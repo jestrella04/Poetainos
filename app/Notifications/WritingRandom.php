@@ -9,10 +9,16 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
+use NotificationChannels\FacebookPoster\FacebookPosterChannel;
+use NotificationChannels\FacebookPoster\FacebookPosterPost;
 
 class WritingRandom extends Notification
 {
     use Queueable;
+
+    protected $writing;
+    protected $msg;
+    protected $url;
 
     /**
      * Create a new notification instance.
@@ -22,6 +28,11 @@ class WritingRandom extends Notification
     public function __construct(Writing $writing)
     {
         $this->writing = $writing;
+        $this->msg = __('":title" by :author has just been published on our site.', [
+            'title' => $this->writing->title,
+        ]);
+        $this->msg = $this->msg . ' ' . __('Go read it, what are you waiting for? #poetry');
+        $this->url = $this->writing->path();
     }
 
     /**
@@ -32,7 +43,7 @@ class WritingRandom extends Notification
      */
     public function via($notifiable)
     {
-        return [TwitterChannel::class];
+        return [TwitterChannel::class, FacebookPosterChannel::class];
     }
 
     /**
@@ -64,14 +75,12 @@ class WritingRandom extends Notification
 
     public function toTwitter($notifiable)
     {
-        $msg = __('":title" by :author is our #SelectionOfTheDay.', [
-            'title' => $this->writing->title,
-            'author' => $this->writing->author->getTwitterUsername()
-        ]);
-
-        $msg = $msg . ' ' . __('Go read it, what are you waiting for? #poetry');
-        $msg = $msg . ' ' . $this->writing->path();
-
+        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $this->msg) . ' ' . $this->url;
         return new TwitterStatusUpdate($msg);
+    }
+
+    public function toFacebookPoster($notifiable) {
+        $msg = str_replace(':author', $this->writing->author->getName(), $this->msg);
+        return (new FacebookPosterPost($msg))->withLink($this->url);
     }
 }
