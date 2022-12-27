@@ -28,7 +28,7 @@ class WritingRandom extends Notification
     public function __construct(Writing $writing)
     {
         $this->writing = $writing;
-        $this->msg = __('":title" by :author has just been published on our site.', [
+        $this->msg = __('":title" by :author is our #SelectionOfTheDay.', [
             'title' => $this->writing->title,
         ]);
         $this->msg = $this->msg . ' ' . __('Go read it, what are you waiting for? #poetry');
