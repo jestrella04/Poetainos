@@ -40,7 +40,6 @@ class WritingFeatured extends Notification implements ShouldQueue
             'body_social' => [
                 __('":title" by :author has been awarded with a #GoldenFlower.', [
                     'title' => $this->writing->title,
-                    'author' => $this->writing->author->getTwitterUsername()
                 ]),
                 __('You cannot miss this! #poetry'),
                 $this->writing->path(),
@@ -91,7 +90,7 @@ class WritingFeatured extends Notification implements ShouldQueue
 
     public function toFacebookPoster($notifiable) {
         $msg = implode(' ', $this->notification['body_social']);
-        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $msg);
+        $msg = str_replace(':author', $this->writing->author->getName(), $msg);
 
         return (new FacebookPosterPost($msg))->withLink($this->notification['url']);
     }
