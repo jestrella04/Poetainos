@@ -18,7 +18,10 @@
 </a>
 
 @auth
-    <a class="flex-fill position-relative" href="{{ route('notifications.list.unread') }}" title="{{ __('Notifications') }}"
+    <a class="flex-fill position-relative"
+        href="{{ route('notifications.list.unread') }}"
+        rel="nofollow"
+        title="{{ __('Notifications') }}"
         aria-label="{{ __('Notifications') }}">
         <i class="fas fa-bell fa-fw" aria-hidden="true"></i>
 

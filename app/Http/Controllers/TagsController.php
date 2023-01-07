@@ -74,6 +74,7 @@ class TagsController extends Controller
                 $tag->name,
                 __('Tags'),
                 ]),
+            'canonical' => $tag->path(),
         ];
 
         if ('latest' === $sort) {

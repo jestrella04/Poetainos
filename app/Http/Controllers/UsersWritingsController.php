@@ -22,6 +22,7 @@ class UsersWritingsController extends Controller
                 __('Writings'),
                 $user->getName()
                 ]),
+            'canonical' => $user->writingsPath(),
             'empty-head' => __('Where did the muses go?'),
             'empty-msg' => __('So sorry to tell you that :name has not yet published a writing.', ['name' => $user->firstName()]),
         ];

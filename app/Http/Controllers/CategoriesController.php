@@ -56,6 +56,7 @@ class CategoriesController extends Controller
                 $category->name,
                 __('Categories')
                 ]),
+            'canonical' => $category->path(),
             'description' => $category->description,
         ];
 

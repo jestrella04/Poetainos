@@ -2,6 +2,10 @@
 
 @section('meta.title', $params['title'])
 
+@isset($params['canonical'])
+    @section('link.canonical', $params['canonical'])
+@endisset
+
 @isset($user->extra_info['bio'])
     @section('meta.description', $user->extra_info['bio'])
 @endisset

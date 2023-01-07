@@ -46,6 +46,7 @@ class WritingsController extends Controller
 
         $params = [
             'title' => getPageTitle([]),
+            'canonical' => route('home'),
         ];
 
         return view('writings.index', [
@@ -90,6 +91,7 @@ class WritingsController extends Controller
                 $writing->title,
                 $writing->author->getName(),
             ]),
+            'canonical' => $writing->path(),
         ];
 
         // Increment writing views

@@ -25,7 +25,7 @@
                     @foreach (App\Models\Page::all() as $page)
                     <a class="nav-link" href="{{ route('pages.show', $page->slug ) }}">{{ $page->title }}</a>
                     @endforeach
-                    <a class="nav-link" href="{{ route('contact.create') }}">{{ __('Contact us') }}</a>
+                    <a class="nav-link" href="{{ route('contact.create') }}" rel="nofollow">{{ __('Contact us') }}</a>
                 </div>
             </div>
 

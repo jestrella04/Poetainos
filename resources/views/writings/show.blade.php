@@ -2,6 +2,10 @@
 
 @section('meta.title', $params['title'])
 
+@isset($params['canonical'])
+    @section('link.canonical', $params['canonical'])
+@endisset
+
 @isset($writing->tags)
     @section('meta.keywords', $writing->tagsAsString())
 @endisset

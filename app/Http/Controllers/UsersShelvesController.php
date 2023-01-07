@@ -22,6 +22,7 @@ class UsersShelvesController extends Controller
                 __('Shelf'),
                 $user->getName()
                 ]),
+            'canonical' => $user->shelfPath(),
             'empty-head' => __('This shelf is empty'),
             'empty-msg' => __("We're afraid that :name has not added any writings to the shelf yet.", ['name' => $user->firstName()]),
             'empty-icon' => 'user-clock'

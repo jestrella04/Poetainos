@@ -8,10 +8,13 @@
         <meta name="author" content="Jonathan Estrella">
         <meta name="generator" content="Writerhood">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        @if (auth()->user())
+        @if (auth()->check())
         <meta name="user-token" content="{{ base64_encode(auth()->user()->id) }}">
         @endif
         <title>@yield('meta.title')</title>
+        @hasSection('link.canonical')
+        <link rel="canonical" href="@yield('link.canonical')">
+        @endif
         <!-- Preload resources -->
         <link rel="preload" href="{{ Vite::asset('resources/sass/app.scss') }}" as="style">
         <link rel="preload" href="{{ Vite::asset('resources/js/app.js') }}" as="script">
@@ -50,6 +53,7 @@
         <base href="{{ config('app.url') }}">
         <script src="{{ Vite::asset('resources/js/app.js') }}" defer></script>
 
+        <!-- Google Analytics -->
         @if (! empty(config('services.google.analytics_id')))
             @include('partials.analytics')
         @endif

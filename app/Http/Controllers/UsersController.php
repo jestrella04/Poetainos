@@ -19,6 +19,7 @@ class UsersController extends Controller
 
         $params = [
             'title' => getPageTitle([__('Writers')]),
+            'canonical' => route('users.index'),
         ];
 
         if ('latest' === $sort) {
@@ -91,6 +92,7 @@ class UsersController extends Controller
                 $user->getName(),
                 __('Writers'),
                 ]),
+            'canonical' => $user->path(),
         ];
 
         // Increment writing views
