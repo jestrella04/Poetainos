@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="description" content="@yield('meta.description', getSiteConfig('slogan'))">
         <meta name="keywords" content="@yield('meta.keywords', __('writings, poetry, poems, short stories, writers, amateur writers, writerhood, writers hood, poets'))">
         <meta name="author" content="Jonathan Estrella">
