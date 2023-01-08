@@ -36,7 +36,7 @@
         @if (! empty($writing->externalLink()))
             <div class="writing-link">
                 <i class="fa fa-link fa-fw" aria-hidden="true"></i>
-                <a href="{{ $writing->externalLink() }}" class="btn btn-link" target="_blank" rel="noopener">
+                <a href="{{ $writing->externalLink() }}" class="btn btn-link" target="_blank" rel="nofollow noopener">
                     {{ cropify($writing->externalLink()) }}
                 </a>
             </div>

@@ -253,7 +253,7 @@ function linkify($string)
         $emailPattern = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
         $isEmail = preg_match($emailPattern, $matches[0]) ? 'mailto:' : '';
 
-        return '<a href="' . $isEmail . $matches[0] . '" target="_blank" title="' . $isEmail . $matches[0] . '">' . cropify($matches[0]) . '</a>';
+        return '<a href="' . $isEmail . $matches[0] . '" rel="nofollow noopener" target="_blank" title="' . $isEmail . $matches[0] . '">' . cropify($matches[0]) . '</a>';
     }, $string);
 
     // Check for @mentions

@@ -23,7 +23,7 @@
 
         @if (auth()->user()->isAllowed('admin'))
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.index') }}" rel="nofollow">
+                <a class="nav-link" href="{{ route('admin.index') }}" rel="noindex">
                     <i class="fas fa-cogs fa-fw" aria-hidden="true"></i>
                     {{ __('Administration') }}
                 </a>
@@ -63,14 +63,14 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="{{ route('writings.random') }}" rel="nofollow">
+        <a class="nav-link" href="{{ route('writings.random') }}" rel="noindex">
             <i class="fas fa-random fa-fw" aria-hidden="true"></i>
             {{ __('Random') }}
         </a>
     </li>
 
     <li class="nav-item {{ Route::current()->getName() === 'contact.create' ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('contact.create') }}" rel="nofollow">
+        <a class="nav-link" href="{{ route('contact.create') }}" rel="noindex">
             <i class="fas fa-envelope fa-fw" aria-hidden="true"></i>
             {{ __('Contact us') }}
         </a>

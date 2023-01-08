@@ -14,12 +14,14 @@
     <div class="dropdown-menu">
         <a href="{{ route('sharer', ['title' => $sharer['title'], 'url' => $sharer['url']]) }}"
             class="dropdown-item sharer" data-wh-title="{{ $sharer['title'] }}" data-wh-url="{{ $sharer['url'] }}"
-            rel="nofollow">
+            rel="noindex">
             {{ __('Share profile') }}
         </a>
 
         @can('update', $user)
-            <a href="{{ route('users.edit', $user) }}" class="dropdown-item">
+            <a href="{{ route('users.edit', $user) }}"
+                rel="noindex"
+                class="dropdown-item">
                 {{ __('Update profile') }}
             </a>
         @endcan
@@ -47,13 +49,15 @@
         @endif
 
         <a class="dropdown-item init-complaint"
-            href="{{ route('complaints.create', ['type' => 'users', 'id' => $user->id]) }}" rel="nofollow">
+            href="{{ route('complaints.create', ['type' => 'users', 'id' => $user->id]) }}"
+            rel="noindex">
             {{ __('Report user') }}
         </a>
 
         @if (auth()->check() &&
             !auth()->user()->is($user))
             <a href="{{ route('users.block.confirm', ['user' => $user->username]) }}"
+                rel="noindex"
                 class="dropdown-item init-block-user">
                 {{ __('Block user') }}
             </a>

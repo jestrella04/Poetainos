@@ -21,7 +21,7 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="{{ route('writings.random') }}" rel="nofollow">
+        <a class="nav-link" href="{{ route('writings.random') }}" rel="noindex">
             <i class="fas fa-random fa-fw" aria-hidden="true"></i>
             {{ __('Random') }}
         </a>
@@ -57,7 +57,7 @@
                         <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
                     @endif
 
-                    <a class="dropdown-item" href="{{ route('notifications.list.unread') }}" rel="nofollow">
+                    <a class="dropdown-item" href="{{ route('notifications.list.unread') }}" rel="noindex">
                         {{ __('Notifications') }}
 
                         <span @class([
