@@ -13,7 +13,7 @@
 
     <div class="dropdown-menu">
         <a href="{{ route('sharer', ['title' => $sharer['title'], 'url' => $sharer['url']]) }}"
-            rel="noindex"
+            rel="noindex nofollow"
             class="dropdown-item sharer"
             aria-label="{{ __('Share writing :writing', ['writing' => $writing->title]) }}"
             data-wh-title="{{ $sharer['title'] }}" data-wh-url="{{ $sharer['url'] }}">

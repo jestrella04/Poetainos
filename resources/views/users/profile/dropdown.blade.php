@@ -14,7 +14,7 @@
     <div class="dropdown-menu">
         <a href="{{ route('sharer', ['title' => $sharer['title'], 'url' => $sharer['url']]) }}"
             class="dropdown-item sharer" data-wh-title="{{ $sharer['title'] }}" data-wh-url="{{ $sharer['url'] }}"
-            rel="noindex">
+            rel="noindex nofollow">
             {{ __('Share profile') }}
         </a>
 

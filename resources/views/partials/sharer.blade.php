@@ -14,7 +14,7 @@
                 <div class="social-links d-flex flex-wrap">
                     @foreach (shareLinks($title, $url) as $serviceName => $serviceData)
                         <span class="flex-fill">
-                            <a class="{{ $serviceData['class'] }}" href="{{ $serviceData['url'] }}" rel="noopener"
+                            <a class="{{ $serviceData['class'] }}" href="{{ $serviceData['url'] }}" rel="noindex noopener"
                                 title="{{ ucfirst($serviceName) }}" data-bs-dismiss="modal">
                                 <i class="{{ $serviceData['icon'] }} fa-3x" aria-hidden="true"></i>
                             </a>
