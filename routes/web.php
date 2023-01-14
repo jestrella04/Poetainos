@@ -137,10 +137,10 @@ Route::get('/comments/{writing}', 'App\Http\Controllers\CommentsController@index
 Route::get('/contact', 'App\Http\Controllers\ContactsController@create')->name('contact.create');
 Route::post('/contact', 'App\Http\Controllers\ContactsController@store')->name('contact.store');
 
-// Redirects
-Route::redirect('/home', '/');
-Route::redirect('/writings', '/');
-
 // Complaints
 Route::get('/complaints/{type}/{id}/create', 'App\Http\Controllers\ComplaintsController@create')->name('complaints.create');
 Route::post('/complaints/store', 'App\Http\Controllers\ComplaintsController@store')->name('complaints.store');
+
+// Redirects, keep on the bottom
+Route::redirect('/home', '/', 301);
+Route::redirect('/writings', '/', 301);
