@@ -276,63 +276,37 @@ function linkify($string)
  * https://github.com/williambelle/crop-url
  * Original code licensed under MPL license
  */
-function cropify($url, $length = 40)
+function cropify($url, $maxLength = 40)
 {
-    if (strlen($url) <= $length) {
-        return $url;
-    }
-
     // Remove http:// or https://
     $url = preg_replace('/^https?:\/\//', '', $url);
 
     // Remove www.
     $url = preg_replace('/^www\./', '', $url);
 
-    // Replace /foo/bar/foo/ with /…/…/…/
-    $urlLength = strlen($url);
-
-    while ($urlLength > $length) {
-        $url = preg_replace('/(.*[^\/])\\/[^\/…]+\\/([^\/])/', '$1/…/$2', $url);
-
-        if (strlen($url) === $urlLength) {
-            break;
-        } else {
-            $urlLength = strlen($url);
-        }
-    }
-
-    // Replace /…/…/…/ with /…/
-    $url = preg_replace('/\/…\/(?:…\/)+/', '/…/', $url);
-
     // Replace all params except first
-    while (strlen($url) > $length) {
-        $idx = strrpos($url, '&');
-        if ($idx === -1) {
-            break;
-        }
+    $pos = strrpos($url, '&');
 
-        $url = substr($url, 0, $idx) . '…';
+    if ($pos > -1) {
+        $url = substr($url, 0, $pos) . '…';
     }
 
     // Replace first param
-    if (strlen($url) > $length) {
-        $idx = strrpos($url, '?');
+    $pos = strrpos($url, '?');
 
-        if ($idx !== -1) {
-            $url = substr($url, 0, $idx) . '?…';
-        }
+    if ($pos > -1) {
+        $url = substr($url, 0, $pos) . '?…';
     }
 
-    // Replace endless hyphens
-    while (strlen($url) > $length) {
-        $idx = strrpos($url, '-');
-
-        if ($idx === -1) {
-            break;
-        }
-
-        $url = substr($url, 0, $idx) . '…';
+    if (strlen($url) <= $maxLength) {
+        return $url;
     }
+
+    // Replace /foo/bar/foo/ with /…/…/…/
+    $url = preg_replace('/(.*[^\/])\/[^\/…]+\/([^\/])/', '$1/…/$2', $url);
+
+    // Replace /…/…/…/ with /…/
+    $url = preg_replace('/\/…\/(?:…\/)+/', '/…/', $url);
 
     return $url;
 };
