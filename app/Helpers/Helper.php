@@ -278,37 +278,38 @@ function linkify($string)
  */
 function cropify($url, $maxLength = 40)
 {
-    // Remove http:// or https://
-    $url = preg_replace('/^https?:\/\//', '', $url);
+    // Get URL parts
+    $urlPath = parse_url($url, PHP_URL_PATH);
+    $displayUrl = parse_url($url, PHP_URL_HOST);
+    $displayParts = '';
 
     // Remove www.
-    $url = preg_replace('/^www\./', '', $url);
+    $displayUrl = preg_replace('/^www\./', '', $displayUrl);
 
-    // Replace all params except first
-    $pos = strrpos($url, '&');
+    // Get path parts
+    if (!empty($urlPath)) {
+        $urlParts = explode('/', trim($urlPath, '/'));
 
-    if ($pos > -1) {
-        $url = substr($url, 0, $pos) . '…';
+        if (count($urlParts) === 1) {
+            $displayParts .= $displayParts . $urlPath;
+        } else {
+            for ($i = 0; $i <= count($urlParts); $i++) {
+                if ($i + 1 === count($urlParts) && count($urlParts) > 1) {
+                    $displayParts .= $displayParts . '/…/' . $urlParts[$i];
+                }
+            }
+        }
     }
 
-    // Replace first param
-    $pos = strrpos($url, '?');
-
-    if ($pos > -1) {
-        $url = substr($url, 0, $pos) . '?…';
+    // Check if trimmed URL is now below threshold
+    if (strlen($displayUrl . $displayParts) <= $maxLength) {
+        return $displayUrl . $displayParts;
     }
-
-    if (strlen($url) <= $maxLength) {
-        return $url;
-    }
-
-    // Replace /foo/bar/foo/ with /…/…/…/
-    $url = preg_replace('/(.*[^\/])\/[^\/…]+\/([^\/])/', '$1/…/$2', $url);
 
     // Replace /…/…/…/ with /…/
-    $url = preg_replace('/\/…\/(?:…\/)+/', '/…/', $url);
+    $displayParts = preg_replace('/\/…\/(?:…\/)+/', '/…/', $displayParts);
 
-    return $url;
+    return $displayUrl . $displayParts;
 };
 
 function isTruthy($string)
