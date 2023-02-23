@@ -93,15 +93,19 @@ Route::get('/init/success', 'App\Http\Controllers\InitController@success')->name
 // PWA manifest
 Route::get('/manifest.json', 'App\Http\Controllers\ResourcesController@pwaManifest')->name('pwa.manifest');
 
-// Social authentication
-Route::get('/login/{service}', 'App\Http\Controllers\SocialAuthController@redirectToProvider')->name('social.login');
-Route::get('/login/{service}/callback', 'App\Http\Controllers\SocialAuthController@handleProviderCallback');
+// Authentication
+Route::middleware(['guest'])->group(function () {
+    Route::get('/socialite', 'App\Http\Controllers\HomeController@socialite')->name('socialite');
+    Route::get('/email', 'App\Http\Controllers\HomeController@loginEmailCheck')->name('login.email.check');
+    Route::post('/email', 'App\Http\Controllers\HomeController@loginEmailPost')->name('login.email.post');
+    Route::get('/login/{service}', 'App\Http\Controllers\SocialAuthController@redirectToProvider')->name('social.login');
+    Route::get('/login/{service}/callback', 'App\Http\Controllers\SocialAuthController@handleProviderCallback');
+});
 
 // Generic
 Route::get('/offline', 'App\Http\Controllers\HomeController@offline')->name('offline');
 Route::get('/search', 'App\Http\Controllers\SearchController@show')->name('search');
 Route::get('/explore','App\Http\Controllers\HomeController@explore')->name('explore');
-Route::get('/socialite','App\Http\Controllers\HomeController@socialite')->name('socialite')->middleware('guest');
 Route::get('/sharer', 'App\Http\Controllers\HomeController@sharer')->name('sharer');
 
 // Writings

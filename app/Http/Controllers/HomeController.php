@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+
 class HomeController extends Controller
 {
     public function offline()
@@ -36,5 +38,27 @@ class HomeController extends Controller
             'title' => $title,
             'url' => $url,
         ]);
+    }
+
+    public function loginEmailCheck()
+    {
+        return view('auth.email_check');
+    }
+
+    public function loginEmailPost()
+    {
+        // Validate user input
+        request()->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = request('email');
+        $emailExists = User::where('email', $email)->count() > 0;
+
+        if ($emailExists) {
+            return to_route('login')->with(['email' => $email])->withInput();
+        }
+
+        return to_route('register')->with(['email' => $email])->withInput();
     }
 }

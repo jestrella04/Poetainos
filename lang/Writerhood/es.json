@@ -272,8 +272,8 @@
     "Welcome to the hood": "Bienvenido a la cofradía",
     "Must be between 3 and 45 characters long": "Debe contener entre 3 y 45 caracteres",
     "Can contain letters, numbers, underscores and periods": "Puede contener letras, números, guiones bajos y puntos",
-    "Cannot start with a period nor end with a period": "No puede empezar ni terminar con un punto",
-    "It must also not have more than one period sequentially": "Tampoco puede contener mas de un punto secuencialmente",
+    "Can't start with a period nor end with a period": "No puede empezar ni terminar con un punto",
+    "Can't have more than one period sequentially": "No puede contener más de un punto de forma seguida",
     "Must be at least 8 characters long": "Debe contener al menos 8 caracteres",
     "Must contain at least one upper case letter, one lower case letter and one number": "Debe contener al menos una letra mayúscula, una letra minúscula, y un número",
     "Must contain at least one special character": "Debe contener al menos un caracter especial",
@@ -322,5 +322,10 @@
     "Report user": "Reportar usuario",
     "Report comment": "Reportar comentario",
     "Delete comment": "Eliminar comentario",
-    "Use the @ symbol to tag other users": "Usa el símbolo @ para etiquetar otros usuarios"
+    "Use the @ symbol to tag other users": "Usa el símbolo @ para etiquetar otros usuarios",
+    "Continue": "Continuar",
+    "Let's validate your email address": "Vamos a validar tu correo",
+    "Welcome back!": "¡Bienvenido de nuevo!",
+    "Let's create an account for you": "Vamos a crearte una cuenta",
+    "Will become your unique identifier on the site (can be changed at a later time)": "Será tu identificador único en el sitio (lo puedes cambiar luego)"
 }

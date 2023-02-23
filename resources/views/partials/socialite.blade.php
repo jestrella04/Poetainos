@@ -32,7 +32,7 @@
         </span>
     </a>
 
-    <a href="{{ route('login') }}"
+    <a href="{{ route('login.email.check') }}"
         class="btn btn-primary d-flex">
         <span class="col-2 col-lg-4">
             <i class="fas fa-fw fa-at" aria-hidden="true"></i>

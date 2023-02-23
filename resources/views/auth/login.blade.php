@@ -6,7 +6,7 @@
     <div id="login" class="login">
         <div class="form-wrapper">
             <div class="header">
-                <h4 class="block-title">{{ __('Welcome to the hood') }}</h4>
+                <h4 class="block-title">{{ __('Welcome back!') }}</h4>
             </div>
 
             <form method="POST" action="{{ route('login') }}">
@@ -19,18 +19,17 @@
                         value="on">
 
                 <div class="form-floating mb-3">
-                    <input id="username"
-                        type="text"
-                        class="form-control form-control-lg @error('username') is-invalid @enderror"
-                        name="username" value="{{ old('username') }}"
+                    <input id="email"
+                        type="email"
+                        class="form-control form-control-lg @error('email') is-invalid @enderror"
+                        name="email" value="{{ old('email') }}"
                         required
-                        pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
-                        placeholder="{{ __('Username') }}"
+                        placeholder="{{ __('Email') }}"
                         autocomplete="off">
 
-                    <label for="username">{{ __('Username') }}</label>
+                    <label for="email">{{ __('Email') }}</label>
 
-                    @error('username')
+                    @error('email')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
@@ -62,10 +61,6 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <a href="{{ route('register') }}" class="btn btn-sm btn-link">
-                        {{ __('Don\'t you have an account?') }}
-                    </a>
-
                     <a href="{{ route('password.request') }}" class="btn btn-sm btn-link">
                         {{ __('Forgot your password?') }}
                     </a>

@@ -20,7 +20,7 @@
         <i class="fab fa-fw fa-google" aria-hidden="true"></i>
     </a>
 
-    <a href="{{ route('login') }}"
+    <a href="{{ route('login.email.check') }}"
         class="btn btn-primary"
         aria-label="{{ __('Continue with Email') }}"
         title="{{ __('Continue with Email') }}">
