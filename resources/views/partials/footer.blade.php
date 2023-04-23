@@ -6,7 +6,7 @@
     </a>
 @endif
 
-<footer id="footer">
+<footer id="footer" class="bg-body-tertiary">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-md-between">
             <div class="copyright footer-column">

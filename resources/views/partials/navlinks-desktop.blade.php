@@ -37,16 +37,18 @@
     @auth
         <li class="nav-item">
             <div class="dropdown">
-                <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {!! getUserAvatar(auth()->user(), $size = 'md') !!}
+                <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                    {!! getUserAvatar(auth()->user(), $size = 'ms') !!}
 
                     <span @class([
                         'badge',
                         'badge-indicator',
                         'bg-danger',
                         'unread-count',
-                        'd-none' => auth()->user()->unreadNotifications->count() == 0,
-                        ])>
+                        'd-none' =>
+                            auth()->user()->unreadNotifications->count() == 0,
+                    ])>
                         <span class="count">{{ auth()->user()->unreadNotifications->count() }}</span>
                         <span class="visually-hidden">{{ __('unread notifications') }}</span>
                     </span>
@@ -66,8 +68,9 @@
                             'bg-danger',
                             'ms-3',
                             'unread-count',
-                            'd-none' => auth()->user()->unreadNotifications->count() == 0,
-                            ])>
+                            'd-none' =>
+                                auth()->user()->unreadNotifications->count() == 0,
+                        ])>
                             <span class="count">{{ auth()->user()->unreadNotifications->count() }}</span>
                             <span class="visually-hidden">{{ __('unread notifications') }}</span>
                         </span>
@@ -90,4 +93,56 @@
             </a>
         </li>
     @endauth
+
+    <li class="nav-item">
+        <div class="dropdown">
+            <button class="btn btn-link nav-link dropdown-toggle"
+                id="bd-theme"
+                type="button"
+                aria-expanded="false"
+                data-bs-toggle="dropdown"
+                data-bs-display="static"
+                aria-label="Toggle theme (auto)">
+                <span class="active-theme-icon">
+                    <i class="fas fa-circle-half-stroke fa-fw" aria-hidden="true"></i>
+                </span>
+                <span class="visually-hidden" id="bd-theme-text">{{ __('Toggle theme') }}</span>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text" data-bs-popper="static">
+                <li>
+                    <button
+                        type="button"
+                        class="dropdown-item"
+                        data-bs-theme-value="light"
+                        aria-pressed="false">
+                        <i class="fas fa-sun fa-fw theme-icon" aria-hidden="true"></i>
+                        {{ __('Light') }}
+                    </button>
+                </li>
+
+                <li>
+                    <button
+                        type="button"
+                        class="dropdown-item"
+                        data-bs-theme-value="dark"
+                        aria-pressed="false">
+                        <i class="fas fa-moon fa-fw theme-icon" aria-hidden="true"></i>
+                        {{ __('Dark') }}
+                    </button>
+                </li>
+
+                <li>
+                    <button
+                        type="button"
+                        class="dropdown-item"
+                        data-bs-theme-value="auto"
+                        aria-pressed="false">
+                        <i class="fas fa-circle-half-stroke fa-fw theme-icon" aria-hidden="true"></i>
+                        {{ __('Auto') }}
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </li>
 </ul>

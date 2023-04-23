@@ -5,7 +5,7 @@
 
     <div class="block-body">
         @forelse (App\Models\Category::secondary() as $category)
-            <a href="{{ $category->path() }}" class="btn btn-outline-primary btn-sm writing-category d-title">
+            <a href="{{ $category->path() }}" class="btn btn-primary btn-sm writing-category d-title">
                 <span>{{ $category->name }}</span>
                 <span>({{ $category->writingsRecursive()->count() }})</span>
             </a>

@@ -11,8 +11,8 @@
     </div>
 </nav>
 
-<nav id="nav-mobile" class="navbar fixed-bottom d-lg-none">
-    <div class="container d-flex">
+<nav id="nav-mobile" class="navbar navbar-expand fixed-bottom d-lg-none">
+    <div class="container">
         @include('partials.navlinks-mobile')
     </div>
 </nav>

@@ -3,3 +3,4 @@ import.meta.glob([
 ]);
 import './base';
 import './events';
+import './bs-theme';

@@ -327,5 +327,9 @@
     "Let's validate your email address": "Vamos a validar tu correo",
     "Welcome back!": "¡Bienvenido de nuevo!",
     "Let's create an account for you": "Vamos a crearte una cuenta",
-    "Will become your unique identifier on the site (can be changed at a later time)": "Será tu identificador único en el sitio (lo puedes cambiar luego)"
+    "Will become your unique identifier on the site (can be changed at a later time)": "Será tu identificador único en el sitio (lo puedes cambiar luego)",
+    "Light": "Claro",
+    "Dark": "Oscuro",
+    "Auto": "Automático",
+    "Toggle theme": "Aplicar tema"
 }

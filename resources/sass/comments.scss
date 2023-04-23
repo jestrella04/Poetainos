@@ -64,10 +64,16 @@
                 @extend .smaller, .lead, .text-muted;
             }
 
-            .comment-body {
-                @extend .border, .rounded, .bg-light;
-                padding: $wh-s-md;
+            .card {
                 margin-left: $wh-s-md;
+            }
+
+            .btn-link {
+                text-decoration: none;
+            }
+
+            .comment-body {
+                padding: $wh-s-md;
 
                 .message {
                     margin-bottom: $wh-s-md;

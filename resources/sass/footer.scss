@@ -1,19 +1,9 @@
 #footer {
     margin-top: auto;
-    background: $bg-gradient;
-    color: $white;
     padding: $wh-s-lg;
 
     @include media-breakpoint-down(lg) {
         padding-bottom: 3rem;
-    }
-
-    a {
-        color: $white;
-    }
-
-    a:hover {
-        color: $light;
     }
 
     .footer-column {

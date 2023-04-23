@@ -1,11 +1,8 @@
 #nav-desktop {
-    @extend .smaller, .lead;
-    padding-top: $wh-s-md;
-    padding-bottom: $wh-s-md;
-    background: $bg-gradient-reverse;
+    background: $bg-gradient;
 
     .navbar-brand {
-        color: $white;
+        color: $light;
 
         img {
             transition: transform .5s;
@@ -19,36 +16,23 @@
         }
     }
 
-    .navbar-nav {
-        li:not(:first-child) {
-            margin-left: $wh-s-lg;
-        }
-    }
-
     .nav-item {
-        border-bottom: 0.15rem solid transparent;
-        transition: border 1s linear;
-
         .nav-link {
-            color: $white;
+            color: $light;
         }
 
-        i {
+        i:not(.theme-icon, .theme-selected) {
             margin-right: $wh-s-sm;
         }
 
         .dropdown-menu {
+
             a.dropdown-item,
             button {
                 border-radius: 0;
                 text-transform: capitalize !important;
             }
         }
-    }
-
-    .nav-item:hover,
-    .nav-item.active {
-        border-bottom: 0.15rem solid $white;
     }
 
     .nav-item.active {
@@ -77,7 +61,6 @@
     padding: 0 !important;
 
     a {
-        color: $light;
         padding-top: $wh-s-md;
         padding-bottom: $wh-s-md;
         text-align: center;
