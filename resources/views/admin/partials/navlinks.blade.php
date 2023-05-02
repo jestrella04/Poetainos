@@ -68,4 +68,11 @@
             {{ __('Tools') }}
         </a>
     </li>
+
+    <li class="nav-item {{ Route::current()->getName() === 'admin.websockets' ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.websockets') }}">
+            <i class="fas fa-fw fa-network-wired" aria-hidden="true"></i>
+            {{ __('Websockets') }}
+        </a>
+    </li>
 </ul>

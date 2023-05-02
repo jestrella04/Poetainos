@@ -28,6 +28,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('writings', 'App\Http\Controllers\AdminController@writings')->name('writings');
     Route::get('tools', 'App\Http\Controllers\AdminController@tools')->name('tools');
     Route::get('complaints', 'App\Http\Controllers\AdminController@complaints')->name('complaints');
+    Route::get('websockets', 'App\Http\Controllers\AdminController@websockets')->name('websockets');
 
     Route::put('settings/edit', 'App\Http\Controllers\SettingsController@update')->name('settings.edit');
     Route::put('categories/edit', 'App\Http\Controllers\CategoriesController@update')->name('categories.edit');

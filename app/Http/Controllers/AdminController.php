@@ -171,4 +171,17 @@ class AdminController extends Controller
             'params' => $params,
         ]);
     }
+
+    public function websockets() {
+        $params = [
+            'title' => getPageTitle([
+                __('Websockets'),
+                __('Administration'),
+            ]),
+        ];
+
+        return view('admin.websockets', [
+            'params' => $params,
+        ]);
+    }
 }
