@@ -75,7 +75,7 @@ class UsersNotificationsController extends Controller
         $info = auth()->user()->extra_info;
         $status = [];
 
-        if (!is_null($info['notifications'])) {
+        if (array_key_exists('notifications', $info)) {
             $status = $info['notifications'];
         } else {
             $status['email'] = 'on';
