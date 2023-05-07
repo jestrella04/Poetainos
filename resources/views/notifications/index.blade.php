@@ -27,33 +27,11 @@
 
                 <form action="{{ route('notifications.clear') }}" method="post" name="notifications.clear">
                     @csrf
-                    <div class="dropdown">
-                        <button
-                            class="btn btn-light"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            role="menu"
-                            aria-label="{{ __('Notification actions') }}"
-                            aria-expanded="false">
-                            <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
-                        </button>
 
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li>
-                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#notifications-settings">
-                                    <i class="fas fa-sliders-h" aria-hidden="true"></i>
-                                    {{ __('Notifications settings') }}
-                                </a>
-                            </li>
-
-                            <li>
-                                <button class="dropdown-item" type="submit">
-                                    <i class="fas fa-check-double" aria-hidden="true"></i>
-                                    {{ __('Mark all as read') }}
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">
+                        <i class="fas fa-check-double" aria-hidden="true"></i>
+                        <span class="visually-hidden">{{ __('Mark all as read') }}</span>
+                    </button>
                 </form>
             </div>
 

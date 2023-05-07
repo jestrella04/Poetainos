@@ -11,7 +11,7 @@ class UsersController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function index()
     {
@@ -81,7 +81,7 @@ class UsersController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function show(User $user)
     {
@@ -111,7 +111,7 @@ class UsersController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function edit(User $user)
     {
@@ -133,7 +133,7 @@ class UsersController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function update(Request $request, User $user)
     {
@@ -231,7 +231,7 @@ class UsersController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(User $user)
     {
@@ -252,7 +252,7 @@ class UsersController extends Controller
      * Display confirmation before blocking another user.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function promptBeforeBlock(User $user)
     {
@@ -265,7 +265,7 @@ class UsersController extends Controller
      * Block another user.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function blockUser(User $user)
     {
@@ -275,5 +275,28 @@ class UsersController extends Controller
         return [
             'message' => __('User blocked successfully')
         ];
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function account(User $user)
+    {
+        $this->authorize('delete', $user);
+
+        $params = [
+            'title' => getPageTitle([
+                $user->getName(),
+                __('Writers'),
+                ]),
+        ];
+
+        return view('users.account', [
+            'user' => $user,
+            'params' => $params
+        ]);
     }
 }

@@ -48,14 +48,13 @@
             </a>
         @endif
 
-        <a class="dropdown-item init-complaint"
-            href="{{ route('complaints.create', ['type' => 'users', 'id' => $user->id]) }}"
-            rel="noindex">
-            {{ __('Report user') }}
-        </a>
+        @if (auth()->check() && !auth()->user()->is($user))
+            <a class="dropdown-item init-complaint"
+                href="{{ route('complaints.create', ['type' => 'users', 'id' => $user->id]) }}"
+                rel="noindex">
+                {{ __('Report user') }}
+            </a>
 
-        @if (auth()->check() &&
-            !auth()->user()->is($user))
             <a href="{{ route('users.block.confirm', ['user' => $user->username]) }}"
                 rel="noindex"
                 class="dropdown-item init-block-user">

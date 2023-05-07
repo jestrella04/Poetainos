@@ -8,11 +8,13 @@
         @method('put')
 
         <div class=" text-center mb-3">
-            <span class="avatar-chooser" data-wh-target="#avatar">
-                <img src="{{ $avatarSrc }}" alt="" class="avatar avatar-xxl avatar-preview">
+            <div class="avatar-chooser" data-wh-target="#avatar">
+                <img src="{{ $avatarSrc }}" alt="" class="avatar avatar-xxl avatar-preview mb-3">
+            </div>
 
-                <i class="fas fa-camera" aria-hidden="true"></i>
-            </span>
+            <button class="avatar-chooser btn btn-secondary btn-sm" type="button"  data-wh-target="#avatar">
+                {{ __('Choose image') }}
+            </button>
 
             <div>
                 <small id="avatar-error" class="text-danger d-none">{{ __('An error ocurred, please select a different file.') }}</small>
@@ -295,36 +297,6 @@
 
         <div class="row mb-3">
             <div class="offset-sm-3 col-sm-9 d-grid gap-2">
-                <a class="btn btn-link btn-sm mb-1"
-                    data-bs-toggle="collapse"
-                    href="#user-profile-delete"
-                    role="button"
-                    aria-expanded="false"
-                    aria-controls="user-profile-delete">
-                    {{ __('Delete account?') }}
-                </a>
-
-                <div class="collapse" id="user-profile-delete">
-                    <div class="card card-body d-grid gap-2">
-                        <p>
-                            {{ __("We're sorry to see you go") }}.
-                            {{ __('Please be aware that when you delete your account all related content will also be removed') }},
-                            {{ __('including but not limited to: writings, comments and replies, likes, shelved items, etc.') }}
-                        </p>
-
-                        <button
-                            type="submit"
-                            class="btn btn-danger"
-                            form="user-delete-form">
-                            {{ __('Delete account') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="offset-sm-3 col-sm-9 d-grid gap-2">
                 <button
                     type="submit"
                     class="btn btn-primary btn-lg"
@@ -333,11 +305,5 @@
                 </button>
             </div>
         </div>
-    </form>
-
-    <form id="user-delete-form" class="d-inline" method="POST" action="{{ route('users.destroy', $user) }}">
-        @csrf
-
-        @method('delete')
     </form>
 </div>

@@ -55,9 +55,7 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-end">
-                    @if (auth()->user()->isAllowed('admin'))
-                        <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
-                    @endif
+                    <a class="dropdown-item" href="{{ route('users.account', auth()->user()) }}">{{ __('My account') }}</a>
 
                     <a class="dropdown-item" href="{{ route('notifications.list.unread') }}" rel="noindex">
                         {{ __('Notifications') }}
@@ -75,13 +73,10 @@
                             <span class="visually-hidden">{{ __('unread notifications') }}</span>
                         </span>
                     </a>
-                    <a class="dropdown-item" href="{{ auth()->user()->path() }}">{{ __('My profile') }}</a>
-                    <a class="dropdown-item" href="{{ auth()->user()->writingsPath() }}">{{ __('My writings') }}</a>
-                    <a class="dropdown-item" href="{{ auth()->user()->shelfPath() }}">{{ __('My shelf') }}</a>
-                    <form class="d-inline" method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn dropdown-item">{{ __('Logout') }}</button>
-                    </form>
+
+                    @if (auth()->user()->isAllowed('admin'))
+                        <a class="dropdown-item" href="{{ route('admin.index') }}">{{ __('Administration') }}</a>
+                    @endif
                 </div>
             </div>
         </li>
@@ -93,56 +88,4 @@
             </a>
         </li>
     @endauth
-
-    <li class="nav-item">
-        <div class="dropdown">
-            <button class="btn btn-link nav-link dropdown-toggle"
-                id="bd-theme"
-                type="button"
-                aria-expanded="false"
-                data-bs-toggle="dropdown"
-                data-bs-display="static"
-                aria-label="Toggle theme (auto)">
-                <span class="active-theme-icon">
-                    <i class="fas fa-circle-half-stroke fa-fw" aria-hidden="true"></i>
-                </span>
-                <span class="visually-hidden" id="bd-theme-text">{{ __('Toggle theme') }}</span>
-            </button>
-
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text" data-bs-popper="static">
-                <li>
-                    <button
-                        type="button"
-                        class="dropdown-item"
-                        data-bs-theme-value="light"
-                        aria-pressed="false">
-                        <i class="fas fa-sun fa-fw theme-icon" aria-hidden="true"></i>
-                        {{ __('Light') }}
-                    </button>
-                </li>
-
-                <li>
-                    <button
-                        type="button"
-                        class="dropdown-item"
-                        data-bs-theme-value="dark"
-                        aria-pressed="false">
-                        <i class="fas fa-moon fa-fw theme-icon" aria-hidden="true"></i>
-                        {{ __('Dark') }}
-                    </button>
-                </li>
-
-                <li>
-                    <button
-                        type="button"
-                        class="dropdown-item"
-                        data-bs-theme-value="auto"
-                        aria-pressed="false">
-                        <i class="fas fa-circle-half-stroke fa-fw theme-icon" aria-hidden="true"></i>
-                        {{ __('Auto') }}
-                    </button>
-                </li>
-            </ul>
-        </div>
-    </li>
 </ul>

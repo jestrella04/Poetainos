@@ -1,23 +1,9 @@
 <ul class="navbar-nav ms-auto">
     @auth
         <li class="nav-item">
-            <a class="nav-link " href="{{ auth()->user()->path() }}">
+            <a class="nav-link" href="{{ route('users.account', auth()->user()) }}">
                 <i class="fas fa-user fa-fw" aria-hidden="true"></i>
-                {{ __('My profile') }}
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link " href="{{ auth()->user()->writingsPath() }}">
-                <i class="fas fa-feather fa-fw" aria-hidden="true"></i>
-                {{ __('My writings') }}
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link " href="{{ auth()->user()->shelfPath() }}">
-                <i class="fas fa-book-bookmark fa-fw" aria-hidden="true"></i>
-                {{ __('My shelf') }}
+                {{ __('My account') }}
             </a>
         </li>
 
@@ -29,16 +15,6 @@
                 </a>
             </li>
         @endif
-
-        <li class="nav-item">
-            <form class="d-inline" method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn">
-                    <i class="fa-solid fa-right-from-bracket fa-fw" aria-hidden="true"></i>
-                    {{ __('Logout') }}
-                </button>
-            </form>
-        </li>
     @else
         <li class="nav-item {{ Route::current()->getName() === 'login' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('socialite') }}">

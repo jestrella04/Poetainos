@@ -59,6 +59,7 @@ Route::middleware(['verified'])->group(function () {
     Route::post('/users/query/{query}', 'App\Http\Controllers\UsersController@query')->name('users.query');
     Route::get('/users/block/{user}', 'App\Http\Controllers\UsersController@promptBeforeBlock')->name('users.block.confirm');
     Route::post('/users/block/{user}', 'App\Http\Controllers\UsersController@blockUser')->name('users.block.confirmed');
+    Route::get('/users/{user}/account', 'App\Http\Controllers\UsersController@account')->name('users.account');
 
     // Comments
     Route::post('/comments/create', 'App\Http\Controllers\CommentsController@store')->name('comments.store');
@@ -78,6 +79,8 @@ Route::middleware(['verified'])->group(function () {
     Route::get('/notifications/list/all', 'App\Http\Controllers\UsersNotificationsController@listAll')->name('notifications.list.all');
     Route::get('/notifications/read/{notification}', 'App\Http\Controllers\UsersNotificationsController@read')->name('notifications.read');
     Route::post('/notifications/read/all', 'App\Http\Controllers\UsersNotificationsController@clear')->name('notifications.clear');
+    Route::post('/notifications/status', 'App\Http\Controllers\UsersNotificationsController@status')->name('notifications.status');
+    Route::post('/notifications/email/{enable}', 'App\Http\Controllers\UsersNotificationsController@email')->name('notifications.email');
 
     // Push Subscriptions
     Route::post('subscriptions', 'App\Http\Controllers\PushNotificationsController@update')->name('push.update');

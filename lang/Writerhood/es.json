@@ -331,5 +331,15 @@
     "Light": "Claro",
     "Dark": "Oscuro",
     "Auto": "Automático",
-    "Toggle theme": "Aplicar tema"
+    "Toggle theme": "Aplicar tema",
+    "Danger zone": "Zona peligrosa",
+    "My account": "Mi cuenta",
+    "This process is permanent and undoable.": "El proceso es permanente e irreversible.",
+    "Do you still want to delete your account?": "¿Aún quieres eliminar tu cuenta?",
+    "Yes, delete the account": "Sí, eliminar la cuenta",
+    "Light theme": "Tema claro",
+    "Dark theme": "Tema oscuro",
+    "Auto theme": "Tema automático",
+    "Choose image": "Escoger imagen",
+    "Manage blocked users": "Gestionar usuarios bloqueados"
 }

@@ -68,11 +68,8 @@
         </div>
 
         @if ($user->writings()->count() > 0)
-            <div class="d-flex justify-content-between align-items-center smaller text-muted all-caps">
-                <div>{{ __('Latest writings:') }}</div>
-                <div>
-                    <a href="{{ $user->writingsPath() }}" class="btn btn-sm text-muted">{{ __('View all') }}</a>
-                </div>
+            <div class="smaller text-muted all-caps text-center">
+                {{ __('Latest writings:') }}
             </div>
 
             <div id="profile-writings" class="row p-2">
@@ -92,6 +89,10 @@
                         </blockquote>
                     </div>
                 @endforeach
+            </div>
+
+            <div class="text-center">
+                <a href="{{ $user->writingsPath() }}" class="btn btn-secondary btn-sm">{{ __('View all') }}</a>
             </div>
         @endif
     </div>

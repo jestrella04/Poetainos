@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Writing;
 
+use function PHPUnit\Framework\isNull;
+
 class UsersNotificationsController extends Controller
 {
     public function listUnread() {
@@ -58,5 +60,31 @@ class UsersNotificationsController extends Controller
         }
 
         return abort(401);
+    }
+
+    public function email($enable)
+    {
+        $user = auth()->user();
+        $user->emailNotifications($enable);
+
+        return response()->json(null, 204);
+    }
+
+    public function status()
+    {
+        $info = auth()->user()->extra_info;
+        $status = [];
+
+        if (!isNull($info)) {
+            $status = $info['notifications'];
+        } else {
+            $status['email'] = 'on';
+        }
+
+        if (empty($status['email'])) {
+            $status['email'] = 'on';
+        }
+
+        return $status;
     }
 }

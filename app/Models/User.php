@@ -275,4 +275,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return false;
     }
+
+    public function emailNotifications($enable)
+    {
+        $info = $this->extra_info;
+
+        if (isTruthy($enable)) {
+            $info['notifications']['email'] = 'on';
+        } else {
+            $info['notifications']['email'] = 'off';
+        }
+
+        $this->update(['extra_info' => $info]);
+    }
 }
