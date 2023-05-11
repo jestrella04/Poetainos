@@ -17,15 +17,16 @@ class UsersNotificationsController extends Controller
     public function listAll() {
         $user = auth()->user();
         $notifications = \App\Models\User::find($user->id)->notifications()->paginate($this->pagination);
-        return $this->list($notifications);
+        return $this->list($notifications, false);
     }
 
-    private function list($notifications)
+    private function list($notifications, $unreadTab = true)
     {
         $params = [
             'title' => getPageTitle([
                 __('My notifications'),
                 ]),
+            'unreadTab' => $unreadTab,
         ];
 
         return view('notifications.index', [

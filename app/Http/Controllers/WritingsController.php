@@ -9,8 +9,8 @@ use App\Models\User;
 use App\Models\Like;
 use App\Models\Writing;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Intervention\Image\Facades\Image;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class WritingsController extends Controller
@@ -18,7 +18,7 @@ class WritingsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index()
     {
@@ -59,7 +59,7 @@ class WritingsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
@@ -70,7 +70,7 @@ class WritingsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function store(Request $request)
     {
@@ -81,7 +81,7 @@ class WritingsController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Writing  $writing
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function show(Writing $writing)
     {
@@ -110,7 +110,7 @@ class WritingsController extends Controller
     /**
      * Display a random resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function random() {
         $writing = User::has('writings', '>', 0)
@@ -126,7 +126,7 @@ class WritingsController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Writing  $writing
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit(Writing $writing)
     {
@@ -157,7 +157,7 @@ class WritingsController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Writing  $writing
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function update(Request $request, Writing $writing)
     {
@@ -283,12 +283,13 @@ class WritingsController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Writing  $writing
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(Writing $writing)
     {
         $this->authorize('delete', $writing);
         $writing->delete();
+        DatabaseNotification::where('data->writing_id', $writing->id)->delete();
 
         // Delete related notifications
         DB::delete('DELETE FROM `notifications` WHERE JSON_EXTRACT(`data`, "$.writing_id") = ?', [$writing->id]);

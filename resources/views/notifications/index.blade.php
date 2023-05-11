@@ -25,14 +25,16 @@
                     <h2 class="all-caps">{{ __('Notifications') }}</h2>
                 </div>
 
-                <form action="{{ route('notifications.clear') }}" method="post" name="notifications.clear">
-                    @csrf
+                @if ($params['unreadTab'] && $notifications->count() > 0)
+                    <form action="{{ route('notifications.clear') }}" method="post" name="notifications.clear">
+                        @csrf
 
-                    <button class="btn btn-secondary btn-xs" type="submit">
-                        <i class="fas fa-check-double" aria-hidden="true"></i>
-                        <span class="visually-hidden">{{ __('Mark all as read') }}</span>
-                    </button>
-                </form>
+                        <button class="btn btn-secondary btn-sm smaller" type="submit" title="{{ __('Mark all as read') }}">
+                            <i class="fas fa-check-double" aria-hidden="true"></i>
+                            <span class="visually-hidden">{{ __('Mark all as read') }}</span>
+                        </button>
+                    </form>
+                @endif
             </div>
 
             <div class="notifications-list infinite-scroll">
