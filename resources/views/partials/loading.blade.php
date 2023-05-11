@@ -8,5 +8,5 @@
 </div>
 
 <div class="d-flex justify-content-center">
-    <button id="pagination-load-more" class="alert alert-light">{{ __('Load More') }}</button>
+    <button id="pagination-load-more" class="btn btn-secondary">{{ __('Load More') }}</button>
 </div>
