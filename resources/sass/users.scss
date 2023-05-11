@@ -41,10 +41,6 @@ hr.banner {
 #user-list {
     margin-bottom: $wh-s-lg;
 
-    .entry-container:not(:last-child) {
-        margin-bottom: $wh-s-md;
-    }
-
     .card-body {
         position: relative;
     }

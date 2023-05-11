@@ -29,7 +29,7 @@
         <div id="writing-list">
             <div class="row masonry infinite-scroll" data-masonry='{"percentPosition": true }'>
                 @forelse ($writings as $writing)
-                    <div class="col-sm-6 col-lg-4 writing-entry-container entry-container">
+                    <div class="col-sm-6 col-lg-4 g-3 entry-container">
                         @include('writings.entry.index')
                     </div>
                 @empty

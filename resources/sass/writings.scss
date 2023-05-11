@@ -10,10 +10,6 @@
     }
 }
 
-.writing-entry-container:not(:last-child) {
-    margin-bottom: $wh-s-lg;
-}
-
 .writing-entry {
     overflow-wrap: break-word;
     word-break: break-word;

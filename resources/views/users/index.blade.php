@@ -16,7 +16,7 @@
 
         <div id="user-list" class="row masonry infinite-scroll" data-masonry='{"percentPosition": true }'>
             @forelse ($users as $user)
-                <div class="col-sm-6 entry-container">
+                <div class="col-sm-6 g-3 entry-container">
                     @include('users.profile.banner')
                 </div>
             @empty
