@@ -37,7 +37,7 @@ hr {
     padding-bottom: 3rem;
 
     @media (min-width: 992px) {
-        padding-top: 5rem;
+        padding-top: 4.5rem;
     }
 }
 
@@ -102,7 +102,6 @@ hr {
 
 .top-links {
     @extend .smaller, .lead;
-    margin-bottom: $wh-s-xl;
     text-transform: capitalize;
 
     i {
