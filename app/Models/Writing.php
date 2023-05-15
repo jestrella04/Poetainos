@@ -115,9 +115,6 @@ class Writing extends Model
 
     public function updateAura()
     {
-        // Get the old aura
-        $auraOld = $this->aura;
-
         // What's the minimum to be featured at home?
         $auraHome = getSiteConfig('aura.min_at_home');
 
@@ -148,8 +145,11 @@ class Writing extends Model
         // Check when writing was posted (in days)
         $postedAt = Carbon::parse($this->created_at)->diffInDays();
 
+        // Check if writing is awarded
+        $awarded = isset($this->home_posted_at);
+
         // Persist to the database
-        if ($auraOld < $auraHome && $auraNew >= $auraHome && $postedAt <= 31) {
+        if ($auraNew >= $auraHome && $postedAt <= 31 && !$awarded) {
             DB::table($this->getTable())->whereId($this->id)->update([
                 'aura' => $auraNew,
                 'aura_updated_at' => Carbon::now(),
