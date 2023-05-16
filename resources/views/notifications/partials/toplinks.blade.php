@@ -1,4 +1,4 @@
-<div id="notification-top-links" class="top-links">
+<div id="notification-top-links" class="top-links mb-3">
     <div class="nav nav-tabs nav-fill">
         <a @class([
             'nav-item',
