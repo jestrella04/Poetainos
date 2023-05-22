@@ -18,6 +18,9 @@ const installComponent = document.createElement("pwa-install");
 const updateComponent = document.createElement("pwa-update");
 const isInstalled = installComponent.getInstalledStatus();
 
+// Scroll pos
+let oldScrollPos = window.scrollY;
+
 //document.querySelector('footer').appendChild(installComponent);
 document.querySelector("footer").appendChild(updateComponent);
 
@@ -1007,13 +1010,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Manage email notifications
         if (element.matches("#enable-email-notifications")) {
             axios
-            .post(`notifications/email/${element.checked}`)
-            .then((response) => {
-                //
-            })
-            .catch((error) => {
-                //
-            });
+                .post(`notifications/email/${element.checked}`)
+                .then((response) => {
+                    //
+                })
+                .catch((error) => {
+                    //
+                });
         }
 
         // Trigger the cover file validation
@@ -1094,26 +1097,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Listen to the window scroll event and act accordingly
     window.addEventListener("scroll", (event) => {
         let jumpToMainNav = document.querySelector(".jump-to-top");
+        let newScrollPos = window.scrollY;
+
+        // Clear visibility classes
+        jumpToMainNav.classList.remove("fade-in");
+        jumpToMainNav.classList.remove("fade-out");
 
         if (!fx.isNilOrEmpty(jumpToMainNav)) {
-            let scrollPosition = window.scrollY;
-            let icon = jumpToMainNav.querySelector("i");
-            let logo = jumpToMainNav.querySelector("img");
-
-            if (0 == scrollPosition) {
-                jumpToMainNav.classList.add("ontop");
-                icon.classList.add("d-none");
-                logo.classList.remove("d-none");
-                fx.animateCSS(logo, "fadeIn");
+            if (newScrollPos > oldScrollPos || 0 == newScrollPos) {
+                jumpToMainNav.classList.add("fade-out");
             } else {
-                icon.classList.remove("d-none");
-                logo.classList.add("d-none");
-
-                if (jumpToMainNav.classList.contains("ontop")) {
-                    jumpToMainNav.classList.remove("ontop");
-                    fx.animateCSS(icon, "fadeIn");
-                }
+                jumpToMainNav.classList.add("fade-in");
             }
+
+            // Save current scroll position.
+            oldScrollPos = newScrollPos;
         }
     });
 

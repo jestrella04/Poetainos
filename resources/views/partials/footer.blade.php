@@ -1,10 +1,8 @@
-@if (Route::current()->getName() !== 'writings.create')
-    <a href="{{ route('writings.create') }}"
-        class="btn btn-primary btn-fixed-br"
-        aria-label="{{ __('Publish') }}">
-        <i class="fas fa-pen-nib fa-fw" aria-hidden="true"></i>
-    </a>
-@endif
+<a href="#"
+    class="btn btn-primary btn-fixed-br jump-to-top fade-out"
+    title="{{ __('Scroll back to top') }}">
+    <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+</a>
 
 <footer id="footer" class="bg-body-tertiary">
     <div class="container">

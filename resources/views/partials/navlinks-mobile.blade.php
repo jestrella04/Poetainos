@@ -8,13 +8,8 @@
     <i class="fas fa-wand-magic-sparkles fa-fw" aria-hidden="true"></i>
 </a>
 
-<a class="nav-link flex-fill jump-to-top ontop" href="#" aria-label="{{ __('Scroll back to top')}}">
-    <i class="fas fa-arrow-turn-up fa-fw d-none" aria-hidden="true"></i>
-    <img src="{{ Vite::asset('resources/images/logo.svg') }}"
-        class="logo-shadow"
-        width="24"
-        height="24"
-        alt="">
+<a class="nav-link flex-fill" href="{{ route('writings.create') }}" title="{{ __('Publish') }}">
+    <i class="fas fa-pen-nib fa-fw" aria-hidden="true"></i>
 </a>
 
 @auth

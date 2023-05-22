@@ -58,12 +58,10 @@
 
 #nav-mobile {
     background: $bg-gradient;
-    padding: 0 !important;
+    height: 3rem;
 
     a {
         color: $light;
-        padding-top: $wh-s-md;
-        padding-bottom: $wh-s-md;
         text-align: center;
     }
 }

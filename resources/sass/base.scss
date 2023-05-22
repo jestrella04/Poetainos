@@ -398,8 +398,8 @@ pwa-update::part(offlineToast) {
 
 .btn-fixed-br {
     position: fixed;
-    bottom: 3.3rem;
-    right: 1rem;
+    bottom: 3.8rem;
+    right: 1.5rem;
     z-index: 999;
 	border-radius: 100%;
 	text-align: center;
@@ -411,7 +411,6 @@ pwa-update::part(offlineToast) {
 
     i {
         font-size: 120%;
-        //vertical-align: middle;
     }
 
     @include media-breakpoint-up(lg) {
