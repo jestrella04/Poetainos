@@ -1,11 +1,2 @@
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.google.analytics_id') }}"></script>
-
-<script>
-    window.analytics_id = '{{ config("services.google.analytics_id") }}';
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', '{{ config("services.google.analytics_id") }}');
-</script>
+<!-- Counter Stats -->
+<script src="https://cdn.counter.dev/script.js" data-id="{{ config('services.counter.tracking_id') }}" data-utcoffset="-4"></script>

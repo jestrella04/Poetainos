@@ -22,10 +22,9 @@
         <link rel="preload" href="{{ Vite::asset('resources/images/logo-32.png') }}" as="image">
         <link rel="preload" href="{{ route('pwa.manifest', [], false) }}" as="fetch" crossorigin="anonymous">
         <!-- Preconnect to external hosts -->
-        <link rel="preconnect" href="https://storage.googleapis.com">
-        <link rel="preconnect" href="https://js.pusher.com">
-        @if (! empty(config('services.google.analytics_id')))
-        <link rel="preconnect" href="https://www.googletagmanager.com">
+        {{-- <link rel="preconnect" href="https://storage.googleapis.com"> --}}
+        @if (! empty(config('services.counter.tracking_id')))
+        <link rel="preconnect" href="https://cdn.counter.dev">
         @endif
         <!-- Icons and CSS styles -->
         <link rel="icon" href="{{ Vite::asset('resources/images/logo.svg') }}" type="image/svg+xml">
@@ -53,8 +52,7 @@
         <base href="{{ config('app.url') }}">
         <script src="{{ Vite::asset('resources/js/app.js') }}" defer></script>
 
-        <!-- Google Analytics -->
-        @if (! empty(config('services.google.analytics_id')))
+        @if (! empty(config('services.counter.tracking_id')))
             @include('partials.analytics')
         @endif
 

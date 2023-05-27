@@ -56,7 +56,6 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_CALLBACK_URL'),
-        'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
         'android' => [
             'assetlinks' => [
                 'namespace' => env('ANDROID_ASSETLINKS_NAMESPACE'),
@@ -70,7 +69,12 @@ return [
         ]
 
     ],
+
     'compliance' => [
         'iarc_rating_id' => env('IARC_RATING_ID'),
+    ],
+
+    'counter' => [
+        'tracking_id' => env('COUNTER_TRACKING_ID'),
     ],
 ];

@@ -136,15 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-    // Disable tracking if the opt-out cookie exists.
-    if (!fx.isNil(window.analytics_id)) {
-        let disableStr = `ga-disable-${window.analytics_id}`;
-
-        if (document.cookie.indexOf(`${disableStr}=true`) > -1) {
-            window[disableStr] = true;
-        }
-    }
-
     // Set what modal element should be displayed
     let modalForm = document.querySelector(".form-wrapper");
 
@@ -610,16 +601,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(() => {
                     //
                 });
-        }
-
-        // Opting out of GA tracking
-        if (element.hasAttribute("href") && "#ga-optout" === element.href) {
-            event.preventDefault();
-            let disableStr = `ga-disable-${analytics_id}`;
-
-            document.cookie = `${disableStr}=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/`;
-            window[disableStr] = true;
-            alert("Google Analytics tracking disabled");
         }
 
         // Toggle main sidebar
