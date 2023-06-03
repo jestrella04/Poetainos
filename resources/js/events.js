@@ -64,6 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!fx.isNil(userToken)) {
         userToken = atob(userToken.content);
+
+        let unreadCount = parseInt(document.querySelector('.unread-count .count').innerHTML);
+
+        if ('setAppBadge' in navigator) {
+            navigator.setAppBadge(unreadCount);
+        }
     }
 
     // Initialize Tags
@@ -279,6 +285,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     badge.classList.remove("d-none");
                     fx.animateCSS(badge, "heartBeat");
                 });
+
+                if ('setAppBadge' in navigator) {
+                    navigator.setAppBadge(payload.notifications.unread);
+                }
             }
         );
     }
