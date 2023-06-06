@@ -357,9 +357,9 @@ pwa-update::part(offlineToast) {
 }
 
 .tribute-container {
-    background-color: $white;
-    color: $body-color;
-    border: 1px solid $gray-400;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
     position: absolute;
     top: 0;
     left: 0;
@@ -379,13 +379,13 @@ pwa-update::part(offlineToast) {
         li {
             padding: 0.5rem 0.8rem;
             cursor: pointer;
-            border-bottom: 1px solid $gray-400;
+            border-bottom: 1px solid var(--bs-border-color);
         }
 
         li:hover,
         li:focus,
         .highlight {
-            background-color: $gray-300 !important;
+            background-color: var(--bs-border-color) !important;
         }
     }
 }
