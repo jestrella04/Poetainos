@@ -4,7 +4,7 @@ import * as bootstrap from "bootstrap";
 import * as fx from "./functions";
 import * as push from "./push";
 import "@pwabuilder/pwaupdate";
-import "@pwabuilder/pwainstall";
+import '@khmyznikov/pwa-install';
 import autoGrow from "@ivanhanak_com/js-textarea-autogrow";
 import Tribute from "tributejs";
 import Tags from "bootstrap5-tags";
@@ -16,25 +16,15 @@ import axios from "axios";
 // PWA Builder goodies
 const installComponent = document.createElement("pwa-install");
 const updateComponent = document.createElement("pwa-update");
-const isInstalled = installComponent.getInstalledStatus();
+
+document.body.appendChild(installComponent);
+document.body.appendChild(updateComponent);
+
+const isInstalled = installComponent.isUnderStandaloneMode;
+updateComponent.updatemessage = "Hay una actualización disponible";
 
 // Scroll pos
 let oldScrollPos = window.scrollY;
-
-//document.querySelector('footer').appendChild(installComponent);
-document.querySelector("footer").appendChild(updateComponent);
-
-// Customizing displayed messages
-installComponent.manifestpath = "/manifest.json";
-installComponent.explainer =
-    "Puedes instalar esta aplicacion web en tu dispositivo y disfrutar de una experiencia nativa.";
-installComponent.featuresheader = "Funcionalidades Principales";
-installComponent.descriptionheader = "Descripción";
-installComponent.installbuttontext = "Instalar";
-installComponent.cancelbuttontext = "Cancelar";
-installComponent.iosinstallinfotext =
-    'Presiona el botón compartir y después "Añadir a la pantalla principal"';
-updateComponent.updatemessage = "Hay una actualización disponible";
 
 // Wait for the page to be fully loaded
 window.addEventListener("load", () => {

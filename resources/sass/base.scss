@@ -319,24 +319,8 @@ hr {
     @extend .rounded-pill;
 }
 
-pwa-install {
-    position: fixed;
-    left: 1rem;
-    bottom: 1rem;
-    z-index: 9997;
-    color: var(--bs-dark);
-    --install-button-color: var(--bs-primary);
-    --modal-z-index: 99999;
-    --modal-background-index: 99998;
-    --modal-background-color: var(--bs-white);
-}
-
 pwa-update {
     --button-background: var(--bs-primary);
-}
-
-pwa-install::part(openButton) {
-    @extend .btn, .btn-sm, .btn-primary;
 }
 
 pwa-update::part(updateToast),
