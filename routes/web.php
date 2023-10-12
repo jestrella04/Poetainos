@@ -144,6 +144,7 @@ Route::get('/comments/{writing}', 'App\Http\Controllers\CommentsController@index
 // Contact form
 Route::get('/contact', 'App\Http\Controllers\ContactsController@create')->name('contact.create');
 Route::post('/contact', 'App\Http\Controllers\ContactsController@store')->name('contact.store');
+Route::get('/reload-captcha', 'App\Http\Controllers\ContactsController@reloadCaptcha')->name('captcha.reload');
 
 // Complaints
 Route::get('/complaints/{type}/{id}/create', 'App\Http\Controllers\ComplaintsController@create')->name('complaints.create');

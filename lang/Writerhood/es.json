@@ -341,5 +341,7 @@
     "Dark theme": "Tema oscuro",
     "Auto theme": "Tema automático",
     "Choose image": "Escoger imagen",
-    "Manage blocked users": "Gestionar usuarios bloqueados"
+    "Manage blocked users": "Gestionar usuarios bloqueados",
+    "The captcha code is invalid.": "El código captcha no es válido.",
+    "Click to reload.": "Presiona para recargar."
 }

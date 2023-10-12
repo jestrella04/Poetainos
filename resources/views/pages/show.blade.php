@@ -13,7 +13,9 @@
         </div>
 
         <div class="page-body">
-            @markdown($page->text)
+            @markdown
+                {{$page->text}}
+            @endmarkdown
         </div>
     </div>
 @endsection

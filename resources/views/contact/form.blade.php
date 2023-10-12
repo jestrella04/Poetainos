@@ -78,7 +78,22 @@
         </div>
 
         <div class="mb-3">
-            @captcha
+            <script>
+                function reloadCaptcha() {
+                    axios
+                    .get("reload-captcha")
+                    .then((response) => {
+                        document.querySelector("#captcha img").src = response.data.captcha;
+                    })
+                    .catch((error) => {
+                        //
+                    });
+                }
+            </script>
+
+            <div id="captcha" title="{{ __("Click to reload.") }}" style="cursor:pointer;" onclick="reloadCaptcha()">
+                {!! captcha_img() !!}
+            </div>
 
             <input
                 type="text"
@@ -92,7 +107,7 @@
 
             @error('captcha')
                 <small class="text-danger" role="alert">
-                    {{ $message }}
+                    {{ __("The captcha code is invalid.") }}
                 </small>
             @enderror
         </div>

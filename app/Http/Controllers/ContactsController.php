@@ -61,4 +61,9 @@ class ContactsController extends Controller
         // Redirect back to the contact form
         return redirect(route(('contact.create')));
     }
+
+    public function reloadCaptcha()
+    {
+        return response()->json(['captcha'=> captcha_src()]);
+    }
 }
