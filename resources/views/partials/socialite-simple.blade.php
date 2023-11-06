@@ -8,9 +8,9 @@
 
     <a href="{{ route('social.login', 'twitter') }}"
         class="btn btn-primary"
-        aria-label="{{ __('Continue with Twitter') }}"
-        title="{{ __('Continue with Twitter') }}">
-        <i class="fab fa-fw fa-twitter" aria-hidden="true"></i>
+        aria-label="{{ __('Continue with X (Twitter)') }}"
+        title="{{ __('Continue with X (Twitter)') }}">
+        <i class="fab fa-fw fa-x-twitter" aria-hidden="true"></i>
     </a>
 
     <a href="{{ route('social.login', 'google') }}"

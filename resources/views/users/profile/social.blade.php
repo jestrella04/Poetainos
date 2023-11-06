@@ -9,7 +9,7 @@
 @if (!empty($user->extra_info['social']['twitter']))
 <span class="flex-fill">
     <a href="{{ getSocialLink($user->extra_info['social']['twitter'], 'twitter') }}" target="_blank" rel="noopener">
-        <i class="fab fa-fw fa-twitter" aria-hidden="true"></i>
+        <i class="fab fa-fw fa-x-twitter" aria-hidden="true"></i>
     </a>
 </span>
 @endif

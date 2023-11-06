@@ -198,7 +198,7 @@
         </div>
 
         <div class="row mb-3">
-            <label for="twitter" class="col-sm-3 col-form-label">{{ __('Twitter') }}:</label>
+            <label for="twitter" class="col-sm-3 col-form-label">{{ __('X (Twitter)') }}:</label>
             <div class="col-sm-9">
                 <input
                     type="text"

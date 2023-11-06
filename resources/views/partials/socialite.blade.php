@@ -13,11 +13,11 @@
     <a href="{{ route('social.login', 'twitter') }}"
         class="btn btn-primary d-flex">
         <span class="col-2 col-lg-4">
-            <i class="fab fa-fw fa-twitter" aria-hidden="true"></i>
+            <i class="fab fa-fw fa-x-twitter" aria-hidden="true"></i>
         </span>
 
         <span class="flex-grow-1 text-lg-start">
-            {{ __('Continue with Twitter') }}
+            {{ __('Continue with X (Twitter)') }}
         </span>
     </a>
 

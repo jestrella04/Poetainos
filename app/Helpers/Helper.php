@@ -339,7 +339,7 @@ function shareLinks($title, $url)
         'twitter' => [
             'url' => str_replace('{text}', $title, str_replace('{url}', $url, $twitterBaseUrl)),
             'class' => 'share-link twitter-link',
-            'icon' => 'fab fa-fw fa-twitter',
+            'icon' => 'fab fa-fw fa-x-twitter',
         ],
         'whatsapp' => [
             'url' => str_replace('{text}', $title, str_replace('{url}', $url, $whatsappBaseUrl)),
