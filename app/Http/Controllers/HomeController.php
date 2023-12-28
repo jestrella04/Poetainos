@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Tag;
 use App\Models\User;
+use Inertia\Inertia;
 
 class HomeController extends Controller
 {
@@ -17,16 +20,20 @@ class HomeController extends Controller
 
     public function explore()
     {
-        return view('explore.index', [
-            'params' => [
-                'title' => getPageTitle([__('Explore')])
-            ]
+        return Inertia::render('explore/PoIndex', [
+            'title' => getPageTitle([__('Explore')]),
+            'categories' => [
+                'main' => Category::main(),
+                'secondary' => Category::secondary()
+            ],
+            'tags' => Tag::popular(20),
+            'authors' => User::featured(20)
         ]);
     }
 
     public function socialite()
     {
-        return view('auth.social');
+        return Inertia::render('auth/PoLogin', []);
     }
 
     public function sharer()
@@ -34,7 +41,7 @@ class HomeController extends Controller
         $title = request('title');
         $url = request('url');
 
-        return view('partials.sharer',  [
+        return view('partials.sharer', [
             'title' => $title,
             'url' => $url,
         ]);

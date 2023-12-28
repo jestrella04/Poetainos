@@ -1,21 +1,15 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+import laravel from 'laravel-vite-plugin'
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: [
-                'resources/js/app.js',
-                'resources/sass/app.scss',
-            ],
-            refresh: true,
-        }),
-    ],
-    resolve: {
-        alias: {
-            '~bootstrap': '/node_modules/bootstrap',
-            '~@fortawesome': '/node_modules/@fortawesome',
-            '~animate.css': '/node_modules/animate.css',
-        }
-    }
-});
+  plugins: [
+    laravel({
+      input: ['resources/js/app.js'],
+      refresh: true
+    }),
+    vue(),
+    vuetify({ autoImport: true })
+  ]
+})

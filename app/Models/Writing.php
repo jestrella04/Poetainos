@@ -76,6 +76,12 @@ class Writing extends Model
         return $this->morphMany(Like::class, 'likeable');
     }
 
+    public function likers()
+    {
+        $likes = $this->likes()->pluck('user_id');
+        return User::select('id', 'username', 'name', 'extra_info->avatar AS avatar')->whereIn('id', $likes)->get();
+    }
+
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
@@ -84,10 +90,10 @@ class Writing extends Model
     public function categoriesAsString($delimiter = ', ')
     {
         $array = $this->categories
-        ->map(function ($category) {
-            return $category->name;
-        })
-        ->toArray();
+            ->map(function ($category) {
+                return $category->name;
+            })
+            ->toArray();
 
         return implode($delimiter, $array);
     }
@@ -95,10 +101,10 @@ class Writing extends Model
     public function tagsAsString($delimiter = ', ')
     {
         $array = $this->tags
-        ->map(function ($tag) {
-            return $tag->name;
-        })
-        ->toArray();
+            ->map(function ($tag) {
+                return $tag->name;
+            })
+            ->toArray();
 
         return implode($delimiter, $array);
     }
@@ -167,14 +173,14 @@ class Writing extends Model
 
     public function externalLink()
     {
-        if (! empty($this->extra_info['link'])) {
+        if (!empty($this->extra_info['link'])) {
             return $this->extra_info['link'];
         }
     }
 
     public function coverPath()
     {
-        if (! empty($this->extra_info['cover'])) {
+        if (!empty($this->extra_info['cover'])) {
             $path = '/storage/' . $this->extra_info['cover'];
 
             if (is_file(public_path($path))) {
@@ -183,11 +189,7 @@ class Writing extends Model
         }
     }
 
-    public function likers()
-    {
-        $likers = $this->likes()->pluck('user_id');
-        return User::whereIn('id', $likers);
-    }
+
 
     public function complaints()
     {

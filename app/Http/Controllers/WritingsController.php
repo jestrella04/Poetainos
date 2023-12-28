@@ -12,47 +12,60 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class WritingsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function index()
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $filter = [0];
+        $filterUsers = [0];
+        $filterAwards = 'writings.awards' === request()->route()->getName() ? 'home_posted_at' : 'id';
 
         if (auth()->check()) {
-            $filter = User::find(auth()->user()->id)->getBlockedAuthors($asArrayOfIds = true);
+            $filterUsers = User::find(auth()->user()->id)->getBlockedAuthors($asArrayOfIds = true);
         }
 
         if ('latest' === $sort) {
-            $writings = Writing::whereNotIn('user_id', $filter)
-            ->latest()
-            ->simplePaginate($this->pagination);
+            $writings = Writing::whereNotIn('user_id', $filterUsers)
+                ->whereNotNull($filterAwards)
+                ->withCount(['likes', 'comments', 'shelf'])
+                ->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])
+                ->latest()
+                ->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = Writing::whereNotIn('user_id', $filter)
-            ->orderBy('views', 'desc')
-            ->simplePaginate($this->pagination);
+            $writings = Writing::whereNotIn('user_id', $filterUsers)
+                ->whereNotNull($filterAwards)
+                ->withCount(['likes', 'comments', 'shelf'])
+                ->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])
+                ->orderBy('views', 'desc')
+                ->simplePaginate($this->pagination);
+
         } elseif ('likes' === $sort) {
-            $writings = Writing::whereNotIn('user_id', $filter)
-            ->withCount('likes')
-            ->orderBy('likes_count', 'desc')
-            ->simplePaginate($this->pagination);
+            $writings = Writing::whereNotIn('user_id', $filterUsers)
+                ->whereNotNull($filterAwards)
+                ->withCount(['likes', 'comments', 'shelf'])
+                ->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])
+                ->orderBy('likes_count', 'desc')
+                ->simplePaginate($this->pagination);
         }
 
-        $params = [
+        return Inertia::render('writings/PoIndex', [
             'title' => getPageTitle([]),
             'canonical' => route('home'),
-        ];
-
-        return view('writings.index', [
-            'writings' => $writings,
-            'params' => $params,
             'sort' => $sort,
+            'writings' => $writings,
         ]);
     }
 
@@ -81,19 +94,10 @@ class WritingsController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Writing  $writing
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function show(Writing $writing)
     {
-        $params = [
-            'writings_single_entry' => true,
-            'title' => getPageTitle([
-                $writing->title,
-                $writing->author->getName(),
-            ]),
-            'canonical' => $writing->path(),
-        ];
-
         // Increment writing views
         $writing->incrementViews();
 
@@ -101,9 +105,27 @@ class WritingsController extends Controller
         $writing->updateAura();
         //$writing->author->updateAura();
 
-        return view('writings.show', [
-            'writing' => $writing,
-            'params' => $params
+        return Inertia::render('writings/PoShow', [
+            'meta' => [
+                'title' => getPageTitle([
+                    $writing->title,
+                    $writing->author->getName(),
+                ]),
+                'canonical' => $writing->path(),
+            ],
+            'writing' => Writing::whereId($writing->id)
+                ->withCount(['likes', 'comments', 'shelf'])
+                ->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])
+                ->with(['categories' => function ($query) {
+                    $query->select('id', 'name', 'slug');
+                }])
+                ->with(['tags' => function ($query) {
+                    $query->select('id', 'name', 'slug');
+                }])
+                ->firstOrFail(),
+            'likers' => $writing->likers()->shuffle()->take(5),
         ]);
     }
 
@@ -112,7 +134,8 @@ class WritingsController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function random() {
+    public function random()
+    {
         $writing = User::has('writings', '>', 0)
             ->inRandomOrder()
             ->firstOrFail()
@@ -204,7 +227,7 @@ class WritingsController extends Controller
         // Persist to database
         $writing->title = request('title');
 
-        if (! $writing->exists) {
+        if (!$writing->exists) {
             $writing->user_id = auth()->user()->id;
             $writing->slug = slugify($writing->getTable(), $writing->title);
         }
@@ -215,14 +238,14 @@ class WritingsController extends Controller
 
         $categories = request('categories');
 
-        if (! empty(request('categories'))) {
+        if (!empty(request('categories'))) {
             array_unshift($categories, request('main_category'));
         }
 
         $tagsToSync = [];
 
         // Let's grab the entered tags
-        if (! empty(request('tags'))) {
+        if (!empty(request('tags'))) {
             foreach (request('tags') as $tag) {
                 $tag = preg_replace('/\s+/', ' ', $tag);
                 $tag = trim($tag);

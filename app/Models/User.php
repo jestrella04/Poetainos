@@ -69,7 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function avatarPath()
     {
-        if (! empty($this->extra_info['avatar'])) {
+        if (!empty($this->extra_info['avatar'])) {
             $path = '/storage/' . $this->extra_info['avatar'];
 
             if (is_file(public_path($path))) {
@@ -80,7 +80,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getName()
     {
-        if (! empty($this->name)) {
+        if (!empty($this->name)) {
             return $this->name;
         }
 
@@ -89,7 +89,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function firstName()
     {
-        if (! empty($this->name)) {
+        if (!empty($this->name)) {
             return explode(' ', $this->name)[0];
         }
 
@@ -98,7 +98,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function initials()
     {
-        if (! empty($this->name) && ! empty($this->last_name)) {
+        if (!empty($this->name) && !empty($this->last_name)) {
             return strtoupper(substr($this->name, 0, 1) . substr($this->last_name, 0, 1));
         }
 
@@ -107,7 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getTwitterUsername()
     {
-        if (! empty($this->extra_info['social']['twitter'])) {
+        if (!empty($this->extra_info['social']['twitter'])) {
             return '@' . $this->extra_info['social']['twitter'];
         }
 
@@ -205,7 +205,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public static function featured($count = 20)
     {
-        return Self::orderByDesc('aura')->take($count)->get();
+        return self::orderByDesc('aura')->take($count)->get(['id', 'username', 'name', 'extra_info->avatar AS avatar']);
     }
 
     public function isAllowed($task)
