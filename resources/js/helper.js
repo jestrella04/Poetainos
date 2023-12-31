@@ -3,6 +3,8 @@ import millify from 'millify'
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import crop from 'crop-url'
+import linkifyHtml from 'linkify-html'
+import 'linkify-plugin-mention'
 
 const page = computed(() => usePage())
 
@@ -79,6 +81,16 @@ const helper = class {
 
   cropUrl(url, max = 40) {
     return crop(url, max)
+  }
+
+  linkify(text) {
+    const options = {
+      formatHref: {
+        mention: (href) => `${window.route('users.index')}${href}`
+      }
+    }
+
+    return linkifyHtml(text, options)
   }
 }
 

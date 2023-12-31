@@ -20,7 +20,7 @@ class HomeController extends Controller
 
     public function explore()
     {
-        return Inertia::render('explore/PoIndex', [
+        return Inertia::render('explore/PoExploreIndex', [
             'title' => getPageTitle([__('Explore')]),
             'categories' => [
                 'main' => Category::main(),

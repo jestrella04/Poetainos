@@ -31,7 +31,7 @@
     "lets-validate-your-email-address": "Vamos a validar tu correo",
     "logged-out-goodbye": "Tu sesión ha terminado. ¡Nos vemos pronto!",
     "login": "Iniciar sesión",
-    "login-before-comment": "Por favor inicia sesión antes de comentar.",
+    "login-before-comment": "Por favor, inicia sesión antes de comentar",
     "login-alt": "Acceder",
     "logout": "Cerrar sesión",
     "manage-blocked-users": "Gestionar usuarios bloqueados",
@@ -84,17 +84,17 @@
     "main-category": "Categoría principal"
   },
   "comments": {
-    "be-first": "Se el primero en dejar un comentario.",
+    "be-first-ask": "¿Te animas a enviar el primero?",
     "comment": "Comentario",
-    "comment-mention": "Deja aquí tu comentario. Puedes mencionar otros usuarios usando @",
+    "comment-mention": "Cuéntanos qué te ha parecido. Puedes usar el símbolo @ para etiquetar otros usuarios.",
     "comment-posted": "Comentario enviado exitosamente.",
     "comments": "Comentarios",
+    "comments-empty": "No hay comentarios aún",
     "delete-comment": "Eliminar comentario",
     "load-older-comment": "Cargar antiguos comentarios",
     "loading-comments": "Cargando comentarios",
     "mention-with": "Usa el símbolo @ para etiquetar otros usuarios",
-    "post-comment": "Enviar comentario",
-    "post-reply": "Enviar Respuesta"
+    "post-comment": "Enviar comentario"
   },
   "complaints": {
     "complaint": "Denunciar",
@@ -107,7 +107,8 @@
     "report-writing": "Denunciar texto"
   },
   "main": {
-    "menu": ".",
+    "more": "Más",
+    "menu": "Menú",
     "about-us": "Sobre Nosotros",
     "action-irreversible": "Esta acción es irreversible.",
     "actions": "Acciones",

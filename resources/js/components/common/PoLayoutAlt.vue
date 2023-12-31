@@ -1,6 +1,5 @@
 <script setup>
 import { useTheme } from 'vuetify'
-import PoHead from './PoHead.vue'
 
 const theme = useTheme()
 

@@ -1,31 +1,41 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
-import PoAvatar from '../common/PoAvatar.vue';
+import { ref, provide } from 'vue'
+import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
 
-defineProps({
+const props = defineProps({
   alone: { type: Boolean, default: true },
   data: { type: Object, required: true },
   likers: Object,
 })
+
+const loadingComments = ref(true)
+
+provide('loadingComments', loadingComments)
+provide('writingId', props.data.id)
 </script>
 
 <template>
-  <v-card border rounded elevation="2">
-    <v-img v-if="!$helper.isNull(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)"
-      class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" cover>
-      <div class="text-center py-3">
-        <po-avatar size="64" color="deep-purple-lighten-2" :user="data.author" />
-      </div>
-    </v-img>
+  <v-card rounded elevation="2" class="mb-5">
+    <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)">
+      <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" cover>
+        <div class="text-center py-3">
+          <po-link :href="$route('users.show', data.author.username)" inertia>
+            <po-avatar size="64" color="secondary" :user="data.author" />
+          </po-link>
+        </div>
+      </v-img>
+    </template>
 
     <div v-else class="text-center pt-3">
-      <po-avatar size="64" color="deep-purple-lighten-2" :user="data.author" />
+      <po-link :href="$route('users.show', data.author.username)" inertia>
+        <po-avatar size="64" color="secondary" :user="data.author" />
+      </po-link>
     </div>
 
     <v-card-text>
       <div class="text-center mb-3">
         <p class="text-h5 text-uppercase font-weight-bold">
-          <Link :href="$route('writings.show', data.slug)">{{ data.title }}</Link>
+          <po-link :href="$route('writings.show', data.slug)" inertia>{{ data.title }}</po-link>
         </p>
         <p class="text-caption text-uppercase font-weight-light">
           {{
@@ -40,12 +50,12 @@ defineProps({
           {{ data.text }}
         </blockquote>
 
-        <template v-if="!$helper.strNullOrEmpty(data.extra_info.link)">
-          <v-btn variant="link" :href="data.extra_info.link" prepend-icon="fas fa-link" target="_blank"
+        <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.link)">
+          <po-button variant="text" :href="data.extra_info.link" prepend-icon="fas fa-link" target="_blank"
             rel="nofollow noopener" class="mb-4">
 
             {{ $helper.cropUrl(data.extra_info.link) }}
-          </v-btn>
+          </po-button>
         </template>
 
         <div v-if="!$helper.isEmpty(data.categories)" class="d-flex mb-2">
@@ -54,11 +64,10 @@ defineProps({
           </div>
 
           <div>
-            <v-btn v-for="category in data.categories" :key="category.slug" color="primary" size="x-small"
-              :href="$route('categories.show', category.slug)" class="mr-1"
-              @click.prevent="$inertia.get($route('categories.show', category.slug))">
+            <po-button v-for="category in data.categories" :key="category.slug" color="primary" size="x-small"
+              :href="$route('categories.show', category.slug)" class="mr-1" inertia>
               {{ category.name }}
-            </v-btn>
+            </po-button>
           </div>
         </div>
 
@@ -68,22 +77,22 @@ defineProps({
           </div>
 
           <div>
-            <v-btn v-for="tag in data.tags" :key="tag.slug" color="success" size="x-small"
-              :href="$route('tags.show', tag.slug)" class="mr-1"
-              @click.prevent="$inertia.get($route('tags.show', tag.slug))">
+            <po-button v-for="tag in data.tags" :key="tag.slug" color="success" size="x-small"
+              :href="$route('tags.show', tag.slug)" class="mr-1" inertia>
               {{ tag.name }}
-            </v-btn>
+            </po-button>
           </div>
         </div>
 
         <div v-if="!$helper.isEmpty(likers)">
           <p class="mb-3">{{ $t('main.liked-by') }}</p>
 
-          <div v-for="liker in likers" :key="liker.id" class="d-flex flex-wrap">
-            <v-btn icon :href="$route('users.show', liker.username)"
-              @click.prevent="$inertia.get($route('users.show', liker.username))">
-              <po-avatar size="48" color="secondary" :user="liker" />
-            </v-btn>
+          <div class="d-inline-flex flex-wrap">
+            <div v-for="liker in likers" :key="liker.id" class="mx-1 my-1">
+              <po-button icon :href="$route('users.show', liker.username)" inertia>
+                <po-avatar size="48" color="secondary" :user="liker" />
+              </po-button>
+            </div>
           </div>
         </div>
       </template>
@@ -95,8 +104,9 @@ defineProps({
       </template>
     </v-card-text>
 
+    <v-divider></v-divider>
     <v-card-actions>
-      <div class="d-flex flex-fill text-caption text-center">
+      <div class="d-flex w-100 mx-auto align-items-center text-caption text-center">
         <div v-if="!$helper.strNullOrEmpty(data.home_posted_at)" class="flex-grow-1">
           <div class="d-flex flex-column">
             <div><v-icon icon="fas fa-fan" color="amber-accent-4"></v-icon></div>
@@ -141,4 +151,12 @@ defineProps({
       </div>
     </v-card-actions>
   </v-card>
+
+  <template v-if="alone">
+    <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
+    <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
+    <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
+
+    <po-comments-index />
+  </template>
 </template>

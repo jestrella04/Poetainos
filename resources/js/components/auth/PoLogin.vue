@@ -1,8 +1,7 @@
 <script setup>
 import { computed, defineOptions } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import PoLayoutAlt from '../common/PoLayoutAlt.vue';
-import PoHead from '../common/PoHead.vue'
+import PoLayoutAlt from '../common/PoLayoutAlt.vue'
 
 const page = computed(() => usePage())
 
@@ -67,35 +66,36 @@ defineOptions({
 
           <v-list>
             <v-list-item>
-              <v-btn block color="primary" :href="$route('social.login', 'facebook')" prepend-icon="fab fa-facebook-f">
+              <po-button block color="primary" :href="$route('social.login', 'facebook')"
+                prepend-icon="fab fa-facebook-f">
                 {{ $t('accounts.continue-with-facebook') }}
-              </v-btn>
+              </po-button>
             </v-list-item>
 
             <v-list-item>
-              <v-btn block color="primary" :href="$route('social.login', 'twitter')" prepend-icon="fab fa-x-twitter">
+              <po-button block color="primary" :href="$route('social.login', 'twitter')" prepend-icon="fab fa-x-twitter">
                 {{ $t('accounts.continue-with-x-twitter') }}
-              </v-btn>
+              </po-button>
             </v-list-item>
 
             <v-list-item>
-              <v-btn block color="primary" :href="$route('social.login', 'google')" prepend-icon="fab fa-google">
+              <po-button block color="primary" :href="$route('social.login', 'google')" prepend-icon="fab fa-google">
                 {{ $t('accounts.continue-with-google') }}
-              </v-btn>
+              </po-button>
             </v-list-item>
 
             <v-list-item>
-              <v-btn block color="primary" :href="$route('login.email.check')" prepend-icon="fas fa-at"
-                @click.prevent="$inertia.get($route('social.login', 'login.email.check'))">
+              <po-button block color="primary" :href="$route('login.email.check')" prepend-icon="fas fa-at"
+                @click.prevent="$inertia.get($route('login.email.check'))">
                 {{ $t('accounts.continue-with-email') }}
-              </v-btn>
+              </po-button>
             </v-list-item>
 
             <v-list-item>
-              <v-btn block color="primary" :href="$route('home')" prepend-icon="fas fa-ghost"
+              <po-button block color="primary" :href="$route('home')" prepend-icon="fas fa-ghost"
                 @click.prevent="$inertia.get($route('home'))">
                 {{ $t('accounts.continue-as-guest') }}
-              </v-btn>
+              </po-button>
             </v-list-item>
           </v-list>
         </div>

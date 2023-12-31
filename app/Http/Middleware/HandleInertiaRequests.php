@@ -42,7 +42,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => auth()->check()
                     ? User::select('username', 'name', 'extra_info->avatar AS avatar')->where('id', auth()->user()->id)->firstOrFail()
                     : null,
-                'admin' => auth()->check() ? auth()->user()->isAllowed('admin') : false
+                'admin' => auth()->check() ? User::find(auth()->user()->id)->isAllowed('admin') : null,
+                'notifications' => auth()->check() ? auth()->user()->unreadNotifications->count() : 0,
             ],
             'route' => [
                 'name' => $request->route()->getName()
@@ -55,7 +56,7 @@ class HandleInertiaRequests extends Middleware
                 //'stores' => getSiteConfig('stores'),
             ],
             'flash' => [
-                'message' => fn() => $request->session()->get('message')
+                'message' => fn () => $request->session()->get('message')
             ],
         ]);
     }

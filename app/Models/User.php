@@ -159,6 +159,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Like::class);
     }
 
+    public function awards()
+    {
+        return $this->hasMany(Writing::class)->whereNotNull('home_posted_at');
+    }
+
     public function incrementViews()
     {
         DB::table($this->getTable())->whereId($this->id)->increment('profile_views');

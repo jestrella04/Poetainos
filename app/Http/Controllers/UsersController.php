@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Intervention\Image\Facades\Image;
 
 class UsersController extends Controller
@@ -11,7 +12,7 @@ class UsersController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function index()
     {
@@ -22,21 +23,34 @@ class UsersController extends Controller
             'canonical' => route('users.index'),
         ];
 
+        $users = User::select(
+            'id',
+            'username',
+            'name',
+            'profile_views',
+            'aura',
+            'extra_info->avatar AS avatar',
+            'extra_info->bio AS bio',
+            'extra_info->social AS social',
+            'extra_info->avatar AS avatar',
+            'extra_info->website AS website',
+            'extra_info->location AS location',
+            'extra_info->interests AS interests',
+        )->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
+
         if ('latest' === $sort) {
-            $users = User::latest()
-            ->simplePaginate($this->pagination);
+            $users = $users->latest()->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $users = User::orderBy('profile_views', 'desc')
-            ->simplePaginate($this->pagination);
+            $users = $users->orderBy('profile_views', 'desc')->simplePaginate($this->pagination);
         } elseif ('featured' === $sort) {
-            $users = User::orderBy('aura', 'desc')
-            ->simplePaginate($this->pagination);
+            $users = $users->orderBy('aura', 'desc')->simplePaginate($this->pagination);
         }
 
-        return view('users.index', [
-            'users' => $users,
+        return Inertia::render('users/PoUsersIndex', [
+            'title' => getPageTitle([__('Writers')]),
+            'canonical' => route('users.index'),
             'sort' => $sort,
-            'params' => $params
+            'users' => $users,
         ]);
     }
 
@@ -47,7 +61,7 @@ class UsersController extends Controller
      */
     public function query()
     {
-        $wildcard = '%'. request('query') .'%';
+        $wildcard = '%' . request('query') . '%';
 
         return User::where('name', 'like', $wildcard)
             ->orWhere('username', 'like', $wildcard)
@@ -91,7 +105,7 @@ class UsersController extends Controller
             'title' => getPageTitle([
                 $user->getName(),
                 __('Writers'),
-                ]),
+            ]),
             'canonical' => $user->path(),
         ];
 
@@ -203,7 +217,7 @@ class UsersController extends Controller
         }
 
         // Check if a user role is set
-        if (! empty(request('role'))) {
+        if (!empty(request('role'))) {
             $user->role_id = request('role');
         }
 
@@ -292,7 +306,7 @@ class UsersController extends Controller
             'title' => getPageTitle([
                 $user->getName(),
                 __('Writers'),
-                ]),
+            ]),
         ];
 
         return view('users.account', [

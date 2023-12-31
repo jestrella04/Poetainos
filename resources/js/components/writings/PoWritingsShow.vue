@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import PoEntry from './PoEntry.vue'
+import PoWritingsEntry from './PoWritingsEntry.vue'
 
 const page = computed(() => usePage())
 </script>
@@ -9,7 +9,7 @@ const page = computed(() => usePage())
 <template>
   <v-row>
     <v-col cols="12" md="8">
-      <po-entry :data="page.props.writing" :likers="page.props.likers"></po-entry>
+      <po-writings-entry :data="page.props.writing" :likers="page.props.likers"></po-writings-entry>
     </v-col>
 
     <v-col cols="12" md="4">Sidebar</v-col>

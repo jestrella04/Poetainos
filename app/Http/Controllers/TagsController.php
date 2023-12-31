@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TagsController extends Controller
 {
@@ -24,12 +25,12 @@ class TagsController extends Controller
      */
     public function query()
     {
-        $wildcard = '%'. request('query') .'%';
+        $wildcard = '%' . request('query') . '%';
 
         return Tag::where('name', 'like', $wildcard)
             ->take($this->pagination)
             ->get()
-            ->map(function($tag, $key) {
+            ->map(function ($tag, $key) {
                 return [
                     "value" => $tag['name'],
                     "label" => $tag['name'],
@@ -62,39 +63,54 @@ class TagsController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Tag  $tag
-     * @return \Illuminate\Http\Response
+     * @return \Inertia\Response
      */
     public function show(Tag $tag)
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $filterUsers = [0];
 
         $params = [
             'head_msg' => __('You are browsing the library of writings tagged with ":tag".', ['tag' => $tag->name]),
-            'title' => getPageTitle([
-                $tag->name,
-                __('Tags'),
-                ]),
-            'canonical' => $tag->path(),
+
         ];
 
         if ('latest' === $sort) {
             $writings = $tag->writings()
-            ->orderBy('created_at', 'desc')
-            ->simplePaginate($this->pagination);
+                ->whereNotIn('user_id', $this->blockedUsers)
+                ->withCount(['likes', 'comments', 'shelf'])
+                ->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])
+                ->orderBy('created_at', 'desc')
+                ->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
             $writings = $tag->writings()
-            ->orderBy('views', 'desc')
-            ->simplePaginate($this->pagination);
+                ->whereNotIn('user_id', $this->blockedUsers)
+                ->withCount(['likes', 'comments', 'shelf'])
+                ->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])
+                ->orderBy('views', 'desc')
+                ->simplePaginate($this->pagination);
         } elseif ('likes' === $sort) {
             $writings = $tag->writings()
-            ->withCount('likes')
-            ->orderBy('likes_count', 'desc')
-            ->simplePaginate($this->pagination);
+                ->whereNotIn('user_id', $this->blockedUsers)
+                ->withCount(['likes', 'comments', 'shelf'])
+                ->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])
+                ->orderBy('likes_count', 'desc')
+                ->simplePaginate($this->pagination);
         }
 
-        return view('writings.index', [
+        return Inertia::render('writings/PoWritingsIndex', [
+            'title' => getPageTitle([
+                $tag->name,
+                __('Tags'),
+            ]),
+            'canonical' => $tag->path(),
             'writings' => $writings,
-            'params' => $params,
             'sort' => $sort,
         ]);
     }

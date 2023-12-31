@@ -1,8 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import PoEntry from './PoEntry.vue'
-import PoHead from '../common/PoHead.vue';
+import PoWritingsEntry from './PoWritingsEntry.vue'
 
 const page = computed(() => usePage())
 </script>
@@ -32,7 +31,7 @@ const page = computed(() => usePage())
 
   <v-row>
     <v-col v-for="writing in page.props.writings.data" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
-      <po-entry :alone="false" :data="writing"></po-entry>
+      <po-writings-entry :alone="false" :data="writing"></po-writings-entry>
     </v-col>
   </v-row>
 </template>

@@ -24,15 +24,10 @@ class WritingsController extends Controller
     public function index()
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $filterUsers = [0];
         $filterAwards = 'writings.awards' === request()->route()->getName() ? 'home_posted_at' : 'id';
 
-        if (auth()->check()) {
-            $filterUsers = User::find(auth()->user()->id)->getBlockedAuthors($asArrayOfIds = true);
-        }
-
         if ('latest' === $sort) {
-            $writings = Writing::whereNotIn('user_id', $filterUsers)
+            $writings = Writing::whereNotIn('user_id', $this->blockedUsers)
                 ->whereNotNull($filterAwards)
                 ->withCount(['likes', 'comments', 'shelf'])
                 ->with(['author' => function ($query) {
@@ -41,7 +36,7 @@ class WritingsController extends Controller
                 ->latest()
                 ->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = Writing::whereNotIn('user_id', $filterUsers)
+            $writings = Writing::whereNotIn('user_id', $this->blockedUsers)
                 ->whereNotNull($filterAwards)
                 ->withCount(['likes', 'comments', 'shelf'])
                 ->with(['author' => function ($query) {
@@ -49,9 +44,8 @@ class WritingsController extends Controller
                 }])
                 ->orderBy('views', 'desc')
                 ->simplePaginate($this->pagination);
-
         } elseif ('likes' === $sort) {
-            $writings = Writing::whereNotIn('user_id', $filterUsers)
+            $writings = Writing::whereNotIn('user_id', $this->blockedUsers)
                 ->whereNotNull($filterAwards)
                 ->withCount(['likes', 'comments', 'shelf'])
                 ->with(['author' => function ($query) {
@@ -61,11 +55,11 @@ class WritingsController extends Controller
                 ->simplePaginate($this->pagination);
         }
 
-        return Inertia::render('writings/PoIndex', [
+        return Inertia::render('writings/PoWritingsIndex', [
             'title' => getPageTitle([]),
             'canonical' => route('home'),
-            'sort' => $sort,
             'writings' => $writings,
+            'sort' => $sort,
         ]);
     }
 
@@ -105,7 +99,7 @@ class WritingsController extends Controller
         $writing->updateAura();
         //$writing->author->updateAura();
 
-        return Inertia::render('writings/PoShow', [
+        return Inertia::render('writings/PoWritingsShow', [
             'meta' => [
                 'title' => getPageTitle([
                     $writing->title,

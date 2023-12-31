@@ -7,6 +7,7 @@ use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
@@ -23,20 +24,16 @@ class CommentsController extends Controller
             $filter = User::find(auth()->user()->id)->getBlockedAuthors()->pluck('blocked_user_id');
         }
 
-        $comments = Comment::with('replies')
-            ->where('writing_id', $writing)
+        $comments = Comment::where('writing_id', $writing)
             ->whereNotIn('user_id', $filter)
+            ->with(['author' => function ($query) {
+                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            }])
+            ->withCount(['likes'])
             ->orderBy('created_at', 'desc')
             ->simplePaginate($this->pagination);
 
-        $html = view('comments.index', [
-            'comments' => $comments,
-        ])->render();
-
-        return response()->json([
-            'next' => $comments->nextPageUrl(),
-            'comments' => $html,
-        ]);
+        return $comments;
     }
 
     /**

@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import PoHead from '../common/PoHead.vue';
 
 const page = computed(() => usePage())
 
