@@ -5,6 +5,7 @@ import { usePage } from '@inertiajs/vue3'
 import crop from 'crop-url'
 import linkifyHtml from 'linkify-html'
 import 'linkify-plugin-mention'
+import MarkdownIt from 'markdown-it'
 
 const page = computed(() => usePage())
 
@@ -91,6 +92,42 @@ const helper = class {
     }
 
     return linkifyHtml(text, options)
+  }
+
+  socialLink(user, network) {
+    let url = ''
+
+    switch (network) {
+      case 'twitter':
+        url = `https://twitter.com/${user}`
+        break
+
+      case 'instagram':
+        url = `https://instagram.com/${user}`
+        break
+
+      case 'facebook':
+        url = `https://facebook.com/${user}`
+        break
+
+      case 'youtube':
+        url = `https://youtube.com/user/${user}`
+        break
+
+      case 'goodreads':
+        url = `https://www.goodreads.com/${user}`
+        break
+
+      case 'telegram':
+        url = `https://t.me/${user}`
+        break
+    }
+
+    return url
+  }
+
+  markdown(md) {
+    return MarkdownIt().render(md)
   }
 }
 

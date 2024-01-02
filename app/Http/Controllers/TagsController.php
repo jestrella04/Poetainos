@@ -68,40 +68,23 @@ class TagsController extends Controller
     public function show(Tag $tag)
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $filterUsers = [0];
-
         $params = [
             'head_msg' => __('You are browsing the library of writings tagged with ":tag".', ['tag' => $tag->name]),
 
         ];
+        $writings = $tag->writings()
+            ->whereNotIn('user_id', $this->blockedUsers)
+            ->withCount(['likes', 'comments', 'shelf'])
+            ->with(['author' => function ($query) {
+                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            }]);
 
         if ('latest' === $sort) {
-            $writings = $tag->writings()
-                ->whereNotIn('user_id', $this->blockedUsers)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])
-                ->orderBy('created_at', 'desc')
-                ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = $tag->writings()
-                ->whereNotIn('user_id', $this->blockedUsers)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])
-                ->orderBy('views', 'desc')
-                ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination);
         } elseif ('likes' === $sort) {
-            $writings = $tag->writings()
-                ->whereNotIn('user_id', $this->blockedUsers)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])
-                ->orderBy('likes_count', 'desc')
-                ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination);
         }
 
         return Inertia::render('writings/PoWritingsIndex', [

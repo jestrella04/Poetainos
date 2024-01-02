@@ -29,13 +29,12 @@ class UsersController extends Controller
             'name',
             'profile_views',
             'aura',
-            'extra_info->avatar AS avatar',
             'extra_info->bio AS bio',
-            'extra_info->social AS social',
+            //'extra_info->social AS social',
             'extra_info->avatar AS avatar',
-            'extra_info->website AS website',
-            'extra_info->location AS location',
-            'extra_info->interests AS interests',
+            //'extra_info->website AS website',
+            //'extra_info->location AS location',
+            //'extra_info->interests AS interests',
         )->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
 
         if ('latest' === $sort) {
@@ -99,25 +98,35 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        $params = [
-            'users_single_entry' => true,
-            'writings_single_entry' => false,
-            'title' => getPageTitle([
-                $user->getName(),
-                __('Writers'),
-            ]),
-            'canonical' => $user->path(),
-        ];
-
         // Increment writing views
         $user->incrementViews();
 
         // Update Aura
         $user->updateAura();
 
-        return view('users.show', [
-            'user' => $user,
-            'params' => $params
+        return Inertia::render('users/PoUsersShow', [
+            /* 'title' => getPageTitle([
+                $user->getName(),
+                __('Writers'),
+            ]),
+            'canonical' => $user->path(), */
+            'user' => User::select(
+                'id',
+                'username',
+                'name',
+                'profile_views',
+                'aura',
+                'created_at',
+                'extra_info->bio AS bio',
+                'extra_info->social AS social',
+                'extra_info->avatar AS avatar',
+                'extra_info->website AS website',
+                'extra_info->location AS location',
+                'extra_info->interests AS interests',
+            )
+                ->whereId($user->id)
+                ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
+                ->firstOrFail(),
         ]);
     }
 

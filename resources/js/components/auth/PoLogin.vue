@@ -10,7 +10,7 @@ defineOptions({
 })
 </script>
 
-<style>
+<style scoped>
 .login-col {
   width: 100%;
   height: 100%;

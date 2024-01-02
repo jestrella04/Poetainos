@@ -52,8 +52,8 @@ class HandleInertiaRequests extends Middleware
                 'name' => getSiteConfig('name'),
                 'slogan' => getSiteConfig('slogan'),
                 'pagination' => getSiteConfig('pagination'),
-                //'social' => getSiteConfig('social'),
-                //'stores' => getSiteConfig('stores'),
+                'social' => getSiteConfig('social'),
+                'stores' => getSiteConfig('stores'),
             ],
             'flash' => [
                 'message' => fn () => $request->session()->get('message')

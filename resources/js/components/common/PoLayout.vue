@@ -24,6 +24,12 @@ provide('mobileUserMenu', mobileUserMenu)
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
 }
 
+@media (max-width: 960px) {
+  footer {
+    margin-bottom: 56px;
+  }
+}
+
 .pos-relative {
   position: relative !important;
 }
@@ -117,7 +123,30 @@ provide('mobileUserMenu', mobileUserMenu)
       </v-container>
     </v-main>
 
-    <v-bottom-navigation v-model="page.props.route.name" bg-color="primary" class="hidden-lg-and-up" mode="shift" grow>
+    <v-footer>
+      <div class="d-flex flex-wrap justify-space-around w-100 ga-2 text-caption text-center">
+        <div>&copy; 2020 {{ page.props.site.name }}</div>
+        <div class="d-inline-flex ga-3">
+          <template v-for="(app, store) in page.props.site.stores" :key="app">
+            <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="primary" size="x-small"
+              variant="tonal">
+              {{ store }}
+            </po-button>
+          </template>
+        </div>
+
+        <div class="d-inline-flex ga-3">
+          <template v-for="(user, social) in page.props.site.social" :key="social">
+            <po-link :href="$helper.socialLink(user.value, social)">
+              <v-icon v-if="social === 'twitter'" :icon="`fab fa-x-${social}`"></v-icon>
+              <v-icon v-else :icon="`fab fa-${social}`"></v-icon>
+            </po-link>
+          </template>
+        </div>
+      </div>
+    </v-footer>
+
+    <v-bottom-navigation v-model="page.props.route.name" bg-color="primary" class="hidden-lg-and-up" mode="shift">
       <po-button value="home" :href="$route('home')" inertia>
         <v-icon icon="fas fa-home" />
         <span>{{ $t('main.home') }}</span>

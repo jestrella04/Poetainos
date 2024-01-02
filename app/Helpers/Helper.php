@@ -1,14 +1,9 @@
 <?php
 
-use App\Models\Comment;
 use App\Models\User;
-use App\Models\Writing;
-use App\Models\Shelf;
-use App\Models\Like;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Builder;
 
 function getSiteConfig($path = '')
 {
@@ -23,39 +18,6 @@ function getSiteConfig($path = '')
     } else {
         return $path;
     }
-}
-
-function getSocialLink($user, $network)
-{
-    $url = '';
-
-    switch ($network) {
-        case 'twitter':
-            $url = 'https://twitter.com/' . $user;
-            break;
-
-        case 'instagram':
-            $url = 'https://instagram.com/' . $user;
-            break;
-
-        case 'facebook':
-            $url = 'https://facebook.com/' . $user;
-            break;
-
-        case 'youtube':
-            $url = 'https://youtube.com/user/' . $user;
-            break;
-
-        case 'goodreads':
-            $url = 'https://www.goodreads.com/' . $user;
-            break;
-
-        default:
-            $url = $user;
-            break;
-    }
-
-    return $url;
 }
 
 function slugify($table, $title, $column = 'slug', $separator = '-')

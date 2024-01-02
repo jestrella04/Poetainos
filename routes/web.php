@@ -34,6 +34,7 @@ use App\Http\Controllers\WritingsController;
 */
 
 /* Authentication routes */
+
 Auth::routes(['verify' => true]);
 
 /* Administration */
@@ -146,6 +147,7 @@ Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('
 Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
 
 // Pages
+Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
 Route::get('/pages/{page}', [PagesController::class, 'show'])->name('pages.show');
 
 // Categories

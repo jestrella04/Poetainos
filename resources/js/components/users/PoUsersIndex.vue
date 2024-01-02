@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import PoUsersEntry from './PoUsersEntry.vue'
+import PoUsersCard from './PoUsersCard.vue'
 
 const page = computed(() => usePage())
 </script>
@@ -31,7 +31,7 @@ const page = computed(() => usePage())
 
   <v-row>
     <v-col v-for="user in page.props.users.data" :key="user.id" tag="user" cols="12" sm="6" lg="4">
-      <po-users-entry :alone="false" :data="user"></po-users-entry>
+      <po-users-card :alone="false" :data="user" />
     </v-col>
   </v-row>
 </template>

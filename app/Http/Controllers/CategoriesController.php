@@ -50,40 +50,23 @@ class CategoriesController extends Controller
     public function show(Category $category)
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $filterUsers = [0];
-
         $params = [
             'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]) . ' ' . $category->description,
-
         ];
 
+        $writings = $category->writingsRecursive()
+            ->whereNotIn('user_id', $this->blockedUsers)
+            ->withCount(['likes', 'comments', 'shelf'])
+            ->with(['author' => function ($query) {
+                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            }]);
+
         if ('latest' === $sort) {
-            $writings = $category->writingsRecursive()
-                ->whereNotIn('user_id', $this->blockedUsers)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])
-                ->orderBy('created_at', 'desc')
-                ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination);
         } elseif ('popular' === $sort) {
-            $writings = $category->writingsRecursive()
-                ->whereNotIn('user_id', $this->blockedUsers)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])
-                ->orderBy('views', 'desc')
-                ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination);
         } elseif ('likes' === $sort) {
-            $writings = $category->writingsRecursive()
-                ->whereNotIn('user_id', $this->blockedUsers)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])
-                ->orderBy('likes_count', 'desc')
-                ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination);
         }
 
         return Inertia::render('writings/PoWritingsIndex', [

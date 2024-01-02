@@ -24,14 +24,15 @@ const page = computed(() => usePage())
 
         <v-tab href="?sort=likes" @click.prevent="$inertia.get('?sort=likes')" value="likes">
           <v-icon icon="fas fa-heart" class="d-md-none" />
-          <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span></v-tab>
+          <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
+        </v-tab>
       </v-tabs>
     </v-col>
   </v-row>
 
   <v-row>
     <v-col v-for="writing in page.props.writings.data" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
-      <po-writings-entry :alone="false" :data="writing"></po-writings-entry>
+      <po-writings-entry :alone="false" :data="writing" />
     </v-col>
   </v-row>
 </template>
