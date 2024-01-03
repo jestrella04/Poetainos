@@ -137,8 +137,8 @@ class WritingsController extends Controller
             $this->authorize('update', $writing);
         }
 
-        $mainCategories = Category::whereNull('parent_id')->get();
-        $subCategories = Category::whereNotNull('parent_id')->get();
+        $mainCategories = Category::select('id', 'name')->whereNull('parent_id')->get();
+        $subCategories = Category::select('id', 'name')->whereNotNull('parent_id')->get();
         $params = [
             'title' => [
                 'update' => getPageTitle([__('Update writing')]),
@@ -146,11 +146,13 @@ class WritingsController extends Controller
             ],
         ];
 
-        return view('writings.edit', [
-            'params' => $params,
-            'mainCategories' => $mainCategories,
-            'subCategories' => $subCategories,
+        return Inertia::render('forms/PoPublishForm', [
+            'categories' => [
+                'main' => $mainCategories,
+                'alt' => $subCategories,
+            ],
             'writing' => $writing,
+            'max-file-size' => getSiteConfig('uploads_max_file_size'),
         ]);
     }
 

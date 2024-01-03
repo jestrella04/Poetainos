@@ -9,7 +9,8 @@ defineProps({
 <template>
   <div class="text-center">
     <p class="font-weight-bold">{{ msgTitle }}</p>
-    <p class="text-medium-emphasis mb-3">{{ msgBody }}</p>
-    <v-icon v-if="'' !== icon" :icon="icon" size="72" class="text-medium-emphasis"></v-icon>
+    <p class="text-medium-emphasis">{{ msgBody }}</p>
+
+    <v-icon v-if="'' !== icon" :icon="icon" size="96" class="text-disabled my-10"></v-icon>
   </div>
 </template>

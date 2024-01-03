@@ -24,7 +24,8 @@ const page = computed(() => usePage())
 
         <v-tab href="?sort=popular" @click.prevent="$inertia.get('?sort=popular')" value="popular">
           <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
-          <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span></v-tab>
+          <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
+        </v-tab>
       </v-tabs>
     </v-col>
   </v-row>

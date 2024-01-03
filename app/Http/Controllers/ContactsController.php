@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\ContactFormSubmitted;
-use App\Models\Role;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Inertia\Inertia;
 
 class ContactsController extends Controller
 {
@@ -17,14 +16,8 @@ class ContactsController extends Controller
      */
     public function create()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Contact form'),
-            ]),
-        ];
-
-        return view('contact.index', [
-            'params' => $params,
+        return Inertia::render('forms/PoContactForm', [
+            //
         ]);
     }
 
@@ -59,11 +52,13 @@ class ContactsController extends Controller
         $request->session()->flash('flash', $flash);
 
         // Redirect back to the contact form
-        return redirect(route(('contact.create')));
+        return Inertia::render('forms/PoContactForm', [
+            //
+        ]);
     }
 
     public function reloadCaptcha()
     {
-        return response()->json(['captcha'=> captcha_src()]);
+        return response()->json(['captcha' => captcha_src()]);
     }
 }

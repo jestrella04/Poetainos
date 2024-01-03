@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +17,7 @@ class SocialAuthController extends Controller
      */
     public function redirectToProvider($service)
     {
+        session()->put('intended_url', url()->previous());
         return Socialite::driver($service)->redirect();
     }
 
@@ -82,6 +82,8 @@ class SocialAuthController extends Controller
         request()->session()->flash('flash', $message);
 
         // Redirect user
-        return redirect(route('home'));
+        $intendedUrl = session('intended_url');
+        session()->forget('intended_url');
+        return redirect($intendedUrl);
     }
 }

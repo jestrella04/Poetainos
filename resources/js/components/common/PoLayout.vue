@@ -24,9 +24,9 @@ provide('mobileUserMenu', mobileUserMenu)
   filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
 }
 
-@media (max-width: 960px) {
+@media screen and (max-width: 1280px) {
   footer {
-    margin-bottom: 56px;
+    margin-bottom: 56px !important;
   }
 }
 
@@ -95,7 +95,7 @@ provide('mobileUserMenu', mobileUserMenu)
                   </po-button>
                   <v-divider class="my-3"></v-divider>
 
-                  <po-button rounded block variant="text" :href="$route('notifications.list.unread')" inertia>
+                  <po-button rounded block variant="text" :href="$route('notifications.index')" inertia>
                     {{ $t('accounts.notifications') }}
                   </po-button>
                   <v-divider class="my-3"></v-divider>
@@ -123,7 +123,7 @@ provide('mobileUserMenu', mobileUserMenu)
       </v-container>
     </v-main>
 
-    <v-footer>
+    <v-footer style="max-height: 36px;">
       <div class="d-flex flex-wrap justify-space-around w-100 ga-2 text-caption text-center">
         <div>&copy; 2020 {{ page.props.site.name }}</div>
         <div class="d-inline-flex ga-3">
