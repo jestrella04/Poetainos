@@ -1,3 +1,5 @@
+// plugins/helper.js
+
 import _ from 'lodash'
 import millify from 'millify'
 import { computed } from 'vue'
@@ -9,7 +11,7 @@ import MarkdownIt from 'markdown-it'
 
 const page = computed(() => usePage())
 
-const helper = class {
+const Helper = class {
   constructor() {}
 
   auth() {
@@ -129,6 +131,59 @@ const helper = class {
   markdown(md) {
     return MarkdownIt().render(md)
   }
+
+  notificationMessage(notification, t) {
+    let message = null
+
+    switch (notification.type) {
+      case 'App\\Notifications\\WritingCommented':
+        message = t('comments.user-added', {
+          name: this.userDisplayName(notification.notifier_user)
+        })
+        break
+
+      case 'App\\Notifications\\WritingCommentMentioned':
+      case 'App\\Notifications\\WritingReplyMentioned':
+        message = t('comments.user-mentioned', {
+          name: this.userDisplayName(notification.notifier_user)
+        })
+        break
+
+      case 'App\\Notifications\\WritingFeatured':
+        message = t('writings.writing-awarded')
+        break
+
+      case 'App\\Notifications\\WritingLiked':
+        message = t('writings.user-liked', {
+          name: this.userDisplayName(notification.notifier_user)
+        })
+        break
+
+      case 'App\\Notifications\\WritingReplied':
+        message = t('comments.user-replied', {
+          name: this.userDisplayName(notification.notifier_user)
+        })
+        break
+
+      case 'App\\Notifications\\WritingShelved':
+        message = t('writings.user-shelved', {
+          name: this.userDisplayName(notification.notifier_user)
+        })
+        break
+
+      case 'App\\Notifications\\CommentLiked':
+        message = t('comments.user-liked', {
+          name: this.userDisplayName(notification.notifier_user)
+        })
+        break
+    }
+
+    return message
+  }
 }
 
-export default helper
+export const helper = {
+  install: (app) => {
+    app.config.globalProperties.$helper = new Helper()
+  }
+}

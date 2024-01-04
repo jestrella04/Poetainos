@@ -42,11 +42,22 @@ const page = computed(() => usePage())
                 <v-avatar size="48" color="secondary" image="/images/logo.svg" />
               </template>
             </div>
-            <div class>
-              {{ notification.message }}
-
-              <po-button :href="$route('notifications.read', notification.id)" variant="text" inertia>ver</po-button>
-              <po-button :href="$route('notifications.read', notification.id)" variant="text" inertia>del</po-button>
+            <div class="w-100">
+              <p class="text-caption font-weight-medium">{{ $helper.toLocaleDate(notification.created_at) }}</p>
+              <div class="d-flex w-100 justify-space-between">
+                <div>
+                  <p>{{ $helper.notificationMessage(notification, $t) }}.</p>
+                  <p class="text-caption text-disabled">
+                    {{ $t('main.title') }}: {{ notification.notifier_writing.title }}
+                  </p>
+                </div>
+                <div>
+                  <po-button color="primary" size="small" variant="tonal">
+                    {{ $t('main.view') }}
+                  </po-button>
+                  <po-link :href="$route('notifications.show', notification.id)" class="stretched" inertia> </po-link>
+                </div>
+              </div>
             </div>
           </div>
         </v-card-text>

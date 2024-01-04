@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set working directory
-cd resources/images
+cd public/images
 
 # Use Inkscape to generate PNGs from the SVG logo
 inkscape --export-background-opacity=0 --export-width=32 --export-type=png --export-filename=logo-32.png logo.svg

@@ -15,7 +15,7 @@ provide('writingId', props.data.id)
 </script>
 
 <template>
-  <v-card rounded elevation="2" class="mb-5">
+  <v-card rounded elevation="2">
     <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)">
       <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" cover>
         <div class="text-center py-3">
@@ -65,8 +65,8 @@ provide('writingId', props.data.id)
           </div>
 
           <div class="d-inline-flex ga-1">
-            <po-chip v-for="category in data.categories" :key="category.slug" color="primary" size="small"
-              :href="$route('categories.show', category.slug)" variant="tonal" inertia>
+            <po-chip v-for="category in data.categories" :key="category.slug" color="info" size="small"
+              :href="$route('categories.show', category.slug)" inertia>
               {{ category.name }}
             </po-chip>
           </div>

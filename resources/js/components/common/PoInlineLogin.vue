@@ -8,28 +8,27 @@
 
     <div class="d-inline-flex flex-wrap justify-center ga-2">
       <div>
-        <po-button color="secondary" :href="$route('social.login', 'facebook')"
+        <po-button color="primary" :href="$route('social.login', 'facebook')"
           :title="$t('accounts.continue-with-facebook')">
           <v-icon icon="fab fa-facebook-f"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button color="secondary" :href="$route('social.login', 'twitter')"
+        <po-button color="primary" :href="$route('social.login', 'twitter')"
           :title="$t('accounts.continue-with-x-twitter')">
           <v-icon icon="fab fa-x-twitter"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button color="secondary" :href="$route('social.login', 'google')"
-          :title="$t('accounts.continue-with-google')">
+        <po-button color="primary" :href="$route('social.login', 'google')" :title="$t('accounts.continue-with-google')">
           <v-icon icon="fab fa-google"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button color="secondary" :href="$route('login.email.check')" :title="$t('accounts.continue-with-email')"
+        <po-button color="primary" :href="$route('login.email.check')" :title="$t('accounts.continue-with-email')"
           inertia>
           <v-icon icon="fas fa-at"></v-icon>
         </po-button>

@@ -96,8 +96,8 @@ Route::middleware(['verified'])->group(function () {
 
     // Notifications
     Route::get('/notifications', [UsersNotificationsController::class, 'index'])->name('notifications.index');
-    Route::get('/notifications/read/{notification}', [UsersNotificationsController::class, 'read'])->name('notifications.read');
-    Route::post('/notifications/read/all', [UsersNotificationsController::class, 'clear'])->name('notifications.clear');
+    Route::get('/notifications/show/{notification}', [UsersNotificationsController::class, 'show'])->name('notifications.show');
+    Route::post('/notifications/clear/read', [UsersNotificationsController::class, 'clear'])->name('notifications.clear');
     Route::post('/notifications/status', [UsersNotificationsController::class, 'status'])->name('notifications.status');
     Route::post('/notifications/email/{enable}', [UsersNotificationsController::class, 'email'])->name('notifications.email');
 

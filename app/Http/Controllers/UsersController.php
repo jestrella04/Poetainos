@@ -318,9 +318,8 @@ class UsersController extends Controller
             ]),
         ];
 
-        return view('users.account', [
-            'user' => $user,
-            'params' => $params
-        ]);
+        return Inertia::render('users/PoAccount', [
+            /* 'user' => $user,
+            'params' => $params */]);
     }
 }

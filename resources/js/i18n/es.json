@@ -72,8 +72,6 @@
     "welcome-to-hood": "Bienvenido a la cofradía"
   },
   "categories": {
-    "select-main": "Selecciona la categoría principal",
-    "select-alt": "Selecciona las categorías secundarias (1 o más)",
     "alt-categories": "Categorías secundarias",
     "category": "Categorías",
     "category-created": "Categoría creada con éxito",
@@ -83,7 +81,9 @@
     "delete-category-warning": "Eliminar una categoría no eliminará los textos asociados",
     "edit-category": "Editar categoría",
     "main-categories": "Categorías principales",
-    "main-category": "Categoría principal"
+    "main-category": "Categoría principal",
+    "select-alt": "Selecciona las categorías secundarias (1 o más)",
+    "select-main": "Selecciona la categoría principal"
   },
   "comments": {
     "be-first-ask": "¿Te animas a enviar el primero?",
@@ -96,7 +96,11 @@
     "load-older-comment": "Cargar antiguos comentarios",
     "loading-comments": "Cargando comentarios",
     "mention-with": "Usa el símbolo @ para etiquetar otros usuarios",
-    "post-comment": "Enviar comentario"
+    "post-comment": "Enviar comentario",
+    "user-added": "{name} ha agregado un comentario en tu texto",
+    "user-liked": "A {name} le ha gustado tu comentario",
+    "user-mentioned": "{name} te ha mencionado en un comentario",
+    "user-replied": "{name} ha respondido a tu comentario"
   },
   "complaints": {
     "complaint": "Denunciar",
@@ -109,11 +113,6 @@
     "report-writing": "Denunciar texto"
   },
   "main": {
-    "select-cover": "Selecciona la imagen de cubierta",
-    "enter-link": "Introduce el enlace",
-    "enter-title": "Introduce el título",
-    "enter-text": "Deja fluir las musas",
-    "required-fields-marked": "Los campos marcados con * son obligatorios",
     "about-us": "Sobre Nosotros",
     "action-irreversible": "Esta acción es irreversible.",
     "actions": "Acciones",
@@ -164,8 +163,11 @@
     "edit-delete": "Editar / Eliminar",
     "email": "Correo electrónico",
     "enable-ask": "¿Por qué no lo habilitas?",
+    "enter-link": "Introduce el enlace",
     "enter-search-criteria": "Introduzca criterios de búsqueda",
     "enter-subject": "Introduce el asunto",
+    "enter-text": "Deja fluir las musas",
+    "enter-title": "Introduce el título",
     "enter-your-email": "Introduce tu correo",
     "enter-your-message": "Introduce el mensaje",
     "enter-your-name": "Introduce tu nombre",
@@ -228,6 +230,7 @@
     "proceed-with-caution": "Por favor, procede con cautela",
     "process-is-undoable.": "El proceso es irreversible.",
     "publish": "Publicar",
+    "push": "Push (en tiempo real)",
     "push-disable": "Deshabilitar las notificaciones push",
     "push-enable": "Habilitar las notificaciones push",
     "push-friendly-description": "Estas son notificaciones en tiempo real enviadas a todos los dispositivos en que hayas iniciado sesión, de modo que nunca te pierdas nada.",
@@ -236,11 +239,13 @@
     "registered": "Registrado",
     "reload": "Recargar",
     "reply": "Responder",
+    "required-fields-marked": "Los campos marcados con * son obligatorios",
     "reset": "Restaurar",
     "role": "Rol",
     "save": "Guardar",
     "save-changes": "Guardar cambios",
     "search": "Buscar",
+    "select-cover": "Selecciona la imagen de cubierta",
     "select-different-file.": "Algo anda mal, por favor selecciona un archivo diferente.",
     "send": "Enviar",
     "settings": "Ajustes",
@@ -267,6 +272,7 @@
     "unread": "Sin leer",
     "validate-not-robot": "Confirma que no eres un robot",
     "verified": "Verificado",
+    "view": "Ver",
     "view-all": "Ver todos",
     "website": "Sitio web",
     "writer-blocked": "Tienes a este autor bloqueado. Si has cambiado de parecer, por favor procede a desbloquearlo.",
@@ -283,9 +289,9 @@
     "pages": "Páginas"
   },
   "tags": {
-    "enter-tags": "Introduce las etiquetas separadas por una coma",
     "create-tag": "Crear etiqueta",
     "delete-tag-warning": "Eliminar una etiqueta no eliminará los textos asociados",
+    "enter-tags": "Introduce las etiquetas separadas por una coma",
     "popular-tags": "Etiquetas populares",
     "tag-deleted": "Etiqueta eliminada con éxito",
     "tags": "Etiquetas"
@@ -299,15 +305,9 @@
     "delete-user-warning-1": "Eliminar un usurio eliminará también todos los textos, votos, el estante, comentarios y respuestas asociados al usuario",
     "delete-user-warning-2": "incluyendo, entre otros, tus textos, comentarios y respuestas, me gusta, textos agregados a tu estante, etc.",
     "user": "Usuario",
-    "user-added-comment": "{name} ha agregado un comentario en tu texto",
-    "user-added-writing-to-shelf": "{name} ha agregado tu texto a su estante",
     "user-blocked": "Usuario bloqueado con éxito",
     "user-deleted": "Usuario eliminado con éxito",
-    "user-likes-your-comment": "A {name} le ha gustado tu comentario",
-    "user-likes-your-writing": "A {name} le ha gustado tu texto",
-    "user-mentioned-on-comment": "{name} te ha mencionado en un comentario",
     "user-no-writings": "Lamentamos informarte que {name} todavía no ha publicado un texto.",
-    "user-replied-comment": "{name} ha respondido uno de tus comentarios",
     "user-shelf-empty": "Lamentamos informarte que {name} aun no ha agregado textos a su estante.",
     "username": "Usuario",
     "users": "Usuarios",
@@ -317,13 +317,16 @@
     "view-writings": "Ver textos"
   },
   "writings": {
-    "awarded-golden-flower": "Condecorado con una Flor de Oro",
+    "awarded": "Condecorado con una Flor de Oro",
     "continue-reading": "Seguir leyendo",
     "delete-writing-ask": "¿Eliminar este texto?",
     "delete-writing-warning": "Eliminar un texto eliminará también todos los votos, estantes, comentarios y respuestas asociados",
     "latest-writings": "Últimos textos",
     "publish-writing": "Publicar un texto",
     "update-writing": "Actualizar texto",
+    "user-liked": "A {name} le ha gustado tu texto",
+    "user-shelved": "{name} ha agregado tu texto a su estante",
+    "writing-awarded": "Tu texto ha sido condecorado con una Flor de Oro",
     "writing-deleted": "Texto eliminado con éxito",
     "writing-published": "Tu texto ha sido publicado con éxito.",
     "writing-updated": "Tu texto ha sido actualizado con éxito.",

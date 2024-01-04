@@ -13,7 +13,13 @@ body {
 }
 
 .logo-shadow {
-  filter: drop-shadow(0 0 2px rgba(248, 249, 250, .5));
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+}
+
+.logo-shadow:focus,
+.logo-shadow:active,
+.logo-shadow:hover {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
 .bg-gradient {

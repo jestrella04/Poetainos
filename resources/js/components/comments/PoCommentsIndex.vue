@@ -16,14 +16,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="mb-5">
+  <div class="my-5">
     <div v-if="!loadingComments" class="mb-5">
       <po-inline-login v-if="!$helper.auth()" />
       <po-comments-form v-else />
     </div>
 
     <template v-if="!$helper.isEmpty(comments.data)">
-      <p class="text-h6">{{ $t('comments.comments') }}</p>
+      <p class="text-h6 mb-3">{{ $t('comments.comments') }}</p>
 
       <template v-for="comment in comments.data" :key="comment.id">
         <v-card class="mb-2">

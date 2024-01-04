@@ -26,8 +26,6 @@ class UsersNotificationsController extends Controller
         }
 
         $notifications->map(function ($notification) {
-            $notification['message'] = getNotificationMessage($notification);
-
             $notification['notifier_user'] =
                 isset($notification->data['user_id'])
                 ? User::select(
@@ -60,7 +58,7 @@ class UsersNotificationsController extends Controller
         return redirect(route('notifications.index'));
     }
 
-    public function read($notificationId)
+    public function show($notificationId)
     {
         $notification = auth()->user()->notifications->find($notificationId);
 

@@ -7,7 +7,6 @@ const page = computed(() => usePage())
 const theme = useTheme()
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
-
 theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
 
 provide('mobileSiteMenu', mobileSiteMenu)
@@ -21,7 +20,17 @@ provide('mobileUserMenu', mobileUserMenu)
 }
 
 .logo-shadow {
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+}
+
+.logo-shadow:focus,
+.logo-shadow:active,
+.logo-shadow:hover {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+footer {
+  max-height: fit-content !important;
 }
 
 @media screen and (max-width: 1280px) {
@@ -35,27 +44,26 @@ provide('mobileUserMenu', mobileUserMenu)
 }
 
 .stretched::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  content: "";
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 1 !important;
+  content: "" !important;
 }
 </style>
 
 <template>
-  <po-head title="" />
-
   <v-app>
+    <po-head title="" />
+
     <v-toolbar color="primary" :elevation="8" class="po-navbar px-3 d-none d-lg-flex">
       <v-container class="d-inline-flex justify-space-between">
         <div class="align-self-center">
-          <po-button :href="$route('home')" variant="plain" size="x-large" class="font-weight-bold" inertia>
-            <v-img width="32" src="/images/logo.svg" class="logo-shadow mr-2"></v-img>
-            {{ page.props.site.name }}
-          </po-button>
+          <po-link :href="$route('home')" variant="plain" size="x-large" class="font-weight-bold" inertia>
+            <v-img width="42" src="/images/logo.svg" class="logo-shadow"></v-img>
+          </po-link>
         </div>
 
         <v-tabs v-model="page.props.route.name" centered>
@@ -123,13 +131,13 @@ provide('mobileUserMenu', mobileUserMenu)
       </v-container>
     </v-main>
 
-    <v-footer style="max-height: 36px;">
+    <v-footer :elevation="2">
       <div class="d-flex flex-wrap justify-space-around w-100 ga-2 text-caption text-center">
         <div>&copy; 2020 {{ page.props.site.name }}</div>
         <div class="d-inline-flex ga-3">
           <template v-for="(app, store) in page.props.site.stores" :key="app">
-            <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="primary" size="x-small"
-              variant="tonal">
+            <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="secondary"
+              size="x-small">
               {{ store }}
             </po-button>
           </template>

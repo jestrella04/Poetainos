@@ -1,12 +1,12 @@
 <script setup>
 import { computed, defineOptions } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import PoLayoutAlt from '../common/PoLayoutAlt.vue'
+import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 
 const page = computed(() => usePage())
 
 defineOptions({
-  layout: PoLayoutAlt,
+  layout: PoLayoutLogin,
 })
 </script>
 
@@ -27,7 +27,17 @@ defineOptions({
   max-height: 72px;
 }
 
-@media (min-width: 960px) {
+@media screen and (max-width: 960px) {
+  .login-col .v-sheet {
+    background: linear-gradient(180deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-surface)) 100%) !important;
+  }
+
+  login-btns {
+    background-color: transparent !important;
+  }
+}
+
+@media screen and (min-width: 960px) {
   .login-col {
     min-height: 100vh;
   }
@@ -64,7 +74,7 @@ defineOptions({
             {{ $t('accounts.welcome-to-hood') }}
           </p>
 
-          <v-list>
+          <v-list tag="login-btns">
             <v-list-item>
               <po-button block color="primary" :href="$route('social.login', 'facebook')"
                 prepend-icon="fab fa-facebook-f">
