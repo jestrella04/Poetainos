@@ -119,7 +119,6 @@ Route::get('/manifest.json', [ResourcesController::class, 'pwaManifest'])->name(
 // Authentication
 Route::middleware(['guest'])->group(function () {
     Route::get('/socialite', [HomeController::class, 'socialite'])->name('socialite');
-    Route::get('/email', [HomeController::class, 'loginEmailCheck'])->name('login.email.check');
     Route::post('/email', [HomeController::class, 'loginEmailPost'])->name('login.email.post');
     Route::get('/login/{service}', [SocialAuthController::class, 'redirectToProvider'])->name('social.login');
     Route::get('/login/{service}/callback', [SocialAuthController::class, 'handleProviderCallback']);

@@ -103,8 +103,22 @@ class WritingsController extends Controller
                 ->with(['tags' => function ($query) {
                     $query->select('id', 'name', 'slug');
                 }])
-                ->firstOrFail(),
+                ->first(),
             'likers' => $writing->likers()->shuffle()->take(5),
+            'related' => [
+                'from_author' => Writing::whereNot('id', $writing->id)
+                    ->where('user_id', $writing->user_id)
+                    ->inRandomOrder()->take(5)->get(),
+                'from_category' => Writing::whereIn(
+                    'id',
+                    DB::table('category_writing')
+                        ->select('writing_id')
+                        ->whereIn('category_id', $writing->categories()->pluck('id'))
+                )->with(['author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }])->inRandomOrder()->take(5)->get(),
+
+            ]
         ]);
     }
 

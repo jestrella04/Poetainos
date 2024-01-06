@@ -23,11 +23,20 @@ class HomeController extends Controller
         return Inertia::render('explore/PoExploreIndex', [
             'title' => getPageTitle([__('Explore')]),
             'categories' => [
-                'main' => Category::main(),
-                'secondary' => Category::secondary()
+                'main' => Category::withCount('writings')->whereNull('parent_id')->orderByDesc('writings_count')
+                    ->having('writings_count', '>', 0)->get(),
+                'alt' => Category::withCount('writings')->whereNotNull('parent_id')->orderByDesc('writings_count')
+                    ->having('writings_count', '>', 0)->get(),
             ],
-            'tags' => Tag::popular(20),
-            'authors' => User::featured(20)
+            'tags' => Tag::withCount('writings')->orderByDesc('writings_count')
+                ->having('writings_count', '>', 0)->get()
+                ->take(20),
+            'authors' => User::select(
+                'id',
+                'username',
+                'name',
+                'extra_info->avatar AS avatar',
+            )->orderByDesc('aura')->take(20)->get()
         ]);
     }
 
@@ -47,11 +56,6 @@ class HomeController extends Controller
         ]);
     }
 
-    public function loginEmailCheck()
-    {
-        return view('auth.email_check');
-    }
-
     public function loginEmailPost()
     {
         // Validate user input
@@ -59,13 +63,6 @@ class HomeController extends Controller
             'email' => 'required|email',
         ]);
 
-        $email = request('email');
-        $emailExists = User::where('email', $email)->count() > 0;
-
-        if ($emailExists) {
-            return to_route('login')->with(['email' => $email])->withInput();
-        }
-
-        return to_route('register')->with(['email' => $email])->withInput();
+        return ['exists' => User::where('email', request('email'))->count() > 0];
     }
 }

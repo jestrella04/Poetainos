@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Like;
 use App\Models\User;
+use App\Models\Writing;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Intervention\Image\Facades\Image;
@@ -127,6 +129,23 @@ class UsersController extends Controller
                 ->whereId($user->id)
                 ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
                 ->firstOrFail(),
+            'writings' => [
+                'from_author' => $user->writings()
+                    ->with(['author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    }])
+                    ->inRandomOrder()->take(5)->get(),
+                'from_shelf' => $user->shelf()
+                    ->with(['author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    }])
+                    ->inRandomOrder()->take(5)->get(),
+                'from_liked' => Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
+                    ->with(['author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    }])
+                    ->inRandomOrder()->take(5)->get(),
+            ]
         ]);
     }
 

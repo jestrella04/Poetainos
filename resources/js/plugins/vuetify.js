@@ -15,13 +15,14 @@ export const vuetify = createVuetify({
         colors: {
           primary: colors.deepPurple.darken2,
           secondary: colors.blueGrey.lighten1,
-          background: colors.grey.lighten5
+          background: colors.grey.lighten2,
+          surface: colors.grey.lighten5
         }
       },
       dark: {
         dark: true,
         colors: {
-          primary: colors.deepPurple.darken3,
+          primary: colors.deepPurple.darken2,
           secondary: colors.blueGrey.darken2
         }
       }

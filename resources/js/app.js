@@ -14,6 +14,7 @@ library.add(fas)
 library.add(fab)
 
 createInertiaApp({
+  progress: { color: '#673AB7' },
   resolve: (name) => {
     const pages = import.meta.glob('./components/**/*.vue', {
       eager: true

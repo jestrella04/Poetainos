@@ -208,11 +208,6 @@ class User extends Authenticatable implements MustVerifyEmail
         DB::table($this->getTable())->whereId($this->id)->update(['aura' => $aura, 'aura_updated_at' => Carbon::now()]);
     }
 
-    public static function featured($count = 20)
-    {
-        return self::orderByDesc('aura')->take($count)->get(['id', 'username', 'name', 'extra_info->avatar AS avatar']);
-    }
-
     public function isAllowed($task)
     {
         if (null !== ($this->role)) {

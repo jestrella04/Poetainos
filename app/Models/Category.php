@@ -26,13 +26,8 @@ class Category extends Model
 
     public function writingsRecursive()
     {
-        $ids = $this->descendantsAndSelf()
-            ->get('id')
-            ->pluck('id')
-            ->toArray();
-
-        return Writing::with('categories')->whereHas('categories', function($q) use($ids) {
-            $q->whereIn('category_id', $ids);
+        return Writing::with('categories')->whereHas('categories', function ($q) {
+            $q->whereIn('category_id', $this->descendantsAndSelf()->pluck('id'));
         });
     }
 
@@ -50,21 +45,5 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent_id')
             ->with('categories');
-    }
-
-    public static function main()
-    {
-        return Self::whereNull('parent_id')
-            ->orderBy('name')
-            ->get();
-    }
-
-    public static function secondary()
-    {
-        return Self::withCount('writings')
-            ->whereNotNull('parent_id')
-            ->orderByDesc('writings_count')
-            ->having('writings_count', '>', 0)
-            ->get();
     }
 }

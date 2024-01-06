@@ -28,9 +28,9 @@ body {
 </style>
 
 <template>
-  <po-head title="" />
-
   <v-app>
+    <po-head title="" />
+
     <v-main>
       <slot />
     </v-main>

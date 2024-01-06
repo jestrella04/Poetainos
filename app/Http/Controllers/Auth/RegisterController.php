@@ -7,7 +7,6 @@ use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -82,7 +81,8 @@ class RegisterController extends Controller
         ]);
     }
 
-    protected function redirectTo() {
+    protected function redirectTo()
+    {
         return route('verification.notice');
     }
 }
