@@ -1,16 +1,55 @@
 <script setup>
-import { computed, ref, provide } from 'vue'
+import { computed, ref, reactive, provide, inject } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
+import { onMounted } from 'vue';
+import { onUpdated } from 'vue';
 
 const page = computed(() => usePage())
+const helper = inject('helper')
 const theme = useTheme()
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
+const snackBar = reactive({
+  active: false,
+  avatar: '/images/logo.svg',
+  color: 'primary',
+  timeout: 6000,
+  message: '',
+})
+
 theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
 
+provide('snackBar', snackBar)
 provide('mobileSiteMenu', mobileSiteMenu)
 provide('mobileUserMenu', mobileUserMenu)
+
+onMounted(() => {
+  getFlashMessages()
+})
+
+onUpdated(() => {
+  getFlashMessages()
+})
+
+function getFlashMessages() {
+  const snack = helper.getSnackBar()
+  const flash = page.value.props.flash.message
+
+  // Check for client side flash messages
+  if (!helper.isEmpty(snack)) {
+    snackBar.message = snack.message
+    snackBar.active = snack.active
+    snackBar.color = snack.color
+  }
+
+  // Check for server side flash messages
+  if (!helper.strNullOrEmpty(flash)) {
+    snackBar.message = flash
+    snackBar.active = true
+    snackBar.color = 'primary'
+  }
+}
 </script>
 
 <style>
@@ -52,11 +91,16 @@ footer {
   z-index: 1 !important;
   content: "" !important;
 }
+
+.v-input {
+  margin-bottom: 1rem;
+}
 </style>
 
 <template>
   <v-app>
     <po-head title="" />
+    <po-snack-bar></po-snack-bar>
 
     <v-toolbar color="primary" :elevation="8" class="po-navbar px-3 d-none d-lg-flex">
       <v-container class="d-inline-flex justify-space-between">
@@ -80,7 +124,7 @@ footer {
         </v-tabs>
 
         <div v-if="!$helper.auth()" class="align-self-center">
-          <po-button prepend-icon="fas fa-arrow-right-to-bracket" variant="tonal" :href="$route('socialite')" inertia>
+          <po-button prepend-icon="fas fa-arrow-right-to-bracket" variant="tonal" :href="$route('login')" inertia>
             {{ $t('accounts.login-alt') }}
           </po-button>
         </div>
@@ -171,7 +215,7 @@ footer {
       </po-button>
 
       <template v-if="!$helper.auth()">
-        <po-button value="login" :href="$route('socialite')" inertia>
+        <po-button value="login" :href="$route('login')" inertia>
           <v-icon icon="fas fa-arrow-right-to-bracket" />
           <span>{{ $t('accounts.login-alt') }}</span>
         </po-button>

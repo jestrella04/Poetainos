@@ -1,19 +1,19 @@
 <script setup>
-import { computed, defineOptions, ref, reactive } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { defineOptions, ref, reactive, provide, inject } from 'vue'
+import { router } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
-import { provide } from 'vue';
 
 defineOptions({
   layout: PoLayoutLogin,
 })
 
-const page = computed(() => usePage())
+const helper = inject('helper')
 const isLoading = ref(false)
 const isEmail = ref(false)
 const shouldLogin = ref(false)
 const shouldRegister = ref(false)
+
 const formData = reactive({
   email: '',
   username: '',
@@ -23,8 +23,30 @@ const formData = reactive({
   privacyAgreement: false
 })
 
-provide('serviceAgreement', formData.serviceAgreement)
-provide('privacyAgreement', formData.privacyAgreement)
+const errors = reactive({
+  email: [],
+  username: [],
+  password: [],
+  confirmPassword: []
+})
+
+provide('formData', formData)
+
+function clearInputs() {
+  formData.email = ''
+  formData.username = ''
+  formData.password = ''
+  formData.confirmPassword = ''
+  formData.serviceAgreement = false
+  formData.privacyAgreement = false
+}
+
+function clearErrors() {
+  errors.email = []
+  errors.username = []
+  errors.password = []
+  errors.confirmPassword = []
+}
 
 function resetForm() {
   setTimeout(() => {
@@ -32,10 +54,11 @@ function resetForm() {
     shouldLogin.value = false
     shouldRegister.value = false
 
-    formData.email = ''
-    formData.username = ''
-    formData.password = ''
-    formData.confirmPassword = ''
+    // Clear inputs
+    clearInputs()
+
+    // Clear errors
+    clearErrors()
   }, 500)
 }
 
@@ -52,7 +75,7 @@ async function submitForm() {
     isLoading.value = true
 
     await axios
-      .post(window.route('login.email.post'), { email: formData.email })
+      .post(window.route('email.check'), { email: formData.email })
       .then((response) => {
         if (response.data.exists) {
           shouldLogin.value = true
@@ -60,26 +83,6 @@ async function submitForm() {
         } else {
           shouldLogin.value = false
           shouldRegister.value = true
-        }
-      }).catch((error) => {
-        console.log(error)
-      }).finally(() => {
-        isLoading.value = false
-      })
-
-    // Prevent entering following if statement
-    return
-  }
-
-  // Attempt to login
-  else if (shouldLogin.value) {
-    isLoading.value = true
-
-    await axios
-      .post(window.route('login'), { email: formData.email, password: formData.password })
-      .then((response) => {
-        if (204 === response.status) {
-          router.visit(window.route('home'))
         }
       })
       .catch((error) => {
@@ -93,9 +96,37 @@ async function submitForm() {
     return
   }
 
+  // Attempt to login
+  else if (shouldLogin.value) {
+    isLoading.value = true
+    clearErrors()
+
+    await axios
+      .post(window.route('login'), { email: formData.email, password: formData.password })
+      .then((response) => {
+        helper.setSnackBar({
+          message: 'accounts.welcome-back',
+          color: 'primary',
+          active: true
+        })
+
+        router.get(response.data.redirect)
+      })
+      .catch((error) => {
+        errors.password = error.response.data.errors.email // Intentional
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+
+    // Prevent entering following if statement
+    return
+  }
+
   // Attempt to register
   else if (shouldRegister.value) {
     isLoading.value = true
+    clearErrors()
 
     await axios
       .post(window.route('register'), {
@@ -107,7 +138,7 @@ async function submitForm() {
         privacy_agreement: formData.privacyAgreement
       })
       .then((response) => {
-
+        router.get(response.data.redirect)
       })
       .catch((error) => {
         console.log(error)
@@ -123,148 +154,100 @@ async function submitForm() {
 </script>
 
 <style scoped>
-.login-col {
+.po-login {
   width: 100%;
-  height: 100%;
-}
-
-.login-col .v-sheet {
-  height: 100%;
-}
-
-.logo {
-  width: 72px;
-  height: 72px;
-  max-width: 72px;
-  max-height: 72px;
-}
-
-@media screen and (max-width: 960px) {
-  .login-col .v-sheet {
-    background: linear-gradient(180deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-surface)) 100%) !important;
-  }
-
-  login-btns {
-    background-color: transparent !important;
-  }
-}
-
-@media screen and (min-width: 960px) {
-  .login-col {
-    min-height: 100vh;
-  }
-
-  .logo {
-    width: 256px;
-    height: 256px;
-    max-width: 256px;
-    max-height: 256px;
-  }
+  max-width: 400px;
+  margin-inline: auto;
+  background-color: transparent;
 }
 </style>
 
 <template>
-  <po-head :title="page.props.title" />
+  <div class="px-10">
+    <p class="text-center text-uppercase font-weight-bold mb-3">
+      {{ $t('accounts.welcome-to-hood') }}
+    </p>
 
-  <v-row class="flex-column flex-md-row" style="height: 100%;" no-gutters>
-    <v-col class="login-col d-none d-md-block">
-      <v-sheet class="d-flex align-center justify-center bg-gradient">
-        <div class="py-10">
-          <v-img src="/images/logo.svg" class="logo logo-shadow"></v-img>
-        </div>
-      </v-sheet>
-    </v-col>
+    <template v-if="isEmail">
+      <v-form id="login-form" class="po-login" @submit.prevent="submitForm()" @reset.prevent="resetForm()">
+        <v-text-field v-model="formData.email" type="email" :label="$t('main.email')"
+          :placeholder="$t('main.enter-your-email')" :error-messages="errors.email"
+          :readonly="shouldLogin || shouldRegister" persistent-placeholder :clearable="!shouldLogin && !shouldRegister"
+          required hide-details="auto">
+        </v-text-field>
 
-    <v-col class="login-col">
-      <v-sheet class="d-flex align-center justify-center">
-        <div>
-          <div class="d-flex align-center justify-center py-10 d-md-none">
-            <v-img src="/images/logo.svg" class="logo logo-shadow"></v-img>
-          </div>
+        <template v-if="shouldRegister">
+          <v-text-field v-model="formData.username" type="text" :label="$t('users.user')"
+            pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$" :placeholder="$t('main.enter-your-user')"
+            :error-messages="errors.username" persistent-placeholder clearable required hide-details="auto">
+          </v-text-field>
 
-          <p class="text-center text-uppercase font-weight-bold mb-3">
-            {{ $t('accounts.welcome-to-hood') }}
-          </p>
+          <v-text-field v-model="formData.password" type="password" :label="$t('main.password')"
+            pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+            :placeholder="$t('main.enter-your-password')" :error-messages="errors.password" persistent-placeholder
+            clearable required hide-details="auto">
+          </v-text-field>
 
-          <template v-if="isEmail">
-            <v-form id="login-form" class="w-100" @submit.prevent="submitForm()" @reset.prevent="resetForm()">
-              <v-text-field v-model="formData.email" type="email" :label="$t('main.email')"
-                :placeholder="$t('main.enter-your-email')" persistent-placeholder clearable required>
-              </v-text-field>
+          <v-text-field v-model="formData.confirmPassword" type="password" :label="$t('accounts.confirm-password')"
+            pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+            :placeholder="$t('main.enter-your-password')" :error-messages="errors.confirmPassword" persistent-placeholder
+            clearable hide-details="auto">
+          </v-text-field>
 
-              <template v-if="shouldRegister">
-                <v-text-field v-model="formData.username" type="text" :label="$t('users.user')"
-                  pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$" :placeholder="$t('main.enter-your-user')"
-                  persistent-placeholder clearable required>
-                </v-text-field>
+          <po-agreement></po-agreement>
+        </template>
 
-                <v-text-field v-model="formData.password" type="password" :label="$t('main.password')"
-                  pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                  :placeholder="$t('main.enter-your-password')" persistent-placeholder clearable required>
-                </v-text-field>
+        <template v-if="shouldLogin">
+          <v-text-field v-model="formData.password" type="password" :label="$t('main.password')"
+            :placeholder="$t('main.enter-your-password')" :error-messages="errors.password" persistent-placeholder
+            clearable required hide-details="auto">
+          </v-text-field>
+        </template>
 
-                <v-text-field v-model="formData.confirmPassword" type="password" :label="$t('accounts.confirm-password')"
-                  pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-                  :placeholder="$t('main.enter-your-password')" persistent-placeholder clearable>
-                </v-text-field>
+        <po-button type="submit" color="primary" size="large" block :disabled="isLoading">
+          <span v-if="!isLoading">{{ $t('main.continue') }}</span>
+          <v-progress-circular v-else indeterminate></v-progress-circular>
+        </po-button>
 
-                <po-agreement></po-agreement>
-              </template>
+        <po-button type="reset" color="secondary" size="large" variant="text" class="mt-5" block>
+          <v-icon icon="fas fa-arrow-left"></v-icon>
+        </po-button>
+      </v-form>
+    </template>
 
-              <template v-if="shouldLogin">
-                <v-text-field v-model="formData.password" type="password" :label="$t('main.password')"
-                  :placeholder="$t('main.enter-your-password')" persistent-placeholder clearable required>
-                </v-text-field>
-              </template>
+    <template v-else>
+      <v-list class="po-login">
+        <v-list-item>
+          <po-button block color="primary" :href="$route('social.login', 'facebook')" prepend-icon="fab fa-facebook-f">
+            {{ $t('accounts.continue-with-facebook') }}
+          </po-button>
+        </v-list-item>
 
-              <po-button type="submit" color="primary" size="large" block :disabled="isLoading">
-                <span v-if="!isLoading">{{ $t('main.continue') }}</span>
-                <v-progress-circular v-else indeterminate></v-progress-circular>
-              </po-button>
-              <po-button type="reset" color="secondary" size="large" variant="text" class="mt-5" block>
-                <v-icon icon="fas fa-arrow-left"></v-icon>
-              </po-button>
-            </v-form>
-          </template>
+        <v-list-item>
+          <po-button block color="primary" :href="$route('social.login', 'twitter')" prepend-icon="fab fa-x-twitter">
+            {{ $t('accounts.continue-with-x-twitter') }}
+          </po-button>
+        </v-list-item>
 
-          <template v-else>
-            <v-list tag="po-social">
-              <v-list-item>
-                <po-button block color="primary" :href="$route('social.login', 'facebook')"
-                  prepend-icon="fab fa-facebook-f">
-                  {{ $t('accounts.continue-with-facebook') }}
-                </po-button>
-              </v-list-item>
+        <v-list-item>
+          <po-button block color="primary" :href="$route('social.login', 'google')" prepend-icon="fab fa-google">
+            {{ $t('accounts.continue-with-google') }}
+          </po-button>
+        </v-list-item>
 
-              <v-list-item>
-                <po-button block color="primary" :href="$route('social.login', 'twitter')"
-                  prepend-icon="fab fa-x-twitter">
-                  {{ $t('accounts.continue-with-x-twitter') }}
-                </po-button>
-              </v-list-item>
+        <v-list-item>
+          <po-button block color="primary" prepend-icon="fas fa-at" @click.prevent="isEmail = true">
+            {{ $t('accounts.continue-with-email') }}
+          </po-button>
+        </v-list-item>
 
-              <v-list-item>
-                <po-button block color="primary" :href="$route('social.login', 'google')" prepend-icon="fab fa-google">
-                  {{ $t('accounts.continue-with-google') }}
-                </po-button>
-              </v-list-item>
-
-              <v-list-item>
-                <po-button block color="primary" prepend-icon="fas fa-at" @click.prevent="isEmail = true">
-                  {{ $t('accounts.continue-with-email') }}
-                </po-button>
-              </v-list-item>
-
-              <v-list-item>
-                <po-button block color="primary" :href="$route('home')" prepend-icon="fas fa-ghost"
-                  @click.prevent="$inertia.get($route('home'))">
-                  {{ $t('accounts.continue-as-guest') }}
-                </po-button>
-              </v-list-item>
-            </v-list>
-          </template>
-        </div>
-      </v-sheet>
-    </v-col>
-  </v-row>
+        <v-list-item>
+          <po-button block color="primary" :href="$route('home')" prepend-icon="fas fa-ghost"
+            @click.prevent="$inertia.get($route('home'))">
+            {{ $t('accounts.continue-as-guest') }}
+          </po-button>
+        </v-list-item>
+      </v-list>
+    </template>
+  </div>
 </template>

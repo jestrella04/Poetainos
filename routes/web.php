@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoriesController;
@@ -17,7 +16,6 @@ use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShelvesController;
-use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersHoodsController;
@@ -35,7 +33,7 @@ use App\Http\Controllers\WritingsController;
 
 /* Authentication routes */
 
-Auth::routes(['verify' => true]);
+require __DIR__ . '/auth.php';
 
 /* Administration */
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -116,14 +114,6 @@ Route::get('/init/success', [InitController::class, 'success'])->name('init.succ
 // PWA manifest
 Route::get('/manifest.json', [ResourcesController::class, 'pwaManifest'])->name('pwa.manifest');
 
-// Authentication
-Route::middleware(['guest'])->group(function () {
-    Route::get('/socialite', [HomeController::class, 'socialite'])->name('socialite');
-    Route::post('/email', [HomeController::class, 'loginEmailPost'])->name('login.email.post');
-    Route::get('/login/{service}', [SocialAuthController::class, 'redirectToProvider'])->name('social.login');
-    Route::get('/login/{service}/callback', [SocialAuthController::class, 'handleProviderCallback']);
-});
-
 // Generic
 Route::get('/offline', [HomeController::class, 'offline'])->name('offline');
 Route::get('/search', [SearchController::class, 'show'])->name('search');
@@ -170,5 +160,6 @@ Route::get('/complaints/{type}/{id}/create', [ComplaintsController::class, 'crea
 Route::post('/complaints/store', [ComplaintsController::class, 'store'])->name('complaints.store');
 
 // Redirects, keep on the bottom
+Route::redirect('/socialite', '/login', 301);
 Route::redirect('/home', '/', 301);
 Route::redirect('/writings', '/', 301);

@@ -180,10 +180,22 @@ const Helper = class {
 
     return message
   }
+
+  setSnackBar(snack = {}) {
+    sessionStorage.setItem('snack', JSON.stringify(snack))
+  }
+
+  getSnackBar() {
+    const snack = JSON.parse(sessionStorage.getItem('snack'))
+    sessionStorage.removeItem('snack')
+    return snack
+  }
 }
 
 export const helper = {
   install: (app) => {
-    app.config.globalProperties.$helper = new Helper()
+    const helper = new Helper()
+    app.config.globalProperties.$helper = helper
+    app.provide('helper', helper)
   }
 }

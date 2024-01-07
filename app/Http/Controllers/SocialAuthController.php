@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -17,7 +19,6 @@ class SocialAuthController extends Controller
      */
     public function redirectToProvider($service)
     {
-        session()->put('intended_url', url()->previous());
         return Socialite::driver($service)->redirect();
     }
 
@@ -71,19 +72,15 @@ class SocialAuthController extends Controller
 
         // Set flash message content
         if ($exists) {
-            $message = __('Welcome back to the hood, we missed you!');
+            $message = 'accounts.welcome-back';
         } else {
-            $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
-            $message .= __('You have now unlocked full access to the site.');
-            $message .= __('Go ahead and like, comment, reply, find the muses and publish your writings.');
+            $message  =  'accounts.welcome-aboard';
         }
 
         // Set flash message
-        request()->session()->flash('flash', $message);
+        request()->session()->flash('message', $message);
 
         // Redirect user
-        $intendedUrl = session('intended_url');
-        session()->forget('intended_url');
-        return redirect($intendedUrl);
+        return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
     }
 }

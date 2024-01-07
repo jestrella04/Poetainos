@@ -1,14 +1,14 @@
 <script setup>
 import { inject } from 'vue';
 
-const serviceAgreement = inject('serviceAgreement')
-const privacyAgreement = inject('privacyAgreement')
+const formData = inject('formData')
 </script>
 
 <template>
   <div class="d-flex">
     <div class="flex-grow-1">
-      <v-switch v-model="serviceAgreement" :label="$t('accounts.i-accept-terms')" required></v-switch>
+      <v-switch v-model="formData.serviceAgreement" :label="$t('accounts.i-accept-terms')" color="primary" class="mb-0"
+        required inset hide-details></v-switch>
     </div>
 
     <div class="pt-4 ps-4">
@@ -20,7 +20,8 @@ const privacyAgreement = inject('privacyAgreement')
 
   <div class="d-flex">
     <div class="flex-grow-1">
-      <v-switch v-model="privacyAgreement" :label="$t('accounts.i-accept-privacy')" required></v-switch>
+      <v-switch v-model="formData.privacyAgreement" :label="$t('accounts.i-accept-privacy')" color="primary" required
+        inset hide-details></v-switch>
     </div>
 
     <div class="pt-4 ps-4">

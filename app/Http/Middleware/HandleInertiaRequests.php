@@ -56,7 +56,7 @@ class HandleInertiaRequests extends Middleware
                 'stores' => getSiteConfig('stores'),
             ],
             'flash' => [
-                'message' => fn () => $request->session()->get('message')
+                'message' => $request->session()->get('message')
             ],
         ]);
     }

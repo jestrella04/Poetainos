@@ -35,8 +35,8 @@
       <div class=" mb-5">
         <p class="text-caption text-uppercase text-disabled mb-3">{{ $t('accounts.notifications') }}</p>
 
-        <v-switch :label="$t('main.email')"></v-switch>
-        <v-switch :label="$t('main.push')"></v-switch>
+        <v-switch :label="$t('main.email')" class="mb-0" hide-details="auto" color="primary"></v-switch>
+        <v-switch :label="$t('main.push')" class="mb-0" hide-details="auto" color="primary"></v-switch>
       </div>
       <div class=" mb-5">
         <p class="text-caption text-uppercase text-disabled mb-3">{{ $t('accounts.danger-zone') }}</p>
