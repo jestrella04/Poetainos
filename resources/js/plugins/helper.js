@@ -8,6 +8,7 @@ import crop from 'crop-url'
 import linkifyHtml from 'linkify-html'
 import 'linkify-plugin-mention'
 import MarkdownIt from 'markdown-it'
+import { intlFormatDistance } from 'date-fns'
 
 const page = computed(() => usePage())
 
@@ -70,6 +71,10 @@ const Helper = class {
 
   toLocaleDate(date) {
     return new Date(date).toLocaleDateString()
+  }
+
+  relativeDate(date) {
+    return intlFormatDistance(new Date(date), new Date(), { locale: 'es' })
   }
 
   excerpt(text) {

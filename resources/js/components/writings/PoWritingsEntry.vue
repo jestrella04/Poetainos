@@ -1,6 +1,7 @@
 <script setup>
-import { ref, provide } from 'vue'
+import { ref, provide, computed } from 'vue'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
+import { usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
   alone: { type: Boolean, default: true },
@@ -8,7 +9,10 @@ const props = defineProps({
   likers: Object,
 })
 
+const page = computed(() => usePage())
 const loadingComments = ref(true)
+const liked = page.value.props.auth.liked.writings.includes(props.data.id)
+const shelved = page.value.props.auth.shelved.includes(props.data.id)
 
 provide('loadingComments', loadingComments)
 provide('writingId', props.data.id)
@@ -41,7 +45,7 @@ provide('writingId', props.data.id)
         <p class="text-caption text-uppercase font-weight-light">
           {{
             `${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
-                    @ ${$helper.toLocaleDate(data.created_at)}`
+                    ${$helper.relativeDate(data.created_at)}`
           }}
         </p>
       </div>
@@ -117,7 +121,7 @@ provide('writingId', props.data.id)
         </div>
 
         <div class="d-flex flex-column">
-          <div><v-icon icon="fas fa-heart"></v-icon></div>
+          <div><v-icon icon="fas fa-heart" :color="liked ? 'red-darken-2' : ''"></v-icon></div>
           <div>{{ $helper.readable(data.likes_count) }}</div>
         </div>
 
@@ -132,7 +136,7 @@ provide('writingId', props.data.id)
         </div>
 
         <div class="d-flex flex-column">
-          <div><v-icon icon="fas fa-bookmark"></v-icon></div>
+          <div><v-icon icon="fas fa-bookmark" :color="shelved ? 'info' : ''"></v-icon></div>
           <div>{{ $helper.readable(data.shelf_count) }}</div>
         </div>
 

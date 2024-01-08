@@ -26,7 +26,7 @@ const page = computed(() => usePage())
 
                 <p class="text-caption text-disabled">
                   {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                  @ {{ $helper.toLocaleDate(writing.created_at) }}
+                  {{ $helper.relativeDate(writing.created_at) }}
                 </p>
               </div>
             </template>
@@ -44,7 +44,7 @@ const page = computed(() => usePage())
 
                 <p class="text-caption text-disabled">
                   {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                  @ {{ $helper.toLocaleDate(writing.created_at) }}
+                  {{ $helper.relativeDate(writing.created_at) }}
                 </p>
               </div>
             </template>
@@ -62,7 +62,7 @@ const page = computed(() => usePage())
 
                 <p class="text-caption text-disabled">
                   {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                  @ {{ $helper.toLocaleDate(writing.created_at) }}
+                  {{ $helper.relativeDate(writing.created_at) }}
                 </p>
               </div>
             </template>

@@ -56,9 +56,8 @@ class RegisteredUserController extends Controller
         //event(new Registered($user));
 
         Auth::login($user);
+        $user->sendEmailVerificationNotification();
 
         return Inertia::render('auth/PoVerify');
-        //return redirect(RouteServiceProvider::HOME);
-        //Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl();
     }
 }

@@ -6,7 +6,7 @@ const formData = inject('formData')
 
 <template>
   <div class="d-flex">
-    <div class="flex-grow-1">
+    <div class="flex-shrink-1">
       <v-switch v-model="formData.serviceAgreement" :label="$t('accounts.i-accept-terms')" color="primary" class="mb-0"
         required inset hide-details></v-switch>
     </div>
@@ -19,7 +19,7 @@ const formData = inject('formData')
   </div>
 
   <div class="d-flex">
-    <div class="flex-grow-1">
+    <div class="flex-shrink-1">
       <v-switch v-model="formData.privacyAgreement" :label="$t('accounts.i-accept-privacy')" color="primary" required
         inset hide-details></v-switch>
     </div>

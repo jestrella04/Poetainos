@@ -14,7 +14,7 @@ const snackBar = inject('snackBar')
 
 <template>
   <v-snackbar v-model="snackBar.active" :timeout="snackBar.timeout" :color="snackBar.color" elevation="24" location="top"
-    multi-line rounded timer>
+    multi-line rounded timer="blue-grey-lighten-1">
     <div class="d-flex ga-4">
       <div>
         <v-avatar size="48" color="primary" :image="snackBar.avatar" />

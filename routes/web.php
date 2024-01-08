@@ -6,7 +6,7 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ComplaintsController;
 use App\Http\Controllers\ContactsController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\GenericController;
 use App\Http\Controllers\HoodsController;
 use App\Http\Controllers\InitController;
 use App\Http\Controllers\LikesController;
@@ -18,11 +18,9 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShelvesController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\UsersHoodsController;
-use App\Http\Controllers\UsersHoodsWritingsController;
+//use App\Http\Controllers\UsersHoodsController;
+//use App\Http\Controllers\UsersHoodsWritingsController;
 use App\Http\Controllers\UsersNotificationsController;
-use App\Http\Controllers\UsersShelvesController;
-use App\Http\Controllers\UsersWritingsController;
 use App\Http\Controllers\WritingsController;
 
 /*
@@ -115,10 +113,10 @@ Route::get('/init/success', [InitController::class, 'success'])->name('init.succ
 Route::get('/manifest.json', [ResourcesController::class, 'pwaManifest'])->name('pwa.manifest');
 
 // Generic
-Route::get('/offline', [HomeController::class, 'offline'])->name('offline');
+Route::get('/offline', [GenericController::class, 'offline'])->name('offline');
 Route::get('/search', [SearchController::class, 'show'])->name('search');
-Route::get('/explore', [HomeController::class, 'explore'])->name('explore');
-Route::get('/sharer', [HomeController::class, 'sharer'])->name('sharer');
+Route::get('/explore', [GenericController::class, 'explore'])->name('explore');
+Route::get('/sharer', [GenericController::class, 'sharer'])->name('sharer');
 
 // Writings
 Route::get('/', [WritingsController::class, 'index'])->name('home');
@@ -129,10 +127,10 @@ Route::get('/writings/{writing}', [WritingsController::class, 'show'])->name('wr
 // Users
 Route::get('/users', [UsersController::class, 'index'])->name('users.index');
 Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show');
-Route::get('/users/{user}/writings', [UsersWritingsController::class, 'index'])->name('users_writings.index');
-Route::get('/users/{user}/shelf', [UsersShelvesController::class, 'index'])->name('users_shelves.index');
-Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('users_hoods.index');
-Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
+Route::get('/users/{user}/writings', [GenericController::class, 'writings'])->name('users.writings.index');
+Route::get('/users/{user}/shelf', [GenericController::class, 'shelf'])->name('users.shelf.index');
+//Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('users.hood.index');
+//Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
 
 // Pages
 Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');

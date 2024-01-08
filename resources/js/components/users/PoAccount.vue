@@ -1,4 +1,8 @@
 <script setup>
+import { inject } from 'vue'
+
+const helper = inject('helper')
+const user = helper.authUser().username
 </script>
 
 <template>
@@ -24,13 +28,24 @@
         <p class="text-caption text-uppercase text-disabled">
           {{ $t('accounts.my-account') }}
         </p>
-        <v-list>
-          <po-list-item href="#" inertia>{{ $t('accounts.update-profile') }}</po-list-item>
-          <po-list-item href="#" inertia>{{ $t('users.view-self-writings') }}</po-list-item>
-          <po-list-item href="#" inertia>{{ $t('users.view-self-shelf') }}</po-list-item>
-          <po-list-item href="#" inertia disabled>{{ $t('accounts.manage-blocked-users') }}</po-list-item>
-        </v-list>
 
+        <v-list>
+          <po-list-item :href="$route('users.edit', user)" inertia>
+            {{ $t('accounts.update-profile') }}
+          </po-list-item>
+
+          <po-list-item :href="$route('users.writings.index', user)" inertia>
+            {{ $t('users.view-self-writings') }}
+          </po-list-item>
+
+          <po-list-item :href="$route('users.shelf.index', user)" inertia>
+            {{ $t('users.view-self-shelf') }}
+          </po-list-item>
+
+          <po-list-item href="#" inertia disabled>
+            {{ $t('accounts.manage-blocked-users') }}
+          </po-list-item>
+        </v-list>
       </div>
       <div class=" mb-5">
         <p class="text-caption text-uppercase text-disabled mb-3">{{ $t('accounts.notifications') }}</p>

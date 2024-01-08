@@ -38,7 +38,7 @@ onMounted(() => {
 
                 <div class="">
                   <p class="text-caption mb-0">{{ $helper.userDisplayName(comment.author) }}</p>
-                  <p class="text-caption text-medium-emphasis">{{ $helper.toLocaleDate(comment.created_at) }}</p>
+                  <p class="text-caption text-medium-emphasis">{{ $helper.relativeDate(comment.created_at) }}</p>
                 </div>
               </div>
 

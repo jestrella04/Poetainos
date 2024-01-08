@@ -59,12 +59,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function writingsPath()
     {
-        return route('users_writings.index', $this->username);
+        return route('users.writings.index', $this->username);
     }
 
     public function shelfPath()
     {
-        return route('users_shelves.index', $this->username);
+        return route('users.shelf.index', $this->username);
     }
 
     public function avatarPath()

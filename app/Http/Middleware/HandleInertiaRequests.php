@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Comment;
 use App\Models\User;
+use App\Models\Writing;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -37,13 +39,20 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = auth()->check() ? User::find(auth()->user()->id) : null;
+
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => auth()->check()
-                    ? User::select('username', 'name', 'extra_info->avatar AS avatar')->where('id', auth()->user()->id)->firstOrFail()
+                    ? User::select('username', 'name', 'extra_info->avatar AS avatar')->where('id', $user->id)->firstOrFail()
                     : null,
-                'admin' => auth()->check() ? User::find(auth()->user()->id)->isAllowed('admin') : null,
-                'notifications' => auth()->check() ? auth()->user()->unreadNotifications->count() : 0,
+                'admin' => auth()->check() ? $user->isAllowed('admin') : null,
+                'notifications' => auth()->check() ? $user->unreadNotifications->count() : 0,
+                'liked' => [
+                    'writings' => auth()->check() ? Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))->pluck('id') : [],
+                    'comments' => auth()->check() ? Comment::whereIn('id', $user->likes()->where('likeable_type', Comment::class)->pluck('likeable_id'))->pluck('id') : [],
+                ],
+                'shelved' => auth()->check() ? $user->shelf()->pluck('id') : []
             ],
             'route' => [
                 'name' => $request->route()->getName()

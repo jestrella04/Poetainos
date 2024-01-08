@@ -55,7 +55,7 @@ defineProps({
           {{ $t('main.registered') }}:
         </v-col>
         <v-col cols="12" md="8">
-          {{ $helper.toLocaleDate(data.created_at) }}
+          {{ $helper.relativeDate(data.created_at) }}
         </v-col>
       </v-row>
 

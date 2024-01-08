@@ -43,7 +43,7 @@ const page = computed(() => usePage())
               </template>
             </div>
             <div class="w-100">
-              <p class="text-caption font-weight-medium">{{ $helper.toLocaleDate(notification.created_at) }}</p>
+              <p class="text-caption font-weight-medium">{{ $helper.relativeDate(notification.created_at) }}</p>
               <div class="d-flex w-100 justify-space-between">
                 <div>
                   <p>{{ $helper.notificationMessage(notification, $t) }}.</p>

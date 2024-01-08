@@ -13,7 +13,7 @@ const mobileSiteMenu = ref(false)
 const snackBar = reactive({
   active: false,
   avatar: '/images/logo.svg',
-  color: 'primary',
+  color: 'info',
   timeout: 6000,
   message: '',
 })

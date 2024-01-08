@@ -27,7 +27,6 @@ const errors = reactive({
   email: [],
   username: [],
   password: [],
-  confirmPassword: []
 })
 
 provide('formData', formData)
@@ -45,7 +44,6 @@ function clearErrors() {
   errors.email = []
   errors.username = []
   errors.password = []
-  errors.confirmPassword = []
 }
 
 function resetForm() {
@@ -137,11 +135,13 @@ async function submitForm() {
         service_agreement: formData.serviceAgreement,
         privacy_agreement: formData.privacyAgreement
       })
-      .then((response) => {
-        router.get(response.data.redirect)
+      .then(() => {
+        router.get(window.route('verification.notice'))
       })
       .catch((error) => {
-        console.log(error)
+        errors.email = error.response.data.errors.email
+        errors.username = error.response.data.errors.username
+        errors.password = error.response.data.errors.password
       })
       .finally(() => {
         isLoading.value = false
@@ -190,7 +190,7 @@ async function submitForm() {
 
           <v-text-field v-model="formData.confirmPassword" type="password" :label="$t('accounts.confirm-password')"
             pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-            :placeholder="$t('main.enter-your-password')" :error-messages="errors.confirmPassword" persistent-placeholder
+            :placeholder="$t('main.enter-your-password')" :error-messages="errors.password" persistent-placeholder
             clearable hide-details="auto">
           </v-text-field>
 
