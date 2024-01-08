@@ -12,6 +12,7 @@ function submitForm() {
 </script>
 
 <template>
+  <po-head></po-head>
   <v-card :title="$t('main.contact-form').toUpperCase()">
     <v-form id="contact-form" class="px-5 pb-5" @submit.prevent="submitForm()">
       <v-text-field :label="$t('main.name')" :placeholder="$t('main.enter-your-name')" hide-details="auto"

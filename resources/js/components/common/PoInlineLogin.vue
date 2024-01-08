@@ -28,7 +28,8 @@
       </div>
 
       <div>
-        <po-button color="primary" :href="$route('email.check')" :title="$t('accounts.continue-with-email')" inertia>
+        <po-button color="primary" :href="$route('login', { 'isEmail': true })" :title="$t('accounts.continue-with-email')"
+          inertia>
           <v-icon icon="fas fa-at"></v-icon>
         </po-button>
       </div>

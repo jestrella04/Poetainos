@@ -23,8 +23,9 @@ class WritingsController extends Controller
      */
     public function index()
     {
+        $awards = 'writings.awards' === request()->route()->getName();
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $filterAwards = 'writings.awards' === request()->route()->getName() ? 'home_posted_at' : 'id';
+        $filterAwards = $awards ? 'home_posted_at' : 'id';
         $writings = Writing::whereNotIn('user_id', $this->blockedUsers)
             ->whereNotNull($filterAwards)
             ->withCount(['likes', 'comments', 'shelf'])
@@ -40,9 +41,15 @@ class WritingsController extends Controller
             $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination);
         }
 
+        if (request()->expectsJson()) {
+            return $writings;
+        }
+
         return Inertia::render('writings/PoWritingsIndex', [
-            'title' => getPageTitle([]),
-            'canonical' => route('home'),
+            'meta' => [
+                'title' => $awards ? getPageTitle([__('Golden Flowers')]) : getPageTitle([]),
+                'canonical' => route('home'),
+            ],
             'writings' => $writings,
             'sort' => $sort,
         ]);
@@ -153,14 +160,14 @@ class WritingsController extends Controller
 
         $mainCategories = Category::select('id', 'name')->whereNull('parent_id')->get();
         $subCategories = Category::select('id', 'name')->whereNotNull('parent_id')->get();
-        $params = [
-            'title' => [
-                'update' => getPageTitle([__('Update writing')]),
-                'create' => getPageTitle([__('Publish a writing')]),
-            ],
-        ];
 
         return Inertia::render('forms/PoPublishForm', [
+            'meta' => [
+                'title' => [
+                    'update' => getPageTitle([__('Update writing')]),
+                    'create' => getPageTitle([__('Publish a writing')]),
+                ],
+            ],
             'categories' => [
                 'main' => $mainCategories,
                 'alt' => $subCategories,

@@ -70,12 +70,14 @@ class CategoriesController extends Controller
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
-            'title' => getPageTitle([
-                $category->name,
-                __('Categories')
-            ]),
-            'canonical' => $category->path(),
-            'description' => $category->description,
+            'meta' => [
+                'title' => getPageTitle([
+                    $category->name,
+                    __('Categories')
+                ]),
+                'canonical' => route('home'),
+                'description' => $category->description,
+            ],
             'writings' => $writings,
             'sort' => $sort,
         ]);

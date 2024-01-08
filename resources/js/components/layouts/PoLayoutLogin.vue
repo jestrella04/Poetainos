@@ -73,7 +73,7 @@ body {
 
 <template>
   <v-app>
-    <po-head title="" />
+    <po-head />
 
     <v-main>
       <v-row class="flex-column flex-md-row" style="height: 100%;" no-gutters>

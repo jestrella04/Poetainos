@@ -88,11 +88,13 @@ class TagsController extends Controller
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
-            'title' => getPageTitle([
-                $tag->name,
-                __('Tags'),
-            ]),
-            'canonical' => $tag->path(),
+            'meta' => [
+                'title' => getPageTitle([
+                    $tag->name,
+                    __('Tags'),
+                ]),
+                'canonical' => route('home'),
+            ],
             'writings' => $writings,
             'sort' => $sort,
         ]);

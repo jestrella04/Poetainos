@@ -6,6 +6,7 @@ const user = helper.authUser().username
 </script>
 
 <template>
+  <po-head></po-head>
   <v-card>
     <v-card-text style="max-width: 400px;">
       <div class="d-flex mb-5 pos-relative">

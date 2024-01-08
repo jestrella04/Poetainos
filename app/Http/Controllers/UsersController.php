@@ -19,12 +19,6 @@ class UsersController extends Controller
     public function index()
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'featured']) ? request('sort') : 'featured';
-
-        $params = [
-            'title' => getPageTitle([__('Writers')]),
-            'canonical' => route('users.index'),
-        ];
-
         $users = User::select(
             'id',
             'username',
@@ -48,8 +42,10 @@ class UsersController extends Controller
         }
 
         return Inertia::render('users/PoUsersIndex', [
-            'title' => getPageTitle([__('Writers')]),
-            'canonical' => route('users.index'),
+            'meta' => [
+                'title' => getPageTitle([__('Writers')]),
+                'canonical' => route('users.index'),
+            ],
             'sort' => $sort,
             'users' => $users,
         ]);
@@ -107,11 +103,13 @@ class UsersController extends Controller
         $user->updateAura();
 
         return Inertia::render('users/PoUsersShow', [
-            /* 'title' => getPageTitle([
-                $user->getName(),
-                __('Writers'),
-            ]),
-            'canonical' => $user->path(), */
+            'meta' => [
+                'title' => getPageTitle([
+                    $user->getName(),
+                    __('Writers'),
+                ]),
+                'canonical' => $user->path(),
+            ],
             'user' => User::select(
                 'id',
                 'username',
@@ -159,14 +157,12 @@ class UsersController extends Controller
     {
         $this->authorize('update', $user);
 
-        $params = [
-            'title' => getPageTitle([__('Update profile')]),
-            'roles' => ['user', 'moderator', 'admin'],
-        ];
-
         return view('users.edit', [
-            'params' => $params,
+            'meta' => [
+                'title' => getPageTitle([__('Update profile')]),
+            ],
             'user' => $user,
+            'roles' => ['user', 'moderator', 'admin'],
         ]);
     }
 

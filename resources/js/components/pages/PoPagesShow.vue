@@ -40,6 +40,7 @@ const data = page.value.props.page
 </style>
 
 <template>
+  <po-head></po-head>
   <v-card :title="data.title.toUpperCase()">
     <v-card-text>
       <div v-html="$helper.markdown(data.text)" class="text-justify"></div>

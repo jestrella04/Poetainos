@@ -106,15 +106,8 @@ function getNotificationMessage($notification)
 
 function getPageTitle(array $titleParts, $separator = '–')
 {
-    $titleParts[] = getSiteConfig('name');
-    $title = [];
-
-    foreach ($titleParts as $part) {
-        $title[] = ucfirst($part);
-    }
-
-    unset($titleParts);
-    return trim(implode(' ' . $separator . ' ', $title), ' ');
+    $titleParts[] = getSiteConfig(('name'));
+    return implode(" {$separator} ", $titleParts);
 }
 
 function isTruthy($string)

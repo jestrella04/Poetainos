@@ -22,6 +22,7 @@ function submitForm() {
 </script>
 
 <template>
+  <po-head></po-head>
   <div class="w-100" style="max-width: 900px;">
     <v-card :title="$t('writings.publish-writing').toUpperCase()" :subtitle="$t('main.required-fields-marked')">
       <v-form id="writing-form" class="px-5 pb-5" @submit.prevent="submitForm()">

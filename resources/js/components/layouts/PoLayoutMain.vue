@@ -8,6 +8,7 @@ import { onUpdated } from 'vue';
 const page = computed(() => usePage())
 const helper = inject('helper')
 const theme = useTheme()
+const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const snackBar = reactive({
@@ -99,7 +100,7 @@ footer {
 
 <template>
   <v-app>
-    <po-head title="" />
+    <po-head />
     <po-snack-bar></po-snack-bar>
 
     <v-toolbar color="primary" :elevation="8" class="po-navbar px-3 d-none d-lg-flex">
@@ -121,6 +122,37 @@ footer {
             @click.prevent="$inertia.get($route('users.index'))"></v-tab>
           <v-tab :text="$t('main.publish')" :href="$route('writings.create')" value="writings.create"
             @click.prevent="$inertia.get($route('writings.create'))"></v-tab>
+          <v-tab href="#" @click.prevent="desktopSiteMenu = true">
+            <v-icon icon="fas fa-ellipsis-vertical"></v-icon>
+            <v-menu v-model="desktopSiteMenu" target="parent">
+              <v-list>
+                <po-list-item :href="$route('contact.create')" prepend-icon="fas fa-envelope" inertia>
+                  <span>{{ $t('main.contact-us') }}</span>
+                </po-list-item>
+                <v-divider class="my-0"></v-divider>
+
+                <po-list-item :href="$route('pages.show', 'preguntas-frecuentes')" prepend-icon="fas fa-circle-question"
+                  inertia>
+                  <span>{{ $t('main.faq') }}</span>
+                </po-list-item>
+                <v-divider class="my-0"></v-divider>
+
+                <po-list-item :href="$route('pages.show', 'sobre-nosotros')" prepend-icon="fas fa-address-card" inertia>
+                  <span>{{ $t('main.about-us') }}</span>
+                </po-list-item>
+                <v-divider class="my-0"></v-divider>
+
+                <po-list-item :href="$route('pages.show', 'condiciones-de-uso')" prepend-icon="fas fa-pen-ruler" inertia>
+                  <span>{{ $t('main.terms-of-use') }}</span>
+                </po-list-item>
+                <v-divider class="my-0"></v-divider>
+
+                <po-list-item :href="$route('pages.show', 'politicas-de-privacidad')" variant="text"
+                  prepend-icon="fas fa-shield-halved" inertia>
+                  <span>{{ $t('main.privacy-policy') }}</span>
+                </po-list-item>
+              </v-list>
+            </v-menu></v-tab>
         </v-tabs>
 
         <div v-if="!$helper.auth()" class="align-self-center">

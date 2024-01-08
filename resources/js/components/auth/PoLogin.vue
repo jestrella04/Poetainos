@@ -3,6 +3,7 @@ import { defineOptions, ref, reactive, provide, inject } from 'vue'
 import { router } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
+import { onMounted } from 'vue';
 
 defineOptions({
   layout: PoLayoutLogin,
@@ -30,6 +31,14 @@ const errors = reactive({
 })
 
 provide('formData', formData)
+
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search)
+
+  if ('1' === params.get('isEmail')) {
+    isEmail.value = true
+  }
+})
 
 function clearInputs() {
   formData.email = ''

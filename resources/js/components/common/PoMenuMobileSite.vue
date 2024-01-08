@@ -29,7 +29,8 @@ const mobileSiteMenu = inject('mobileSiteMenu', false)
           </po-list-item>
           <v-divider class="my-0"></v-divider>
 
-          <po-list-item :href="$route('pages.show', 'preguntas-fecuentes')" prepend-icon="fas fa-circle-question" inertia>
+          <po-list-item :href="$route('pages.show', 'preguntas-frecuentes')" prepend-icon="fas fa-circle-question"
+            inertia>
             <span>{{ $t('main.faq') }}</span>
           </po-list-item>
           <v-divider class="my-0"></v-divider>

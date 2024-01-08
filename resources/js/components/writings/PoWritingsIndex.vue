@@ -1,14 +1,31 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
+import axios from 'axios'
+import { inject } from 'vue';
 
 const page = computed(() => usePage())
+const helper = inject('helper')
+const writings = ref(page.value.props.writings.data)
+const next = ref(page.value.props.writings.next_page_url)
+
+function loadMore({ done }) {
+  if (!helper.strNullOrEmpty(next.value)) {
+    axios.get(next.value).then((response) => {
+      writings.value.push(...response.data.data)
+      next.value = response.data.next_page_url
+      done('ok')
+    })
+  } else {
+    done('empty')
+  }
+
+}
 </script>
 
 <template>
-  <po-head v-if="'writings.awards' === page.props.route.name" :title="$t('main.awards')" />
-
+  <po-head></po-head>
   <v-row>
     <v-col cols="12">
       <v-tabs v-model="page.props.sort" fixed-tabs>
@@ -31,8 +48,13 @@ const page = computed(() => usePage())
   </v-row>
 
   <v-row>
-    <v-col v-for="writing in page.props.writings.data" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
+    <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
       <po-writings-entry :alone="false" :data="writing" />
     </v-col>
   </v-row>
+
+  <v-infinite-scroll mode="manual" color="primary" :load-more-text="$t('main.load-more')"
+    :empty-text="$t('main.nothing-to-display')" @load="loadMore">
+
+  </v-infinite-scroll>
 </template>

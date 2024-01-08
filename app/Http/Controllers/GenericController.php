@@ -28,8 +28,10 @@ class GenericController extends Controller
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
-            'title' => getPageTitle([]),
-            'canonical' => route('home'),
+            'meta' => [
+                'title' => getPageTitle([__('Writings'), $user->getName()]),
+                'canonical' => route('home'),
+            ],
             'writings' => $writings,
             'sort' => $sort,
         ]);
@@ -54,8 +56,10 @@ class GenericController extends Controller
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
-            'title' => getPageTitle([]),
-            'canonical' => route('home'),
+            'meta' => [
+                'title' => getPageTitle([__('Shelf'), $user->getName()]),
+                'canonical' => route('home'),
+            ],
             'writings' => $writings,
             'sort' => $sort,
         ]);
@@ -64,7 +68,9 @@ class GenericController extends Controller
     public function explore()
     {
         return Inertia::render('explore/PoExploreIndex', [
-            'title' => getPageTitle([__('Explore')]),
+            'meta' => [
+                'title' => getPageTitle([__('Explore')]),
+            ],
             'categories' => [
                 'main' => Category::withCount('writings')->whereNull('parent_id')->orderByDesc('writings_count')
                     ->having('writings_count', '>', 0)->get(),

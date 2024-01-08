@@ -7,6 +7,7 @@ const page = computed(() => usePage())
 </script>
 
 <template>
+  <po-head></po-head>
   <v-row>
     <v-col cols="12" md="8">
       <po-users-entry :data="page.props.user" />

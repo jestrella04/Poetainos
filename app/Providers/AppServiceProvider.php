@@ -71,6 +71,6 @@ class AppServiceProvider extends ServiceProvider
     protected function registerResources(): void
     {
         // Loading project's custom language strings
-        $this->loadJSONTranslationsFrom(base_path('lang/poetainoss'));
+        $this->loadJSONTranslationsFrom(base_path('lang/poetainos'));
     }
 }

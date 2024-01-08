@@ -7,7 +7,7 @@ const page = computed(() => usePage())
 </script>
 
 <template>
-    <po-head :title="page.props.title" />
+    <po-head />
 
     <v-card>
         <v-card-text>
