@@ -1,8 +1,29 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import axios from 'axios'
 
 const page = computed(() => usePage())
+const helper = inject('helper')
+const notifications = ref(page.value.props.notifications.data)
+const next = ref(page.value.props.notifications.next_page_url)
+
+async function loadMore({ done }) {
+  if (!helper.strNullOrEmpty(next.value)) {
+    await axios
+      .get(next.value)
+      .then((response) => {
+        notifications.value.push(...response.data.data)
+        next.value = response.data.next_page_url
+        done('ok')
+      })
+      .catch(() => {
+        done('error')
+      })
+  } else {
+    done('empty')
+  }
+}
 </script>
 
 <template>
@@ -64,4 +85,6 @@ const page = computed(() => usePage())
       </v-card>
     </template>
   </div>
+
+  <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
 </template>

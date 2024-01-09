@@ -34,11 +34,15 @@ class UsersController extends Controller
         )->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
 
         if ('latest' === $sort) {
-            $users = $users->latest()->simplePaginate($this->pagination);
+            $users = $users->latest()->simplePaginate($this->pagination)->withQueryString();
         } elseif ('popular' === $sort) {
-            $users = $users->orderBy('profile_views', 'desc')->simplePaginate($this->pagination);
+            $users = $users->orderBy('profile_views', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('featured' === $sort) {
-            $users = $users->orderBy('aura', 'desc')->simplePaginate($this->pagination);
+            $users = $users->orderBy('aura', 'desc')->simplePaginate($this->pagination)->withQueryString();
+        }
+
+        if (request()->expectsJson()) {
+            return $users;
         }
 
         return Inertia::render('users/PoUsersIndex', [

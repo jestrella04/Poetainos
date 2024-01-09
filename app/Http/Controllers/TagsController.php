@@ -80,11 +80,15 @@ class TagsController extends Controller
             }]);
 
         if ('latest' === $sort) {
-            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
+        }
+
+        if (request()->expectsJson()) {
+            return $writings;
         }
 
         return Inertia::render('writings/PoWritingsIndex', [

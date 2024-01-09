@@ -69,8 +69,8 @@ provide('writingId', props.data.id)
           </div>
 
           <div class="d-inline-flex ga-1">
-            <po-chip v-for="category in data.categories" :key="category.slug" color="primary" size="small"
-              :href="$route('categories.show', category.slug)" inertia>
+            <po-chip v-for="category in data.categories" :key="category.slug" color="secondary" variant="elevated"
+              size="small" :href="$route('categories.show', category.slug)" inertia>
               {{ category.name }}
             </po-chip>
           </div>
@@ -82,7 +82,7 @@ provide('writingId', props.data.id)
           </div>
 
           <div class="d-inline-flex ga-1">
-            <po-chip v-for="tag in data.tags" :key="tag.slug" color="primary" size="small"
+            <po-chip v-for="tag in data.tags" :key="tag.slug" color="secondary" variant="elevated" size="small"
               :href="$route('tags.show', tag.slug)" inertia>
               {{ tag.name }}
             </po-chip>

@@ -20,9 +20,9 @@ class UsersNotificationsController extends Controller
         $notifications = [];
 
         if ($tab === 'unread') {
-            $notifications = User::find($user->id)->unreadNotifications()->paginate($this->pagination);
+            $notifications = User::find($user->id)->unreadNotifications()->paginate($this->pagination)->withQueryString();
         } else {
-            $notifications = User::find($user->id)->notifications()->paginate($this->pagination);
+            $notifications = User::find($user->id)->notifications()->paginate($this->pagination)->withQueryString();
         }
 
         $notifications->map(function ($notification) {
@@ -46,7 +46,12 @@ class UsersNotificationsController extends Controller
                 : null;
         });
 
+        if (request()->expectsJson()) {
+            return $notifications;
+        }
+
         return Inertia::render('notifications/PoNotificationsIndex', [
+            'meta' => [],
             'notifications' => $notifications,
             'tab' => $tab,
         ]);
@@ -79,7 +84,7 @@ class UsersNotificationsController extends Controller
 
     public function email($enable)
     {
-        auth()->user()->emailNotifications($enable);
+        User::find(auth()->user()->id)->emailNotifications($enable);
         return response()->json(null, 204);
     }
 

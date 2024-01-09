@@ -20,11 +20,15 @@ class GenericController extends Controller
             }]);
 
         if ('latest' === $sort) {
-            $writings = $writings->latest()->simplePaginate($this->pagination);
+            $writings = $writings->latest()->simplePaginate($this->pagination)->withQueryString();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
+        }
+
+        if (request()->expectsJson()) {
+            return $writings;
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
@@ -48,11 +52,15 @@ class GenericController extends Controller
             }]);
 
         if ('latest' === $sort) {
-            $writings = $writings->latest()->simplePaginate($this->pagination);
+            $writings = $writings->latest()->simplePaginate($this->pagination)->withQueryString();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
+        }
+
+        if (request()->expectsJson()) {
+            return $writings;
         }
 
         return Inertia::render('writings/PoWritingsIndex', [

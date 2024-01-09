@@ -1,27 +1,39 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, inject, onMounted, nextTick } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
-import { inject } from 'vue';
+import Masonry from 'masonry-layout'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
 const writings = ref(page.value.props.writings.data)
 const next = ref(page.value.props.writings.next_page_url)
+const mason = ref()
 
-function loadMore({ done }) {
+async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
-    axios.get(next.value).then((response) => {
-      writings.value.push(...response.data.data)
-      next.value = response.data.next_page_url
-      done('ok')
-    })
+    await axios
+      .get(next.value)
+      .then((response) => {
+        writings.value.push(...response.data.data)
+        next.value = response.data.next_page_url
+        nextTick(() => {
+          mason.value = new Masonry('.masonry', { "percentPosition": true })
+        })
+        done('ok')
+      })
+      .catch(() => {
+        done('error')
+      })
   } else {
     done('empty')
   }
-
 }
+
+onMounted(() => {
+  mason.value = new Masonry('.masonry', { "percentPosition": true })
+})
 </script>
 
 <template>
@@ -47,14 +59,11 @@ function loadMore({ done }) {
     </v-col>
   </v-row>
 
-  <v-row>
+  <v-row class="masonry">
     <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
       <po-writings-entry :alone="false" :data="writing" />
     </v-col>
   </v-row>
 
-  <v-infinite-scroll mode="manual" color="primary" :load-more-text="$t('main.load-more')"
-    :empty-text="$t('main.nothing-to-display')" @load="loadMore">
-
-  </v-infinite-scroll>
+  <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
 </template>

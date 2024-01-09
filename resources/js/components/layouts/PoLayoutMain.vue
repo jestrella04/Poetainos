@@ -162,7 +162,7 @@ footer {
         </div>
 
         <div v-else class="align-self-center">
-          <v-menu class="align-self-center" min-width="200px" rounded>
+          <v-menu target="parent">
             <template v-slot:activator="{ props }">
               <po-button icon v-bind="props">
                 <po-badge :count="page.props.auth.notifications">
@@ -171,30 +171,29 @@ footer {
               </po-button>
             </template>
 
-            <v-card>
-              <v-card-text>
-                <div class="mx-auto text-center">
-                  <po-button rounded block variant="text" :href="$route('users.account', $helper.authUser())" inertia>
-                    {{ $t('accounts.my-account') }}
-                  </po-button>
-                  <v-divider class="my-3"></v-divider>
+            <v-list>
+              <po-list-item :href="$route('users.account', $helper.authUser())" prepend-icon="fas fa-user" inertia>
+                <span>{{ $t('accounts.my-account') }}</span>
+              </po-list-item>
+              <v-divider class="my-0"></v-divider>
 
-                  <po-button rounded block variant="text" :href="$route('notifications.index')" inertia>
-                    {{ $t('accounts.notifications') }}
-                  </po-button>
-                  <v-divider class="my-3"></v-divider>
+              <po-list-item :href="$route('notifications.index')" prepend-icon="fas fa-bell" inertia>
+                <span>{{ $t('accounts.notifications') }}</span>
+                <po-badge :count="page.props.auth.notifications" inline></po-badge>
+              </po-list-item>
+              <v-divider class="my-0"></v-divider>
 
-                  <po-button v-if="$helper.admin()" rounded block variant="text" :href="$route('admin.index')" inertia>
-                    {{ $t('main.administration') }}
-                  </po-button>
-                  <v-divider class="my-3"></v-divider>
+              <template v-if="$helper.admin()">
+                <po-list-item :href="$route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
+                  <span>{{ $t('main.administration') }}</span>
+                </po-list-item>
+                <v-divider class="my-0"></v-divider>
+              </template>
 
-                  <po-button rounded block variant="text" :href="$route('logout')" method="post" inertia>
-                    {{ $t('accounts.logout') }}
-                  </po-button>
-                </div>
-              </v-card-text>
-            </v-card>
+              <po-list-item :href="$route('logout')" prepend-icon="fas fa-arrow-right-from-bracket" method="post" inertia>
+                <span>{{ $t('accounts.logout') }}</span>
+              </po-list-item>
+            </v-list>
           </v-menu>
         </div>
 
