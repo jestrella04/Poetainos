@@ -1,18 +1,46 @@
 <script setup>
+
+import { ref, onMounted, inject, computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
-import { ref, onMounted, inject } from 'vue'
 import PoCommentsForm from './PoCommentsForm.vue'
 
+const page = computed(() => usePage())
+const helper = inject('helper')
 const comments = ref({})
 const loadingComments = inject('loadingComments', true)
 const writingId = inject('writingId')
 
 onMounted(() => {
-  axios.get(window.route('comments.index', writingId)).then(response => {
-    comments.value = response.data
-    loadingComments.value = false
-  })
+  axios.
+    get(window.route('comments.index', writingId))
+    .then(response => {
+      comments.value = response.data
+      loadingComments.value = false
+    })
 })
+
+async function like(event, id) {
+  const doer = event.target.closest('.do-like')
+
+  if (helper.auth()) {
+    await axios
+      .post(window.route('likes.store', ['comment', id]))
+      .then((response) => {
+        doer.querySelector('span.count').textContent = helper.readable(response.data.count)
+
+        if ('store' === response.data.method) {
+          doer.classList.add('liked')
+        } else {
+          doer.classList.remove('liked')
+        }
+      })
+      .catch()
+      .finally(() => {
+        helper.animate(doer.querySelector("i"), "heartBeat")
+      })
+  }
+}
 </script>
 
 <template>
@@ -43,9 +71,11 @@ onMounted(() => {
               </div>
 
               <div class="d-flex align-end justify-end">
-                <po-button variant="tonal" size="small">
+                <po-button variant="tonal" size="small" class="do-like"
+                  :class="{ 'liked': page.props.auth.liked.comments.includes(comment.id) }"
+                  @click="(event) => { like(event, comment.id) }">
                   <v-icon class="me-2" icon="fas fa-heart"></v-icon>
-                  <span>{{ comment.likes_count }}</span>
+                  <span class="count">{{ helper.readable(comment.likes_count) }}</span>
                 </po-button>
 
                 <po-button variant="tonal" size="small">
@@ -58,7 +88,6 @@ onMounted(() => {
                 </po-button>
               </div>
             </div>
-
           </v-card-actions>
         </v-card>
       </template>

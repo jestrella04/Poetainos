@@ -129,6 +129,7 @@ Route::get('/users', [UsersController::class, 'index'])->name('users.index');
 Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show');
 Route::get('/users/{user}/writings', [GenericController::class, 'writings'])->name('users.writings.index');
 Route::get('/users/{user}/shelf', [GenericController::class, 'shelf'])->name('users.shelf.index');
+Route::get('/users/{user}/likes', [GenericController::class, 'likes'])->name('users.likes.index');
 //Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('users.hood.index');
 //Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
 

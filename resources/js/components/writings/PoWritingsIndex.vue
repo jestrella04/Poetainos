@@ -34,36 +34,49 @@ async function loadMore({ done }) {
 onMounted(() => {
   mason.value = new Masonry('.masonry', { "percentPosition": true })
 })
+
+function liked(id, count) {
+  let pos
+  const a = Object.values(writings.value).filter((writing, idx) => {
+    if (writing.id === id) {
+      pos = idx
+      return
+    }
+  })
+  console.log(`${a}: ${pos}`)
+  a.likes_count.value = count
+}
 </script>
 
 <template>
-  <po-head></po-head>
-  <v-row>
-    <v-col cols="12">
-      <v-tabs v-model="page.props.sort" fixed-tabs>
-        <v-tab href="?sort=latest" @click.prevent="$inertia.get('?sort=latest')" value="latest">
-          <v-icon icon="fas fa-clock" class="d-md-none" />
-          <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
-        </v-tab>
+  <po-wrapper>
+    <po-head></po-head>
+    <v-row>
+      <v-col cols="12">
+        <v-tabs v-model="page.props.sort" fixed-tabs>
+          <v-tab href="?sort=latest" @click.prevent="$inertia.get('?sort=latest')" value="latest">
+            <v-icon icon="fas fa-clock" class="d-md-none" />
+            <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
+          </v-tab>
 
-        <v-tab href="?sort=popular" @click.prevent="$inertia.get('?sort=popular')" value="popular">
-          <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
-          <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
-        </v-tab>
+          <v-tab href="?sort=popular" @click.prevent="$inertia.get('?sort=popular')" value="popular">
+            <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
+            <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
+          </v-tab>
 
-        <v-tab href="?sort=likes" @click.prevent="$inertia.get('?sort=likes')" value="likes">
-          <v-icon icon="fas fa-heart" class="d-md-none" />
-          <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
-        </v-tab>
-      </v-tabs>
-    </v-col>
-  </v-row>
+          <v-tab href="?sort=likes" @click.prevent="$inertia.get('?sort=likes')" value="likes">
+            <v-icon icon="fas fa-heart" class="d-md-none" />
+            <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
+          </v-tab>
+        </v-tabs>
+      </v-col>
+    </v-row>
 
-  <v-row class="masonry">
-    <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
-      <po-writings-entry :alone="false" :data="writing" />
-    </v-col>
-  </v-row>
-
-  <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+    <v-row class="masonry">
+      <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
+        <po-writings-entry @liked="liked" :alone="false" :data="writing" />
+      </v-col>
+    </v-row>
+    <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+  </po-wrapper>
 </template>

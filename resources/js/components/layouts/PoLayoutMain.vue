@@ -96,6 +96,21 @@ footer {
 .v-input {
   margin-bottom: 1rem;
 }
+
+.liked i,
+.do-like:hover i {
+  color: #D32F2F;
+}
+
+.shelved i,
+.do-shelf:hover i {
+  color: #2196F3;
+}
+
+.do-shelf,
+.do-like {
+  cursor: pointer;
+}
 </style>
 
 <template>

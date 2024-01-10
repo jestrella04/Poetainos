@@ -43,6 +43,10 @@ const user = helper.authUser().username
             {{ $t('users.view-self-shelf') }}
           </po-list-item>
 
+          <po-list-item :href="$route('users.likes.index', user)" inertia>
+            {{ $t('users.view-self-likes') }}
+          </po-list-item>
+
           <po-list-item href="#" inertia disabled>
             {{ $t('accounts.manage-blocked-users') }}
           </po-list-item>

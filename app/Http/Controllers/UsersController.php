@@ -330,15 +330,15 @@ class UsersController extends Controller
     {
         $this->authorize('delete', $user);
 
-        $params = [
-            'title' => getPageTitle([
-                $user->getName(),
-                __('Writers'),
-            ]),
-        ];
+        $params = [];
 
         return Inertia::render('users/PoAccount', [
-            /* 'user' => $user,
-            'params' => $params */]);
+            'meta' => [
+                'title' => getPageTitle([
+                    $user->getName(),
+                    __('Writers'),
+                ]),
+            ],
+        ]);
     }
 }

@@ -6,7 +6,6 @@ use App\Notifications\WritingShelved;
 use App\Models\Shelf;
 use App\Models\User;
 use App\Models\Writing;
-use Illuminate\Http\Request;
 
 class ShelvesController extends Controller
 {
@@ -21,27 +20,32 @@ class ShelvesController extends Controller
         $userId = auth()->user()->id;
 
         // Check existence
-        $old = Shelf::where('user_id', $userId)->where('writing_id', $writing->id)->count();
+        $exist = Shelf::where('user_id', $userId)->where('writing_id', $writing->id)->count();
 
-        if (0 === $old) {
-            Shelf::create([
-                'writing_id' => $writing->id,
-                'user_id' => $userId,
-            ]);
-
-            // Update aura
-            User::find($userId)->updateAura();
-            Writing::find($writing->id)->updateAura();
-
-            // Notify author
-            if (! Writing::find($writing->id)->author->is(auth()->user())) {
-                Writing::find($writing->id)->author->notify(new WritingShelved(Writing::find($writing->id), auth()->user()));
-            }
+        if ($exist > 0) {
+            return $this->destroy($writing);
         }
 
-        $count = ReadableHumanNumber(Shelf::where('writing_id', $writing->id)->count());
+        Shelf::create([
+            'writing_id' => $writing->id,
+            'user_id' => $userId,
+        ]);
+
+        // Update aura
+        User::find($userId)->updateAura();
+        Writing::find($writing->id)->updateAura();
+
+        // Notify author
+        if (!Writing::find($writing->id)->author->is(auth()->user())) {
+            Writing::find($writing->id)->author->notify(
+                new WritingShelved(Writing::find($writing->id), auth()->user())
+            );
+        }
+
+        $count = Shelf::where('writing_id', $writing->id)->count();
 
         return [
+            'method' => 'store',
             'count' => $count,
         ];
     }
@@ -55,9 +59,10 @@ class ShelvesController extends Controller
     public function destroy(Writing $writing)
     {
         User::find(auth()->user()->id)->shelf()->detach($writing->id);
-        $count = ReadableHumanNumber(Shelf::where('writing_id', $writing->id)->count());
+        $count = Shelf::where('writing_id', $writing->id)->count();
 
         return [
+            'method' => 'destroy',
             'count' => $count,
         ];
     }
