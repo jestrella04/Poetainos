@@ -12,7 +12,6 @@ use App\Http\Controllers\InitController;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PushNotificationsController;
-use App\Http\Controllers\ResourcesController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShelvesController;
@@ -110,7 +109,7 @@ Route::post('/init', [InitController::class, 'init'])->name('init.init');
 Route::get('/init/success', [InitController::class, 'success'])->name('init.success');
 
 // PWA manifest
-Route::get('/manifest.json', [ResourcesController::class, 'pwaManifest'])->name('pwa.manifest');
+Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.manifest');
 
 // Generic
 Route::get('/offline', [GenericController::class, 'offline'])->name('offline');

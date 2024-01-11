@@ -108,7 +108,7 @@ class GenericController extends Controller
 
     public function explore()
     {
-        return Inertia::render('explore/PoExploreIndex', [
+        return Inertia::render('generic/PoExploreIndex', [
             'meta' => [
                 'title' => getPageTitle([__('Explore')]),
             ],
@@ -139,5 +139,51 @@ class GenericController extends Controller
             'title' => $title,
             'url' => $url,
         ]);
+    }
+
+    public function manifest()
+    {
+        $json = json_decode(file_get_contents(base_path('resources/json/manifest.json')));
+
+        $json->name = getSiteConfig('name');
+        $json->gcm_sender_id = config('webpush.gcm.sender_id');
+        $json->short_name = getSiteConfig('name');
+        $json->description = getSiteConfig('slogan');
+
+        foreach ($json->shortcuts as $shortcut) {
+            if ("publish" === $shortcut->name) {
+                $shortcut->name = __('Publish');
+                $shortcut->short_name = __('Publish');
+                $shortcut->url = route('writings.create');
+            }
+
+            if ("featured" === $shortcut->name) {
+                $shortcut->name = __('Golden Flowers');
+                $shortcut->short_name = __('Golden Flowers');
+                $shortcut->url = route('writings.awards');
+            }
+
+            if ("random" === $shortcut->name) {
+                $shortcut->name = __('Random');
+                $shortcut->short_name = __('Random');
+                $shortcut->url = route('writings.random');
+            }
+        }
+
+        foreach ($json->related_applications as $app) {
+            if ("play" === $app->platform) {
+                $app->url = config('services.google.play_store.url');
+                $app->id = config('services.google.play_store.id');
+            }
+        }
+
+        $json->iarc_rating_id = config('services.compliance.iarc_rating_id');
+
+        return $json;
+    }
+
+    public function offline()
+    {
+        Inertia::render('generic/PoOffline');
     }
 }

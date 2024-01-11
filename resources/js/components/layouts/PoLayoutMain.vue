@@ -1,9 +1,8 @@
 <script setup>
-import { computed, ref, reactive, provide, inject } from 'vue'
+import { computed, ref, reactive, provide, inject, onMounted, onUpdated } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
-import { onMounted } from 'vue';
-import { onUpdated } from 'vue';
+import { registerSW } from 'virtual:pwa-register'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -20,6 +19,7 @@ const snackBar = reactive({
 })
 
 theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
+registerSW({ immediate: true })
 
 provide('snackBar', snackBar)
 provide('mobileSiteMenu', mobileSiteMenu)
