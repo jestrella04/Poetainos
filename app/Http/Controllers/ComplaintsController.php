@@ -27,22 +27,11 @@ class ComplaintsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($type, $id)
+    public function reasons()
     {
-        if (! in_array($type, ['writings', 'comments', 'replies', 'users'])) {
-            abort(404);
-        }
-
-        $params = [
-            'complainable_type' => $type,
-            'complainable_id' => $id,
-            'modal_id' => "complaint-{$type}-{$id}",
+        return  [
             'reasons' => getSiteConfig('complaints'),
         ];
-
-        return view('complaints.create', [
-            'params' => $params,
-        ]);
     }
 
     /**
@@ -55,9 +44,9 @@ class ComplaintsController extends Controller
     {
         // Validate user input
         request()->validate([
-            'complainable_type' => 'required|string|in:writings,comments,replies,users',
+            'complainable_type' => 'required|string|in:writings,comments,users',
             'complainable_id' => 'required|integer',
-            'reasons' => 'required|array',
+            'reasons' => 'required|array|min:1',
             'comment' => 'nullable|string|max:255',
         ]);
 
@@ -80,10 +69,7 @@ class ComplaintsController extends Controller
         $recipients = getSiteConfig('emails.admin');
         Notification::route('mail', $recipients)->notify(new ComplaintSubmitted);
 
-        return [
-            'message' => __('We received your complaint request successfully and will be processing it soon.'),
-            'id' => $complaint->id,
-        ];
+        return [];
     }
 
     /**

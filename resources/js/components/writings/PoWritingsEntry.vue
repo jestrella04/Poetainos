@@ -1,8 +1,8 @@
 <script setup>
-import { ref, provide, computed, inject } from 'vue'
+import { ref, provide } from 'vue'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
-import { usePage } from '@inertiajs/vue3'
-import axios from 'axios'
+import PoWritingStats from './partials/PoWritingStats.vue'
+import PoWritingDropdown from './partials/PoWritingDropdown.vue';
 
 const props = defineProps({
   alone: { type: Boolean, default: true },
@@ -10,65 +10,17 @@ const props = defineProps({
   likers: Object,
 })
 
-const page = computed(() => usePage())
-const helper = inject('helper')
 const loadingComments = ref(true)
-const liked = page.value.props.auth.liked.writings.includes(props.data.id)
-const shelved = page.value.props.auth.shelved.includes(props.data.id)
-const likesCount = ref(props.data.likes_count)
-const shelfCount = ref(props.data.shelf_count)
 
 provide('loadingComments', loadingComments)
-provide('writingId', props.data.id)
+provide('writing', props.data)
 
-async function like(event) {
-  const doer = event.target.closest('.do-like')
-
-  if (helper.auth()) {
-    await axios
-      .post(window.route('likes.store', ['writing', props.data.id]))
-      .then((response) => {
-        likesCount.value = response.data.count
-
-        if ('store' === response.data.method) {
-          doer.classList.add('liked')
-        } else {
-          doer.classList.remove('liked')
-        }
-      })
-      .catch()
-      .finally(() => {
-        helper.animate(doer.querySelector("i"), "heartBeat")
-      })
-  }
-}
-
-async function shelf(event) {
-  const doer = event.target.closest('.do-shelf')
-
-  if (helper.auth()) {
-    await axios
-      .post(window.route('shelves.store', props.data.slug))
-      .then((response) => {
-        shelfCount.value = response.data.count
-
-        if ('store' === response.data.method) {
-          doer.classList.add('shelved')
-        } else {
-          doer.classList.remove('shelved')
-        }
-      })
-      .catch()
-      .finally(() => {
-        helper.animate(doer.querySelector("i"), "heartBeat")
-      })
-  }
-}
 </script>
 
 <template>
   <po-wrapper>
-    <v-card rounded elevation="2">
+    <v-card class="pos-relative" elevation="2" rounded>
+      <po-writing-dropdown></po-writing-dropdown>
       <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)">
         <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" cover>
           <div class="text-center py-3">
@@ -85,10 +37,11 @@ async function shelf(event) {
         </po-link>
       </div>
 
-      <v-card-text>
+      <v-card-text class="pos-relative">
         <div class="text-center mb-3">
           <p class="text-h5 text-uppercase font-weight-bold">
-            <po-link v-if="!alone" :href="$route('writings.show', data.slug)" inertia>{{ data.title }}</po-link>
+            <po-link v-if="!alone" :href="$route('writings.show', data.slug)" class="stretched" inertia>{{ data.title
+            }}</po-link>
             <span v-else>{{ data.title }}</span>
           </p>
           <p class="text-caption text-uppercase font-weight-light">
@@ -163,37 +116,7 @@ async function shelf(event) {
 
       <v-divider></v-divider>
       <v-card-actions>
-        <div class="d-flex justify-center ga-8 mx-auto text-medium-emphasis text-caption text-center">
-          <div v-if="!$helper.strNullOrEmpty(data.home_posted_at)" class="d-flex flex-column">
-            <div><v-icon icon="fas fa-fan" color="amber-accent-4"></v-icon></div>
-            <div>:</div>
-          </div>
-
-          <div class="d-flex flex-column do-like" :class="{ 'liked': liked }" @click="like">
-            <div><v-icon icon="fas fa-heart"></v-icon></div>
-            <div>{{ $helper.readable(likesCount) }}</div>
-          </div>
-
-          <div class="d-flex flex-column">
-            <div><v-icon icon="fas fa-comment"></v-icon></div>
-            <div>{{ $helper.readable(data.comments_count) }}</div>
-          </div>
-
-          <div class="d-flex flex-column">
-            <div><v-icon icon="fas fa-book-reader"></v-icon></div>
-            <div>{{ $helper.readable(data.views) }}</div>
-          </div>
-
-          <div class="d-flex flex-column do-shelf" :class="{ 'shelved': shelved }" @click="shelf">
-            <div><v-icon icon="fas fa-bookmark"></v-icon></div>
-            <div>{{ $helper.readable(shelfCount) }}</div>
-          </div>
-
-          <div class="d-flex flex-column">
-            <div><v-icon icon="fas fa-dove"></v-icon></div>
-            <div>{{ data.aura }}</div>
-          </div>
-        </div>
+        <po-writing-stats></po-writing-stats>
       </v-card-actions>
     </v-card>
 

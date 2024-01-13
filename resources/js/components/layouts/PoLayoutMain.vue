@@ -3,6 +3,7 @@ import { computed, ref, reactive, provide, inject, onMounted, onUpdated } from '
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
 import { registerSW } from 'virtual:pwa-register'
+import { watch } from 'vue';
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -10,6 +11,7 @@ const theme = useTheme()
 const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
+const forceSnackBar = ref(false)
 const snackBar = reactive({
   active: false,
   avatar: '/images/logo.svg',
@@ -22,6 +24,7 @@ theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matc
 registerSW({ immediate: true })
 
 provide('snackBar', snackBar)
+provide('forceSnackBar', forceSnackBar)
 provide('mobileSiteMenu', mobileSiteMenu)
 provide('mobileUserMenu', mobileUserMenu)
 
@@ -31,6 +34,13 @@ onMounted(() => {
 
 onUpdated(() => {
   getFlashMessages()
+})
+
+watch(forceSnackBar, () => {
+  if (forceSnackBar.value) {
+    getFlashMessages()
+    forceSnackBar.value = false
+  }
 })
 
 function getFlashMessages() {
@@ -179,7 +189,7 @@ footer {
         <div v-else class="align-self-center">
           <v-menu target="parent">
             <template v-slot:activator="{ props }">
-              <po-button icon v-bind="props">
+              <po-button v-bind="props">
                 <po-badge :count="page.props.auth.notifications">
                   <po-avatar size="32" color="secondary" :user="$helper.authUser()" />
                 </po-badge>

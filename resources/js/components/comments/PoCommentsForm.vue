@@ -4,7 +4,7 @@ import axios from 'axios'
 
 const emit = defineEmits('commentPosted')
 const helper = inject('helper')
-const writingId = inject('writingId')
+const writing = inject('writing')
 const message = ref('')
 const errorMessages = ref([])
 
@@ -18,7 +18,7 @@ async function submitForm() {
   errorMessages.value = []
 
   await axios
-    .post(form.action, { writing_id: writingId, comment: message.value })
+    .post(form.action, { writing_id: writing.id, comment: message.value })
     .then(() => {
       message.value = ''
       emit('commentPosted')
@@ -31,7 +31,7 @@ async function submitForm() {
 </script>
 
 <template>
-  <v-form id="comment-form" :action="$route('comments.store')" :data="writingId" @submit.prevent="submitForm">
+  <v-form id="comment-form" :action="$route('comments.store')" :data="writing.id" @submit.prevent="submitForm">
     <v-textarea v-model="message" :label="$t('comments.comment')"
       :placeholder="$t('comments.comment-mention', { at: '@' })" rows="2" max-length="300" hide-details="auto"
       :error-messages="errorMessages" auto-grow clearable persistent-placeholder required></v-textarea>

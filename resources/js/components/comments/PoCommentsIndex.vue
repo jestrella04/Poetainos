@@ -9,7 +9,7 @@ const page = computed(() => usePage())
 const helper = inject('helper')
 const comments = ref({})
 const loadingComments = inject('loadingComments', true)
-const writingId = inject('writingId')
+const writing = inject('writing')
 
 onMounted(() => {
   loadComments()
@@ -17,7 +17,7 @@ onMounted(() => {
 
 async function loadComments() {
   await axios.
-    get(window.route('comments.index', writingId))
+    get(window.route('comments.index', writing.id))
     .then(response => {
       comments.value = response.data
       loadingComments.value = false

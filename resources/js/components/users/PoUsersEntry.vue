@@ -1,13 +1,19 @@
 <script setup>
+import { provide } from 'vue'
 import PoUsersStats from './PoUsersStats.vue'
+import PoUserDropdown from './partials/PoUserDropdown.vue'
 
-defineProps({
+const props = defineProps({
   data: { type: Object, required: true },
 })
+
+provide('user', props.data)
 </script>
 
 <template>
-  <v-card rounded elevation="2" class="mb-5">
+  <v-card class="mb-5 pos-relative" elevation="2" rounded>
+    <po-user-dropdown></po-user-dropdown>
+
     <v-card-text>
       <div class="text-center mb-5">
         <po-avatar size="96" color="secondary" class="mb-2" :user="data" />

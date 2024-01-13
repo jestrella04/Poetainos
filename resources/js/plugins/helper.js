@@ -221,6 +221,41 @@ const Helper = class {
 
       node.addEventListener('animationend', handleAnimationEnd, { once: true })
     })
+
+  shareLinks(title, url) {
+    const facebookBaseUrl = `https://facebook.com/sharer/sharer.php?u=${url}`
+    const twitterBaseUrl = `https://twitter.com/intent/tweet/?text=${title}&url=${url}`
+    const whatsappBaseUrl = `whatsapp://send?text=${title}%20${url}`
+    const telegramBaseUrl = `https://t.me/share/url?url=${url}&text=${title}`
+
+    return [
+      {
+        name: 'Facebook',
+        url: facebookBaseUrl,
+        icon: 'fab fa-facebook'
+      },
+      {
+        name: 'Twitter',
+        url: twitterBaseUrl,
+        icon: 'fab fa-x-twitter'
+      },
+      {
+        name: 'Whatsapp',
+        url: whatsappBaseUrl,
+        icon: 'fab fa-whatsapp'
+      },
+      {
+        name: 'Telegram',
+        url: telegramBaseUrl,
+        icon: 'fab fa-telegram'
+      },
+      {
+        name: 'copy',
+        url: '#',
+        icon: 'far fa-clone'
+      }
+    ]
+  }
 }
 
 export const helper = {

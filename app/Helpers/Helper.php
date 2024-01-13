@@ -120,39 +120,3 @@ function isTruthy($string)
 
     return false;
 }
-
-function shareLinks($title, $url)
-{
-    $facebookBaseUrl = 'https://facebook.com/sharer/sharer.php?u={url}';
-    $twitterBaseUrl = 'https://twitter.com/intent/tweet/?text={text}&url={url}';
-    $whatsappBaseUrl = 'whatsapp://send?text={text}%20{url}';
-    $telegramBaseUrl = 'https://t.me/share/url?url={url}&text={text}';
-
-    return [
-        'facebook' => [
-            'url' => str_replace('{url}', $url, $facebookBaseUrl),
-            'class' => 'share-link facebook-link',
-            'icon' => 'fab fa-fw fa-facebook',
-        ],
-        'twitter' => [
-            'url' => str_replace('{text}', $title, str_replace('{url}', $url, $twitterBaseUrl)),
-            'class' => 'share-link twitter-link',
-            'icon' => 'fab fa-fw fa-x-twitter',
-        ],
-        'whatsapp' => [
-            'url' => str_replace('{text}', $title, str_replace('{url}', $url, $whatsappBaseUrl)),
-            'class' => 'share-link whatsapp-link',
-            'icon' => 'fab fa-fw fa-whatsapp',
-        ],
-        'telegram' => [
-            'url' => str_replace('{text}', $title, str_replace('{url}', $url, $telegramBaseUrl)),
-            'class' => 'share-link telegram-link',
-            'icon' => 'fab fa-fw fa-telegram',
-        ],
-        __('Copy link') => [
-            'url' => $url,
-            'class' => 'share-link copy-to-clipboard-link',
-            'icon' => 'far fa-fw fa-clone',
-        ],
-    ];
-}

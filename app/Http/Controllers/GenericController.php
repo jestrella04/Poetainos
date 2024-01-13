@@ -130,17 +130,6 @@ class GenericController extends Controller
         ]);
     }
 
-    public function sharer()
-    {
-        $title = request('title');
-        $url = request('url');
-
-        return view('partials.sharer', [
-            'title' => $title,
-            'url' => $url,
-        ]);
-    }
-
     public function manifest()
     {
         $json = json_decode(file_get_contents(base_path('resources/json/manifest.json')));

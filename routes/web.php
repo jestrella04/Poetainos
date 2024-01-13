@@ -154,7 +154,7 @@ Route::post('/contact', [ContactsController::class, 'store'])->name('contact.sto
 Route::get('/reload-captcha', [ContactsController::class, 'reloadCaptcha'])->name('captcha.reload');
 
 // Complaints
-Route::get('/complaints/{type}/{id}/create', [ComplaintsController::class, 'create'])->name('complaints.create');
+Route::get('/complaints/reasons', [ComplaintsController::class, 'reasons'])->name('complaints.reasons');
 Route::post('/complaints/store', [ComplaintsController::class, 'store'])->name('complaints.store');
 
 // Redirects, keep on the bottom
