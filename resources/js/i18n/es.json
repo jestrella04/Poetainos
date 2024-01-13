@@ -114,6 +114,7 @@
     "report-writing": "Denunciar texto"
   },
   "main": {
+    "here": "aquí",
     "about-us": "Sobre Nosotros",
     "action-irreversible": "Esta acción es irreversible.",
     "actions": "Acciones",
@@ -247,6 +248,7 @@
     "recommend-push": "Si aún no lo has hecho, te recomendamos encarecidamente habilitar las notificaciones push.",
     "registered": "Registrado",
     "reload": "Recargar",
+    "reload-captcha": "Recargar captcha",
     "reply": "Responder",
     "required-fields-marked": "Los campos marcados con * son obligatorios",
     "reset": "Restaurar",

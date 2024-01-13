@@ -1,13 +1,40 @@
 <script setup>
-import { inject } from 'vue'
+import { inject, ref } from 'vue'
+import axios from 'axios'
 
+const emit = defineEmits('commentPosted')
+const helper = inject('helper')
 const writingId = inject('writingId')
+const message = ref('')
+const errorMessages = ref([])
+
+async function submitForm() {
+  const form = document.querySelector('#comment-form')
+
+  if (!helper.checkFormValidity(form)) {
+    return
+  }
+
+  errorMessages.value = []
+
+  await axios
+    .post(form.action, { writing_id: writingId, comment: message.value })
+    .then(() => {
+      message.value = ''
+      emit('commentPosted')
+    })
+    .catch((error) => {
+      errorMessages.value = error.response.data.errors.comment
+    })
+    .finally(() => { })
+}
 </script>
 
 <template>
-  <v-form :action="$route('comments.store')" :data="writingId" @submit.prevent>
-    <v-textarea :label="$t('comments.comment')" :placeholder="$t('comments.comment-mention', { at: '@' })" rows="2"
-      hide-details="auto" auto-grow clearable persistent-placeholder></v-textarea>
+  <v-form id="comment-form" :action="$route('comments.store')" :data="writingId" @submit.prevent="submitForm">
+    <v-textarea v-model="message" :label="$t('comments.comment')"
+      :placeholder="$t('comments.comment-mention', { at: '@' })" rows="2" max-length="300" hide-details="auto"
+      :error-messages="errorMessages" auto-grow clearable persistent-placeholder required></v-textarea>
     <po-button type="submit" block class="mt-1">{{ $t('comments.post-comment') }}</po-button>
   </v-form>
 </template>

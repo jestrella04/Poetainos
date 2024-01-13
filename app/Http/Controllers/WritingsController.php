@@ -158,22 +158,23 @@ class WritingsController extends Controller
             $this->authorize('update', $writing);
         }
 
-        $mainCategories = Category::select('id', 'name')->whereNull('parent_id')->get();
-        $subCategories = Category::select('id', 'name')->whereNotNull('parent_id')->get();
+        $mainCategories = Category::select('id', 'name')
+            ->whereNull('parent_id')
+            ->with('descendants'/* ['descendants' => function ($query) {
+                $query->select('id', 'name');
+            }] */)
+            ->get();
 
         return Inertia::render('forms/PoPublishForm', [
             'meta' => [
-                'title' => [
-                    'update' => getPageTitle([__('Update writing')]),
-                    'create' => getPageTitle([__('Publish a writing')]),
-                ],
+                'title' => request()->route()->getName() === 'writings.edit'
+                    ? getPageTitle([__('Update writing')])
+                    : getPageTitle([__('Publish a writing')])
             ],
-            'categories' => [
-                'main' => $mainCategories,
-                'alt' => $subCategories,
-            ],
+            'categories' => $mainCategories,
             'writing' => $writing,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
+            'agreement' => User::find(auth()->user()->id)->isInAgreement(),
         ]);
     }
 
@@ -196,7 +197,7 @@ class WritingsController extends Controller
         request()->validate([
             'title' => 'required|string|min:3|max:100',
             'main_category' => 'required|integer|exists:categories,id',
-            'categories' => 'nullable|array|exists:categories,id',
+            'categories' => 'nullable|array|exists:categories,id|max:2',
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
@@ -291,17 +292,11 @@ class WritingsController extends Controller
             $like->save();
         }
 
-        // Append link
-        $message .= ' <a href="{url}">' . __('Take a look for yourself') . '</a>';
-
         // Set response data
-        $response = $writing->toArray();
-        $response['url'] = $writing->path();
-        $response['message'] = str_replace('{url}', $writing->path(), $message);
-        $response['action'] = $action ?? 'create';
-
-        // Output the response
-        return $response;
+        return [
+            'url' => $writing->path(),
+            'action' => $action ?? 'create',
+        ];
     }
 
     /**

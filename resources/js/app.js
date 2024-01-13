@@ -2,6 +2,7 @@ import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { far } from '@fortawesome/free-regular-svg-icons'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { vuetify } from './plugins/vuetify'
@@ -11,6 +12,7 @@ import { route } from './plugins/route'
 import 'animate.css'
 import PoLayoutMain from './components/layouts/PoLayoutMain.vue'
 
+library.add(far)
 library.add(fas)
 library.add(fab)
 

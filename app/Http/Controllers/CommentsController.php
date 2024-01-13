@@ -55,7 +55,7 @@ class CommentsController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'comment' => 'required|min:2|max:300',
+            'comment' => 'required|min:1|max:300',
             'writing_id' => 'required|exists:writings,id',
             'reply_to' => 'nullable|exists:users,username',
         ]);
@@ -97,10 +97,6 @@ class CommentsController extends Controller
                 $mention->notify(new WritingCommentMentioned($comment, auth()->user()));
             }
         }
-
-        return view('comments.show', [
-            'comment' => $comment,
-        ])->render();
     }
 
     /**

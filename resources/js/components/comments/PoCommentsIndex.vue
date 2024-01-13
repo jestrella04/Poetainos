@@ -12,13 +12,17 @@ const loadingComments = inject('loadingComments', true)
 const writingId = inject('writingId')
 
 onMounted(() => {
-  axios.
+  loadComments()
+})
+
+async function loadComments() {
+  await axios.
     get(window.route('comments.index', writingId))
     .then(response => {
       comments.value = response.data
       loadingComments.value = false
     })
-})
+}
 
 async function like(event, id) {
   const doer = event.target.closest('.do-like')
@@ -47,7 +51,7 @@ async function like(event, id) {
   <div class="my-5">
     <div v-if="!loadingComments" class="mb-5">
       <po-inline-login v-if="!$helper.auth()" />
-      <po-comments-form v-else />
+      <po-comments-form @comment-posted="loadComments" v-else />
     </div>
 
     <template v-if="!$helper.isEmpty(comments.data)">

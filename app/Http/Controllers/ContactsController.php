@@ -17,7 +17,9 @@ class ContactsController extends Controller
     public function create()
     {
         return Inertia::render('forms/PoContactForm', [
-            //
+            'meta' => [
+                'title' => __('Contact form')
+            ]
         ]);
     }
 
@@ -35,7 +37,8 @@ class ContactsController extends Controller
             'email' => 'required|string|email|max:45',
             'subject' => 'required|string|min:3|max:40',
             'message' => 'required|string|min:100',
-            'captcha' => 'required|captcha'
+            'key' => 'required|string|min:1',
+            'captcha' => 'required|captcha_api:' . request('key') . ',math'
         ]);
 
         $name = request('name');
@@ -47,14 +50,8 @@ class ContactsController extends Controller
         $recipients = getSiteConfig('emails.admin');
         Notification::route('mail', $recipients)->notify(new ContactFormSubmitted($name, $email, $subject, $message));
 
-        // Set session flash message
-        $flash = __('Your message was successfully scheduled, and will be sent shortly.');
-        $request->session()->flash('flash', $flash);
-
         // Redirect back to the contact form
-        return Inertia::render('forms/PoContactForm', [
-            //
-        ]);
+        return [];
     }
 
     public function reloadCaptcha()

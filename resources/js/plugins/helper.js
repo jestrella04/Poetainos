@@ -196,6 +196,15 @@ const Helper = class {
     return snack
   }
 
+  checkFormValidity(form) {
+    if (!form.checkValidity()) {
+      form.reportValidity()
+      return false
+    }
+
+    return true
+  }
+
   animate = (node, animation, prefix = 'animate__') =>
     // We create a Promise and return it
     new Promise((resolve) => {
