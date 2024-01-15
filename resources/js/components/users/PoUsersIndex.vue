@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, inject, onMounted, nextTick } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import PoUsersCard from './PoUsersCard.vue'
+import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
 import Masonry from 'masonry-layout'
 

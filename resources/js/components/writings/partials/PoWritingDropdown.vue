@@ -36,19 +36,23 @@ function share() {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('writings.edit', [writing.id])" prepend-icon="fas fa-pen-to-square" inertia>
-        <span>{{ $t('main.edit-delete') }}</span>
-      </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <template v-if="$helper.canEdit(writing.author)">
+        <po-list-item :href="$route('writings.edit', [writing.slug])" prepend-icon="fas fa-pen-to-square" inertia>
+          <span>{{ $t('main.edit-delete') }}</span>
+        </po-list-item>
+        <v-divider class="my-0"></v-divider>
+      </template>
 
       <po-list-item prepend-icon="fas fa-flag" @click.prevent="complainer = true">
         <span>{{ $t('complaints.report-writing') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('users.block.confirm', [writing.author.username])" prepend-icon="fas fa-ban" inertia>
-        <span>{{ $t('main.block-user') }}</span>
-      </po-list-item>
+      <template v-if="$helper.auth()">
+        <v-divider class="my-0"></v-divider>
+        <po-list-item :href="$route('users.block.confirm', [writing.author.username])" prepend-icon="fas fa-ban" inertia>
+          <span>{{ $t('main.block-user') }}</span>
+        </po-list-item>
+      </template>
     </v-list>
   </v-menu>
 </template>

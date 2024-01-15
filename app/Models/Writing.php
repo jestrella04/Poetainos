@@ -50,6 +50,16 @@ class Writing extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function mainCategory()
+    {
+        return $this->belongsToMany(Category::class)->whereNull('parent_id');
+    }
+
+    public function altCategories()
+    {
+        return $this->belongsToMany(Category::class)->whereNotNull('parent_id');
+    }
+
     public function categories()
     {
         return $this->belongsToMany(Category::class);
@@ -188,8 +198,6 @@ class Writing extends Model
             }
         }
     }
-
-
 
     public function complaints()
     {

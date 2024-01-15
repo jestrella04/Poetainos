@@ -165,14 +165,19 @@ class WritingsController extends Controller
             }] */)
             ->get();
 
-        return Inertia::render('forms/PoPublishForm', [
+        return Inertia::render('writings/PoWritingsForm', [
             'meta' => [
                 'title' => request()->route()->getName() === 'writings.edit'
                     ? getPageTitle([__('Update writing')])
                     : getPageTitle([__('Publish a writing')])
             ],
-            'categories' => $mainCategories,
-            'writing' => $writing,
+            'writing' => [
+                'data' => $writing,
+                'main_category' => $writing->exists ? $writing->mainCategory()->pluck('id')->first() : null,
+                'categories' => $writing->exists ? $writing->altCategories()->pluck('id') : [],
+                'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
+            ],
+            'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
             'agreement' => User::find(auth()->user()->id)->isInAgreement(),
         ]);
@@ -187,6 +192,8 @@ class WritingsController extends Controller
      */
     public function update(Request $request, Writing $writing)
     {
+        $action = 'create';
+
         // Ensure user has the proper permission
         if ($writing->exists) {
             $this->authorize('update', $writing);
@@ -197,7 +204,7 @@ class WritingsController extends Controller
         request()->validate([
             'title' => 'required|string|min:3|max:100',
             'main_category' => 'required|integer|exists:categories,id',
-            'categories' => 'nullable|array|exists:categories,id|max:2',
+            'categories' => 'required|array|exists:categories,id|max:2',
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
@@ -240,10 +247,7 @@ class WritingsController extends Controller
         $writing->save();
 
         $categories = request('categories');
-
-        if (!empty(request('categories'))) {
-            array_unshift($categories, request('main_category'));
-        }
+        array_unshift($categories, request('main_category'));
 
         $tagsToSync = [];
 
@@ -276,11 +280,7 @@ class WritingsController extends Controller
         }
 
         // Set response message and trigger notification
-        if (isset($action) && 'update' === $action) {
-            $message = __('Your writing was successfully updated.');
-        } else {
-            $message = __('Your writing was successfully posted.');
-
+        if ('create' === $action) {
             // Share on social media
             $writing->author->notify(new WritingPublished($writing));
 
@@ -295,7 +295,6 @@ class WritingsController extends Controller
         // Set response data
         return [
             'url' => $writing->path(),
-            'action' => $action ?? 'create',
         ];
     }
 

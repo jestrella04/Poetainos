@@ -29,6 +29,14 @@ const Helper = class {
     return auth.admin
   }
 
+  canEdit(author) {
+    if (this.auth()) {
+      return this.authUser().username === author.username || this.admin()
+    }
+
+    return false
+  }
+
   storage(path) {
     return `/storage/${path}`
   }

@@ -332,7 +332,7 @@ class UsersController extends Controller
 
         $params = [];
 
-        return Inertia::render('users/PoAccount', [
+        return Inertia::render('users/PoUsersAccount', [
             'meta' => [
                 'title' => getPageTitle([
                     $user->getName(),

@@ -1,6 +1,6 @@
 <script setup>
 import { provide } from 'vue'
-import PoUsersStats from './PoUsersStats.vue'
+import PoUsersStats from './partials/PoUsersStats.vue'
 import PoUserDropdown from './partials/PoUserDropdown.vue'
 
 const props = defineProps({

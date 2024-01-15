@@ -83,7 +83,7 @@
     "edit-category": "Editar categoría",
     "main-categories": "Categorías principales",
     "main-category": "Categoría principal",
-    "select-alt": "Selecciona las categorías secundarias (1 o más)",
+    "select-alt": "Selecciona las categorías secundarias (máximo 2)",
     "select-main": "Selecciona la categoría principal"
   },
   "comments": {

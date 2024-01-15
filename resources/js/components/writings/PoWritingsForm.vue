@@ -1,43 +1,69 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
 import axios from 'axios';
+import { onMounted } from 'vue';
 import { watch } from 'vue';
 import { inject, provide, reactive, computed, ref } from 'vue'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
+const writing = page.value.props.writing
 const formData = reactive({
-  title: '',
-  main_category: [],
-  categories: [],
-  tags: [],
-  text: '',
+  title: writing.data.title ??= '',
+  main_category: null, // Properly set onMounted
+  alt_categories: [], // Properly set onMounted
+  tags: writing.tags ??= [],
+  text: writing.data.text ??= '',
   link: '',
   cover: []
 })
 const errors = ref({})
-const categories = ref([])
+const mainCategories = ref(page.value.props.main_categories)
+const altCategories = ref([])
 const isPosting = ref(false)
 const isPosted = ref({})
+const isUpdate = !helper.strNullOrEmpty(writing.data.title)
 
 provide('formData', formData)
 
+onMounted(() => {
+  // If updating trigger category update onMounted
+  if (!helper.strNullOrEmpty(writing.data.title)) {
+    formData.main_category = writing.main_category
+    formData.alt_categories = writing.categories
+  }
+
+  // Logic needed to assign below values
+  if ('extra_info' in writing.data) {
+    formData.link = writing.data.extra_info.link ??= ''
+  }
+})
+
 watch(
-  () => formData.main_category, () => {
+  () => formData.main_category, (newValue, oldValue) => {
+    // Clear selections (but not on first load)
+    if (!helper.isNull(oldValue) && newValue > 0) {
+      formData.alt_categories = []
+    }
+
+    // Set new options
     if (parseInt(formData.main_category) > 0) {
-      categories.value = JSON.parse(JSON.stringify(Object.values(page.value.props.categories).filter((category) => {
-        return category.id === formData.main_category
-      })))[0].descendants
+      altCategories.value = JSON.parse(
+        JSON.stringify(
+          Object.values(mainCategories.value).filter((category) => {
+            return category.id === formData.main_category
+          }))
+      )[0].descendants
     } else {
-      categories.value = []
+      altCategories.value = []
     }
   }
 )
 
 function clearInputs() {
   formData.title = ''
-  formData.main_category = []
-  formData.categories = []
+  formData.main_category = null
+  formData.alt_categories = []
   formData.tags = []
   formData.text = ''
   formData.link = ''
@@ -51,19 +77,21 @@ function clearErrors() {
 async function submitForm() {
   const form = document.querySelector('#writing-form')
 
-  isPosted.value = {}
-  isPosting.value = true
   clearErrors()
 
   if (!helper.checkFormValidity(form)) {
     return
   }
 
+  isPosted.value = {}
+  isPosting.value = true
+
   await axios
     .postForm(form.action, {
+      _method: isUpdate ? 'PUT' : 'POST',
       title: formData.title,
       main_category: formData.main_category,
-      categories: formData.categories,
+      categories: formData.alt_categories,
       tags: formData.tags,
       text: formData.text,
       link: formData.link,
@@ -84,29 +112,34 @@ async function submitForm() {
 }
 
 function resetForm() {
-  clearInputs()
   clearErrors()
+
+  if (!isUpdate) {
+    clearInputs()
+  }
 }
 </script>
 
 <template>
   <po-wrapper class="w-100" style="max-width: 900px;">
     <po-head></po-head>
-    <v-card :title="$t('writings.publish-writing').toUpperCase()" :subtitle="$t('main.required-fields-marked')">
-      <v-form id="writing-form" :action="$route('writings.create')" class="px-5 pb-5" @submit.prevent="submitForm"
-        @reset.prevent="resetForm">
+    <v-card :title="isUpdate ? $t('writings.update-writing') : $t('writings.publish-writing').toUpperCase()"
+      :subtitle="$t('main.required-fields-marked')">
+      <v-form id="writing-form"
+        :action="isUpdate ? $route('writings.update', writing.data.slug) : $route('writings.store')" class="px-5 pb-5"
+        @submit.prevent="submitForm" @reset.prevent="resetForm">
         <v-text-field v-model="formData.title" :label="$t('main.title') + ' *'" hide-details="auto"
           :error-messages="errors.title" :placeholder="$t('main.enter-title')" minlength="3" maxlength="100"
-          persistent-placeholder clearable required></v-text-field>
+          persistent-placeholder clearable required @update:menu="console.log('ok')"></v-text-field>
 
         <v-select v-model="formData.main_category" :label="$t('categories.main-category') + ' *'" hide-details="auto"
           :error-messages="errors.main_category" :placeholder="$t('categories.select-main')" persistent-placeholder
-          :items="page.props.categories" item-title="name" item-value="id" clearable required chips></v-select>
+          :items="mainCategories" item-title="name" item-value="id" clearable required chips></v-select>
 
-        <v-select v-model="formData.categories" :label="$t('categories.alt-categories') + ' *'" hide-details="auto"
+        <v-select v-model="formData.alt_categories" :label="$t('categories.alt-categories') + ' *'" hide-details="auto"
           :error-messages="errors.categories" :placeholder="$t('categories.select-alt')" persistent-placeholder
-          :items="categories" item-title="name" item-value="id" multiple clearable required chips
-          :disabled="$helper.isEmpty(categories)"></v-select>
+          :items="altCategories" item-title="name" item-value="id" multiple clearable required chips
+          :disabled="!parseInt(formData.main_category) > 0"></v-select>
 
         <v-combobox v-model="formData.tags" :label="$t('tags.tags')" hide-details="auto" :error-messages="errors.tags"
           :placeholder="$t('tags.enter-tags')"
@@ -130,13 +163,13 @@ function resetForm() {
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
           <template v-if="isPosting"><v-progress-circular indeterminate></v-progress-circular></template>
-          <template v-else>{{ $t('main.send') }}</template>
+          <template v-else>{{ isUpdate ? $t('main.save') : $t('main.send') }}</template>
         </po-button>
       </v-form>
 
       <v-alert v-if="!helper.isEmpty(isPosted)" type="success" variant="tonal" class="mb-5 mx-auto"
         style="width: 85%; max-width: 600px;">
-        {{ isPosted.action === 'create' ? $t('writings.writing-published') : $t('writings.writing-updated') }}
+        {{ isUpdate ? $t('writings.writing-updated') : $t('writings.writing-published') }}
         {{ $t('main.take-a-look') }}
         <po-link :href="isPosted.url" inertia>{{ $t('main.here') }}.</po-link>
       </v-alert>
