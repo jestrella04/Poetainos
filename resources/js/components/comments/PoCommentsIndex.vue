@@ -4,6 +4,7 @@ import { ref, onMounted, inject, computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoCommentsForm from './PoCommentsForm.vue'
+import PoCommentsDropdown from './PoCommentsDropdown.vue'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -48,7 +49,7 @@ async function like(event, id) {
 </script>
 
 <template>
-  <div class="my-5">
+  <po-wrapper class="my-5">
     <div v-if="!loadingComments" class="mb-5">
       <po-inline-login v-if="!$helper.auth()" />
       <po-comments-form @comment-posted="loadComments" v-else />
@@ -58,9 +59,12 @@ async function like(event, id) {
       <p class="text-h6 mb-3">{{ $t('comments.comments') }}</p>
 
       <template v-for="comment in comments.data" :key="comment.id">
-        <v-card class="mb-2">
-          <v-card-text class="pb-0">
-            <div v-html="$helper.linkify(comment.message)"></div>
+        <v-card class="mb-2 pos-relative">
+          <v-card-text class="d-flex pb-2">
+            <div class="flex-grow-1" v-html="$helper.linkify(comment.message)"></div>
+            <div>
+              <po-comments-dropdown :comment="comment"></po-comments-dropdown>
+            </div>
           </v-card-text>
 
           <v-card-actions>
@@ -86,10 +90,6 @@ async function like(event, id) {
                   <v-icon class="me-2" icon="fa fa-reply"></v-icon>
                   <span>{{ $t('main.reply') }}</span>
                 </po-button>
-
-                <po-button variant="tonal" size="small" max-width="2">
-                  <v-icon icon="fa fa-ellipsis-v"></v-icon>
-                </po-button>
               </div>
             </div>
           </v-card-actions>
@@ -101,5 +101,5 @@ async function like(event, id) {
       <po-msg-block :msg-title="$t('comments.comments-empty')" :msg-body="$t('comments.be-first-ask')"
         icon="fas fa-comment" class="py-10" />
     </template>
-  </div>
+  </po-wrapper>
 </template>

@@ -321,8 +321,6 @@ class WritingsController extends Controller
             request()->session()->flash('flash', __('Writing deleted successfully'));
         }
 
-        return [
-            'message' => __('Writing deleted successfully')
-        ];
+        return [];
     }
 }

@@ -7,6 +7,8 @@ use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class CommentsController extends Controller
@@ -141,6 +143,10 @@ class CommentsController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+        $this->authorize('delete', $comment);
+        $comment->delete();
+        DatabaseNotification::where('data->comment_id', $comment->id)->delete();
+
+        return [];
     }
 }

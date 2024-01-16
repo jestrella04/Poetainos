@@ -324,6 +324,9 @@ class UsersController extends Controller
                     __('Writers'),
                 ]),
             ],
+            'notifications' => [
+                'email' => isTruthy($user->extra_info['notifications']['email']) ?? true,
+            ]
         ]);
     }
 }

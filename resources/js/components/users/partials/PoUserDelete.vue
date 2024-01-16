@@ -28,23 +28,30 @@ async function submit() {
   errors.value = false
 
   await axios
-    .post(form.action, {
-      '_method': 'DELETE',
-      'password.confirm': formData.password
+    .post(window.route('password.confirmer'), {
+      //'_method': 'DELETE',
+      password: formData.password
     })
     .then(() => {
-      router.visit(window.route('home'))
-      helper.setSnackBar({
-        message: 'accounts.account-deleted',
-        color: 'success',
-        active: true
-      })
+      axios
+        .post(form.action, {
+          '_method': 'DELETE',
+        }).then(() => {
+          router.visit(window.route('home'))
+          helper.setSnackBar({
+            message: 'accounts.account-deleted',
+            color: 'success',
+            active: true
+          })
 
-      forceSnackBar.value = true
-      isDelete.value = false
+          forceSnackBar.value = true
+          isDelete.value = false
+        })
+        .catch()
+        .finally()
     })
-    .catch(() => {
-      errors.value = true
+    .catch((error) => {
+      errors.value = error.response.data.errors
     })
     .finally(() => {
       isPosting.value = false
