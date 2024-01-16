@@ -73,7 +73,7 @@ class TagsController extends Controller
 
         ];
         $writings = $tag->writings()
-            ->whereNotIn('user_id', $this->blockedUsers)
+            ->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
             ->with(['author' => function ($query) {
                 $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');

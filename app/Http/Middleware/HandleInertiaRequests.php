@@ -52,7 +52,7 @@ class HandleInertiaRequests extends Middleware
                     'writings' => auth()->check() ? Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))->pluck('id') : [],
                     'comments' => auth()->check() ? Comment::whereIn('id', $user->likes()->where('likeable_type', Comment::class)->pluck('likeable_id'))->pluck('id') : [],
                 ],
-                'shelved' => auth()->check() ? $user->shelf()->pluck('id') : []
+                'shelved' => auth()->check() ? $user->shelf()->pluck('id') : [],
             ],
             'route' => [
                 'name' => $request->route()->getName()

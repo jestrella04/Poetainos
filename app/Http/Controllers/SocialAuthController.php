@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -42,6 +43,7 @@ class SocialAuthController extends Controller
             'name' => $social->getName(),
             'username' => slugify('users', $nick, 'username', '_'),
             'password' => Hash::make(bin2hex(random_bytes(10))),
+            'role_id' => Role::where('name', 'user')->first()->id,
         ]);
 
         // Grab avatar

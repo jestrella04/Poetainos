@@ -13,7 +13,7 @@ class GenericController extends Controller
     public function writings(User $user)
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $writings = $user->writings()->whereNotIn('user_id', $this->blockedUsers)
+        $writings = $user->writings()->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
             ->with(['author' => function ($query) {
                 $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
@@ -45,7 +45,7 @@ class GenericController extends Controller
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
         $writings = Writing::whereIn('id', $user->shelf()->pluck('id'))
-            ->whereNotIn('user_id', $this->blockedUsers)
+            ->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
             ->with(['author' => function ($query) {
                 $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
@@ -77,7 +77,7 @@ class GenericController extends Controller
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
         $writings = Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
-            ->whereNotIn('user_id', $this->blockedUsers)
+            ->whereNotIn('user_id', $this->getBlockedUsers())
             ->whereNot('user_id', $user->id)
             ->withCount(['likes', 'comments', 'shelf'])
             ->with(['author' => function ($query) {

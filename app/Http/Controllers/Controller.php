@@ -21,6 +21,14 @@ class Controller extends BaseController
     {
         $this->pagination = getSiteConfig('pagination');
         $this->auraHome = getSiteConfig('aura.min_at_home');
-        $this->blockedUsers = auth()->check() ? User::find(auth()->user()->id)->getBlockedAuthors()->pluck('blocked_user_id') : [0];
+    }
+
+    public function getBlockedUsers()
+    {
+        $blockedUsers = auth()->check()
+            ? User::find(auth()->user()->id)->blockedAuthors()->pluck('blocked_user_id')->toArray()
+            : [0];
+
+        return $blockedUsers;
     }
 }

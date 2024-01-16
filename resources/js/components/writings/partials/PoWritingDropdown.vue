@@ -5,8 +5,10 @@ import { ref, inject } from 'vue'
 const writing = inject('writing')
 const sharer = ref(false)
 const complainer = ref(false)
+const blocker = ref(false)
 
 provide('complainer', complainer)
+provide('blocker', blocker)
 
 function share() {
   if (navigator.share) {
@@ -23,6 +25,7 @@ function share() {
 <template>
   <po-sharer v-model="sharer" :link-title="writing.title" :link-url="$route('writings.show', [writing.slug])"></po-sharer>
   <po-complainer v-model="complainer" comp-type="writings" :comp-id="writing.id"></po-complainer>
+  <po-blocker v-model="blocker" :user="writing.author"></po-blocker>
 
   <v-menu>
     <template v-slot:activator="{ props }">
@@ -47,9 +50,9 @@ function share() {
         <span>{{ $t('complaints.report-writing') }}</span>
       </po-list-item>
 
-      <template v-if="$helper.auth()">
+      <template v-if="$helper.auth() && $helper.authUser().username !== writing.author.username">
         <v-divider class="my-0"></v-divider>
-        <po-list-item :href="$route('users.block.confirm', [writing.author.username])" prepend-icon="fas fa-ban" inertia>
+        <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>
         </po-list-item>
       </template>

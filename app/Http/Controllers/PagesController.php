@@ -17,6 +17,7 @@ class PagesController extends Controller
     public function index()
     {
         return Inertia::render('pages/PoPagesIndex', [
+            'meta' => [],
             'pages' => Page::all(),
         ]);
     }
@@ -51,6 +52,9 @@ class PagesController extends Controller
     public function show(Page $page)
     {
         return Inertia::render('pages/PoPagesShow', [
+            'meta' => [
+                'title' => getPageTitle([$page->title]),
+            ],
             'page' => $page,
         ]);
     }

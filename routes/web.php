@@ -72,8 +72,7 @@ Route::middleware(['verified'])->group(function () {
     Route::put('/users/edit/{user}', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/delete/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
     Route::post('/users/query/{query}', [UsersController::class, 'query'])->name('users.query');
-    Route::get('/users/block/{user}', [UsersController::class, 'promptBeforeBlock'])->name('users.block.confirm');
-    Route::post('/users/block/{user}', [UsersController::class, 'blockUser'])->name('users.block.confirmed');
+    Route::post('/users/block/{user}', [UsersController::class, 'blockUser'])->name('users.block');
     Route::get('/users/{user}/account', [UsersController::class, 'account'])->name('users.account');
 
     // Comments

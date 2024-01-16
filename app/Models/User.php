@@ -212,13 +212,16 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if (null !== ($this->role)) {
             $this->task = $task;
+            $permissions = $this->role->permissions();
 
-            $allowed = Arr::first($this->role->permissions(), function ($value, $key) {
-                return $this->task === $value['name'];
-            });
+            if (count($permissions) > 0) {
+                $allowed = Arr::first($this->role->permissions(), function ($value, $key) {
+                    return $this->task === $value['name'];
+                });
 
-            if ($allowed['enabled']) {
-                return true;
+                if ($allowed['enabled']) {
+                    return true;
+                }
             }
         }
 
@@ -254,20 +257,14 @@ class User extends Authenticatable implements MustVerifyEmail
         ]);
     }
 
-    public function getBlockedAuthors($asArrayOfIds = false)
+    public function blockedAuthors()
     {
-        $collection = $this->hasMany(BlockedUser::class);
-
-        if ($asArrayOfIds) {
-            $collection = $collection->pluck('blocked_user_id')->toArray();
-        }
-
-        return $collection;
+        return $this->hasMany(BlockedUser::class);
     }
 
     public function isAuthorBlocked(User $author)
     {
-        $blocked = $this->getBlockedAuthors($asArrayOfIds = true);
+        $blocked = $this->blockedAuthors()->pluck('blocked_user_id')->toArray();
 
         if (in_array($author->id, $blocked)) {
             return true;

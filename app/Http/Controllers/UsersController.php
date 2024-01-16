@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Like;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Http\Request;
@@ -106,6 +107,8 @@ class UsersController extends Controller
         // Update Aura
         $user->updateAura();
 
+        $authUser = auth()->check() ? User::find(auth()->user()->id) : null;
+
         return Inertia::render('users/PoUsersShow', [
             'meta' => [
                 'title' => getPageTitle([
@@ -147,7 +150,8 @@ class UsersController extends Controller
                         $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                     }])
                     ->inRandomOrder()->take(5)->get(),
-            ]
+            ],
+            'isAuthorBlocked' => auth()->check() ? $authUser->isAuthorBlocked($user) : false
         ]);
     }
 
@@ -161,12 +165,13 @@ class UsersController extends Controller
     {
         $this->authorize('update', $user);
 
-        return view('users.edit', [
+        return Inertia::render('users/PoUsersForm', [
             'meta' => [
                 'title' => getPageTitle([__('Update profile')]),
             ],
             'user' => $user,
-            'roles' => ['user', 'moderator', 'admin'],
+            'agreement' => $user->isInAgreement(),
+            'roles' => Role::select('id', 'name')->get(),
         ]);
     }
 
@@ -261,12 +266,9 @@ class UsersController extends Controller
         }
 
         // Set response data
-        $response = $user->toArray();
-        $response['message'] = __('Your profile was successfully updated');
-        $response['url'] = $user->path();
-
-        // Output the response
-        return $response;
+        return [
+            'url' => $user->path()
+        ];
     }
 
     /**
@@ -286,22 +288,7 @@ class UsersController extends Controller
             return redirect(route('home'));
         }
 
-        return [
-            'message' => __('User deleted successfully')
-        ];
-    }
-
-    /**
-     * Display confirmation before blocking another user.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function promptBeforeBlock(User $user)
-    {
-        return view('users.partials.blockauthor', [
-            'user' => $user,
-        ]);
+        return [];
     }
 
     /**
@@ -315,9 +302,7 @@ class UsersController extends Controller
         $blockingUser = User::find(auth()->user()->id);
         $blockingUser->block($user);
 
-        return [
-            'message' => __('User blocked successfully')
-        ];
+        return [];
     }
 
     /**

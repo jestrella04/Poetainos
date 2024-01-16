@@ -26,7 +26,7 @@ class WritingsController extends Controller
         $awards = 'writings.awards' === request()->route()->getName();
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
         $filterAwards = $awards ? 'home_posted_at' : 'id';
-        $writings = Writing::whereNotIn('user_id', $this->blockedUsers)
+        $writings = Writing::whereNotIn('user_id', $this->getBlockedUsers())
             ->whereNotNull($filterAwards)
             ->withCount(['likes', 'comments', 'shelf'])
             ->with(['author' => function ($query) {
@@ -91,6 +91,8 @@ class WritingsController extends Controller
         $writing->updateAura();
         //$writing->author->updateAura();
 
+        $user = auth()->check() ? User::find(auth()->user()->id) : null;
+
         return Inertia::render('writings/PoWritingsShow', [
             'meta' => [
                 'title' => getPageTitle([
@@ -125,7 +127,8 @@ class WritingsController extends Controller
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                 }])->inRandomOrder()->take(5)->get(),
 
-            ]
+            ],
+            'isAuthorBlocked' => auth()->check() ? $user->isAuthorBlocked($writing->author) : false
         ]);
     }
 
@@ -176,6 +179,7 @@ class WritingsController extends Controller
                 'main_category' => $writing->exists ? $writing->mainCategory()->pluck('id')->first() : null,
                 'categories' => $writing->exists ? $writing->altCategories()->pluck('id') : [],
                 'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
+
             ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),

@@ -21,7 +21,7 @@ class CommentsController extends Controller
         $filter = [0];
 
         if (auth()->check()) {
-            $filter = User::find(auth()->user()->id)->getBlockedAuthors()->pluck('blocked_user_id');
+            $filter = User::find(auth()->user()->id)->blockedAuthors()->pluck('blocked_user_id');
         }
 
         $comments = Comment::where('writing_id', $writing)

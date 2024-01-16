@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
@@ -50,7 +51,8 @@ class RegisteredUserController extends Controller
                     'terms_of_use' => $request->service_agreement,
                     'privacy_policy' => $request->privacy_agreement,
                 ]
-            ]
+            ],
+            'role_id' => Role::where('name', 'user')->first()->id,
         ]);
 
         //event(new Registered($user));

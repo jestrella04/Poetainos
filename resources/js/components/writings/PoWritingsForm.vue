@@ -1,9 +1,8 @@
 <script setup>
-import { usePage } from '@inertiajs/vue3';
-import axios from 'axios';
-import { onMounted } from 'vue';
-import { watch } from 'vue';
-import { inject, provide, reactive, computed, ref } from 'vue'
+import { inject, provide, reactive, computed, ref, watch, onMounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
+import axios from 'axios'
+import PoWritingDelete from './partials/PoWritingDelete.vue'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -23,8 +22,10 @@ const altCategories = ref([])
 const isPosting = ref(false)
 const isPosted = ref({})
 const isUpdate = !helper.strNullOrEmpty(writing.data.title)
+const isDelete = ref(false)
 
 provide('formData', formData)
+provide('isDelete', isDelete)
 
 onMounted(() => {
   // If updating trigger category update onMounted
@@ -123,6 +124,7 @@ function resetForm() {
 <template>
   <po-wrapper class="w-100" style="max-width: 900px;">
     <po-head></po-head>
+
     <v-card :title="isUpdate ? $t('writings.update-writing') : $t('writings.publish-writing').toUpperCase()"
       :subtitle="$t('main.required-fields-marked')">
       <v-form id="writing-form"
@@ -130,7 +132,7 @@ function resetForm() {
         @submit.prevent="submitForm" @reset.prevent="resetForm">
         <v-text-field v-model="formData.title" :label="$t('main.title') + ' *'" hide-details="auto"
           :error-messages="errors.title" :placeholder="$t('main.enter-title')" minlength="3" maxlength="100"
-          persistent-placeholder clearable required @update:menu="console.log('ok')"></v-text-field>
+          persistent-placeholder clearable required></v-text-field>
 
         <v-select v-model="formData.main_category" :label="$t('categories.main-category') + ' *'" hide-details="auto"
           :error-messages="errors.main_category" :placeholder="$t('categories.select-main')" persistent-placeholder
@@ -161,13 +163,19 @@ function resetForm() {
 
         <po-agreement v-if="!page.props.agreement"></po-agreement>
 
+        <po-button v-if="isUpdate" color="error" variant="tonal" class="mb-2" block @click.prevent="isDelete = true">
+          {{ $t('writings.delete-writing-ask') }}
+        </po-button>
+
+        <po-writing-delete v-model="isDelete" :slug="writing.data.slug"></po-writing-delete>
+
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
           <template v-if="isPosting"><v-progress-circular indeterminate></v-progress-circular></template>
           <template v-else>{{ isUpdate ? $t('main.save') : $t('main.send') }}</template>
         </po-button>
       </v-form>
 
-      <v-alert v-if="!helper.isEmpty(isPosted)" type="success" variant="tonal" class="mb-5 mx-auto"
+      <v-alert v-if="!helper.isEmpty(isPosted)" id="writing-alert" type="success" variant="tonal" class="mb-5 mx-auto"
         style="width: 85%; max-width: 600px;">
         {{ isUpdate ? $t('writings.writing-updated') : $t('writings.writing-published') }}
         {{ $t('main.take-a-look') }}

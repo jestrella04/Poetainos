@@ -4,8 +4,10 @@ import { ref, inject, provide } from 'vue'
 const user = inject('user')
 const sharer = ref(false)
 const complainer = ref(false)
+const blocker = ref(false)
 
 provide('complainer', complainer)
+provide('blocker', blocker)
 
 function share() {
   if (navigator.share) {
@@ -23,6 +25,7 @@ function share() {
   <po-sharer v-model="sharer" :link-title="$helper.userDisplayName(user)"
     :link-url="$route('users.show', [user.username])"></po-sharer>
   <po-complainer v-model="complainer" comp-type="users" :comp-id="user.id"></po-complainer>
+  <po-blocker v-model="blocker" :user="user"></po-blocker>
 
   <v-menu>
     <template v-slot:activator="{ props }">
@@ -56,9 +59,11 @@ function share() {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('users.block.confirm', [user.username])" prepend-icon="fas fa-ban" inertia>
-        <span>{{ $t('main.block-user') }}</span>
-      </po-list-item>
+      <template v-if="$helper.auth() && $helper.authUser().username !== user.username">
+        <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
+          <span>{{ $t('main.block-user') }}</span>
+        </po-list-item>
+      </template>
     </v-list>
   </v-menu>
 </template>

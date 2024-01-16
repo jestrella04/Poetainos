@@ -1,8 +1,12 @@
 <script setup>
-import { inject } from 'vue'
+import { inject, ref, provide } from 'vue'
+import PoUserDelete from './partials/PoUserDelete.vue'
 
 const helper = inject('helper')
-const user = helper.authUser().username
+const username = helper.authUser().username
+const isDelete = ref(false)
+
+provide('isDelete', isDelete)
 </script>
 
 <template>
@@ -31,19 +35,19 @@ const user = helper.authUser().username
         </p>
 
         <v-list>
-          <po-list-item :href="$route('users.edit', user)" inertia>
+          <po-list-item :href="$route('users.edit', username)" inertia>
             {{ $t('accounts.update-profile') }}
           </po-list-item>
 
-          <po-list-item :href="$route('users.writings.index', user)" inertia>
+          <po-list-item :href="$route('users.writings.index', username)" inertia>
             {{ $t('users.view-self-writings') }}
           </po-list-item>
 
-          <po-list-item :href="$route('users.shelf.index', user)" inertia>
+          <po-list-item :href="$route('users.shelf.index', username)" inertia>
             {{ $t('users.view-self-shelf') }}
           </po-list-item>
 
-          <po-list-item :href="$route('users.likes.index', user)" inertia>
+          <po-list-item :href="$route('users.likes.index', username)" inertia>
             {{ $t('users.view-self-likes') }}
           </po-list-item>
 
@@ -61,8 +65,15 @@ const user = helper.authUser().username
       <div class=" mb-5">
         <p class="text-caption text-uppercase text-disabled mb-3">{{ $t('accounts.danger-zone') }}</p>
 
-        <po-button class="w-100 mb-1" color="secondary" size="small">{{ $t('accounts.logout') }}</po-button>
-        <po-button class="w-100 mb-1" color="error" size="small">{{ $t('accounts.delete-account') }}</po-button>
+        <po-button class="w-100 mb-1" color="secondary" size="small" :href="$route('logout')" method="post" inertia>
+          {{ $t('accounts.logout') }}
+        </po-button>
+
+        <po-button class="w-100 mb-1" color="error" size="small" @click.prevent="isDelete = true">
+          {{ $t('accounts.delete-account') }}
+        </po-button>
+
+        <po-user-delete v-model="isDelete" :username="username"></po-user-delete>
       </div>
     </v-card-text>
   </v-card>
