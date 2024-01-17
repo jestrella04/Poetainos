@@ -107,6 +107,15 @@ function getFlashMessages() {
 </script>
 
 <style>
+html {
+  font-size: clamp(1.13rem, 1.08rem + 0.24vw, 1.25rem) !important;
+}
+
+html,
+body {
+  height: 100%;
+}
+
 .po-navbar {
   position: fixed !important;
   z-index: 999 !important;
@@ -148,6 +157,10 @@ footer {
 
 .v-input {
   margin-bottom: 1rem;
+}
+
+.v-tab {
+  font-size: 0.7rem;
 }
 
 .liked i,
@@ -224,7 +237,8 @@ footer {
         </v-tabs>
 
         <div v-if="!$helper.auth()" class="align-self-center">
-          <po-button prepend-icon="fas fa-arrow-right-to-bracket" variant="tonal" :href="$route('login')" inertia>
+          <po-button prepend-icon="fas fa-arrow-right-to-bracket" variant="tonal" :href="$route('login')"
+            style="font-size: 0.7rem;" inertia>
             {{ $t('accounts.login-alt') }}
           </po-button>
         </div>
@@ -232,7 +246,7 @@ footer {
         <div v-else class="align-self-center">
           <v-menu target="parent">
             <template v-slot:activator="{ props }">
-              <po-button icon v-bind="props">
+              <po-button icon v-bind="props" style="font-size: 0.7rem;">
                 <po-badge :count="unreadCount">
                   <po-avatar size="32" color="secondary" :user="$helper.authUser()" />
                 </po-badge>
@@ -297,46 +311,6 @@ footer {
       </div>
     </v-footer>
 
-    <v-bottom-navigation v-model="page.props.route.name" bg-color="primary" class="hidden-lg-and-up" mode="shift">
-      <po-button value="home" :href="$route('home')" inertia>
-        <v-icon icon="fas fa-home" />
-        <span>{{ $t('main.home') }}</span>
-      </po-button>
-
-      <po-button value="explore" :href="$route('explore')" inertia>
-        <v-icon icon="fas fa-wand-magic-sparkles" />
-        <span>{{ $t('main.explore') }}</span>
-      </po-button>
-
-      <po-button value="publish" :href="$route('writings.create')" inertia>
-        <v-icon icon="fas fa-pen-nib" />
-        <span>{{ $t('main.publish') }}</span>
-      </po-button>
-
-      <template v-if="!$helper.auth()">
-        <po-button value="login" :href="$route('login')" inertia>
-          <v-icon icon="fas fa-arrow-right-to-bracket" />
-          <span>{{ $t('accounts.login-alt') }}</span>
-        </po-button>
-      </template>
-
-      <template v-else>
-        <po-button value="account" @click.prevent="mobileUserMenu = !mobileUserMenu">
-          <po-badge :count="unreadCount">
-            <po-avatar size="24" color="secondary" :user="$helper.authUser()" />
-          </po-badge>
-          <span>{{ $t('accounts.my-account') }}</span>
-        </po-button>
-
-        <po-menu-mobile-user />
-      </template>
-
-      <po-button value="menu" @click.prevent="mobileSiteMenu = !mobileSiteMenu">
-        <v-icon icon="fas fa-bars" />
-        <span><span>{{ $t('main.menu') }}</span></span>
-      </po-button>
-
-      <po-menu-mobile-site />
-    </v-bottom-navigation>
+    <po-bottom-nav></po-bottom-nav>
   </v-app>
 </template>
