@@ -69,8 +69,9 @@ async function submit() {
 </script>
 
 <template>
-  <v-dialog width="500">
+  <v-dialog width="500" persistent>
     <v-card :title="$t('complaints.complaint')">
+      <po-modal-close @click.prevent="complainer = false"></po-modal-close>
       <v-card-text>
         <p class="text-bold">{{ $t('complaints.report-reason-ask') }}</p>
         <p class="text-disabled">{{ $t('complaints.select-all-apply') }}</p>

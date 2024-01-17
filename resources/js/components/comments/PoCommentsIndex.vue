@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, onMounted, inject, computed } from 'vue'
+import { ref, onMounted, inject, computed, provide } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoCommentsForm from './PoCommentsForm.vue'
@@ -11,6 +11,9 @@ const helper = inject('helper')
 const comments = ref({})
 const loadingComments = inject('loadingComments', true)
 const writing = inject('writing')
+const replyBox = ref(0)
+
+provide('replyBox', replyBox)
 
 onMounted(() => {
   loadComments()
@@ -46,13 +49,31 @@ async function like(event, id) {
       })
   }
 }
+function toggleReply(commentId) {
+  if (replyBox.value === commentId) {
+    replyBox.value = 0
+  } else {
+    replyBox.value = commentId
+  }
+}
+
+function reply(comment) {
+  let initialText = ['@' + comment.author.username]
+  const mentions = comment.message.matchAll(/(^|\W)@\b([-a-zA-Z0-9._]{3,25})\b/g)
+
+  for (const mention of mentions) {
+    initialText.push(mention[0].trim())
+  }
+
+  return [... new Set(initialText)].join(' ') + ' '
+}
 </script>
 
 <template>
   <po-wrapper class="my-5">
     <div v-if="!loadingComments" class="mb-5">
       <po-inline-login v-if="!$helper.auth()" />
-      <po-comments-form @comment-posted="loadComments" v-else />
+      <po-comments-form v-else form-id="comment-form" @comment-posted="loadComments" />
     </div>
 
     <template v-if="!$helper.isEmpty(comments.data)">
@@ -86,13 +107,20 @@ async function like(event, id) {
                   <span class="count">{{ helper.readable(comment.likes_count) }}</span>
                 </po-button>
 
-                <po-button variant="tonal" size="small">
+                <po-button variant="tonal" size="small" @click.prevent="toggleReply(comment.id)">
                   <v-icon class="me-2" icon="fa fa-reply"></v-icon>
                   <span>{{ $t('main.reply') }}</span>
                 </po-button>
               </div>
             </div>
           </v-card-actions>
+
+          <template v-if="$helper.auth() && replyBox === comment.id">
+            <div id="" class="reply-box pa-3">
+              <po-comments-form :form-id="`reply-${comment.id}-form`" :reply-to="reply(comment)"
+                @comment-posted="loadComments" />
+            </div>
+          </template>
         </v-card>
       </template>
     </template>

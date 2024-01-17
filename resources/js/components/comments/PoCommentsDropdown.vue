@@ -35,8 +35,7 @@ provide('isDelete', isDelete)
         <v-divider class="my-0"></v-divider>
       </template>
 
-      <po-list-item prepend-icon="fas fa-flag"
-        @click.prevent="complainer = true; console.log($helper.canEdit(comment.author))">
+      <po-list-item prepend-icon="fas fa-flag" @click.prevent="complainer = true">
         <span>{{ $t('complaints.report-comment') }}</span>
       </po-list-item>
 

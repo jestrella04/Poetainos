@@ -57,7 +57,7 @@ const page = computed(() => usePage())
           <p class="text-uppercase text-disabled mb-3">{{ $t('main.featured-authors') }}</p>
           <div class="d-inline-flex flex-wrap ga-2 mb-10">
             <template v-for="author in page.props.authors" :key="author.id">
-              <po-link :href="$route('users.show', author.username)" inertia>
+              <po-link :href="$route('users.show', author.username)" :title="$helper.userDisplayName(author)" inertia>
                 <po-avatar size="64" color="secondary" :user="author" />
               </po-link>
             </template>

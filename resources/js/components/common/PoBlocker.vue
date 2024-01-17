@@ -42,8 +42,10 @@ async function submit() {
 </script>
 
 <template>
-  <v-dialog width="500">
+  <v-dialog width="500" persistent>
     <v-card :title="$t('main.block-user')">
+      <po-modal-close @click.prevent="blocker = false"></po-modal-close>
+
       <v-card-text>
         <p>
           {{ $t('accounts.block-user-warning') }}

@@ -167,7 +167,7 @@ function resetForm() {
           {{ $t('writings.delete-writing-ask') }}
         </po-button>
 
-        <po-writing-delete v-model="isDelete" :slug="writing.data.slug"></po-writing-delete>
+        <po-writing-delete v-if="isUpdate" v-model="isDelete" :slug="writing.data.slug"></po-writing-delete>
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
           <template v-if="isPosting"><v-progress-circular indeterminate></v-progress-circular></template>

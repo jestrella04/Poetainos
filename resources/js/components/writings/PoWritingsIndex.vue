@@ -36,14 +36,12 @@ onMounted(() => {
 })
 
 function liked(id, count) {
-  let pos
-  const a = Object.values(writings.value).filter((writing, idx) => {
+  const a = Object.values(writings.value).filter((writing) => {
     if (writing.id === id) {
-      pos = idx
       return
     }
   })
-  console.log(`${a}: ${pos}`)
+
   a.likes_count.value = count
 }
 </script>

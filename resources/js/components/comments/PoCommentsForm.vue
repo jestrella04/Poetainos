@@ -2,14 +2,20 @@
 import { inject, ref } from 'vue'
 import axios from 'axios'
 
+const props = defineProps({
+  formId: { type: String, required: true },
+  replyTo: String
+})
+
 const emit = defineEmits('commentPosted')
 const helper = inject('helper')
 const writing = inject('writing')
-const message = ref('')
+const message = ref(props.replyTo)
 const errorMessages = ref([])
+const replyBox = inject('replyBox')
 
 async function submitForm() {
-  const form = document.querySelector('#comment-form')
+  const form = document.querySelector(`#${props.formId}`)
 
   if (!helper.checkFormValidity(form)) {
     return
@@ -22,6 +28,7 @@ async function submitForm() {
     .then(() => {
       message.value = ''
       emit('commentPosted')
+      replyBox.value = 0
     })
     .catch((error) => {
       errorMessages.value = error.response.data.errors.comment
@@ -31,7 +38,7 @@ async function submitForm() {
 </script>
 
 <template>
-  <v-form id="comment-form" :action="$route('comments.store')" :data="writing.id" @submit.prevent="submitForm">
+  <v-form :id="formId" :action="$route('comments.store')" :data="writing.id" @submit.prevent="submitForm">
     <v-textarea v-model="message" :label="$t('comments.comment')"
       :placeholder="$t('comments.comment-mention', { at: '@' })" rows="2" max-length="300" hide-details="auto"
       :error-messages="errorMessages" auto-grow clearable persistent-placeholder required></v-textarea>

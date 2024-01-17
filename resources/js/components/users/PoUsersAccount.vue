@@ -6,6 +6,7 @@ import axios from 'axios';
 
 const page = computed(() => usePage())
 const helper = inject('helper')
+const push = inject('push')
 const username = helper.authUser().username
 const isDelete = ref(false)
 const notifications = reactive({
@@ -21,7 +22,7 @@ navigator.serviceWorker.ready.then((registration) => {
     .then((subscription) => {
       // Keep subscription in sync with server
       if (subscription) {
-        pusher.subscribe()
+        push.subscribe()
         notifications.push = true
       }
 
@@ -45,13 +46,13 @@ function email() {
     .finally()
 }
 
-function push() {
+function pusher() {
   notifications.push = !notifications.push
 
   if (notifications.push) {
-    pusher.subscribe()
+    push.subscribe()
   } else {
-    pusher.unsubscribe()
+    push.unsubscribe()
   }
 }
 </script>
@@ -112,7 +113,7 @@ function push() {
             color="primary" @click.prevent="email"></v-switch>
 
           <v-switch :label="$t('main.push')" class="mb-0" hide-details="auto" color="primary"
-            @click.prevent="push"></v-switch>
+            @click.prevent="pusher"></v-switch>
         </div>
         <div class=" mb-5">
           <p class="text-caption text-uppercase text-disabled mb-3">{{ $t('accounts.danger-zone') }}</p>

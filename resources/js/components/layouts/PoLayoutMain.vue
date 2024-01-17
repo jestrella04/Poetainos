@@ -1,9 +1,10 @@
 <script setup>
-import { computed, ref, reactive, provide, inject, onMounted, onUpdated } from 'vue'
+import { computed, ref, reactive, provide, inject, onMounted, onUpdated, watch } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
 import { registerSW } from 'virtual:pwa-register'
-import { watch } from 'vue';
+import Echo from 'laravel-echo'
+import Pusher from 'pusher-js'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -12,6 +13,7 @@ const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
+const unreadCount = ref(page.value.props.auth.notifications)
 const snackBar = reactive({
   active: false,
   avatar: '/images/logo.svg',
@@ -20,6 +22,19 @@ const snackBar = reactive({
   message: '',
 })
 
+const echo = new Echo({
+  broadcaster: "pusher",
+  key: import.meta.env.VITE_PUSHER_APP_KEY,
+  wsHost: import.meta.env.VITE_PUSHER_HOST,
+  wsPort: import.meta.env.VITE_PUSHER_PORT,
+  wssPort: import.meta.env.VITE_PUSHER_PORT,
+  cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+  forceTLS: import.meta.env.VITE_PUSHER_APP_FORCETLS === "true",
+  disableStats: true,
+})
+
+echo.Pusher = Pusher
+
 theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
 registerSW({ immediate: true })
 
@@ -27,9 +42,28 @@ provide('snackBar', snackBar)
 provide('forceSnackBar', forceSnackBar)
 provide('mobileSiteMenu', mobileSiteMenu)
 provide('mobileUserMenu', mobileUserMenu)
+provide('unreadCount', unreadCount)
 
 onMounted(() => {
   getFlashMessages()
+
+  if (helper.auth() && 'setAppBadge' in navigator) {
+    navigator.setAppBadge(unreadCount.value)
+  }
+
+  // Listen for new user notification events coming from the server
+  if (helper.auth()) {
+    echo.private(`notifications.${helper.authUser().username}`).listen(
+      "NotificationEvent",
+      (payload) => {
+        unreadCount.value = payload.notifications.unread
+
+        if ('setAppBadge' in navigator) {
+          navigator.setAppBadge(payload.notifications.unread);
+        }
+      }
+    )
+  }
 })
 
 onUpdated(() => {
@@ -189,8 +223,8 @@ footer {
         <div v-else class="align-self-center">
           <v-menu target="parent">
             <template v-slot:activator="{ props }">
-              <po-button v-bind="props">
-                <po-badge :count="page.props.auth.notifications">
+              <po-button icon v-bind="props">
+                <po-badge :count="unreadCount">
                   <po-avatar size="32" color="secondary" :user="$helper.authUser()" />
                 </po-badge>
               </po-button>
@@ -204,7 +238,7 @@ footer {
 
               <po-list-item :href="$route('notifications.index')" prepend-icon="fas fa-bell" inertia>
                 <span>{{ $t('accounts.notifications') }}</span>
-                <po-badge :count="page.props.auth.notifications" inline></po-badge>
+                <po-badge :count="unreadCount" inline></po-badge>
               </po-list-item>
               <v-divider class="my-0"></v-divider>
 
@@ -279,7 +313,7 @@ footer {
 
       <template v-else>
         <po-button value="account" @click.prevent="mobileUserMenu = !mobileUserMenu">
-          <po-badge :count="page.props.auth.notifications">
+          <po-badge :count="unreadCount">
             <po-avatar size="24" color="secondary" :user="$helper.authUser()" />
           </po-badge>
           <span>{{ $t('accounts.my-account') }}</span>

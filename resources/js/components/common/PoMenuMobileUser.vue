@@ -1,8 +1,7 @@
 <script setup>
-import { usePage } from '@inertiajs/vue3';
-import { computed, inject } from 'vue';
+import { inject } from 'vue';
 
-const page = computed(() => usePage())
+const unreadCount = inject('unreadCount')
 const mobileUserMenu = inject('mobileUserMenu', false)
 </script>
 
@@ -18,7 +17,7 @@ const mobileUserMenu = inject('mobileUserMenu', false)
 
           <po-list-item :href="$route('notifications.index')" prepend-icon="fas fa-bell" inertia>
             <span>{{ $t('accounts.notifications') }}</span>
-            <po-badge :count="page.props.auth.notifications" inline></po-badge>
+            <po-badge :count="unreadCount" inline></po-badge>
           </po-list-item>
           <v-divider class="my-0"></v-divider>
 

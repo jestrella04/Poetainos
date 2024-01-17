@@ -60,8 +60,9 @@ async function submit() {
 </script>
 
 <template>
-  <v-dialog width="500">
+  <v-dialog width="500" persistent>
     <v-card :title="$t('accounts.delete-account')">
+      <po-modal-close @click.prevent="isDelete = false"></po-modal-close>
       <v-card-text>
         <p class="mb-2">
           {{ $t('accounts.sorry-see-you-go') }}

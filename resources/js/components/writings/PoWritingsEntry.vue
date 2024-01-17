@@ -96,7 +96,8 @@ provide('writing', props.data)
 
             <div class="d-inline-flex flex-wrap ga-1">
               <div v-for="liker in likers" :key="liker.id">
-                <po-button icon :href="$route('users.show', liker.username)" inertia>
+                <po-button icon :href="$route('users.show', liker.username)" :title="$helper.userDisplayName(liker)"
+                  inertia>
                   <po-avatar size="48" color="secondary" :user="liker" />
                 </po-button>
               </div>

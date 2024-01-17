@@ -9,6 +9,7 @@ import { vuetify } from './plugins/vuetify'
 import { i18n } from './plugins/i18n'
 import { helper } from './plugins/helper'
 import { route } from './plugins/route'
+import { push } from './plugins/push'
 import 'animate.css'
 import PoLayoutMain from './components/layouts/PoLayoutMain.vue'
 
@@ -37,6 +38,7 @@ createInertiaApp({
       .use(i18n)
       .use(helper)
       .use(route)
+      .use(push)
       .component('font-awesome-icon', FontAwesomeIcon)
       .mount(el)
   }
