@@ -7,6 +7,7 @@ const props = defineProps({
 })
 
 const helper = inject('helper')
+const sharer = inject('sharer')
 const social = helper.shareLinks(props.linkTitle, props.linkUrl)
 
 function copy(event) {
@@ -14,12 +15,15 @@ function copy(event) {
     event.preventDefault()
     navigator.clipboard.writeText(props.linkUrl);
   }
+
+  sharer.value = false
 }
 </script>
 
 <template>
-  <v-dialog width="500">
+  <v-dialog width="500" persistent>
     <v-card :title="$t('main.share-content')">
+      <po-modal-close @click.prevent="sharer = false"></po-modal-close>
       <v-card-text class="text-center">
         <p class="text-bold">{{ linkTitle }}</p>
         <p class="text-disabled">{{ $helper.cropUrl(linkUrl) }}</p>

@@ -9,6 +9,7 @@ const blocker = ref(false)
 
 provide('complainer', complainer)
 provide('blocker', blocker)
+provide('sharer', sharer)
 
 function share() {
   if (navigator.share) {

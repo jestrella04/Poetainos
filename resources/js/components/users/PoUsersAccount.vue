@@ -112,7 +112,7 @@ function pusher() {
           <v-switch v-model="notifications.email" :label="$t('main.email')" class="mb-0" hide-details="auto"
             color="primary" @click.prevent="email"></v-switch>
 
-          <v-switch :label="$t('main.push')" class="mb-0" hide-details="auto" color="primary"
+          <v-switch v-model="notifications.push" :label="$t('main.push')" class="mb-0" hide-details="auto" color="primary"
             @click.prevent="pusher"></v-switch>
         </div>
         <div class=" mb-5">
