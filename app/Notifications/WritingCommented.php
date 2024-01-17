@@ -42,7 +42,7 @@ class WritingCommented extends Notification implements ShouldQueue
             'footer' => __('Thank you for being part of the hood!'),
             'url' => route('writings.show', $this->writing),
             'action' => __('View writing'),
-            'icon' => asset('resources/images/logo-192.png'),
+            'icon' => asset('images/logo-192.png'),
             'tag' => getSiteConfig('name'),
         ];
     }
