@@ -325,7 +325,9 @@ class UsersController extends Controller
                 ]),
             ],
             'notifications' => [
-                'email' => isTruthy($user->extra_info['notifications']['email']) ?? true,
+                'email' => isset($user->extra_info['notifications']['email'])
+                    ? isTruthy($user->extra_info['notifications']['email'])
+                    : true,
             ]
         ]);
     }
