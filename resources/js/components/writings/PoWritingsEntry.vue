@@ -17,6 +17,12 @@ provide('writing', props.data)
 
 </script>
 
+<style scoped>
+.writing-body {
+  white-space: pre-wrap !important;
+}
+</style>
+
 <template>
   <po-wrapper>
     <v-card class="pos-relative" elevation="2" rounded>
@@ -53,7 +59,7 @@ provide('writing', props.data)
         </div>
 
         <template v-if="alone">
-          <blockquote class="mb-3">
+          <blockquote class="writing-body mb-3">
             {{ data.text }}
           </blockquote>
 
@@ -109,7 +115,7 @@ provide('writing', props.data)
         </template>
 
         <template v-else>
-          <blockquote>
+          <blockquote class="writing-body">
             {{ $helper.excerpt(data.text) }}
           </blockquote>
         </template>
