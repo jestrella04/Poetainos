@@ -5,7 +5,6 @@ import { useTheme } from 'vuetify'
 import { registerSW } from 'virtual:pwa-register'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
-//import "@pwabuilder/pwaupdate"
 import '@khmyznikov/pwa-install'
 
 const page = computed(() => usePage())
