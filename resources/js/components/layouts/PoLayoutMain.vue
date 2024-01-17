@@ -5,6 +5,8 @@ import { useTheme } from 'vuetify'
 import { registerSW } from 'virtual:pwa-register'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
+//import "@pwabuilder/pwaupdate"
+import '@khmyznikov/pwa-install'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -22,6 +24,9 @@ const snackBar = reactive({
   message: '',
 })
 
+theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
+registerSW({ immediate: true })
+
 const echo = new Echo({
   broadcaster: "pusher",
   key: import.meta.env.VITE_PUSHER_APP_KEY,
@@ -35,8 +40,13 @@ const echo = new Echo({
 
 echo.Pusher = Pusher
 
-theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
-registerSW({ immediate: true })
+// PWA Builder goodies
+const installComponent = document.createElement("pwa-install");
+//const updateComponent = document.createElement("pwa-update");
+
+document.body.appendChild(installComponent);
+//document.body.appendChild(updateComponent);
+//updateComponent.updatemessage = "Hay una actualización disponible";
 
 provide('snackBar', snackBar)
 provide('forceSnackBar', forceSnackBar)
