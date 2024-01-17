@@ -34,9 +34,10 @@ class Role extends Model
 
     public function permissions()
     {
-        $extra_info = $this->extra_info;
-        $permissions = $extra_info['permissions'];
+        if (isset($this->extra_info['permissions'])) {
+            return $this->extra_info['permissions'];
+        }
 
-        return $permissions;
+        return [];
     }
 }

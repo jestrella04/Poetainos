@@ -6,17 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Like extends Model
 {
-     /**
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
      */
     public $timestamps = false;
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     /**
      * Get the parent likeable model (writing, user or comment).
@@ -24,5 +19,15 @@ class Like extends Model
     public function likeable()
     {
         return $this->morphTo();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function writing()
+    {
+        return $this->belongsTo(Writing::class);
     }
 }

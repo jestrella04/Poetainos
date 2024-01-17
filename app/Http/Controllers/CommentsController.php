@@ -7,6 +7,9 @@ use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
@@ -20,23 +23,19 @@ class CommentsController extends Controller
         $filter = [0];
 
         if (auth()->check()) {
-            $filter = User::find(auth()->user()->id)->getBlockedAuthors()->pluck('blocked_user_id');
+            $filter = User::find(auth()->user()->id)->blockedAuthors()->pluck('blocked_user_id');
         }
 
-        $comments = Comment::with('replies')
-            ->where('writing_id', $writing)
+        $comments = Comment::where('writing_id', $writing)
             ->whereNotIn('user_id', $filter)
+            ->with(['author' => function ($query) {
+                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            }])
+            ->withCount(['likes'])
             ->orderBy('created_at', 'desc')
             ->simplePaginate($this->pagination);
 
-        $html = view('comments.index', [
-            'comments' => $comments,
-        ])->render();
-
-        return response()->json([
-            'next' => $comments->nextPageUrl(),
-            'comments' => $html,
-        ]);
+        return $comments;
     }
 
     /**
@@ -58,17 +57,11 @@ class CommentsController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'comment' => 'required|min:2|max:300',
+            'comment' => 'required|min:1|max:300',
             'writing_id' => 'required|exists:writings,id',
-            'reply_to' => 'nullable|exists:users,username',
         ]);
 
         $message = request('comment');
-
-        if (null !== request('reply_to')) {
-            $message = '@' . request('reply_to') . ' ' . $message;
-        }
-
         $comment = Comment::create([
             'user_id' => auth()->user()->id,
             'writing_id' => request('writing_id'),
@@ -100,10 +93,6 @@ class CommentsController extends Controller
                 $mention->notify(new WritingCommentMentioned($comment, auth()->user()));
             }
         }
-
-        return view('comments.show', [
-            'comment' => $comment,
-        ])->render();
     }
 
     /**
@@ -148,6 +137,10 @@ class CommentsController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+        $this->authorize('delete', $comment);
+        $comment->delete();
+        DatabaseNotification::where('data->comment_id', $comment->id)->delete();
+
+        return [];
     }
 }

@@ -11,7 +11,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
-use Illuminate\Support\Facades\Vite;
 
 class WritingCommented extends Notification implements ShouldQueue
 {
@@ -43,7 +42,7 @@ class WritingCommented extends Notification implements ShouldQueue
             'footer' => __('Thank you for being part of the hood!'),
             'url' => route('writings.show', $this->writing),
             'action' => __('View writing'),
-            'icon' => Vite::asset('resources/images/logo-192.png'),
+            'icon' => asset('resources/images/logo-192.png'),
             'tag' => getSiteConfig('name'),
         ];
     }

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Writing;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class CategoriesController extends Controller
 {
@@ -44,40 +45,44 @@ class CategoriesController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
+     * @return \Inertia\Response
      */
     public function show(Category $category)
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-
         $params = [
-            'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]) .' '. $category->description,
-            'title' => getPageTitle([
-                $category->name,
-                __('Categories')
-                ]),
-            'canonical' => $category->path(),
-            'description' => $category->description,
+            'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]) . ' ' . $category->description,
         ];
 
+        $writings = $category->writingsRecursive()
+            ->whereNotIn('user_id', $this->getBlockedUsers())
+            ->withCount(['likes', 'comments', 'shelf'])
+            ->with(['author' => function ($query) {
+                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            }]);
+
         if ('latest' === $sort) {
-            $writings = $category->writingsRecursive()
-            ->orderBy('created_at', 'desc')
-            ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('popular' === $sort) {
-            $writings = $category->writingsRecursive()
-            ->orderBy('views', 'desc')
-            ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('likes' === $sort) {
-            $writings = $category->writingsRecursive()
-            ->withCount('likes')
-            ->orderBy('likes_count', 'desc')
-            ->simplePaginate($this->pagination);
+            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
         }
 
-        return view('writings.index', [
+        if (request()->expectsJson()) {
+            return $writings;
+        }
+
+        return Inertia::render('writings/PoWritingsIndex', [
+            'meta' => [
+                'title' => getPageTitle([
+                    $category->name,
+                    __('Categories')
+                ]),
+                'canonical' => route('home'),
+                'description' => $category->description,
+            ],
             'writings' => $writings,
-            'params' => $params,
             'sort' => $sort,
         ]);
     }
@@ -118,7 +123,7 @@ class CategoriesController extends Controller
         $category->parent_id = request('parent');
         $category->description = request('description');
 
-        if (! $category->exists) {
+        if (!$category->exists) {
             $action = 'create';
             $category->slug = slugify($category->getTable(), request('name'));
         }

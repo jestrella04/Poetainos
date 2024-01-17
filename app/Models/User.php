@@ -59,17 +59,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function writingsPath()
     {
-        return route('users_writings.index', $this->username);
+        return route('users.writings.index', $this->username);
     }
 
     public function shelfPath()
     {
-        return route('users_shelves.index', $this->username);
+        return route('users.shelf.index', $this->username);
     }
 
     public function avatarPath()
     {
-        if (! empty($this->extra_info['avatar'])) {
+        if (!empty($this->extra_info['avatar'])) {
             $path = '/storage/' . $this->extra_info['avatar'];
 
             if (is_file(public_path($path))) {
@@ -80,7 +80,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getName()
     {
-        if (! empty($this->name)) {
+        if (!empty($this->name)) {
             return $this->name;
         }
 
@@ -89,7 +89,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function firstName()
     {
-        if (! empty($this->name)) {
+        if (!empty($this->name)) {
             return explode(' ', $this->name)[0];
         }
 
@@ -98,7 +98,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function initials()
     {
-        if (! empty($this->name) && ! empty($this->last_name)) {
+        if (!empty($this->name) && !empty($this->last_name)) {
             return strtoupper(substr($this->name, 0, 1) . substr($this->last_name, 0, 1));
         }
 
@@ -107,7 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getTwitterUsername()
     {
-        if (! empty($this->extra_info['social']['twitter'])) {
+        if (!empty($this->extra_info['social']['twitter'])) {
             return '@' . $this->extra_info['social']['twitter'];
         }
 
@@ -159,6 +159,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Like::class);
     }
 
+    public function awards()
+    {
+        return $this->hasMany(Writing::class)->whereNotNull('home_posted_at');
+    }
+
     public function incrementViews()
     {
         DB::table($this->getTable())->whereId($this->id)->increment('profile_views');
@@ -203,22 +208,20 @@ class User extends Authenticatable implements MustVerifyEmail
         DB::table($this->getTable())->whereId($this->id)->update(['aura' => $aura, 'aura_updated_at' => Carbon::now()]);
     }
 
-    public static function featured($count = 20)
-    {
-        return Self::orderByDesc('aura')->take($count)->get();
-    }
-
     public function isAllowed($task)
     {
         if (null !== ($this->role)) {
             $this->task = $task;
+            $permissions = $this->role->permissions();
 
-            $allowed = Arr::first($this->role->permissions(), function ($value, $key) {
-                return $this->task === $value['name'];
-            });
+            if (count($permissions) > 0) {
+                $allowed = Arr::first($this->role->permissions(), function ($value, $key) {
+                    return $this->task === $value['name'];
+                });
 
-            if ($allowed['enabled']) {
-                return true;
+                if ($allowed['enabled']) {
+                    return true;
+                }
             }
         }
 
@@ -254,20 +257,14 @@ class User extends Authenticatable implements MustVerifyEmail
         ]);
     }
 
-    public function getBlockedAuthors($asArrayOfIds = false)
+    public function blockedAuthors()
     {
-        $collection = $this->hasMany(BlockedUser::class);
-
-        if ($asArrayOfIds) {
-            $collection = $collection->pluck('blocked_user_id')->toArray();
-        }
-
-        return $collection;
+        return $this->hasMany(BlockedUser::class);
     }
 
     public function isAuthorBlocked(User $author)
     {
-        $blocked = $this->getBlockedAuthors($asArrayOfIds = true);
+        $blocked = $this->blockedAuthors()->pluck('blocked_user_id')->toArray();
 
         if (in_array($author->id, $blocked)) {
             return true;

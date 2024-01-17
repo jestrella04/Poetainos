@@ -13,7 +13,6 @@ use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterPost;
-use Illuminate\Support\Facades\Vite;
 
 class WritingFeatured extends Notification implements ShouldQueue
 {
@@ -47,7 +46,7 @@ class WritingFeatured extends Notification implements ShouldQueue
             'footer' => __('Thank you for being part of the hood!'),
             'url' => $this->writing->path(),
             'action' => __('View writing'),
-            'icon' => Vite::asset('resources/images/logo-192.png'),
+            'icon' => asset('resources/images/logo-192.png'),
             'tag' => getSiteConfig('name'),
         ];
     }
@@ -88,7 +87,8 @@ class WritingFeatured extends Notification implements ShouldQueue
         return new TwitterStatusUpdate($msg);
     }
 
-    public function toFacebookPoster($notifiable) {
+    public function toFacebookPoster($notifiable)
+    {
         $msg = implode(' ', $this->notification['body_social']);
         $msg = str_replace(':author', $this->writing->author->getName(), $msg);
 

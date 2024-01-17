@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // Check the app is not running in CLI mode
-        if (! App::runningInConsole()) {
+        if (!App::runningInConsole()) {
             // Getting App settings from database
             try {
                 if (Schema::hasTable('settings')) {
@@ -71,6 +71,6 @@ class AppServiceProvider extends ServiceProvider
     protected function registerResources(): void
     {
         // Loading project's custom language strings
-        $this->loadJSONTranslationsFrom(base_path('lang/Writerhood'));
+        $this->loadJSONTranslationsFrom(base_path('lang/poetainos'));
     }
 }

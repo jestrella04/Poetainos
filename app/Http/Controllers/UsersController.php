@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Like;
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Writing;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Intervention\Image\Facades\Image;
 
 class UsersController extends Controller
@@ -11,32 +15,44 @@ class UsersController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function index()
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'featured']) ? request('sort') : 'featured';
-
-        $params = [
-            'title' => getPageTitle([__('Writers')]),
-            'canonical' => route('users.index'),
-        ];
+        $users = User::select(
+            'id',
+            'username',
+            'name',
+            'profile_views',
+            'aura',
+            'extra_info->bio AS bio',
+            //'extra_info->social AS social',
+            'extra_info->avatar AS avatar',
+            //'extra_info->website AS website',
+            //'extra_info->location AS location',
+            //'extra_info->interests AS interests',
+        )->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
 
         if ('latest' === $sort) {
-            $users = User::latest()
-            ->simplePaginate($this->pagination);
+            $users = $users->latest()->simplePaginate($this->pagination)->withQueryString();
         } elseif ('popular' === $sort) {
-            $users = User::orderBy('profile_views', 'desc')
-            ->simplePaginate($this->pagination);
+            $users = $users->orderBy('profile_views', 'desc')->simplePaginate($this->pagination)->withQueryString();
         } elseif ('featured' === $sort) {
-            $users = User::orderBy('aura', 'desc')
-            ->simplePaginate($this->pagination);
+            $users = $users->orderBy('aura', 'desc')->simplePaginate($this->pagination)->withQueryString();
         }
 
-        return view('users.index', [
-            'users' => $users,
+        if (request()->expectsJson()) {
+            return $users;
+        }
+
+        return Inertia::render('users/PoUsersIndex', [
+            'meta' => [
+                'title' => getPageTitle([__('Writers')]),
+                'canonical' => route('users.index'),
+            ],
             'sort' => $sort,
-            'params' => $params
+            'users' => $users,
         ]);
     }
 
@@ -47,7 +63,7 @@ class UsersController extends Controller
      */
     public function query()
     {
-        $wildcard = '%'. request('query') .'%';
+        $wildcard = '%' . request('query') . '%';
 
         return User::where('name', 'like', $wildcard)
             ->orWhere('username', 'like', $wildcard)
@@ -85,25 +101,57 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        $params = [
-            'users_single_entry' => true,
-            'writings_single_entry' => false,
-            'title' => getPageTitle([
-                $user->getName(),
-                __('Writers'),
-                ]),
-            'canonical' => $user->path(),
-        ];
-
         // Increment writing views
         $user->incrementViews();
 
         // Update Aura
         $user->updateAura();
 
-        return view('users.show', [
-            'user' => $user,
-            'params' => $params
+        $authUser = auth()->check() ? User::find(auth()->user()->id) : null;
+
+        return Inertia::render('users/PoUsersShow', [
+            'meta' => [
+                'title' => getPageTitle([
+                    $user->getName(),
+                    __('Writers'),
+                ]),
+                'canonical' => $user->path(),
+            ],
+            'user' => User::select(
+                'id',
+                'username',
+                'name',
+                'profile_views',
+                'aura',
+                'created_at',
+                'extra_info->bio AS bio',
+                'extra_info->social AS social',
+                'extra_info->avatar AS avatar',
+                'extra_info->website AS website',
+                'extra_info->location AS location',
+                'extra_info->interests AS interests',
+            )
+                ->whereId($user->id)
+                ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
+                ->firstOrFail(),
+            'writings' => [
+                'from_author' => $user->writings()
+                    ->with(['author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    }])
+                    ->inRandomOrder()->take(5)->get(),
+                'from_shelf' => $user->shelf()
+                    ->with(['author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    }])
+                    ->inRandomOrder()->take(5)->get(),
+                'from_liked' => Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
+                    ->with(['author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    }])
+                    ->inRandomOrder()->take(5)->get(),
+            ],
+            'isAuthorBlocked' => auth()->check() ? $authUser->isAuthorBlocked($user) : false
         ]);
     }
 
@@ -117,14 +165,13 @@ class UsersController extends Controller
     {
         $this->authorize('update', $user);
 
-        $params = [
-            'title' => getPageTitle([__('Update profile')]),
-            'roles' => ['user', 'moderator', 'admin'],
-        ];
-
-        return view('users.edit', [
-            'params' => $params,
+        return Inertia::render('users/PoUsersForm', [
+            'meta' => [
+                'title' => getPageTitle([__('Update profile')]),
+            ],
             'user' => $user,
+            'agreement' => $user->isInAgreement(),
+            'roles' => Role::select('id', 'name')->get(),
         ]);
     }
 
@@ -203,7 +250,7 @@ class UsersController extends Controller
         }
 
         // Check if a user role is set
-        if (! empty(request('role'))) {
+        if (!empty(request('role'))) {
             $user->role_id = request('role');
         }
 
@@ -219,12 +266,9 @@ class UsersController extends Controller
         }
 
         // Set response data
-        $response = $user->toArray();
-        $response['message'] = __('Your profile was successfully updated');
-        $response['url'] = $user->path();
-
-        // Output the response
-        return $response;
+        return [
+            'url' => $user->path()
+        ];
     }
 
     /**
@@ -244,22 +288,7 @@ class UsersController extends Controller
             return redirect(route('home'));
         }
 
-        return [
-            'message' => __('User deleted successfully')
-        ];
-    }
-
-    /**
-     * Display confirmation before blocking another user.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function promptBeforeBlock(User $user)
-    {
-        return view('users.partials.blockauthor', [
-            'user' => $user,
-        ]);
+        return [];
     }
 
     /**
@@ -273,9 +302,7 @@ class UsersController extends Controller
         $blockingUser = User::find(auth()->user()->id);
         $blockingUser->block($user);
 
-        return [
-            'message' => __('User blocked successfully')
-        ];
+        return [];
     }
 
     /**
@@ -288,16 +315,18 @@ class UsersController extends Controller
     {
         $this->authorize('delete', $user);
 
-        $params = [
-            'title' => getPageTitle([
-                $user->getName(),
-                __('Writers'),
-                ]),
-        ];
+        $params = [];
 
-        return view('users.account', [
-            'user' => $user,
-            'params' => $params
+        return Inertia::render('users/PoUsersAccount', [
+            'meta' => [
+                'title' => getPageTitle([
+                    $user->getName(),
+                    __('Writers'),
+                ]),
+            ],
+            'notifications' => [
+                'email' => isTruthy($user->extra_info['notifications']['email']) ?? true,
+            ]
         ]);
     }
 }

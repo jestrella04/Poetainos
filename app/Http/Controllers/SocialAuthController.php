@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -41,6 +43,7 @@ class SocialAuthController extends Controller
             'name' => $social->getName(),
             'username' => slugify('users', $nick, 'username', '_'),
             'password' => Hash::make(bin2hex(random_bytes(10))),
+            'role_id' => Role::where('name', 'user')->first()->id,
         ]);
 
         // Grab avatar
@@ -71,17 +74,15 @@ class SocialAuthController extends Controller
 
         // Set flash message content
         if ($exists) {
-            $message = __('Welcome back to the hood, we missed you!');
+            $message = 'accounts.welcome-back';
         } else {
-            $message  =  __('Welcome aboard, the hood is pleased to have you as a member!');
-            $message .= __('You have now unlocked full access to the site.');
-            $message .= __('Go ahead and like, comment, reply, find the muses and publish your writings.');
+            $message  =  'accounts.welcome-aboard';
         }
 
         // Set flash message
-        request()->session()->flash('flash', $message);
+        request()->session()->flash('message', $message);
 
         // Redirect user
-        return redirect(route('home'));
+        return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
     }
 }

@@ -49,6 +49,16 @@ class LikesController extends Controller
             $like->likeable()->associate(Comment::find($likeable_id));
         }
 
+        // Check existence
+        $exist = Like::where('user_id', $like->user_id)
+            ->where('likeable_type', $like->likeable_type)
+            ->where('likeable_id', $like->likeable_id)
+            ->count();
+
+        if ($exist > 0) {
+            return $this->destroy($likeable, $likeable_id);
+        }
+
         $like->save();
 
         // Update aura
@@ -59,19 +69,24 @@ class LikesController extends Controller
 
             // Notify writing author
             if ($like->likeable->author->isNot(auth()->user())) {
-                $like->likeable->author->notify(new WritingLiked($like->likeable, auth()->user()));
+                $like->likeable->author->notify(
+                    new WritingLiked($like->likeable, auth()->user())
+                );
             }
         }
 
         if ('comment' == $likeable) {
             // Notify comment author
             if ($like->likeable->author->isNot(auth()->user())) {
-                $like->likeable->author->notify(new CommentLiked($like->likeable, auth()->user()));
+                $like->likeable->author->notify(
+                    new CommentLiked($like->likeable, auth()->user())
+                );
             }
         }
 
         return [
-            'count' => ReadableHumanNumber($like->likeable->likes()->count()),
+            'method' => 'store',
+            'count' => $like->likeable->likes()->count(),
         ];
     }
 
@@ -126,7 +141,8 @@ class LikesController extends Controller
         }
 
         return [
-            'count' => ReadableHumanNumber($count),
+            'method' => 'destroy',
+            'count' => $count,
         ];
     }
 }

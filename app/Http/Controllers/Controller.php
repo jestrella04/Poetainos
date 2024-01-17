@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Models\Setting;
+use App\Models\User;
 
 class Controller extends BaseController
 {
@@ -14,10 +14,21 @@ class Controller extends BaseController
 
     protected $pagination;
     protected $aura;
+    protected $auraHome;
+    protected $blockedUsers;
 
     public function __construct()
     {
         $this->pagination = getSiteConfig('pagination');
         $this->auraHome = getSiteConfig('aura.min_at_home');
+    }
+
+    public function getBlockedUsers()
+    {
+        $blockedUsers = auth()->check()
+            ? User::find(auth()->user()->id)->blockedAuthors()->pluck('blocked_user_id')->toArray()
+            : [0];
+
+        return $blockedUsers;
     }
 }

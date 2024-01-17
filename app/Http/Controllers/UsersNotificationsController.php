@@ -2,49 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Writing;
-
-use function PHPUnit\Framework\isNull;
+use Inertia\Inertia;
 
 class UsersNotificationsController extends Controller
 {
-    public function listUnread() {
-        $user = auth()->user();
-        $notifications = \App\Models\User::find($user->id)->unreadNotifications()->paginate($this->pagination);
-        return $this->list($notifications);
-    }
-
-    public function listAll() {
-        $user = auth()->user();
-        $notifications = \App\Models\User::find($user->id)->notifications()->paginate($this->pagination);
-        return $this->list($notifications, false);
-    }
-
-    private function list($notifications, $unreadTab = true)
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Inertia\Response
+     */
+    public function index()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('My notifications'),
-                ]),
-            'unreadTab' => $unreadTab,
-        ];
+        $user = auth()->user();
+        $tab = in_array(request('tab'), ['unread', 'all']) ? request('tab') : 'unread';
+        $notifications = [];
 
-        return view('notifications.index', [
-            'user' => auth()->user(),
+        if ($tab === 'unread') {
+            $notifications = User::find($user->id)->unreadNotifications()->paginate($this->pagination)->withQueryString();
+        } else {
+            $notifications = User::find($user->id)->notifications()->paginate($this->pagination)->withQueryString();
+        }
+
+        $notifications->map(function ($notification) {
+            $notification['notifier_user'] =
+                isset($notification->data['user_id'])
+                ? User::select(
+                    'id',
+                    'name',
+                    'username',
+                    'extra_info->avatar AS avatar'
+                )->whereId($notification->data['user_id'])->first()
+                : null;
+
+            $notification['notifier_writing'] =
+                isset($notification->data['writing_id'])
+                ? Writing::select(
+                    'id',
+                    'title',
+                    'slug',
+                )->whereId($notification->data['writing_id'])->first()
+                : null;
+        });
+
+        if (request()->expectsJson()) {
+            return $notifications;
+        }
+
+        return Inertia::render('notifications/PoNotificationsIndex', [
+            'meta' => [],
             'notifications' => $notifications,
-            'params' => $params,
+            'tab' => $tab,
         ]);
     }
 
     public function clear()
     {
-        $user = auth()->user();
-        $user->unreadNotifications->markAsRead();
-
-        return redirect(route('notifications.list.unread'));
+        auth()->user()->unreadNotifications->markAsRead();
+        return redirect(route('notifications.index'));
     }
 
-    public function read($notificationId)
+    public function show($notificationId)
     {
         $notification = auth()->user()->notifications->find($notificationId);
 
@@ -65,9 +84,7 @@ class UsersNotificationsController extends Controller
 
     public function email($enable)
     {
-        $user = auth()->user();
-        $user->emailNotifications($enable);
-
+        User::find(auth()->user()->id)->emailNotifications($enable);
         return response()->json(null, 204);
     }
 

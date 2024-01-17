@@ -16,7 +16,7 @@ class Tag extends Model
         'slug',
     ];
 
-     /**
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
@@ -36,14 +36,5 @@ class Tag extends Model
     public function writings()
     {
         return $this->belongsToMany(Writing::class);
-    }
-
-    public static function popular($count = 20)
-    {
-        return Self::withCount('writings')
-            ->orderByDesc('writings_count')
-            ->having('writings_count', '>', 0)
-            ->take($count)
-            ->get();
     }
 }

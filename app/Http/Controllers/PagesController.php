@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class PagesController extends Controller
 {
@@ -15,7 +16,10 @@ class PagesController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('pages/PoPagesIndex', [
+            'meta' => [],
+            'pages' => Page::all(),
+        ]);
     }
 
     /**
@@ -47,16 +51,11 @@ class PagesController extends Controller
      */
     public function show(Page $page)
     {
-        $params = [
-            'title' => getPageTitle([$page->title]),
-        ];
-
-        // Increment page views
-        //$page->incrementViews();
-
-        return view('pages.show', [
+        return Inertia::render('pages/PoPagesShow', [
+            'meta' => [
+                'title' => getPageTitle([$page->title]),
+            ],
             'page' => $page,
-            'params' => $params
         ]);
     }
 
@@ -94,7 +93,7 @@ class PagesController extends Controller
         $page->title = request('title');
         $page->text = request('text');
 
-        if (! $page->exists) {
+        if (!$page->exists) {
             $action = 'create';
             $page->slug = slugify($page->getTable(), request('title'));
         }
