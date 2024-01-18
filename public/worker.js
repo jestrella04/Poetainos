@@ -1,5 +1,5 @@
 self.importScripts("https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js");
-const r = "po-cache", f = [{"revision":"f7db8a4bd70b8949c51c5023cf93d1a7","url":"build/assets/app-ZeOFqHEe.css"},{"revision":"ed0c862094c41f455cdef837aa7dafd2","url":"build/assets/workbox-window.prod.es5-prqDwDSL.js"}], l = "offline";
+const r = "po-cache", f = [{"revision":"28418b6c9fee7fc7d7b2f2b1fdbca40f","url":"build/assets/app-sTfp0ZdD.css"},{"revision":"ed0c862094c41f455cdef837aa7dafd2","url":"build/assets/workbox-window.prod.es5-prqDwDSL.js"}], l = "offline";
 self.addEventListener("message", (e) => {
   e.origin == location.host && e.data && e.data.type === "SKIP_WAITING" && self.skipWaiting();
 });

@@ -54,17 +54,17 @@ function liked(id, count) {
         <v-tabs v-model="page.props.sort" fixed-tabs>
           <v-tab href="?sort=latest" @click.prevent="$inertia.get('?sort=latest')" value="latest">
             <v-icon icon="fas fa-clock" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
+            <span class="d-none d-sm-sr-only d-md-inline">{{ $t('main.most-recent') }}</span>
           </v-tab>
 
           <v-tab href="?sort=popular" @click.prevent="$inertia.get('?sort=popular')" value="popular">
             <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
+            <span class="d-none d-sm-sr-only d-md-inline">{{ $t('main.most-popular') }}</span>
           </v-tab>
 
           <v-tab href="?sort=likes" @click.prevent="$inertia.get('?sort=likes')" value="likes">
             <v-icon icon="fas fa-heart" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
+            <span class="d-none d-sm-sr-only d-md-inline">{{ $t('main.most-liked') }}</span>
           </v-tab>
         </v-tabs>
       </v-col>
