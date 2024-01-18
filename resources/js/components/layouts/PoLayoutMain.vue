@@ -14,7 +14,7 @@ const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
-const unreadCount = ref(page.value.props.auth.notifications)
+const unreadCount = (page.value.props.auth.notifications)
 const loginModal = ref(false)
 const snackBar = reactive({
   active: false,
@@ -64,7 +64,7 @@ onMounted(() => {
 
   // Listen for new user notification events coming from the server
   if (helper.auth()) {
-    echo.private(`notifications.${helper.authUser().username}`).listen(
+    echo.private(`notifications.${helper.authUser().id}`).listen(
       "NotificationEvent",
       (payload) => {
         unreadCount.value = payload.notifications.unread
