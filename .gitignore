@@ -3,6 +3,7 @@
 /public/hot
 /public/storage
 /public/static/*
+/public/worker.js
 /public/sitemap.xml
 /public/robots.txt
 /public/mix-manifest.json
