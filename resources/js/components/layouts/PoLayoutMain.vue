@@ -316,8 +316,9 @@ footer {
     </v-main>
 
     <v-footer :elevation="2">
-      <div class="d-flex flex-wrap justify-space-around w-100 ga-2 text-caption text-center">
+      <div class="d-flex flex-wrap align-center justify-space-around w-100 ga-2 text-caption text-center">
         <div>&copy; 2020 {{ page.props.site.name }}</div>
+
         <div class="d-inline-flex ga-3">
           <template v-for="(app, store) in page.props.site.stores" :key="app">
             <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="secondary"
