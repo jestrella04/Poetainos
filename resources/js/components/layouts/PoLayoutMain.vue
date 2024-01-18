@@ -14,7 +14,7 @@ const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
-const unreadCount = page.value.props.auth.notifications
+const unreadCount = ref(page.value.props.auth.notifications)
 const loginModal = ref(false)
 const snackBar = reactive({
   active: false,
