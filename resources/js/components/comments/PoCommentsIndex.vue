@@ -11,6 +11,7 @@ const helper = inject('helper')
 const comments = ref({})
 const loadingComments = inject('loadingComments', true)
 const writing = inject('writing')
+const loginModal = inject('loginModal', false)
 const replyBox = ref(0)
 
 provide('replyBox', replyBox)
@@ -47,13 +48,20 @@ async function like(event, id) {
       .finally(() => {
         helper.animate(doer.querySelector("i"), "heartBeat")
       })
+  } else {
+    loginModal.value = true
   }
 }
+
 function toggleReply(commentId) {
-  if (replyBox.value === commentId) {
-    replyBox.value = 0
+  if (helper.auth()) {
+    if (replyBox.value === commentId) {
+      replyBox.value = 0
+    } else {
+      replyBox.value = commentId
+    }
   } else {
-    replyBox.value = commentId
+    loginModal.value = true
   }
 }
 
@@ -72,7 +80,7 @@ function reply(comment) {
 <template>
   <po-wrapper class="my-5">
     <div v-if="!loadingComments" class="mb-5">
-      <po-inline-login v-if="!$helper.auth()" />
+      <po-inline-login v-if="!$helper.auth()" :message="$t('accounts.login-before-comment')" />
       <po-comments-form v-else form-id="comment-form" @comment-posted="loadComments" />
     </div>
 

@@ -10,6 +10,7 @@ const liked = page.value.props.auth.liked.writings.includes(writing.id)
 const shelved = page.value.props.auth.shelved.includes(writing.id)
 const likesCount = ref(writing.likes_count)
 const shelfCount = ref(writing.shelf_count)
+const loginModal = inject('loginModal', false)
 
 async function like(event) {
   const doer = event.target.closest('.do-like')
@@ -30,13 +31,15 @@ async function like(event) {
       .finally(() => {
         helper.animate(doer.querySelector("i"), "heartBeat")
       })
+  } else {
+    loginModal.value = true
   }
 }
 
 async function shelf(event) {
   const doer = event.target.closest('.do-shelf')
 
-  if (helper.auth()) {
+  if (helper.auth() && helper.authUser().username !== writing.author.username) {
     await axios
       .post(window.route('shelves.store', writing.slug))
       .then((response) => {
@@ -52,6 +55,8 @@ async function shelf(event) {
       .finally(() => {
         helper.animate(doer.querySelector("i"), "heartBeat")
       })
+  } else if (!helper.auth()) {
+    loginModal.value = true
   }
 }
 </script>
