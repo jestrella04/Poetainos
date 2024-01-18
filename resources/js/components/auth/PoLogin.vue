@@ -225,38 +225,38 @@ async function submitForm() {
     </template>
 
     <template v-else>
-      <v-list class="po-login">
-        <v-list-item>
+      <div class="po-login d-flex flex-column ga-3">
+        <div>
           <po-button block color="primary" :href="$route('social.login', 'facebook')" prepend-icon="fab fa-facebook-f">
             {{ $t('accounts.continue-with-facebook') }}
           </po-button>
-        </v-list-item>
+        </div>
 
-        <v-list-item>
+        <div>
           <po-button block color="primary" :href="$route('social.login', 'twitter')" prepend-icon="fab fa-x-twitter">
             {{ $t('accounts.continue-with-x-twitter') }}
           </po-button>
-        </v-list-item>
+        </div>
 
-        <v-list-item>
+        <div>
           <po-button block color="primary" :href="$route('social.login', 'google')" prepend-icon="fab fa-google">
             {{ $t('accounts.continue-with-google') }}
           </po-button>
-        </v-list-item>
+        </div>
 
-        <v-list-item>
+        <div>
           <po-button block color="primary" prepend-icon="fas fa-at" @click.prevent="isEmail = true">
             {{ $t('accounts.continue-with-email') }}
           </po-button>
-        </v-list-item>
+        </div>
 
-        <v-list-item>
+        <div>
           <po-button block color="primary" :href="$route('home')" prepend-icon="fas fa-ghost"
             @click.prevent="$inertia.get($route('home'))">
             {{ $t('accounts.continue-as-guest') }}
           </po-button>
-        </v-list-item>
-      </v-list>
+        </div>
+      </div>
     </template>
   </div>
 </template>

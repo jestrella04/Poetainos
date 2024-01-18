@@ -15,6 +15,7 @@ const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
 const unreadCount = ref(page.value.props.auth.notifications)
+const loginModal = ref(false)
 const snackBar = reactive({
   active: false,
   avatar: '/images/logo.svg',
@@ -52,6 +53,7 @@ provide('forceSnackBar', forceSnackBar)
 provide('mobileSiteMenu', mobileSiteMenu)
 provide('mobileUserMenu', mobileUserMenu)
 provide('unreadCount', unreadCount)
+provide('loginModal', loginModal)
 
 onMounted(() => {
   getFlashMessages()
@@ -108,12 +110,36 @@ function getFlashMessages() {
 
 <style>
 html {
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    "Noto Sans",
+    "Liberation Sans",
+    Arial, sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji" !important;
   font-size: clamp(1.13rem, 1.08rem + 0.24vw, 1.25rem) !important;
 }
 
 html,
 body {
   height: 100%;
+}
+
+pre,
+code {
+  font-family:
+    SFMono-Regular,
+    Menlo, Monaco,
+    Consolas,
+    "Liberation Mono",
+    "Courier New",
+    monospace;
 }
 
 .po-navbar {
@@ -183,6 +209,7 @@ footer {
   <v-app>
     <po-head />
     <po-snack-bar></po-snack-bar>
+    <po-login-modal v-model="loginModal"></po-login-modal>
 
     <v-toolbar color="primary" :elevation="8" class="po-navbar px-3 d-none d-lg-flex">
       <v-container class="d-inline-flex justify-space-between">

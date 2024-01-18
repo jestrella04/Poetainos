@@ -1,35 +1,40 @@
-<script setup></script>
+<script setup>
+defineProps({
+  message: { type: String, default: '' },
+})
+</script>
 
 <template>
   <div class="text-center">
-    <p class="text-medium-emphasis mb-3">
-      {{ $t('accounts.login-before-comment') }}
+    <p v-if="'' !== message" class="text-medium-emphasis mb-5">
+      {{ message }}
     </p>
 
-    <div class="d-inline-flex flex-wrap justify-center ga-2">
+    <div class="d-inline-flex flex-wrap justify-center ga-4">
       <div>
-        <po-button color="primary" :href="$route('social.login', 'facebook')"
+        <po-button icon color="primary" :href="$route('social.login', 'facebook')"
           :title="$t('accounts.continue-with-facebook')">
           <v-icon icon="fab fa-facebook-f"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button color="primary" :href="$route('social.login', 'twitter')"
+        <po-button icon color="primary" :href="$route('social.login', 'twitter')"
           :title="$t('accounts.continue-with-x-twitter')">
           <v-icon icon="fab fa-x-twitter"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button color="primary" :href="$route('social.login', 'google')" :title="$t('accounts.continue-with-google')">
+        <po-button icon color="primary" :href="$route('social.login', 'google')"
+          :title="$t('accounts.continue-with-google')">
           <v-icon icon="fab fa-google"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button color="primary" :href="$route('login', { 'isEmail': true })" :title="$t('accounts.continue-with-email')"
-          inertia>
+        <po-button icon color="primary" :href="$route('login', { 'isEmail': true })"
+          :title="$t('accounts.continue-with-email')" inertia>
           <v-icon icon="fas fa-at"></v-icon>
         </po-button>
       </div>
