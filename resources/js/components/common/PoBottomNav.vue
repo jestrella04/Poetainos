@@ -5,6 +5,7 @@ import { usePage } from '@inertiajs/vue3'
 const page = computed(() => usePage())
 const mobileSiteMenu = inject('mobileSiteMenu')
 const mobileUserMenu = inject('mobileUserMenu')
+const unreadCount = inject('unreadCount')
 </script>
 
 <style scoped>
