@@ -14,7 +14,7 @@ export default defineConfig({
       refresh: true
     }),
     vue(),
-    vuetify({ autoImport: true }),
+    vuetify(),
     Components({
       dirs: ['resources/js/components/common'],
       extensions: ['vue']
