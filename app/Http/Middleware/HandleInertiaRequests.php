@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => auth()->check()
-                    ? User::select('username', 'name', 'extra_info->avatar AS avatar')->where('id', $user->id)->firstOrFail()
+                    ? User::select('id', 'username', 'name', 'extra_info->avatar AS avatar')->where('id', $user->id)->firstOrFail()
                     : null,
                 'admin' => auth()->check() ? $user->isAllowed('admin') : null,
                 'notifications' => auth()->check() ? $user->unreadNotifications->count() : 0,
