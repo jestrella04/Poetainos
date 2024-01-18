@@ -28,7 +28,7 @@ provide('writing', props.data)
     <v-card class="pos-relative" elevation="2" rounded>
       <po-writing-dropdown></po-writing-dropdown>
       <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)">
-        <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" cover>
+        <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" alt="" cover>
           <div class="text-center py-3">
             <po-link :href="$route('users.show', data.author.username)" inertia>
               <po-avatar size="64" color="secondary" :user="data.author" />

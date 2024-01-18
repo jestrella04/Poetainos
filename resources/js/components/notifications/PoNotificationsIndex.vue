@@ -8,6 +8,7 @@ const helper = inject('helper')
 const notifications = ref(page.value.props.notifications.data)
 const next = ref(page.value.props.notifications.next_page_url)
 const total = ref(page.value.props.notifications.total)
+const unreadCount = inject('unreadCount')
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -48,7 +49,7 @@ async function loadMore({ done }) {
 
   <template v-if="'unread' === page.props.tab && total > 0">
     <div class="mx-auto mb-3 text-right" style="width: 100%; max-width: 620px;">
-      <po-button :href="$route('notifications.clear')" size="x-small" method="post" inertia>
+      <po-button :href="$route('notifications.clear')" size="x-small" method="post" inertia @click="unreadCount = 0">
         <v-icon icon="fas fa-check-double" class="me-2"></v-icon>
         {{ $t('main.mark-all-read') }}
       </po-button>

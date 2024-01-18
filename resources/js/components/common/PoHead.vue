@@ -13,7 +13,7 @@ const description = page.value.props.meta.description ??= page.value.props.site.
   <Head :title="title">
     <link v-if="null !== canonical" rel="canonical" :href="canonical" head-key="canonical">
     <meta name="keywords" :content="$t('main.keywords')">
-    <meta type="description" :content="description" head-key="description">
+    <meta name="description" :content="description" head-key="description">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ window.location.href }}">
     <meta property="og:title" :content="title">

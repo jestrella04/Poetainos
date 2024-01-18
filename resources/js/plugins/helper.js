@@ -1,6 +1,6 @@
 // plugins/helper.js
 
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import millify from 'millify'
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
