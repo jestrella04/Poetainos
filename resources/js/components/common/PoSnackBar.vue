@@ -6,7 +6,7 @@ const snackBar = inject('snackBar')
 
 <style scoped>
 .v-snackbar {
-  width: 90%;
+  width: 100%;
   max-width: 400px;
   margin: 1rem auto;
 }
