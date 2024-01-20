@@ -42,20 +42,20 @@ onMounted(() => {
   <v-row>
     <v-col cols="12">
       <v-tabs v-model="page.props.sort" fixed-tabs>
-        <v-tab href="?sort=featured" @click.prevent="$inertia.get('?sort=featured')" value="featured">
+        <po-tab href="?sort=featured" value="featured" :aria-label="$t('main.featured')" inertia>
           <v-icon icon="fas fa-fan" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.featured') }}</span>
-        </v-tab>
+        </po-tab>
 
-        <v-tab href="?sort=latest" @click.prevent="$inertia.get('?sort=latest')" value="latest">
+        <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
           <v-icon icon="fas fa-clock" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
-        </v-tab>
+        </po-tab>
 
-        <v-tab href="?sort=popular" @click.prevent="$inertia.get('?sort=popular')" value="popular">
+        <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
           <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
-        </v-tab>
+        </po-tab>
       </v-tabs>
     </v-col>
   </v-row>

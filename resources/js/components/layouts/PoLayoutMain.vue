@@ -193,6 +193,13 @@ footer {
 .do-like {
   cursor: pointer;
 }
+
+.po-btn-more {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 999;
+}
 </style>
 
 <template>
@@ -210,17 +217,12 @@ footer {
         </div>
 
         <v-tabs v-model="page.props.route.name" centered>
-          <v-tab :text="$t('main.explore')" :href="$route('explore')" value="explore"
-            @click.prevent="$inertia.get($route('explore'))"></v-tab>
-          <v-tab :text="$t('main.awards')" :href="$route('writings.awards')" value="writings.awards"
-            @click.prevent="$inertia.get($route('writings.awards'))"></v-tab>
-          <v-tab :text="$t('main.random')" :href="$route('writings.random')" value="writings.random"
-            @click.prevent="$inertia.get($route('writings.random'))"></v-tab>
-          <v-tab :text="$t('users.authors')" :href="$route('users.index')" value="users.index"
-            @click.prevent="$inertia.get($route('users.index'))"></v-tab>
-          <v-tab :text="$t('main.publish')" :href="$route('writings.create')" value="writings.create"
-            @click.prevent="$inertia.get($route('writings.create'))"></v-tab>
-          <v-tab href="#" @click.prevent="desktopSiteMenu = true">
+          <po-tab :href="$route('explore')" value="explore" inertia>{{ $t('main.explore') }}</po-tab>
+          <po-tab :href="$route('writings.awards')" value="writings.awards" inertia>{{ $t('main.awards') }}</po-tab>
+          <po-tab :href="$route('writings.random')" value="writings.random" inertia>{{ $t('main.random') }}</po-tab>
+          <po-tab :href="$route('users.index')" value="users.index" inertia>{{ $t('users.authors') }}</po-tab>
+          <po-tab :href="$route('writings.create')" value="writings.create" inertia>{{ $t('main.publish') }}</po-tab>
+          <po-tab @click.prevent="desktopSiteMenu = true">
             <v-icon icon="fas fa-ellipsis-vertical"></v-icon>
             <v-menu v-model="desktopSiteMenu" target="parent">
               <v-list>
@@ -250,7 +252,8 @@ footer {
                   <span>{{ $t('main.privacy-policy') }}</span>
                 </po-list-item>
               </v-list>
-            </v-menu></v-tab>
+            </v-menu>
+          </po-tab>
         </v-tabs>
 
         <div v-if="!$helper.auth()" class="align-self-center">
@@ -309,7 +312,7 @@ footer {
       <div class="d-flex flex-wrap align-center justify-space-around w-100 ga-2 text-caption text-center">
         <div>&copy; 2020 {{ page.props.site.name }}</div>
 
-        <div v-if="installComponent.isInstalled" class="d-inline-flex ga-3">
+        <div v-if="!installComponent.isInstalled" class="d-inline-flex ga-3">
           <template v-for="(app, store) in page.props.site.stores" :key="app">
             <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="secondary"
               size="x-small">
@@ -320,10 +323,10 @@ footer {
 
         <div class="d-inline-flex ga-3">
           <template v-for="(user, social) in page.props.site.social" :key="social">
-            <po-link :href="$helper.socialLink(user.value, social)">
-              <v-icon v-if="social === 'twitter'" :icon="`fab fa-x-${social}`"></v-icon>
-              <v-icon v-else :icon="`fab fa-${social}`"></v-icon>
-            </po-link>
+            <po-button icon color="primary" size="x-small" :href="$helper.socialLink(user.value, social)"
+              :title="$t('main.follow-on', { app: social })">
+              <v-icon :icon="$helper.socialIcon()[social]"></v-icon>
+            </po-button>
           </template>
         </div>
       </div>

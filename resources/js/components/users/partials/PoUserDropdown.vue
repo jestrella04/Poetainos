@@ -31,7 +31,8 @@ function share() {
   <v-menu>
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" icon="fas fa-ellipsis-vertical" color="secondary" size="x-small" variant="tonal"
-        style="position: absolute; top: 1rem; right: 1rem; z-index: 999;"></v-btn>
+        class="po-btn-more" :aria-label="$t('main.more-actions')">
+      </v-btn>
     </template>
 
     <v-list>
@@ -46,12 +47,12 @@ function share() {
       <v-divider class="my-0"></v-divider>
 
       <po-list-item :href="$route('users.writings.index', [user.username])" prepend-icon="fas fa-feather" inertia>
-        <span>{{ $helper.authUser().id === user.id ? $t('users.view-self-writings') : $t('users.view-writings') }}</span>
+        <span>{{ $t('users.view-writings') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
       <po-list-item :href="$route('users.shelf.index', [user.username])" prepend-icon="fas fa-bookmark" inertia>
-        <span>{{ $helper.authUser().id === user.id ? $t('users.view-self-shelf') : $t('users.view-shelf') }}</span>
+        <span>{{ $t('users.view-shelf') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 

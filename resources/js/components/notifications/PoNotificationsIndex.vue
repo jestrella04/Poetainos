@@ -34,15 +34,15 @@ async function loadMore({ done }) {
   <v-row class="mb-5">
     <v-col cols="12">
       <v-tabs v-model="page.props.tab" fixed-tabs>
-        <v-tab href="?tab=unread" @click.prevent="$inertia.get('?tab=unread')" value="unread">
+        <po-tab href="?tab=unread" value="unread" :aria-label="$t('main.unread')" inertia>
           <v-icon icon="fas fa-envelope" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.unread') }}</span>
-        </v-tab>
+        </po-tab>
 
-        <v-tab href="?tab=all" @click.prevent="$inertia.get('?tab=all')" value="all">
+        <po-tab href="?tab=all" value="all" :aria-label="$t('main.read')" inertia>
           <v-icon icon="fas fa-envelope-open" class="d-md-none" />
-          <span class="d-none d-md-inline">{{ $t('main.all') }}</span>
-        </v-tab>
+          <span class="d-none d-md-inline">{{ $t('main.read') }}</span>
+        </po-tab>
       </v-tabs>
     </v-col>
   </v-row>

@@ -240,7 +240,7 @@ const Helper = class {
       {
         name: 'Facebook',
         url: facebookBaseUrl,
-        icon: 'fab fa-facebook'
+        icon: 'fab fa-facebook-f'
       },
       {
         name: 'Twitter',
@@ -263,6 +263,16 @@ const Helper = class {
         icon: 'far fa-clone'
       }
     ]
+  }
+
+  socialIcon() {
+    return {
+      twitter: 'fab fa-x-twitter',
+      instagram: 'fab fa-instagram',
+      facebook: 'fab fa-facebook-f',
+      youtube: 'fab fa-youtube',
+      telegram: 'fab fa-telegram'
+    }
   }
 }
 
