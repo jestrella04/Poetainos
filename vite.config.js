@@ -30,6 +30,7 @@ export default defineConfig({
       injectRegister: false,
       includeManifestIcons: false,
       manifest: false,
+      registerType: 'autoUpdate',
       devOptions: {
         enabled: true,
         type: 'module',

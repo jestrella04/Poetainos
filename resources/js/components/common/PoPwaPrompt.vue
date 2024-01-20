@@ -3,7 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 // replaced dynamically
 const reloadSW = '__RELOAD_SW__'
-const intervalMS = 5000 /*60 * 60 * 1000 /* 20s for testing purposes */
+const intervalMS = 60 * 60 * 1000
 
 const { needRefresh, updateServiceWorker } = useRegisterSW({
   onRegisteredSW(swUrl, r) {
@@ -19,10 +19,6 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
     }
   },
 })
-
-async function close() {
-  needRefresh.value = false
-}
 </script>
 
 <style scoped>
@@ -47,7 +43,7 @@ async function close() {
         </div>
 
         <div>
-          <v-btn @click="updateServiceWorker(); close()">{{ $t('main.reload') }}</v-btn>
+          <v-btn @click="updateServiceWorker()">{{ $t('main.reload') }}</v-btn>
         </div>
       </div>
     </v-snackbar>
