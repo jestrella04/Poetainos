@@ -15,6 +15,7 @@ const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
 const unreadCount = ref(page.value.props.auth.notifications)
 const loginModal = ref(false)
+const installComponent = document.createElement("pwa-install")
 const snackBar = reactive({
   active: false,
   avatar: '/images/logo.svg',
@@ -22,7 +23,6 @@ const snackBar = reactive({
   timeout: 6000,
   message: '',
 })
-const installComponent = document.createElement("pwa-install")
 const echo = new Echo({
   broadcaster: "pusher",
   key: import.meta.env.VITE_PUSHER_APP_KEY,

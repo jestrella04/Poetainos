@@ -3,10 +3,9 @@ import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 // replaced dynamically
 const reloadSW = '__RELOAD_SW__'
-const intervalMS = 24 * 60 * 60 * 1000 /* 20s for testing purposes */
+const intervalMS = 5000 /*60 * 60 * 1000 /* 20s for testing purposes */
 
 const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
-  immediate: true,
   onRegisteredSW(swUrl, r) {
     console.log(`Service Worker at: ${swUrl}`)
 
@@ -15,8 +14,7 @@ const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
         console.log('Checking for sw update')
         await r.update()
       }, intervalMS)
-    }
-    else {
+    } else {
       console.log(`SW Registered: ${r}`)
     }
   },
