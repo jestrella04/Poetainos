@@ -1,18 +1,16 @@
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching'
 import * as navigationPreload from 'workbox-navigation-preload'
+import { clientsClaim } from 'workbox-core'
 
 const CACHE = 'po-cache'
 const entries = self.__WB_MANIFEST
 const offlineFallbackPage = 'offline'
 
+self.skipWaiting()
+clientsClaim()
+
 cleanupOutdatedCaches()
 precacheAndRoute(entries)
-
-self.addEventListener('message', (event) => {
-  if (event.origin == location.host && event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting()
-  }
-})
 
 self.addEventListener('install', async (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.add(offlineFallbackPage)))

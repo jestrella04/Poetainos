@@ -2,6 +2,7 @@
 import { computed, ref, reactive, provide, inject, onMounted, onUpdated, watch } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 import '@khmyznikov/pwa-install'
@@ -33,10 +34,27 @@ const echo = new Echo({
   forceTLS: import.meta.env.VITE_PUSHER_APP_FORCETLS === "true",
   disableStats: true,
 })
+const reloadSW = '__RELOAD_SW__'
+const intervalMS = 60 * 60 * 1000
 
 echo.Pusher = Pusher
 document.body.appendChild(installComponent)
 theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
+
+useRegisterSW({
+  onRegisteredSW(swUrl, r) {
+    console.log(`Service Worker at: ${swUrl}`)
+
+    if (reloadSW === 'true') {
+      r && setInterval(async () => {
+        console.log('Checking for sw update')
+        await r.update()
+      }, intervalMS)
+    } else {
+      console.log(`SW Registered: ${r}`)
+    }
+  },
+})
 
 provide('snackBar', snackBar)
 provide('forceSnackBar', forceSnackBar)
@@ -142,7 +160,7 @@ code {
 }
 
 .avatar-shadow {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.9));
 }
 
 .logo-shadow:focus,
@@ -336,7 +354,7 @@ footer {
       </div>
     </v-footer>
 
-    <po-pwa-prompt></po-pwa-prompt>
+    <!-- <po-pwa-prompt></po-pwa-prompt> -->
     <po-bottom-nav></po-bottom-nav>
   </v-app>
 </template>
