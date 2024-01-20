@@ -29,18 +29,16 @@ function copy(event) {
         <p class="text-disabled">{{ $helper.cropUrl(linkUrl) }}</p>
       </v-card-text>
 
-      <v-card-actions>
-        <div class="d-flex flex-wrap pa-5 ga-5 w-100 justify-center">
-          <template v-for="data in social" :key="data.name">
-            <div :id="data.name" class="social">
-              <po-link :href="data.url" rel="noindex noopener" target="_blank"
-                :title="'copy' === data.name ? $t('main.copy-link') : data.name" @click="copy">
-                <v-icon :icon="data.icon" size="48"></v-icon>
-              </po-link>
-            </div>
-          </template>
-        </div>
-      </v-card-actions>
+      <div class="d-flex flex-wrap pa-5 ga-3 w-100 justify-center">
+        <template v-for="data in social" :key="data.name">
+          <div :id="data.name" class="social">
+            <po-button icon color="primary" size="64" :href="data.url" rel="noindex noopener" target="_blank"
+              :title="'copy' === data.name ? $t('main.copy-link') : data.name" @click="copy">
+              <v-icon :icon="data.icon"></v-icon>
+            </po-button>
+          </div>
+        </template>
+      </div>
     </v-card>
   </v-dialog>
 </template>

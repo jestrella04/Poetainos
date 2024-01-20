@@ -31,7 +31,8 @@ function share() {
   <v-menu>
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" icon="fas fa-ellipsis-vertical" color="secondary" size="x-small" variant="tonal"
-        style="position: absolute; top: 1rem; right: 1rem; z-index: 999;"></v-btn>
+        class="po-btn-more" :aria-label="$t('main.more-actions')">
+      </v-btn>
     </template>
 
     <v-list>

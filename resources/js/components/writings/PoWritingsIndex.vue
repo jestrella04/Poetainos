@@ -52,20 +52,20 @@ function liked(id, count) {
     <v-row>
       <v-col cols="12">
         <v-tabs v-model="page.props.sort" fixed-tabs>
-          <v-tab href="?sort=latest" @click.prevent="$inertia.get('?sort=latest')" value="latest">
+          <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
             <v-icon icon="fas fa-clock" class="d-md-none" />
-            <span class="d-none d-sm-sr-only d-md-inline">{{ $t('main.most-recent') }}</span>
-          </v-tab>
+            <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
+          </po-tab>
 
-          <v-tab href="?sort=popular" @click.prevent="$inertia.get('?sort=popular')" value="popular">
+          <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
             <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
-            <span class="d-none d-sm-sr-only d-md-inline">{{ $t('main.most-popular') }}</span>
-          </v-tab>
+            <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
+          </po-tab>
 
-          <v-tab href="?sort=likes" @click.prevent="$inertia.get('?sort=likes')" value="likes">
+          <po-tab href="?sort=likes" value="likes" :aria-label="$t('main.most-liked')" inertia>
             <v-icon icon="fas fa-heart" class="d-md-none" />
-            <span class="d-none d-sm-sr-only d-md-inline">{{ $t('main.most-liked') }}</span>
-          </v-tab>
+            <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
+          </po-tab>
         </v-tabs>
       </v-col>
     </v-row>
