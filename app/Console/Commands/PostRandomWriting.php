@@ -39,7 +39,7 @@ class PostRandomWriting extends Command
      */
     public function handle()
     {
-        $writing = User::has('writings', '>', 0)
+        $writing = User::whereHas('writings')
             ->inRandomOrder()
             ->firstOrFail()
             ->writings()

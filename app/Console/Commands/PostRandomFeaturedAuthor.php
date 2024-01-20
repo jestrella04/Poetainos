@@ -39,9 +39,9 @@ class PostRandomFeaturedAuthor extends Command
      */
     public function handle()
     {
-        $user = User::with('writings')
-            ->orderBy('aura', 'desc')
-            ->take(50)
+        $user = User::whereHas('writings')
+            ->orderByDesc('aura')
+            ->take(20)
             ->get()
             ->random();
         $user->notify(new AuthorFeaturedRandom($user));
