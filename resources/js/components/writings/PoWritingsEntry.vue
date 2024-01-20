@@ -31,7 +31,7 @@ provide('writing', props.data)
         <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" alt="" cover>
           <div class="text-center py-3">
             <po-link :href="$route('users.show', data.author.username)" inertia>
-              <po-avatar size="64" color="secondary" :user="data.author" />
+              <po-avatar size="64" color="secondary" :user="data.author" class="avatar-shadow" />
             </po-link>
           </div>
         </v-img>

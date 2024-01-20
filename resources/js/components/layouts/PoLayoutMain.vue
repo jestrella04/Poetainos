@@ -141,6 +141,10 @@ code {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
 }
 
+.avatar-shadow {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
 .logo-shadow:focus,
 .logo-shadow:active,
 .logo-shadow:hover {
