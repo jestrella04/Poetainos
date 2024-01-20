@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import laravel from 'laravel-vite-plugin'
@@ -19,6 +19,7 @@ export default defineConfig({
       dirs: ['resources/js/components/common'],
       extensions: ['vue']
     }),
+    splitVendorChunkPlugin(),
     VitePWA({
       scope: '/',
       base: '/',
@@ -31,7 +32,12 @@ export default defineConfig({
       manifest: false,
       devOptions: {
         enabled: true,
-        type: 'module'
+        type: 'module',
+        suppressWarnings: true
+      },
+      workbox: {
+        cleanupOutdatedCaches: true,
+        maximumFileSizeToCacheInBytes: 3000000
       }
     })
   ]

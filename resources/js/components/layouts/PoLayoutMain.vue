@@ -2,7 +2,6 @@
 import { computed, ref, reactive, provide, inject, onMounted, onUpdated, watch } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
-import { registerSW } from 'virtual:pwa-register'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 import '@khmyznikov/pwa-install'
@@ -16,6 +15,7 @@ const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
 const unreadCount = ref(page.value.props.auth.notifications)
 const loginModal = ref(false)
+const installComponent = document.createElement("pwa-install")
 const snackBar = reactive({
   active: false,
   avatar: '/images/logo.svg',
@@ -23,10 +23,6 @@ const snackBar = reactive({
   timeout: 6000,
   message: '',
 })
-
-theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
-registerSW({ immediate: true })
-
 const echo = new Echo({
   broadcaster: "pusher",
   key: import.meta.env.VITE_PUSHER_APP_KEY,
@@ -39,14 +35,8 @@ const echo = new Echo({
 })
 
 echo.Pusher = Pusher
-
-// PWA Builder goodies
-const installComponent = document.createElement("pwa-install");
-//const updateComponent = document.createElement("pwa-update");
-
-document.body.appendChild(installComponent);
-//document.body.appendChild(updateComponent);
-//updateComponent.updatemessage = "Hay una actualización disponible";
+document.body.appendChild(installComponent)
+theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
 
 provide('snackBar', snackBar)
 provide('forceSnackBar', forceSnackBar)
@@ -319,7 +309,7 @@ footer {
       <div class="d-flex flex-wrap align-center justify-space-around w-100 ga-2 text-caption text-center">
         <div>&copy; 2020 {{ page.props.site.name }}</div>
 
-        <div class="d-inline-flex ga-3">
+        <div v-if="installComponent.isInstalled" class="d-inline-flex ga-3">
           <template v-for="(app, store) in page.props.site.stores" :key="app">
             <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="secondary"
               size="x-small">
@@ -339,6 +329,7 @@ footer {
       </div>
     </v-footer>
 
+    <po-pwa-prompt></po-pwa-prompt>
     <po-bottom-nav></po-bottom-nav>
   </v-app>
 </template>
