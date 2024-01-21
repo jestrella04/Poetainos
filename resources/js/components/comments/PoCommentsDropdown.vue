@@ -24,7 +24,7 @@ provide('isDelete', isDelete)
   <v-menu>
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" icon="fas fa-ellipsis-vertical" color="secondary" size="x-small" variant="tonal"
-        class="po-btn-more" :aria-label="$t('main.more-actions')">
+        :aria-label="$t('main.more-actions')">
       </v-btn>
     </template>
 

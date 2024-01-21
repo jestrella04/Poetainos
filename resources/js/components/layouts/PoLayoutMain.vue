@@ -147,7 +147,7 @@ code {
     Consolas,
     "Liberation Mono",
     "Courier New",
-    monospace;
+    monospace !important;
 }
 
 .po-navbar {

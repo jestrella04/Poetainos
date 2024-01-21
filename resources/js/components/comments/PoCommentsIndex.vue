@@ -89,7 +89,7 @@ function reply(comment) {
 
       <template v-for="comment in comments.data" :key="comment.id">
         <v-card class="mb-2 pos-relative">
-          <v-card-text class="d-flex pb-2">
+          <v-card-text class="d-flex pb-2 ga-3">
             <div class="flex-grow-1" v-html="$helper.linkify(comment.message)"></div>
             <div>
               <po-comments-dropdown :comment="comment"></po-comments-dropdown>
