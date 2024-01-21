@@ -107,10 +107,8 @@ Route::get('/init', [InitController::class, 'show'])->name('init.show');
 Route::post('/init', [InitController::class, 'init'])->name('init.init');
 Route::get('/init/success', [InitController::class, 'success'])->name('init.success');
 
-// PWA manifest
-Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.manifest');
-
 // Generic
+Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.manifest');
 Route::get('/offline', [GenericController::class, 'offline'])->name('offline');
 Route::get('/search', [SearchController::class, 'show'])->name('search');
 Route::get('/explore', [GenericController::class, 'explore'])->name('explore');
