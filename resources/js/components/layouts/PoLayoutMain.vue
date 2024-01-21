@@ -169,8 +169,13 @@ code {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
+main {
+  height: auto;
+}
+
 footer {
-  max-height: fit-content !important;
+  display: block !important;
+  flex: none !important;
 }
 
 @media screen and (max-width: 1280px) {
@@ -331,7 +336,7 @@ footer {
     </v-main>
 
     <v-footer :elevation="2">
-      <div class="d-flex flex-wrap align-center justify-space-around w-100 ga-2 text-caption text-center">
+      <div class="d-flex flex-wrap align-center justify-space-around w-100 pa-2 ga-2 text-caption text-center">
         <div>&copy; 2020 {{ page.props.site.name }}</div>
 
         <div v-if="!installComponent.isInstalled" class="d-inline-flex ga-3">
@@ -354,7 +359,6 @@ footer {
       </div>
     </v-footer>
 
-    <!-- <po-pwa-prompt></po-pwa-prompt> -->
     <po-bottom-nav></po-bottom-nav>
   </v-app>
 </template>
