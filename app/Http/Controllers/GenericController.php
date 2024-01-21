@@ -160,6 +160,10 @@ class GenericController extends Controller
         }
 
         foreach ($json->related_applications as $app) {
+            if ("webapp" === $app->platform) {
+                $app->url = route('pwa.manifest');
+            }
+
             if ("play" === $app->platform) {
                 $app->url = config('services.google.play_store.url');
                 $app->id = config('services.google.play_store.id');

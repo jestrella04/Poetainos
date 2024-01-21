@@ -36,6 +36,14 @@ const echo = new Echo({
 })
 const reloadSW = '__RELOAD_SW__'
 const intervalMS = 60 * 60 * 1000
+const relatedApps = ref([])
+
+if ('getInstalledRelatedApps' in navigator) {
+  navigator.getInstalledRelatedApps()
+    .then((related) => {
+      relatedApps.value = related
+    })
+}
 
 echo.Pusher = Pusher
 document.body.appendChild(installComponent)
@@ -339,7 +347,7 @@ footer {
       <div class="d-flex flex-wrap align-center justify-space-around w-100 pa-2 ga-2 text-caption text-center">
         <div>&copy; 2020 {{ page.props.site.name }}</div>
 
-        <div v-if="!installComponent.isInstalled" class="d-inline-flex ga-3">
+        <div v-if="$helper.isEmpty(relatedApps)" class="d-inline-flex ga-3">
           <template v-for="(app, store) in page.props.site.stores" :key="app">
             <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="secondary"
               size="x-small">
