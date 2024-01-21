@@ -97,5 +97,5 @@ async function loadMore({ done }) {
     </template>
   </div>
 
-  <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+  <po-infinite-scroll v-if="!$helper.strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
 </template>

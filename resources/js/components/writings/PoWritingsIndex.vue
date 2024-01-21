@@ -36,18 +36,18 @@ onMounted(() => {
 })
 
 function liked(id, count) {
-  const a = Object.values(writings.value).filter((writing) => {
+  const liked = Object.values(writings.value).filter((writing) => {
     if (writing.id === id) {
       return
     }
   })
 
-  a.likes_count.value = count
+  liked.likes_count.value = count
 }
 </script>
 
 <template>
-  <po-wrapper>
+  <po-wrapper v-if="!$helper.isEmpty(writings)">
     <po-head></po-head>
     <v-row>
       <v-col cols="12">
@@ -75,6 +75,12 @@ function liked(id, count) {
         <po-writings-entry @liked="liked" :alone="false" :data="writing" />
       </v-col>
     </v-row>
-    <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+
+    <po-infinite-scroll v-if="!$helper.strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
+  </po-wrapper>
+
+  <po-wrapper v-else>
+    <po-head></po-head>
+    <po-msg-block class="py-15" :msg-body="$t('main.nothing-to-display')" icon="fas fa-sad-tear"></po-msg-block>
   </po-wrapper>
 </template>
