@@ -50,7 +50,7 @@
       "url": ""
     }
   ],
-  "start_url": "/socialite",
+  "start_url": "/login",
   "display": "standalone",
   "display_override": [
     "window-controls-overlay",
@@ -70,8 +70,8 @@
     "writing",
     "short stories"
   ],
-  "background_color": "#17141f",
-  "theme_color": "#fff",
+  "background_color": "#512DA8",
+  "theme_color": "#512DA8",
   "scope": "/",
   "dir": "ltr",
   "prefer_related_applications": true,

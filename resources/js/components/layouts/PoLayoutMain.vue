@@ -143,8 +143,10 @@ html {
 }
 
 html,
-body {
-  height: 100%;
+body,
+.po-container,
+.po-wrapper {
+  height: 100% !important;
 }
 
 pre,
@@ -158,9 +160,28 @@ code {
     monospace !important;
 }
 
-.po-navbar {
-  position: fixed !important;
-  z-index: 999 !important;
+main {
+  height: auto;
+}
+
+footer {
+  display: block !important;
+  flex: none !important;
+  min-height: 64px !important;
+}
+
+@media screen and (max-width: 1280px) {
+  footer {
+    margin-bottom: 56px !important;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  .po-navbar {
+    position: fixed !important;
+    z-index: 999 !important;
+    min-height: 64px !important;
+  }
 }
 
 .logo-shadow {
@@ -175,21 +196,6 @@ code {
 .logo-shadow:active,
 .logo-shadow:hover {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-}
-
-main {
-  height: auto;
-}
-
-footer {
-  display: block !important;
-  flex: none !important;
-}
-
-@media screen and (max-width: 1280px) {
-  footer {
-    margin-bottom: 56px !important;
-  }
 }
 
 .pos-relative {
@@ -247,7 +253,7 @@ footer {
       <v-container class="d-inline-flex justify-space-between">
         <div class="align-self-center">
           <po-link :href="$route('home')" variant="plain" size="x-large" class="font-weight-bold" inertia>
-            <v-img width="42" src="/images/logo.svg" class="logo-shadow"></v-img>
+            <v-img height="42" width="42" src="/images/logo.svg" class="logo-shadow"></v-img>
           </po-link>
         </div>
 
@@ -338,35 +344,12 @@ footer {
     </v-toolbar>
 
     <v-main class="mt-lg-16">
-      <v-container>
+      <v-container class="po-container">
         <slot />
       </v-container>
     </v-main>
 
-    <v-footer :elevation="2">
-      <div class="d-flex flex-wrap align-center justify-space-around w-100 pa-2 ga-2 text-caption text-center">
-        <div>&copy; 2020 {{ page.props.site.name }}</div>
-
-        <div v-if="$helper.isEmpty(relatedApps)" class="d-inline-flex ga-3">
-          <template v-for="(app, store) in page.props.site.stores" :key="app">
-            <po-button v-if="'' !== app.value" :href="app.value" :prepend-icon="app.icon" color="secondary"
-              size="x-small">
-              {{ store }}
-            </po-button>
-          </template>
-        </div>
-
-        <div class="d-inline-flex ga-3">
-          <template v-for="(user, social) in page.props.site.social" :key="social">
-            <po-button icon color="primary" size="x-small" :href="$helper.socialLink(user.value, social)"
-              :title="$t('main.follow-on', { app: social })">
-              <v-icon :icon="$helper.socialIcon()[social]"></v-icon>
-            </po-button>
-          </template>
-        </div>
-      </div>
-    </v-footer>
-
+    <po-footer></po-footer>
     <po-bottom-nav></po-bottom-nav>
   </v-app>
 </template>
