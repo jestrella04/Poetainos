@@ -36,14 +36,6 @@ const echo = new Echo({
 })
 const reloadSW = '__RELOAD_SW__'
 const intervalMS = 60 * 60 * 1000
-const relatedApps = ref([])
-
-if ('getInstalledRelatedApps' in navigator) {
-  navigator.getInstalledRelatedApps()
-    .then((related) => {
-      relatedApps.value = related
-    })
-}
 
 echo.Pusher = Pusher
 document.body.appendChild(installComponent)
@@ -144,9 +136,10 @@ html {
 
 html,
 body,
+main,
 .po-container,
 .po-wrapper {
-  height: 100% !important;
+  height: auto !important;
 }
 
 pre,
@@ -160,14 +153,10 @@ code {
     monospace !important;
 }
 
-main {
-  height: auto;
-}
-
 footer {
   display: block !important;
   flex: none !important;
-  min-height: 64px !important;
+  min-height: 95px !important;
 }
 
 @media screen and (max-width: 1280px) {
@@ -216,8 +205,9 @@ footer {
   margin-bottom: 1rem;
 }
 
-.v-tab {
-  font-size: 0.7rem;
+.v-tab,
+footer {
+  font-size: 0.7rem !important;
 }
 
 .liked i,
