@@ -20,7 +20,7 @@ library.add(fab)
 createInertiaApp({
   progress: {
     delay: 0,
-    color: '#673AB7',
+    color: '#B39DDB',
     showSpinner: true
   },
   resolve: (name) => {

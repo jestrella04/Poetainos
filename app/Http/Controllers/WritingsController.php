@@ -34,15 +34,15 @@ class WritingsController extends Controller
             }]);
 
         if ('latest' === $sort) {
-            $writings = $writings->latest()->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->latest();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('views', 'desc');
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('likes_count', 'desc');
         }
 
         if (request()->expectsJson()) {
-            return $writings;
+            return $writings->simplePaginate($this->pagination)->withQueryString();
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
@@ -50,7 +50,7 @@ class WritingsController extends Controller
                 'title' => $awards ? getPageTitle([__('Golden Flowers')]) : getPageTitle([]),
                 'canonical' => route('home'),
             ],
-            'writings' => $writings,
+            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }

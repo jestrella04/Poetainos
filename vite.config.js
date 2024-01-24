@@ -7,6 +7,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
+  build: {
+    sourcemap: true
+  },
   plugins: [
     nodePolyfills(),
     laravel({

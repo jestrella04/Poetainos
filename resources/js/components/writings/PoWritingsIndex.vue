@@ -1,26 +1,23 @@
 <script setup>
 import { computed, ref, inject, onMounted, nextTick } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
 import Masonry from 'masonry-layout'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
-const writings = ref(page.value.props.writings.data)
-const next = ref(page.value.props.writings.next_page_url)
+const writings = ref([])
+const next = ref('')
 const mason = ref()
+const fetched = ref(false)
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
     await axios
       .get(next.value)
       .then((response) => {
-        writings.value.push(...response.data.data)
-        next.value = response.data.next_page_url
-        nextTick(() => {
-          mason.value = new Masonry('.masonry', { "percentPosition": true })
-        })
+        update(response.data.data, response.data.next_page_url)
         done('ok')
       })
       .catch(() => {
@@ -31,9 +28,24 @@ async function loadMore({ done }) {
   }
 }
 
-onMounted(() => {
-  mason.value = new Masonry('.masonry', { "percentPosition": true })
+onMounted(async () => {
+  await router.reload({
+    only: ['writings'],
+    onSuccess: (page) => {
+      update(page.props.writings.data, page.props.writings.next_page_url)
+    }
+  })
 })
+
+function update(writingsData, nextPage) {
+  writings.value.push(...writingsData)
+  next.value = nextPage
+  fetched.value = true
+
+  nextTick(() => {
+    mason.value = new Masonry('.masonry', { "percentPosition": true })
+  })
+}
 
 function liked(id, count) {
   const liked = Object.values(writings.value).filter((writing) => {
@@ -47,40 +59,47 @@ function liked(id, count) {
 </script>
 
 <template>
-  <po-wrapper v-if="!$helper.isEmpty(writings)">
+  <po-wrapper>
     <po-head></po-head>
-    <v-row>
-      <v-col cols="12">
-        <v-tabs v-model="page.props.sort" fixed-tabs>
-          <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
-            <v-icon icon="fas fa-clock" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
-          </po-tab>
 
-          <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
-            <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
-          </po-tab>
+    <template v-if="!fetched">
+      <po-loading></po-loading>
+    </template>
 
-          <po-tab href="?sort=likes" value="likes" :aria-label="$t('main.most-liked')" inertia>
-            <v-icon icon="fas fa-heart" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
-          </po-tab>
-        </v-tabs>
-      </v-col>
-    </v-row>
+    <template v-else-if="!$helper.isEmpty(writings)">
+      <v-row>
+        <v-col cols="12">
+          <v-tabs v-model="page.props.sort" fixed-tabs>
+            <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
+              <v-icon icon="fas fa-clock" class="d-md-none" />
+              <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
+            </po-tab>
 
-    <v-row class="masonry">
-      <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
-        <po-writings-entry @liked="liked" :alone="false" :data="writing" />
-      </v-col>
-    </v-row>
+            <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
+              <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
+              <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
+            </po-tab>
 
-    <po-infinite-scroll v-if="!$helper.strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
-  </po-wrapper>
+            <po-tab href="?sort=likes" value="likes" :aria-label="$t('main.most-liked')" inertia>
+              <v-icon icon="fas fa-heart" class="d-md-none" />
+              <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
+            </po-tab>
+          </v-tabs>
+        </v-col>
+      </v-row>
 
-  <po-wrapper v-else>
-    <po-head></po-head>
-    <po-msg-block class="py-15" :msg-body="$t('main.nothing-to-display')" icon="fas fa-sad-tear"></po-msg-block>
+      <v-row class="masonry">
+        <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
+          <po-writings-entry @liked="liked" :alone="false" :data="writing" />
+        </v-col>
+      </v-row>
+
+      <po-infinite-scroll v-if="!$helper.strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
+    </template>
+
+    <template v-else>
+      <po-msg-block class="py-15" msg-title="" :msg-body="$t('main.nothing-to-display')"
+        icon="fas fa-sad-tear"></po-msg-block>
+    </template>
   </po-wrapper>
 </template>
