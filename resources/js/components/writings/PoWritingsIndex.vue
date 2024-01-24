@@ -44,6 +44,7 @@ function update(writingsData, nextPage) {
 
   nextTick(() => {
     mason.value = new Masonry('.masonry', { "percentPosition": true })
+
   })
 }
 
