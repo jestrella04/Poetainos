@@ -32,7 +32,7 @@ provide('user', props.data)
           </template>
 
           <template v-for="(user, network) in JSON.parse(data.social)" :key="network">
-            <div>
+            <div v-if="!$helper.strNullOrEmpty(user)">
               <po-link :href="$helper.socialLink(user, network)" target="_blank">
                 <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`"></v-icon>
                 <v-icon v-else :icon="`fab fa-${network}`"></v-icon>
