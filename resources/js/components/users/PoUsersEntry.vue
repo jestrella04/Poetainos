@@ -22,21 +22,21 @@ provide('user', props.data)
       </div>
 
       <template v-if="!$helper.strNullOrEmpty(data.website) || !$helper.isEmpty(JSON.parse(data.social))">
-        <div class="d-flex flex-wrap justify-center ga-5 mb-5">
+        <div class="d-flex flex-wrap justify-center ga-3 mb-5">
           <template v-if="!$helper.strNullOrEmpty(data.website)">
             <div>
-              <po-link :href="data.website" target="_blank">
+              <po-button icon color="primary" size="x-small" :href="data.website" target="_blank">
                 <v-icon icon="fas fa-globe"></v-icon>
-              </po-link>
+              </po-button>
             </div>
           </template>
 
           <template v-for="(user, network) in JSON.parse(data.social)" :key="network">
             <div v-if="!$helper.strNullOrEmpty(user)">
-              <po-link :href="$helper.socialLink(user, network)" target="_blank">
+              <po-button icon color="primary" size="x-small" :href="$helper.socialLink(user, network)" target="_blank">
                 <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`"></v-icon>
                 <v-icon v-else :icon="`fab fa-${network}`"></v-icon>
-              </po-link>
+              </po-button>
             </div>
           </template>
         </div>
