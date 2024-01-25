@@ -15,6 +15,7 @@ if ('getInstalledRelatedApps' in navigator) {
 
 <style scoped>
 footer {
+  max-height: 96px !important;
   font-size: 0.7rem !important;
   padding: 1rem !important;
   text-align: center;
