@@ -135,11 +135,16 @@ html {
 }
 
 html,
-body,
+body {
+  height: 100% !important;
+}
+
 main,
 .po-container,
 .po-wrapper {
-  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
 }
 
 pre,
