@@ -158,17 +158,7 @@ code {
     monospace !important;
 }
 
-footer {
-  display: block !important;
-  flex: none !important;
-  min-height: 95px !important;
-}
 
-@media screen and (max-width: 1280px) {
-  footer {
-    margin-bottom: 56px !important;
-  }
-}
 
 @media screen and (min-width: 1280px) {
   .po-navbar {
@@ -206,12 +196,15 @@ footer {
   content: "" !important;
 }
 
+.v-card-text {
+  font-size: 1rem !important;
+}
+
 .v-input {
   margin-bottom: 1rem;
 }
 
-.v-tab,
-footer {
+.v-tab {
   font-size: 0.7rem !important;
 }
 

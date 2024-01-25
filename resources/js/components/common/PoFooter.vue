@@ -13,9 +13,25 @@ if ('getInstalledRelatedApps' in navigator) {
 }
 </script>
 
+<style scoped>
+footer {
+  font-size: 0.7rem !important;
+  padding: 1rem !important;
+  text-align: center;
+}
+
+@media screen and (max-width: 1280px) {
+  footer {
+    margin-bottom: 56px !important;
+  }
+}
+</style>
+
 <template>
-  <v-footer :elevation="2" class="d-flex flex-wrap align-center justify-space-around w-100 pa-2 ga-2 text-center">
-    <div>&copy; 2020 {{ page.props.site.name }}</div>
+  <v-footer :elevation="2" class="d-flex flex-wrap align-center justify-space-around ga-2">
+    <div class="d-inline-flex ga-3">
+      &copy; 2020 {{ page.props.site.name }}
+    </div>
 
     <div v-if="$helper.isEmpty(relatedApps)" class="d-inline-flex ga-3">
       <template v-for="(app, store) in page.props.site.stores" :key="app">
