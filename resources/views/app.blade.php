@@ -24,8 +24,9 @@
     @vite('resources/js/app.js')
     @if (!empty(config('services.counter.tracking_id')))
         <!-- Counter Stats -->
+        <link rel="preconnect" href="https://cdn.counter.dev">
         <script src="https://cdn.counter.dev/script.js" data-id="{{ config('services.counter.tracking_id') }}"
-            data-utcoffset="-4"></script>
+            data-utcoffset="-4" defer></script>
     @endif
 </head>
 
