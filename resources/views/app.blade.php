@@ -11,7 +11,7 @@
     <link rel="icon" href="/images/logo.svg" type="image/svg+xml">
     <link rel="alternate icon" href="/images/logo-32.png" sizes="32x32" type="image/png">
 
-    <!-- PWA Support -->
+    <!-- PWA -->
     <meta name="theme-color" content="#673AB7" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,14 +19,19 @@
     <link rel="apple-touch-icon" href="/images/logo.svg">
     <link rel="manifest" href="{{ route('pwa.manifest', [], false) }}">
 
+    <!-- Inertia -->
     @inertiaHead
+
+    <!-- Ziggy/Laravel Routes -->
     @routes
+
+    <!-- Vite -->
     @vite('resources/js/app.js')
+
     @if (!empty(config('services.counter.tracking_id')))
         <!-- Counter Stats -->
         <link rel="preconnect" href="https://cdn.counter.dev">
-        <script src="https://cdn.counter.dev/script.js" data-id="{{ config('services.counter.tracking_id') }}"
-            data-utcoffset="-4" defer></script>
+        <script src="https://cdn.counter.dev/script.js" data-id="{{ config('services.counter.tracking_id') }}" data-utcoffset="-4" defer></script>
     @endif
 </head>
 
