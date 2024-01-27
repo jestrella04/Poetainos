@@ -73,7 +73,7 @@ Route::middleware(['verified'])->group(function () {
     Route::delete('/users/delete/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
     Route::post('/users/query/{query}', [UsersController::class, 'query'])->name('users.query');
     Route::post('/users/block/{user}', [UsersController::class, 'blockUser'])->name('users.block');
-    Route::get('/users/{user}/account', [UsersController::class, 'account'])->name('users.account');
+    Route::get('/account', [UsersController::class, 'account'])->name('users.account');
 
     // Comments
     Route::post('/comments/create', [CommentsController::class, 'store'])->name('comments.store');
