@@ -56,6 +56,11 @@ function share() {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
+      <po-list-item :href="$route('users.likes.index', [user.username])" prepend-icon="fas fa-heart" inertia>
+        <span>{{ $t('users.view-liked') }}</span>
+      </po-list-item>
+      <v-divider class="my-0"></v-divider>
+
       <po-list-item prepend-icon="fas fa-flag" @click.prevent="complainer = true">
         <span>{{ $t('complaints.report-user') }}</span>
       </po-list-item>
