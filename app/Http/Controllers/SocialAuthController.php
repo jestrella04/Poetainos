@@ -20,6 +20,10 @@ class SocialAuthController extends Controller
      */
     public function redirectToProvider($service)
     {
+        if (!empty(request('redirect'))) {
+            Redirect::setIntendedUrl(request('redirect'));
+        }
+
         return Socialite::driver($service)->redirect();
     }
 
@@ -82,7 +86,6 @@ class SocialAuthController extends Controller
         // Set flash message
         request()->session()->flash('message', $message);
 
-        // Redirect user
         return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
     }
 }

@@ -79,7 +79,7 @@ function reply(comment) {
 
 <template>
   <po-wrapper class="my-5">
-    <div v-if="!loadingComments" class="mb-5">
+    <div class="mb-5">
       <po-inline-login v-if="!$helper.auth()" :message="$t('accounts.login-before-comment')" />
       <po-comments-form v-else form-id="comment-form" @comment-posted="loadComments" />
     </div>
@@ -88,8 +88,8 @@ function reply(comment) {
       <p class="text-h6 mb-3">{{ $t('comments.comments') }}</p>
 
       <template v-for="comment in comments.data" :key="comment.id">
-        <v-card class="mb-2 pos-relative">
-          <v-card-text class="d-flex pb-2 ga-3">
+        <v-card class="mb-2 pos-relative smaller">
+          <v-card-text class="d-flex pb-1 ga-3">
             <div class="flex-grow-1" v-html="$helper.linkify(comment.message)"></div>
             <div>
               <po-comments-dropdown :comment="comment"></po-comments-dropdown>
@@ -99,7 +99,7 @@ function reply(comment) {
           <v-card-actions>
             <div class="w-100 d-flex flex-wrap ga-3">
               <div class="flex-grow-1 d-inline-flex ga-3">
-                <po-avatar size="36" color="secondary" :user="comment.author" />
+                <po-avatar size="44" color="secondary" :user="comment.author" />
 
                 <div class="">
                   <p class="text-caption mb-0">{{ $helper.userDisplayName(comment.author) }}</p>

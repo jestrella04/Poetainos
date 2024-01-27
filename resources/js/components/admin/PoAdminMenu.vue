@@ -15,29 +15,26 @@ nav {
   width: 60px;
 }
 
-.v-list {
-  overflow-x: hidden !important;
-}
-
 @media screen and (min-width: 960px) {
   nav {
     width: 250px;
   }
 }
+
+.v-list {
+  overflow-x: hidden !important;
+}
 </style>
 
 <template>
   <nav>
-    <v-list>
+    <v-list class="h-100" nav>
       <po-list-item prepend-avatar="/images/logo.svg">
         <div class="d-none d-md-inline">
           <p>{{ page.props.site.name }}</p>
           <p class="text-disabled text-caption">{{ $t('admin.admin-panel') }}</p>
         </div>
       </po-list-item>
-    </v-list>
-
-    <v-list class="h-100" nav>
       <v-divider class="my-0"></v-divider>
 
       <po-list-item :href="$route('home')" prepend-icon="fas fa-home" inertia>
@@ -95,7 +92,7 @@ nav {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.websockets')" prepend-icon="fas fa-chart-pie" inertia>
+      <po-list-item :href="$route('admin.analytics')" prepend-icon="fas fa-chart-pie" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.analytics') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>

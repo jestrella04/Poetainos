@@ -21,6 +21,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
+        if (!empty(request('redirect'))) {
+            Redirect::setIntendedUrl(request('redirect'));
+        }
+
         return Inertia::render('auth/PoLogin', [
             'meta' => [],
             'canResetPassword' => Route::has('password.request'),

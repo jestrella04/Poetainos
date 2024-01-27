@@ -44,6 +44,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('tools', [AdminController::class, 'tools'])->name('tools');
     Route::get('complaints', [AdminController::class, 'complaints'])->name('complaints');
     Route::get('websockets', [AdminController::class, 'websockets'])->name('websockets');
+    Route::get('analytics', [AdminController::class, 'analytics'])->name('analytics');
 
     Route::put('settings/edit', [SettingsController::class, 'update'])->name('settings.edit');
     Route::put('categories/edit', [CategoriesController::class, 'update'])->name('categories.edit');

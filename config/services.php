@@ -76,5 +76,7 @@ return [
 
     'counter' => [
         'tracking_id' => env('COUNTER_TRACKING_ID'),
+        'user_id' => env('COUNTER_USER_ID'),
+        'access_token' => env('COUNTER_ACCESS_TOKEN'),
     ],
 ];

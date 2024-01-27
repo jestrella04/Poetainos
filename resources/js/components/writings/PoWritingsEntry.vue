@@ -59,48 +59,51 @@ provide('writing', props.data)
         </div>
 
         <template v-if="alone">
-          <blockquote class="writing-body mb-3">
+          <blockquote class="writing-body mb-4">
             {{ data.text }}
           </blockquote>
 
           <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.link)">
-            <po-button variant="text" :href="data.extra_info.link" prepend-icon="fas fa-link" target="_blank"
-              rel="nofollow noopener" class="mb-4">
-
-              {{ $helper.cropUrl(data.extra_info.link) }}
-            </po-button>
+            <div class="d-flex align-center mb-4">
+              <v-icon icon="fas fa-link" size="24" class="mr-3"></v-icon>
+              <po-link :href="data.extra_info.link" target="_blank" rel="nofollow noopener">
+                {{ $helper.cropUrl(data.extra_info.link) }}
+              </po-link>
+            </div>
           </template>
 
-          <div v-if="!$helper.isEmpty(data.categories)" class="d-flex mb-2">
-            <div class="mr-3">
-              <v-icon icon="fas fa-folder-open"></v-icon>
+          <div class="d-flex flex-column ga-3 mb-4">
+            <div v-if="!$helper.isEmpty(data.categories)" class="d-flex">
+              <div class="mr-3">
+                <v-icon icon="fas fa-folder-open" size="24"></v-icon>
+              </div>
+
+              <div class="d-inline-flex ga-1">
+                <po-chip v-for="category in data.categories" :key="category.slug" color="secondary" variant="elevated"
+                  size="small" :href="$route('categories.show', category.slug)" inertia>
+                  {{ category.name }}
+                </po-chip>
+              </div>
             </div>
 
-            <div class="d-inline-flex ga-1">
-              <po-chip v-for="category in data.categories" :key="category.slug" color="secondary" variant="elevated"
-                size="small" :href="$route('categories.show', category.slug)" inertia>
-                {{ category.name }}
-              </po-chip>
-            </div>
-          </div>
+            <div v-if="!$helper.isEmpty(data.tags)" class="d-flex">
+              <div class="mr-3">
+                <v-icon icon="fas fa-hashtag" size="24"></v-icon>
+              </div>
 
-          <div v-if="!$helper.isEmpty(data.tags)" class="d-flex mb-4">
-            <div class="mr-3">
-              <v-icon icon="fas fa-hashtag"></v-icon>
-            </div>
-
-            <div class="d-inline-flex ga-1">
-              <po-chip v-for="tag in data.tags" :key="tag.slug" color="secondary" variant="elevated" size="small"
-                :href="$route('tags.show', tag.slug)" inertia>
-                {{ tag.name }}
-              </po-chip>
+              <div class="d-inline-flex ga-1">
+                <po-chip v-for="tag in data.tags" :key="tag.slug" color="secondary" variant="elevated" size="small"
+                  :href="$route('tags.show', tag.slug)" inertia>
+                  {{ tag.name }}
+                </po-chip>
+              </div>
             </div>
           </div>
 
           <div v-if="!$helper.isEmpty(likers)">
-            <p class="mb-3">{{ $t('main.liked-by') }}</p>
+            <p class="text-caption mb-2">{{ $t('main.liked-by') }}</p>
 
-            <div class="d-inline-flex flex-wrap ga-1">
+            <div class="d-inline-flex flex-wrap ga-2">
               <div v-for="liker in likers" :key="liker.id">
                 <po-button icon :href="$route('users.show', liker.username)" :title="$helper.userDisplayName(liker)"
                   inertia>
