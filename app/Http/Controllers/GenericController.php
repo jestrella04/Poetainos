@@ -20,15 +20,15 @@ class GenericController extends Controller
             }]);
 
         if ('latest' === $sort) {
-            $writings = $writings->latest()->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->latest();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('views', 'desc');
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('likes_count', 'desc');
         }
 
         if (request()->expectsJson()) {
-            return $writings;
+            return $writings->simplePaginate($this->pagination)->withQueryString();
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
@@ -36,7 +36,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Writings'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => $writings,
+            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -52,15 +52,15 @@ class GenericController extends Controller
             }]);
 
         if ('latest' === $sort) {
-            $writings = $writings->latest()->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->latest();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('views', 'desc');
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('likes_count', 'desc');
         }
 
         if (request()->expectsJson()) {
-            return $writings;
+            return $writings->simplePaginate($this->pagination)->withQueryString();
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
@@ -68,7 +68,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Shelf'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => $writings,
+            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -85,15 +85,15 @@ class GenericController extends Controller
             }]);
 
         if ('latest' === $sort) {
-            $writings = $writings->latest()->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->latest();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('views', 'desc');
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $writings = $writings->orderBy('likes_count', 'desc');
         }
 
         if (request()->expectsJson()) {
-            return $writings;
+            return $writings->simplePaginate($this->pagination)->withQueryString();
         }
 
         return Inertia::render('writings/PoWritingsIndex', [
@@ -101,7 +101,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Likes'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => $writings,
+            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -140,33 +140,52 @@ class GenericController extends Controller
         $json->description = getSiteConfig('slogan');
 
         foreach ($json->shortcuts as $shortcut) {
+            if ("account" === $shortcut->name) {
+                $shortcut->name = __('My account');
+                $shortcut->short_name = __('My account');
+                $shortcut->url = route('users.account');
+                continue;
+            }
+
             if ("publish" === $shortcut->name) {
                 $shortcut->name = __('Publish');
                 $shortcut->short_name = __('Publish');
                 $shortcut->url = route('writings.create');
+                continue;
             }
 
             if ("featured" === $shortcut->name) {
                 $shortcut->name = __('Golden Flowers');
                 $shortcut->short_name = __('Golden Flowers');
                 $shortcut->url = route('writings.awards');
+                continue;
             }
 
             if ("random" === $shortcut->name) {
                 $shortcut->name = __('Random');
                 $shortcut->short_name = __('Random');
                 $shortcut->url = route('writings.random');
+                continue;
+            }
+
+            if ("authors" === $shortcut->name) {
+                $shortcut->name = __('Writers');
+                $shortcut->short_name = __('Writers');
+                $shortcut->url = route('users.index');
+                continue;
             }
         }
 
         foreach ($json->related_applications as $app) {
             if ("webapp" === $app->platform) {
                 $app->url = route('pwa.manifest');
+                continue;
             }
 
             if ("play" === $app->platform) {
                 $app->url = config('services.google.play_store.url');
                 $app->id = config('services.google.play_store.id');
+                continue;
             }
         }
 
