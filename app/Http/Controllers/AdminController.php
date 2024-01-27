@@ -54,16 +54,14 @@ class AdminController extends Controller
 
     public function settings()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Settings'),
-                __('Administration'),
-            ]),
-        ];
-
-        return view('admin.settings', [
+        return Inertia::render('admin/PoAdminSettings', [
             'settings' => json_encode(Setting::where('name', 'site')->first()->pluck('data')[0], JSON_PRETTY_PRINT),
-            'params' => $params,
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Settings'),
+                    __('Administration'),
+                ]),
+            ],
         ]);
     }
 
@@ -150,18 +148,16 @@ class AdminController extends Controller
         ob_end_clean();
 
         $log = storage_path('logs/laravel.log');
-        $params = [
-            'title' => getPageTitle([
-                __('Tools'),
-                __('Administration'),
-            ]),
-            'log_file' => $log,
-            'log_contents' => shell_exec('tail -n 100 ' . $log),
-            'php_info' => $pinfo,
-        ];
 
-        return view('admin.tools', [
-            'params' => $params,
+        return Inertia::render('admin/PoAdminTools', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Tools'),
+                    __('Administration'),
+                ]),
+            ],
+            'log' => shell_exec('tail -n 100 ' . $log),
+            'info' => $pinfo,
         ]);
     }
 
@@ -182,15 +178,29 @@ class AdminController extends Controller
 
     public function websockets()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Websockets'),
-                __('Administration'),
-            ]),
-        ];
+        return Inertia::render('admin/PoAdminWebsockets', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Websockets'),
+                    __('Administration'),
+                ]),
+            ],
+        ]);
+    }
 
-        return view('admin.websockets', [
-            'params' => $params,
+    public function analytics()
+    {
+        $user = config('services.counter.user_id');
+        $token = config('services.counter.access_token');
+
+        return Inertia::render('admin/PoAdminAnalytics', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Analytics'),
+                    __('Administration'),
+                ]),
+            ],
+            'counter' => "https://counter.dev/dashboard.html?user=$user&token=$token%3D"
         ]);
     }
 }
