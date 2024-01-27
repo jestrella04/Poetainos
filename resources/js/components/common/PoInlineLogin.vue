@@ -2,6 +2,7 @@
 defineProps({
   message: { type: String, default: '' },
 })
+
 </script>
 
 <template>
@@ -12,28 +13,31 @@ defineProps({
 
     <div class="d-inline-flex flex-wrap justify-center ga-4">
       <div>
-        <po-button icon color="primary" :href="$route('social.login', 'facebook')"
+        <po-button icon color="primary"
+          :href="$route('social.login', { service: 'facebook', redirect: $helper.asset($page.url) })"
           :title="$t('accounts.continue-with-facebook')">
           <v-icon icon="fab fa-facebook-f"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button icon color="primary" :href="$route('social.login', 'twitter')"
+        <po-button icon color="primary"
+          :href="$route('social.login', { service: 'twitter', redirect: $helper.asset($page.url) })"
           :title="$t('accounts.continue-with-x-twitter')">
           <v-icon icon="fab fa-x-twitter"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button icon color="primary" :href="$route('social.login', 'google')"
+        <po-button icon color="primary"
+          :href="$route('social.login', { service: 'google', redirect: $helper.asset($page.url) })"
           :title="$t('accounts.continue-with-google')">
           <v-icon icon="fab fa-google"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button icon color="primary" :href="$route('login', { 'isEmail': true })"
+        <po-button icon color="primary" :href="$route('login', { isEmail: true, redirect: $helper.asset($page.url) })"
           :title="$t('accounts.continue-with-email')" inertia>
           <v-icon icon="fas fa-at"></v-icon>
         </po-button>

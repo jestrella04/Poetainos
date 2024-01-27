@@ -274,6 +274,10 @@ const Helper = class {
       telegram: 'fab fa-telegram'
     }
   }
+
+  asset(url) {
+    return new URL(url, window.route('home')).toString()
+  }
 }
 
 export const helper = {

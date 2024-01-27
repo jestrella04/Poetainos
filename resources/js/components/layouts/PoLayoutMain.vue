@@ -158,8 +158,6 @@ code {
     monospace !important;
 }
 
-
-
 @media screen and (min-width: 1280px) {
   .po-navbar {
     position: fixed !important;
@@ -228,6 +226,11 @@ code {
   top: 1rem;
   right: 1rem;
   z-index: 999;
+}
+
+.smaller,
+.smaller .v-card-text {
+  font-size: 0.85rem !important;
 }
 </style>
 
