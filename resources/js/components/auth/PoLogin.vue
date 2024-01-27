@@ -1,9 +1,8 @@
 <script setup>
-import { defineOptions, ref, reactive, provide, inject } from 'vue'
+import { defineOptions, ref, reactive, provide, inject, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
-import { onMounted } from 'vue';
 
 defineOptions({
   layout: PoLayoutLogin,

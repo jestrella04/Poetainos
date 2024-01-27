@@ -311,8 +311,9 @@ class UsersController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Contracts\View\View
      */
-    public function account(User $user)
+    public function account()
     {
+        $user = User::find(auth()->user()->id);
         $this->authorize('delete', $user);
 
         $params = [];
@@ -320,8 +321,7 @@ class UsersController extends Controller
         return Inertia::render('users/PoUsersAccount', [
             'meta' => [
                 'title' => getPageTitle([
-                    $user->getName(),
-                    __('Writers'),
+                    __('My account'),
                 ]),
             ],
             'notifications' => [

@@ -303,7 +303,7 @@ code {
             </template>
 
             <v-list>
-              <po-list-item :href="$route('users.account', $helper.authUser())" prepend-icon="fas fa-user" inertia>
+              <po-list-item :href="$route('users.account')" prepend-icon="fas fa-user" inertia>
                 <span>{{ $t('accounts.my-account') }}</span>
               </po-list-item>
               <v-divider class="my-0"></v-divider>

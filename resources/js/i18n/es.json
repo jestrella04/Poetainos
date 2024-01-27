@@ -1,4 +1,12 @@
 {
+  "admin": {
+    "admin-panel": "Administración",
+    "summary": "Sumario",
+    "settings": "Ajustes",
+    "tools": "Herramientas",
+    "websockets": "Websockets",
+    "analytics": "Analíticas"
+  },
   "accounts": {
     "account-deleted": "¡Tu cuenta y todo el contenido asociado han sido eliminados!",
     "account-let-you": "Una cuenta gratuita en la tribu te permite votar, comentar, responder, encontrar las musas y publicar tus textos.",
@@ -337,6 +345,7 @@
     "view-self-likes": "Ver mis me gusta",
     "view-self-shelf": "Ver mi estante",
     "view-self-writings": "Ver mis textos",
+    "view-liked": "Ver gustados",
     "view-shelf": "Ver estante",
     "view-writings": "Ver textos"
   },

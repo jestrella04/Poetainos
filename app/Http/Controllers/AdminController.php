@@ -11,17 +11,13 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Models\Like;
 use App\Models\Writing;
+use Inertia\Inertia;
 
 class AdminController extends Controller
 {
-    public function index() {
-        $params = [
-            'title' => getPageTitle([
-                __('Administration'),
-            ]),
-        ];
-
-        return view('admin.summary', [
+    public function index()
+    {
+        return Inertia::render('admin/PoAdminIndex', [
             'counters' => [
                 'users' => [
                     'title' => __('Users'),
@@ -48,11 +44,16 @@ class AdminController extends Controller
                     'count' => Like::all()->count(),
                 ],
             ],
-            'params' => $params,
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Administration'),
+                ]),
+            ],
         ]);
     }
 
-    public function settings() {
+    public function settings()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Settings'),
@@ -66,7 +67,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function categories() {
+    public function categories()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Categories'),
@@ -80,7 +82,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function tags() {
+    public function tags()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Tags'),
@@ -94,7 +97,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function users() {
+    public function users()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Users'),
@@ -108,7 +112,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function writings() {
+    public function writings()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Writings'),
@@ -122,7 +127,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function pages() {
+    public function pages()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Pages'),
@@ -136,11 +142,12 @@ class AdminController extends Controller
         ]);
     }
 
-    public function tools() {
-        ob_start () ;
-        phpinfo () ;
-        $pinfo = ob_get_contents () ;
-        ob_end_clean () ;
+    public function tools()
+    {
+        ob_start();
+        phpinfo();
+        $pinfo = ob_get_contents();
+        ob_end_clean();
 
         $log = storage_path('logs/laravel.log');
         $params = [
@@ -158,7 +165,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function complaints() {
+    public function complaints()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Complaints'),
@@ -172,7 +180,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function websockets() {
+    public function websockets()
+    {
         $params = [
             'title' => getPageTitle([
                 __('Websockets'),

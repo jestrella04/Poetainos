@@ -35,6 +35,11 @@
   ],
   "shortcuts": [
     {
+      "name": "account",
+      "short_name": "",
+      "url": ""
+    },
+    {
       "name": "publish",
       "short_name": "",
       "url": ""
@@ -46,6 +51,11 @@
     },
     {
       "name": "random",
+      "short_name": "",
+      "url": ""
+    },
+    {
+      "name": "authors",
       "short_name": "",
       "url": ""
     }
