@@ -113,7 +113,6 @@ Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.
 Route::get('/offline', [GenericController::class, 'offline'])->name('offline');
 Route::get('/search', [SearchController::class, 'show'])->name('search');
 Route::get('/explore', [GenericController::class, 'explore'])->name('explore');
-Route::get('/sharer', [GenericController::class, 'sharer'])->name('sharer');
 
 // Writings
 Route::get('/', [WritingsController::class, 'index'])->name('home');
