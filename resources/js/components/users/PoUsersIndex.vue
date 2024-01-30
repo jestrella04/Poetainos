@@ -3,13 +3,12 @@ import { computed, ref, inject, onMounted, nextTick } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
-import Masonry from 'masonry-layout'
+import Masonry from '@paper-folding/masonry-layout'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
 const users = ref(page.value.props.users.data)
 const next = ref(page.value.props.users.next_page_url)
-const mason = ref()
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -19,7 +18,7 @@ async function loadMore({ done }) {
         users.value.push(...response.data.data)
         next.value = response.data.next_page_url
         nextTick(() => {
-          mason.value = new Masonry('.masonry', { "percentPosition": true })
+          new Masonry('.masonry', { "percentPosition": true })
         })
         done('ok')
       })
@@ -32,7 +31,7 @@ async function loadMore({ done }) {
 }
 
 onMounted(() => {
-  mason.value = new Masonry('.masonry', { "percentPosition": true })
+  new Masonry('.masonry', { "percentPosition": true })
 })
 </script>
 

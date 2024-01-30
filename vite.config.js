@@ -7,6 +7,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
+  /* ssr: {
+    noExternal: ['@inertiajs/server', /\.css$/, /\?vue&type=style/, /^vuetify/]
+  }, */
   build: {
     sourcemap: true
   },
@@ -14,6 +17,7 @@ export default defineConfig({
     nodePolyfills(),
     laravel({
       input: ['resources/js/app.js'],
+      /* ssr: ['resources/js/ssr.js'], */
       refresh: true
     }),
     vue(),

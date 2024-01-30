@@ -3,13 +3,12 @@ import { computed, ref, inject, onMounted, nextTick } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
-import Masonry from 'masonry-layout'
+import Masonry from '@paper-folding/masonry-layout'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
 const writings = ref([])
 const next = ref('')
-const mason = ref()
 const fetched = ref(false)
 
 async function loadMore({ done }) {
@@ -43,7 +42,7 @@ function update(writingsData, nextPage) {
   fetched.value = true
 
   nextTick(() => {
-    mason.value = new Masonry('.masonry', { "percentPosition": true })
+    new Masonry('.masonry', { "percentPosition": true })
   })
 }
 
