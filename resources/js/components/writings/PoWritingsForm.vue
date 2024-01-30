@@ -35,8 +35,10 @@ onMounted(() => {
   }
 
   // Logic needed to assign below values
-  if ('extra_info' in writing.data) {
-    formData.link = writing.data.extra_info.link ??= ''
+  if ('extra_info' in writing.data
+    && !helper.isNull(writing.data.extra_info)
+    && 'link' in writing.data.extra_info) {
+    formData.link = writing.data.extra_info.link
   }
 })
 

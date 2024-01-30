@@ -8,6 +8,7 @@
 /public/robots.txt
 /public/mix-manifest.json
 /public/.well-known/*
+/bootstrap/ssr/*
 /storage/*.key
 /vendor
 .env

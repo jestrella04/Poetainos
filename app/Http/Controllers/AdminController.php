@@ -112,16 +112,23 @@ class AdminController extends Controller
 
     public function writings()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Writings'),
-                __('Administration'),
-            ]),
-        ];
+        $writings = Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
+            ->with(['author' => function ($query) {
+                $query->select('id', 'username', 'name');
+            }]);
 
-        return view('admin.writings', [
-            'writings' => Writing::simplePaginate($this->pagination),
-            'params' => $params,
+        if (request()->expectsJson()) {
+            return $writings->simplePaginate($this->pagination)->withQueryString();
+        }
+
+        return Inertia::render('admin/PoAdminWritings', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Writings'),
+                    __('Administration'),
+                ]),
+            ],
+            'total' => Writing::all()->count(),
         ]);
     }
 
