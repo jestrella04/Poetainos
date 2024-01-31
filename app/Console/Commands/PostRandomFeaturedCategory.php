@@ -40,7 +40,7 @@ class PostRandomFeaturedCategory extends Command
      */
     public function handle()
     {
-        $category = Category::secondary()->random();
+        $category = Category::has('writings', '>', 0)->inRandomOrder()->firstOrFail();
         Notification::route('twitter', '')->notify(new CategoryFeaturedRandom($category));
     }
 }
