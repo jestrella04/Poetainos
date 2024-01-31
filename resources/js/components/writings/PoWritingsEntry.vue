@@ -78,7 +78,7 @@ provide('writing', props.data)
                 <v-icon icon="fas fa-folder-open" size="24"></v-icon>
               </div>
 
-              <div class="d-inline-flex ga-1">
+              <div class="d-inline-flex flex-wrap ga-1">
                 <po-chip v-for="category in data.categories" :key="category.slug" color="secondary" variant="elevated"
                   size="small" :href="$route('categories.show', category.slug)" inertia>
                   {{ category.name }}
@@ -91,7 +91,7 @@ provide('writing', props.data)
                 <v-icon icon="fas fa-hashtag" size="24"></v-icon>
               </div>
 
-              <div class="d-inline-flex ga-1">
+              <div class="d-inline-flex flex-wrap ga-1">
                 <po-chip v-for="tag in data.tags" :key="tag.slug" color="secondary" variant="elevated" size="small"
                   :href="$route('tags.show', tag.slug)" inertia>
                   {{ tag.name }}
