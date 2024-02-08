@@ -11,8 +11,10 @@ defineOptions({
 const helper = inject('helper')
 const isLoading = ref(false)
 const isEmail = ref(false)
+const isReset = ref(false)
 const shouldLogin = ref(false)
 const shouldRegister = ref(false)
+const shouldReset = ref(false)
 
 const formData = reactive({
   email: '',
@@ -36,6 +38,15 @@ onMounted(() => {
 
   if ('1' === params.get('isEmail')) {
     isEmail.value = true
+
+    if (!helper.strNullOrEmpty(params.get('email'))) {
+      formData.email = params.get('email')
+      shouldLogin.value = true
+    }
+  }
+
+  if ('1' === params.get('isReset')) {
+    isReset.value = true
   }
 })
 
@@ -159,6 +170,17 @@ async function submitForm() {
     return
   }
 }
+
+async function resetPassword() {
+  await axios
+    .post(window.route('password.email'), { email: formData.email })
+    .then(() => {
+      shouldReset.value = true
+    })
+    .catch(() => {
+      //errors.email = error.response.data.errors.email
+    })
+}
 </script>
 
 <style scoped>
@@ -217,10 +239,20 @@ async function submitForm() {
           <v-progress-circular v-else indeterminate></v-progress-circular>
         </po-button>
 
-        <po-button type="reset" color="secondary" size="large" variant="text" class="mt-5" block>
+        <po-button v-if="shouldLogin" size="x-small" variant="plain" class="mt-5" block @click.prevent="resetPassword">
+          {{ $t('accounts.forgot-password-ask') }}
+        </po-button>
+
+        <po-button type="reset" size="large" variant="plain" class="mt-5" block>
           <v-icon icon="fas fa-arrow-left"></v-icon>
         </po-button>
       </v-form>
+
+      <v-alert v-if="shouldReset || isReset" type="success" variant="tonal" class="mt-5 mx-auto text-caption"
+        style="width: 85%; max-width: 600px;">
+        <span v-if="shouldReset">{{ $t('accounts.reset-password-link-sent') }}</span>
+        <span v-else>{{ $t('accounts.new-password-set') }}</span>
+      </v-alert>
     </template>
 
     <template v-else>
