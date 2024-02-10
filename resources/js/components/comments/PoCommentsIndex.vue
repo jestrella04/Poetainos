@@ -89,38 +89,39 @@ function reply(comment) {
 
       <template v-for="comment in comments.data" :key="comment.id">
         <v-card class="mb-2 pos-relative smaller">
-          <v-card-text class="d-flex pb-1 ga-3">
-            <div class="flex-grow-1" v-html="$helper.linkify(comment.message)"></div>
-            <div>
-              <po-comments-dropdown :comment="comment"></po-comments-dropdown>
-            </div>
-          </v-card-text>
-
-          <v-card-actions>
-            <div class="w-100 d-flex flex-wrap ga-3">
+          <v-card-text class="pb-1">
+            <div class="d-flex ga-3">
               <div class="flex-grow-1 d-inline-flex ga-3">
-                <po-avatar size="44" color="secondary" :user="comment.author" />
+                <po-avatar size="40" color="secondary" :user="comment.author" />
 
                 <div class="">
                   <p class="text-caption mb-0">{{ $helper.userDisplayName(comment.author) }}</p>
-                  <p class="text-caption text-medium-emphasis">{{ $helper.relativeDate(comment.created_at) }}</p>
+                  <p class="text-caption mb-2 text-medium-emphasis">
+                    {{ $helper.toLocaleDate(comment.created_at) }}
+                  </p>
                 </div>
               </div>
 
-              <div class="d-flex align-end justify-end">
-                <po-button variant="tonal" size="small" class="do-like"
-                  :class="{ 'liked': page.props.auth.liked.comments.includes(comment.id) }"
-                  @click="(event) => { like(event, comment.id) }">
-                  <v-icon class="me-2" icon="fas fa-heart"></v-icon>
-                  <span class="count">{{ helper.readable(comment.likes_count) }}</span>
-                </po-button>
-
-                <po-button variant="tonal" size="small" @click.prevent="toggleReply(comment.id)">
-                  <v-icon class="me-2" icon="fa fa-reply"></v-icon>
-                  <span>{{ $t('main.reply') }}</span>
-                </po-button>
+              <div>
+                <po-comments-dropdown :comment="comment"></po-comments-dropdown>
               </div>
             </div>
+
+            <div v-html="$helper.linkify(comment.message)"></div>
+          </v-card-text>
+
+          <v-card-actions class="justify-end">
+            <po-button variant="tonal" size="small" class="do-like"
+              :class="{ 'liked': page.props.auth.liked.comments.includes(comment.id) }"
+              @click="(event) => { like(event, comment.id) }">
+              <v-icon class="me-2" icon="fas fa-heart"></v-icon>
+              <span class="count">{{ helper.readable(comment.likes_count) }}</span>
+            </po-button>
+
+            <po-button variant="tonal" size="small" @click.prevent="toggleReply(comment.id)">
+              <v-icon class="me-2" icon="fa fa-reply"></v-icon>
+              <span>{{ $t('main.reply') }}</span>
+            </po-button>
           </v-card-actions>
 
           <template v-if="$helper.auth() && replyBox === comment.id">

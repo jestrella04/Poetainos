@@ -43,17 +43,19 @@ provide('writing', props.data)
         </po-link>
       </div>
 
-      <v-card-text class="pos-relative">
+      <v-card-text class="pos-relative pt-1">
         <div class="text-center mb-3">
-          <p class="text-h5 text-uppercase font-weight-bold">
+          <p class="text-h6 text-uppercase font-weight-bold">
             <po-link v-if="!alone" :href="$route('writings.show', data.slug)" class="stretched" inertia>{{ data.title
             }}</po-link>
             <span v-else>{{ data.title }}</span>
           </p>
-          <p class="text-caption text-uppercase font-weight-light">
+
+          <p class="text-caption text-uppercase text-medium-emphasis">
             {{
-              `${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
-                        ${$helper.relativeDate(data.created_at)}`
+              `${$helper.toLocaleDate(data.created_at)}
+                        — ${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
+            `
             }}
           </p>
         </div>

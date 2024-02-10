@@ -6,7 +6,7 @@ const theme = useTheme()
 theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
 </script>
 
-<style scoped>
+<style>
 .admin-wrapper {
   margin-left: 60px;
 }
@@ -15,6 +15,12 @@ theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matc
   .admin-wrapper {
     margin-left: 250px;
   }
+}
+
+iframe {
+  border: 0 !important;
+  border-radius: 5px !important;
+  overflow: hidden;
 }
 </style>
 

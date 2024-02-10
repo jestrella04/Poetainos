@@ -45,7 +45,7 @@ const page = computed(() => usePage())
               </div>
 
               <div v-if="!$helper.isEmpty(page.props.related.from_category)">
-                <p class="text-uppercase font-medium-weight mb-5">{{ $t('main.from-categories') }}</p>
+                <p class="text-uppercase font-medium-weight mb-5">{{ $t('main.related') }}</p>
                 <template v-for="writing in page.props.related.from_category" :key="writing.id">
                   <div class="mb-2 pos-relative">
                     <po-link :href="$route('writings.show', writing.slug)" class="text-bold stretched" inertia>

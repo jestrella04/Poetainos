@@ -78,7 +78,11 @@ const Helper = class {
   }
 
   toLocaleDate(date) {
-    return new Date(date).toLocaleDateString()
+    return new Date(date).toLocaleDateString('es-DO', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
   }
 
   relativeDate(date) {
