@@ -121,6 +121,10 @@ const Helper = class {
         url = `https://twitter.com/${user}`
         break
 
+      case 'threads':
+        url = `https://threads.net/@${user}`
+        break
+
       case 'instagram':
         url = `https://instagram.com/${user}`
         break
@@ -272,6 +276,7 @@ const Helper = class {
   socialIcon() {
     return {
       twitter: 'fab fa-x-twitter',
+      threads: 'fab fa-threads',
       instagram: 'fab fa-instagram',
       facebook: 'fab fa-facebook-f',
       youtube: 'fab fa-youtube',

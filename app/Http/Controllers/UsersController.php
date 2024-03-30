@@ -197,6 +197,7 @@ class UsersController extends Controller
             'interests' => 'nullable|string|min:3|max:100',
             'website' => 'nullable|url|max:250',
             'twitter' => 'nullable|string|min:3|max:40',
+            'threads' => 'nullable|string|min:3|max:40',
             'instagram' => 'nullable|string|min:3|max:40',
             'facebook' => 'nullable|string|min:3|max:40',
             'youtube' => 'nullable|string|min:3|max:40',
@@ -231,6 +232,7 @@ class UsersController extends Controller
             'bio' => request('bio') ?? '',
             'social' => [
                 'twitter' => request('twitter') ?? '',
+                'threads' => request('threads') ?? '',
                 'instagram' => request('instagram') ?? '',
                 'facebook' => request('facebook') ?? '',
                 'youtube' => request('youtube') ?? '',
