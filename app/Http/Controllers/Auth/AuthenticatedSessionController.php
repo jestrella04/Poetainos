@@ -26,7 +26,9 @@ class AuthenticatedSessionController extends Controller
         }
 
         return Inertia::render('auth/PoLogin', [
-            'meta' => [],
+            'meta' => [
+                'canonical' => route('login'),
+            ],
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
         ]);
