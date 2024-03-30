@@ -20,7 +20,6 @@ Homestead.yaml
 auth.json
 npm-debug.log
 yarn-error.log
-/laradock
 ./idea
 /.vscode
 composer-setup.php
