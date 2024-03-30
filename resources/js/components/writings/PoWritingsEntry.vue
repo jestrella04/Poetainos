@@ -18,6 +18,11 @@ provide('writing', props.data)
 </script>
 
 <style scoped>
+.writing-title {
+  line-height: 1.6rem !important;
+  margin-bottom: 0.3rem;
+}
+
 .writing-body {
   white-space: pre-wrap !important;
 }
@@ -45,18 +50,19 @@ provide('writing', props.data)
 
       <v-card-text class="pos-relative pt-1">
         <div class="text-center mb-3">
-          <p class="text-h6 text-uppercase font-weight-bold">
-            <po-link v-if="!alone" :href="$route('writings.show', data.slug)" class="stretched" inertia>{{ data.title
-            }}</po-link>
+          <p class="text-h6 text-uppercase writing-title">
+            <po-link v-if="!alone" :href="$route('writings.show', data.slug)" class="stretched" inertia>
+              {{ data.title }}
+            </po-link>
             <span v-else>{{ data.title }}</span>
           </p>
 
           <p class="text-caption text-uppercase text-medium-emphasis">
             {{
-              `${$helper.toLocaleDate(data.created_at)}
-                        — ${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
+        `${$helper.toLocaleDate(data.created_at)}
+            — ${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
             `
-            }}
+      }}
           </p>
         </div>
 
