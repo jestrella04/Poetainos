@@ -38,7 +38,7 @@ onMounted(() => {
 <template>
   <po-head />
 
-  <v-row>
+  <v-row class="sticky-tabs">
     <v-col cols="12">
       <v-tabs v-model="page.props.sort" fixed-tabs>
         <po-tab href="?sort=featured" value="featured" :aria-label="$t('main.featured')" inertia>
