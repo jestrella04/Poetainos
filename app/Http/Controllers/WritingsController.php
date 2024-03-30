@@ -289,11 +289,11 @@ class WritingsController extends Controller
             $writing->author->notify(new WritingPublished($writing));
 
             // Add a like automatically from the poster
-            $like = new Like;
+            /* $like = new Like;
             $like->user_id = auth()->user()->id;
             $like->vote = 1;
             $like->likeable()->associate(Writing::find($writing->id));
-            $like->save();
+            $like->save(); */
         }
 
         // Set response data
@@ -312,10 +312,13 @@ class WritingsController extends Controller
     {
         $this->authorize('delete', $writing);
         $writing->delete();
-        DatabaseNotification::where('data->writing_id', $writing->id)->delete();
 
         // Delete related notifications
+        DatabaseNotification::where('data->writing_id', $writing->id)->delete();
         DB::delete('DELETE FROM `notifications` WHERE JSON_EXTRACT(`data`, "$.writing_id") = ?', [$writing->id]);
+
+        // Delete related likes
+        Like::where('likeable_type', 'App\Models\Writing')->whereAnd('likeable_id', $writing->id)->delete();
 
         if (request('redirect')) {
             request()->session()->flash('flash', __('Writing deleted successfully'));
