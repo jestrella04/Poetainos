@@ -44,7 +44,7 @@ footer {
 
     <div class="d-inline-flex ga-3">
       <template v-for="(user, social) in page.props.site.social" :key="social">
-        <template v-if="$helper.strNullOrEmpty(user)">
+        <template v-if="!$helper.strNullOrEmpty(user.value)">
           <po-button icon color="primary" size="x-small" :href="$helper.socialLink(user.value, social)"
             :title="$t('main.follow-on', { app: social })">
             <v-icon :icon="$helper.socialIcon()[social]"></v-icon>
