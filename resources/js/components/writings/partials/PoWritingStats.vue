@@ -15,7 +15,7 @@ const loginModal = inject('loginModal', false)
 async function like(event) {
   const doer = event.target.closest('.do-like')
 
-  if (helper.auth()) {
+  if (helper.auth() && helper.authUser().username !== writing.author.username) {
     await axios
       .post(window.route('likes.store', ['writing', writing.id]))
       .then((response) => {
@@ -31,7 +31,7 @@ async function like(event) {
       .finally(() => {
         helper.animate(doer.querySelector("i"), "heartBeat")
       })
-  } else {
+  } else if (!helper.auth()) {
     loginModal.value = true
   }
 }

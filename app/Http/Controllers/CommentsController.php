@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Like;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Models\User;
@@ -139,7 +140,12 @@ class CommentsController extends Controller
     {
         $this->authorize('delete', $comment);
         $comment->delete();
+
+        // Delete related notifications
         DatabaseNotification::where('data->comment_id', $comment->id)->delete();
+
+        // Delete related likes
+        Like::where('likeable_type', 'App\Models\Comment')->whereAnd('likeable_id', $comment->id)->delete();
 
         return [];
     }
