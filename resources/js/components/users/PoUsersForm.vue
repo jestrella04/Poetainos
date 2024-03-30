@@ -18,6 +18,7 @@ const formData = reactive({
   interests: '',
   website: '',
   twitter: '',
+  threads: '',
   instagram: '',
   facebook: '',
   youtube: '',
@@ -44,13 +45,13 @@ if ('extra_info' in user) {
 
   if ('social' in user.extra_info) {
     formData.twitter = user.extra_info.social.twitter ??= ''
+    formData.threads = user.extra_info.social.threads ??= ''
     formData.instagram = user.extra_info.social.instagram ??= ''
     formData.facebook = user.extra_info.social.facebook ??= ''
     formData.youtube = user.extra_info.social.youtube ??= ''
     formData.goodreads = user.extra_info.social.goodreads ??= ''
   }
 }
-
 
 function clearErrors() {
   errors.value = {}
@@ -81,6 +82,7 @@ async function submitForm() {
       interests: formData.interests,
       website: formData.website,
       twitter: formData.twitter,
+      threads: formData.threads,
       instagram: formData.instagram,
       facebook: formData.facebook,
       youtube: formData.youtube,
@@ -151,6 +153,9 @@ function file() {
 
         <v-text-field v-model="formData.twitter" type="text" label="X (Twitter)" hide-details="auto"
           :error-messages="errors.twitter" minlength="3" maxlength="250" clearable></v-text-field>
+
+        <v-text-field v-model="formData.threads" type="text" label="Threads" hide-details="auto"
+          :error-messages="errors.threads" minlength="3" maxlength="250" clearable></v-text-field>
 
         <v-text-field v-model="formData.instagram" type="text" label="Instagram" hide-details="auto"
           :error-messages="errors.instagram" minlength="3" maxlength="100" clearable></v-text-field>
