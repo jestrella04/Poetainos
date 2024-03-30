@@ -44,10 +44,12 @@ footer {
 
     <div class="d-inline-flex ga-3">
       <template v-for="(user, social) in page.props.site.social" :key="social">
-        <po-button icon color="primary" size="x-small" :href="$helper.socialLink(user.value, social)"
-          :title="$t('main.follow-on', { app: social })">
-          <v-icon :icon="$helper.socialIcon()[social]"></v-icon>
-        </po-button>
+        <template v-if="$helper.strNullOrEmpty(user)">
+          <po-button icon color="primary" size="x-small" :href="$helper.socialLink(user.value, social)"
+            :title="$t('main.follow-on', { app: social })">
+            <v-icon :icon="$helper.socialIcon()[social]"></v-icon>
+          </po-button>
+        </template>
       </template>
     </div>
   </v-footer>
