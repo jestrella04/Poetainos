@@ -232,6 +232,19 @@ code {
 .smaller .v-card-text {
   font-size: 0.85rem !important;
 }
+
+.sticky-tabs {
+  position: sticky !important;
+  top: 64px !important;
+  z-index: 990;
+  background-color: rgb(var(--v-theme-background));
+}
+
+@media screen and (max-width: 1280px) {
+  .sticky-tabs {
+    top: 0 !important;
+  }
+}
 </style>
 
 <template>
@@ -274,7 +287,8 @@ code {
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item :href="$route('pages.show', 'condiciones-de-uso')" prepend-icon="fas fa-pen-ruler" inertia>
+                <po-list-item :href="$route('pages.show', 'condiciones-de-uso')" prepend-icon="fas fa-pen-ruler"
+                  inertia>
                   <span>{{ $t('main.terms-of-use') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
@@ -324,7 +338,8 @@ code {
                 <v-divider class="my-0"></v-divider>
               </template>
 
-              <po-list-item :href="$route('logout')" prepend-icon="fas fa-arrow-right-from-bracket" method="post" inertia>
+              <po-list-item :href="$route('logout')" prepend-icon="fas fa-arrow-right-from-bracket" method="post"
+                inertia>
                 <span>{{ $t('accounts.logout') }}</span>
               </po-list-item>
             </v-list>

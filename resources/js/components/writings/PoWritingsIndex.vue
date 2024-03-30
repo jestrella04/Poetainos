@@ -66,7 +66,7 @@ function liked(id, count) {
     </template>
 
     <template v-else-if="!$helper.isEmpty(writings)">
-      <v-row>
+      <v-row class="sticky-tabs">
         <v-col cols="12">
           <v-tabs v-model="page.props.sort" fixed-tabs>
             <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>

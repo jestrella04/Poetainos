@@ -31,7 +31,7 @@ async function loadMore({ done }) {
 <template>
   <po-head />
 
-  <v-row class="mb-5 flex-grow-0">
+  <v-row class="sticky-tabs mb-5 flex-grow-0">
     <v-col cols="12">
       <v-tabs v-model="page.props.tab" fixed-tabs>
         <po-tab href="?tab=unread" value="unread" :aria-label="$t('main.unread')" inertia>
