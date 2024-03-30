@@ -52,7 +52,7 @@ onMounted(() => {
         </po-tab>
 
         <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
-          <v-icon icon="fas fa-fire-flame-curved" class="d-md-none" />
+          <v-icon icon="fas fa-fire" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
         </po-tab>
       </v-tabs>
