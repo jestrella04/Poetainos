@@ -67,46 +67,54 @@ class AdminController extends Controller
 
     public function categories()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Categories'),
-                __('Administration'),
-            ]),
-        ];
+        if (request()->expectsJson()) {
+            return Category::simplePaginate($this->pagination)->withQueryString();
+        }
 
-        return view('admin.categories', [
-            'categories' => Category::simplePaginate($this->pagination),
-            'params' => $params,
+        return Inertia::render('admin/PoAdminCategories', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Categories'),
+                    __('Administration'),
+                ]),
+            ],
+            'total' => Category::all()->count(),
         ]);
     }
 
     public function tags()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Tags'),
-                __('Administration'),
-            ]),
-        ];
+        if (request()->expectsJson()) {
+            return Tag::simplePaginate($this->pagination)->withQueryString();
+        }
 
-        return view('admin.tags', [
-            'tags' => Tag::simplePaginate($this->pagination),
-            'params' => $params,
+        return Inertia::render('admin/PoAdminTags', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Tags'),
+                    __('Administration'),
+                ]),
+            ],
+            'total' => Tag::all()->count(),
         ]);
     }
 
     public function users()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Users'),
-                __('Administration'),
-            ]),
-        ];
+        $users = User::select('id', 'username', 'name', 'email', 'created_at');
 
-        return view('admin.users', [
-            'users' => User::simplePaginate($this->pagination),
-            'params' => $params,
+        if (request()->expectsJson()) {
+            return $users->simplePaginate($this->pagination)->withQueryString();
+        }
+
+        return Inertia::render('admin/PoAdminUsers', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Users'),
+                    __('Administration'),
+                ]),
+            ],
+            'total' => User::all()->count(),
         ]);
     }
 
@@ -134,16 +142,18 @@ class AdminController extends Controller
 
     public function pages()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Pages'),
-                __('Administration'),
-            ]),
-        ];
+        if (request()->expectsJson()) {
+            return Page::simplePaginate($this->pagination)->withQueryString();
+        }
 
-        return view('admin.pages', [
-            'pages' => Page::simplePaginate($this->pagination),
-            'params' => $params,
+        return Inertia::render('admin/PoAdminPages', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Pages'),
+                    __('Administration'),
+                ]),
+            ],
+            'total' => Page::all()->count(),
         ]);
     }
 
@@ -170,16 +180,18 @@ class AdminController extends Controller
 
     public function complaints()
     {
-        $params = [
-            'title' => getPageTitle([
-                __('Complaints'),
-                __('Administration'),
-            ]),
-        ];
+        if (request()->expectsJson()) {
+            return Complaint::simplePaginate($this->pagination)->withQueryString();
+        }
 
-        return view('admin.complaints', [
-            'complaints' => Complaint::simplePaginate($this->pagination),
-            'params' => $params,
+        return Inertia::render('admin/PoAdminComplaints', [
+            'meta' => [
+                'title' => getPageTitle([
+                    __('Complaints'),
+                    __('Administration'),
+                ]),
+            ],
+            'total' => Complaint::all()->count(),
         ]);
     }
 
