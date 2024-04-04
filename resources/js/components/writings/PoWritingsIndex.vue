@@ -4,16 +4,16 @@ import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
 import Masonry from '@paper-folding/masonry-layout'
-import { useSwipe } from '@vueuse/core'
+//import { useSwipe } from '@vueuse/core'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
 const writings = ref([])
 const next = ref('')
 const fetched = ref(false)
-const target = document.body
+//const target = document.body
 
-useSwipe(
+/* useSwipe(
   target,
   {
     passive: false,
@@ -28,7 +28,7 @@ useSwipe(
       }
     },
   },
-)
+) */
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -46,7 +46,7 @@ async function loadMore({ done }) {
   }
 }
 
-function swipeRight() {
+/* function swipeRight() {
   if ("latest" === page.value.props.sort) {
     document.querySelector('.v-tab[value="popular"]').click()
   } else if ("popular" === page.value.props.sort) {
@@ -60,7 +60,7 @@ function swipeLeft() {
   } else if ("popular" === page.value.props.sort) {
     document.querySelector('.v-tab[value="latest"]').click()
   }
-}
+} */
 
 onMounted(async () => {
   await router.reload({
