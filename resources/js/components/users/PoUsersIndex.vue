@@ -4,11 +4,31 @@ import { usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
 import Masonry from '@paper-folding/masonry-layout'
+import { useSwipe } from '@vueuse/core'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
 const users = ref(page.value.props.users.data)
 const next = ref(page.value.props.users.next_page_url)
+//const fetched = ref(false) //TODO: add loading state
+const target = document.body
+
+useSwipe(
+  target,
+  {
+    passive: false,
+    onSwipe() {
+      //
+    },
+    onSwipeEnd(e, direction) {
+      if (direction === 'left') {
+        swipeRight()
+      } else if (direction === 'right') {
+        swipeLeft()
+      }
+    },
+  },
+)
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -27,6 +47,22 @@ async function loadMore({ done }) {
       })
   } else {
     done('empty')
+  }
+}
+
+function swipeRight() {
+  if ("featured" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="latest"]').click()
+  } else if ("latest" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="popular"]').click()
+  }
+}
+
+function swipeLeft() {
+  if ("popular" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="latest"]').click()
+  } else if ("latest" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="featured"]').click()
   }
 }
 

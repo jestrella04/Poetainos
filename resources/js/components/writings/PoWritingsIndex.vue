@@ -4,12 +4,31 @@ import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
 import Masonry from '@paper-folding/masonry-layout'
+import { useSwipe } from '@vueuse/core'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
 const writings = ref([])
 const next = ref('')
 const fetched = ref(false)
+const target = document.body
+
+useSwipe(
+  target,
+  {
+    passive: false,
+    onSwipe() {
+      //
+    },
+    onSwipeEnd(e, direction) {
+      if (direction === 'left') {
+        swipeRight()
+      } else if (direction === 'right') {
+        swipeLeft()
+      }
+    },
+  },
+)
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -24,6 +43,22 @@ async function loadMore({ done }) {
       })
   } else {
     done('empty')
+  }
+}
+
+function swipeRight() {
+  if ("latest" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="popular"]').click()
+  } else if ("popular" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="likes"]').click()
+  }
+}
+
+function swipeLeft() {
+  if ("likes" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="popular"]').click()
+  } else if ("popular" === page.value.props.sort) {
+    document.querySelector('.v-tab[value="latest"]').click()
   }
 }
 
@@ -61,32 +96,32 @@ function liked(id, count) {
   <po-wrapper>
     <po-head></po-head>
 
+    <v-row class="sticky-tabs">
+      <v-col cols="12">
+        <v-tabs v-model="page.props.sort" fixed-tabs>
+          <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
+            <v-icon icon="fas fa-clock" class="d-md-none" />
+            <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
+          </po-tab>
+
+          <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
+            <v-icon icon="fas fa-fire" class="d-md-none" />
+            <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
+          </po-tab>
+
+          <po-tab href="?sort=likes" value="likes" :aria-label="$t('main.most-liked')" inertia>
+            <v-icon icon="fas fa-heart" class="d-md-none" />
+            <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
+          </po-tab>
+        </v-tabs>
+      </v-col>
+    </v-row>
+
     <template v-if="!fetched">
       <po-loading></po-loading>
     </template>
 
     <template v-else-if="!$helper.isEmpty(writings)">
-      <v-row class="sticky-tabs">
-        <v-col cols="12">
-          <v-tabs v-model="page.props.sort" fixed-tabs>
-            <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
-              <v-icon icon="fas fa-clock" class="d-md-none" />
-              <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
-            </po-tab>
-
-            <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
-              <v-icon icon="fas fa-fire" class="d-md-none" />
-              <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
-            </po-tab>
-
-            <po-tab href="?sort=likes" value="likes" :aria-label="$t('main.most-liked')" inertia>
-              <v-icon icon="fas fa-heart" class="d-md-none" />
-              <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
-            </po-tab>
-          </v-tabs>
-        </v-col>
-      </v-row>
-
       <v-row class="masonry">
         <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
           <po-writings-entry @liked="liked" :alone="false" :data="writing" />
