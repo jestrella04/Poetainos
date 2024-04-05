@@ -52,7 +52,7 @@ class UsersController extends Controller
                 'canonical' => route('users.index'),
             ],
             'sort' => $sort,
-            'users' => $users,
+            'users' => Inertia::lazy(fn () => $users),
         ]);
     }
 

@@ -52,8 +52,8 @@ class UsersNotificationsController extends Controller
 
         return Inertia::render('notifications/PoNotificationsIndex', [
             'meta' => [],
-            'notifications' => $notifications,
             'tab' => $tab,
+            'notifications' => Inertia::lazy(fn () => $notifications),
         ]);
     }
 

@@ -1,22 +1,22 @@
 <script setup>
 import { computed, ref, inject, onMounted, nextTick } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
 import Masonry from '@paper-folding/masonry-layout'
-//import { useSwipe } from '@vueuse/core'
+import { useSwipe } from '@vueuse/core'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
-const users = ref(page.value.props.users.data)
-const next = ref(page.value.props.users.next_page_url)
-//const fetched = ref(false) //TODO: add loading state
-//const target = document.body
+const users = ref([])
+const next = ref('')
+const fetched = ref(false)
+const target = document.body
 
-/* useSwipe(
+useSwipe(
   target,
   {
-    passive: false,
+    passive: true,
     onSwipe() {
       //
     },
@@ -28,7 +28,7 @@ const next = ref(page.value.props.users.next_page_url)
       }
     },
   },
-) */
+)
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -50,7 +50,7 @@ async function loadMore({ done }) {
   }
 }
 
-/* function swipeRight() {
+function swipeRight() {
   if ("featured" === page.value.props.sort) {
     document.querySelector('.v-tab[value="latest"]').click()
   } else if ("latest" === page.value.props.sort) {
@@ -64,11 +64,26 @@ function swipeLeft() {
   } else if ("latest" === page.value.props.sort) {
     document.querySelector('.v-tab[value="featured"]').click()
   }
-} */
+}
 
-onMounted(() => {
-  new Masonry('.masonry', { "percentPosition": true })
+onMounted(async () => {
+  await router.reload({
+    only: ['users'],
+    onSuccess: (page) => {
+      update(page.props.users.data, page.props.users.next_page_url)
+    }
+  })
 })
+
+function update(usersData, nextPage) {
+  users.value.push(...usersData)
+  next.value = nextPage
+  fetched.value = true
+
+  nextTick(() => {
+    new Masonry('.masonry', { "percentPosition": true })
+  })
+}
 </script>
 
 <template>
@@ -95,11 +110,22 @@ onMounted(() => {
     </v-col>
   </v-row>
 
-  <v-row class="masonry">
-    <v-col v-for="user in users" :key="user.id" tag="user" cols="12" sm="6" lg="4">
-      <po-users-card :alone="false" :data="user" />
-    </v-col>
-  </v-row>
+  <template v-if="!fetched">
+    <po-loading type="avatar, paragraph, divider, text"></po-loading>
+  </template>
 
-  <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+  <template v-else-if="!$helper.isEmpty(users)">
+    <v-row class="masonry">
+      <v-col v-for="user in users" :key="user.id" tag="user" cols="12" sm="6" lg="4">
+        <po-users-card :alone="false" :data="user" />
+      </v-col>
+    </v-row>
+
+    <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+  </template>
+
+  <template v-else>
+    <po-msg-block class="py-15" msg-title="" :msg-body="$t('main.nothing-to-display')"
+      icon="fas fa-sad-tear"></po-msg-block>
+  </template>
 </template>
