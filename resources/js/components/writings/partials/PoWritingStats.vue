@@ -23,7 +23,7 @@ async function like(event) {
 
         if ('store' === response.data.method) {
           doer.classList.add('liked')
-        } else {
+        } else if ('destroy' === response.data.method) {
           doer.classList.remove('liked')
         }
       })
@@ -47,7 +47,7 @@ async function shelf(event) {
 
         if ('store' === response.data.method) {
           doer.classList.add('shelved')
-        } else {
+        } else if ('destroy' === response.data.method) {
           doer.classList.remove('shelved')
         }
       })
