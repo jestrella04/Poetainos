@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Like;
+use App\Models\Shelf;
 use App\Models\Writing;
 use Inertia\Inertia;
 
@@ -42,6 +43,10 @@ class AdminController extends Controller
                 'likes' => [
                     'title' => __('Likes'),
                     'count' => Like::all()->count(),
+                ],
+                'shelves' => [
+                    'title' => __('Bookmarks'),
+                    'count' => Shelf::all()->count(),
                 ],
             ],
             'meta' => [

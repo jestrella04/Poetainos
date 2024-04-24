@@ -132,6 +132,8 @@ class LikesController extends Controller
      */
     public function destroy($likeable, $likeable_id)
     {
+        return []; // TODO: review
+
         if ('writing' == $likeable) {
             Writing::find($likeable_id)->likes()->where('user_id', auth()->user()->id)->delete();
             $count = Writing::find($likeable_id)->likes()->count();
