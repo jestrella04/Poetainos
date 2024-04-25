@@ -145,7 +145,8 @@ class CommentsController extends Controller
         DatabaseNotification::where('data->comment_id', $comment->id)->delete();
 
         // Delete related likes
-        Like::where('likeable_type', 'App\Models\Comment')->whereAnd('likeable_id', $comment->id)->delete();
+        //Like::where('likeable_type', 'App\Models\Comment')->whereAnd('likeable_id', $comment->id)->delete();
+        // TODO: delete likes using DB facade
 
         return [];
     }

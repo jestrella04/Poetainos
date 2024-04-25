@@ -284,6 +284,7 @@ class UsersController extends Controller
         $this->authorize('delete', $user);
         $user->delete();
         $user->notifications()->delete();
+        // TODO: delete likes
 
         if (auth()->user()->id === $user->id) {
             request()->session()->flash('flash', __('Your account and related data have been deleted successfully!'));

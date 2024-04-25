@@ -132,13 +132,13 @@ class LikesController extends Controller
      */
     public function destroy($likeable, $likeable_id)
     {
-        return []; // TODO: review
+        // TODO: review
 
         if ('writing' == $likeable) {
-            Writing::find($likeable_id)->likes()->where('user_id', auth()->user()->id)->delete();
+            //Writing::find($likeable_id)->likes()->where('user_id', auth()->user()->id)->delete();
             $count = Writing::find($likeable_id)->likes()->count();
         } elseif ('comment' == $likeable) {
-            Comment::find($likeable_id)->likes()->where('user_id', auth()->user()->id)->delete();
+            //Comment::find($likeable_id)->likes()->where('user_id', auth()->user()->id)->delete();
             $count = Comment::find($likeable_id)->likes()->count();
         }
 

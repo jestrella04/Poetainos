@@ -318,7 +318,8 @@ class WritingsController extends Controller
         DB::delete('DELETE FROM `notifications` WHERE JSON_EXTRACT(`data`, "$.writing_id") = ?', [$writing->id]);
 
         // Delete related likes
-        Like::where('likeable_type', 'App\Models\Writing')->whereAnd('likeable_id', $writing->id)->delete();
+        //Like::where('likeable_type', 'App\Models\Writing')->whereAnd('likeable_id', $writing->id)->delete();
+        // TODO: delete likes using DB facade
 
         if (request('redirect')) {
             request()->session()->flash('flash', __('Writing deleted successfully'));
