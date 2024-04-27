@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a0156f1f903e2e8f1fc545320e200b09",
+    "content-hash": "3febfdd1c9c0318684a730042a0e9ff8",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -2205,27 +2205,27 @@
         },
         {
             "name": "laravel-notification-channels/facebook-poster",
-            "version": "5.2.0",
+            "version": "6.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel-notification-channels/facebook-poster.git",
-                "reference": "46507c45d0a4116955f1c32418a523e8b4bd99f9"
+                "reference": "856fb179a891a28ab6a20b852219f755f480d06b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel-notification-channels/facebook-poster/zipball/46507c45d0a4116955f1c32418a523e8b4bd99f9",
-                "reference": "46507c45d0a4116955f1c32418a523e8b4bd99f9",
+                "url": "https://api.github.com/repos/laravel-notification-channels/facebook-poster/zipball/856fb179a891a28ab6a20b852219f755f480d06b",
+                "reference": "856fb179a891a28ab6a20b852219f755f480d06b",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^7.2",
-                "illuminate/notifications": "^8.0|^9.0|^10.0",
-                "illuminate/support": "^8.0|^9.0|^10.0",
-                "php": "^8.0"
+                "illuminate/notifications": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
             },
             "require-dev": {
                 "mockery/mockery": "^1.3.3",
-                "phpunit/phpunit": "~9.0"
+                "phpunit/phpunit": "^10.5.0"
             },
             "type": "library",
             "autoload": {
@@ -2246,9 +2246,9 @@
             "description": "Use notification to create posts on Facebook",
             "support": {
                 "issues": "https://github.com/laravel-notification-channels/facebook-poster/issues",
-                "source": "https://github.com/laravel-notification-channels/facebook-poster/tree/5.2.0"
+                "source": "https://github.com/laravel-notification-channels/facebook-poster/tree/6.1.0"
             },
-            "time": "2023-02-13T03:49:26+00:00"
+            "time": "2024-03-12T05:35:41+00:00"
         },
         {
             "name": "laravel-notification-channels/twitter",
@@ -2313,28 +2313,28 @@
         },
         {
             "name": "laravel-notification-channels/webpush",
-            "version": "7.1.0",
+            "version": "8.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel-notification-channels/webpush.git",
-                "reference": "b31f7d807d30c80e7391063291ebfe9683bb7de5"
+                "reference": "6e7a60558721f674172664283467a69ab93f3d5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel-notification-channels/webpush/zipball/b31f7d807d30c80e7391063291ebfe9683bb7de5",
-                "reference": "b31f7d807d30c80e7391063291ebfe9683bb7de5",
+                "url": "https://api.github.com/repos/laravel-notification-channels/webpush/zipball/6e7a60558721f674172664283467a69ab93f3d5e",
+                "reference": "6e7a60558721f674172664283467a69ab93f3d5e",
                 "shasum": ""
             },
             "require": {
-                "illuminate/notifications": "^8.0|^9.0|^10.0",
-                "illuminate/support": "^8.0|^9.0|^10.0",
+                "illuminate/notifications": "^9.0|^10.0|^11.0",
+                "illuminate/support": "^9.0|^10.0|^11.0",
                 "minishlink/web-push": "^8.0",
-                "php": "^8.0"
+                "php": "^8.1"
             },
             "require-dev": {
                 "mockery/mockery": "~1.0",
-                "orchestra/testbench": "^6.0|^7.0|^8.0",
-                "phpunit/phpunit": "^9.0"
+                "orchestra/testbench": "^7.0|^8.0|^9.0",
+                "phpunit/phpunit": "^9.5|^10.5"
             },
             "type": "library",
             "extra": {
@@ -2365,9 +2365,9 @@
             "homepage": "https://github.com/laravel-notification-channels/webpush",
             "support": {
                 "issues": "https://github.com/laravel-notification-channels/webpush/issues",
-                "source": "https://github.com/laravel-notification-channels/webpush/tree/7.1.0"
+                "source": "https://github.com/laravel-notification-channels/webpush/tree/8.0.0"
             },
-            "time": "2023-03-14T11:20:02+00:00"
+            "time": "2024-03-16T05:36:52+00:00"
         },
         {
             "name": "laravel/framework",
@@ -4527,26 +4527,30 @@
         },
         {
             "name": "nicmart/tree",
-            "version": "0.3.1",
+            "version": "0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nicmart/Tree.git",
-                "reference": "c55ba47c64a3cb7454c22e6d630729fc2aab23ff"
+                "reference": "8d02952acc9779a2c14f7a9c4ac1650c3dacb545"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nicmart/Tree/zipball/c55ba47c64a3cb7454c22e6d630729fc2aab23ff",
-                "reference": "c55ba47c64a3cb7454c22e6d630729fc2aab23ff",
+                "url": "https://api.github.com/repos/nicmart/Tree/zipball/8d02952acc9779a2c14f7a9c4ac1650c3dacb545",
+                "reference": "8d02952acc9779a2c14f7a9c4ac1650c3dacb545",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1 || ^8.0"
+                "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
             },
             "require-dev": {
-                "ergebnis/composer-normalize": "^2.8.0",
-                "ergebnis/license": "^1.0.0",
-                "ergebnis/php-cs-fixer-config": "^2.2.1",
-                "phpunit/phpunit": "^7.5.20"
+                "ergebnis/composer-normalize": "^2.31.0",
+                "ergebnis/license": "^2.4.0",
+                "ergebnis/php-cs-fixer-config": "^6.13.0",
+                "fakerphp/faker": "^1.23.0",
+                "infection/infection": "~0.26.19",
+                "phpunit/phpunit": "^9.6.14",
+                "psalm/plugin-phpunit": "~0.18.4",
+                "vimeo/psalm": "^5.16.0"
             },
             "type": "library",
             "autoload": {
@@ -4562,14 +4566,18 @@
                 {
                     "name": "Nicolò Martini",
                     "email": "nicmartnic@gmail.com"
+                },
+                {
+                    "name": "Andreas Möller",
+                    "email": "am@localheinz.com"
                 }
             ],
             "description": "A basic but flexible php tree data structure and a fluent tree builder implementation.",
             "support": {
                 "issues": "https://github.com/nicmart/Tree/issues",
-                "source": "https://github.com/nicmart/Tree/tree/0.3.1"
+                "source": "https://github.com/nicmart/Tree/tree/0.8.0"
             },
-            "time": "2020-11-27T09:02:17+00:00"
+            "time": "2023-12-02T13:24:56+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -6737,31 +6745,31 @@
         },
         {
             "name": "spatie/crawler",
-            "version": "7.1.3",
+            "version": "8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/crawler.git",
-                "reference": "f0f73947fdfaf68efdc68b73c4dbb28dfc785113"
+                "reference": "807d145a3c071dc0e69bb7e6783611e2591f9773"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/crawler/zipball/f0f73947fdfaf68efdc68b73c4dbb28dfc785113",
-                "reference": "f0f73947fdfaf68efdc68b73c4dbb28dfc785113",
+                "url": "https://api.github.com/repos/spatie/crawler/zipball/807d145a3c071dc0e69bb7e6783611e2591f9773",
+                "reference": "807d145a3c071dc0e69bb7e6783611e2591f9773",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^7.3",
                 "guzzlehttp/psr7": "^2.0",
-                "illuminate/collections": "^8.38|^9.0|^10.0",
-                "nicmart/tree": "^0.3.0",
-                "php": "^8.0",
-                "spatie/browsershot": "^3.45",
+                "illuminate/collections": "^10.0|^11.0",
+                "nicmart/tree": "^0.8.0",
+                "php": "^8.1",
+                "spatie/browsershot": "^3.45|^4.0",
                 "spatie/robots-txt": "^2.0",
-                "symfony/dom-crawler": "^5.2|^6.0"
+                "symfony/dom-crawler": "^6.0|^7.0"
             },
             "require-dev": {
-                "pestphp/pest": "^1.21",
-                "phpunit/phpunit": "^9.5"
+                "pestphp/pest": "^2.0",
+                "spatie/ray": "^1.37"
             },
             "type": "library",
             "autoload": {
@@ -6789,7 +6797,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/crawler/issues",
-                "source": "https://github.com/spatie/crawler/tree/7.1.3"
+                "source": "https://github.com/spatie/crawler/tree/8.2.0"
             },
             "funding": [
                 {
@@ -6801,7 +6809,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-01-24T07:47:06+00:00"
+            "time": "2024-02-15T10:40:48+00:00"
         },
         {
             "name": "spatie/flare-client-php",
@@ -7233,16 +7241,16 @@
         },
         {
             "name": "spatie/laravel-sitemap",
-            "version": "6.4.0",
+            "version": "7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-sitemap.git",
-                "reference": "d5115b430de517aaa29a6410f4cd6f1561766579"
+                "reference": "1d7989d8a368ecec0401420a57be920d626572c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-sitemap/zipball/d5115b430de517aaa29a6410f4cd6f1561766579",
-                "reference": "d5115b430de517aaa29a6410f4cd6f1561766579",
+                "url": "https://api.github.com/repos/spatie/laravel-sitemap/zipball/1d7989d8a368ecec0401420a57be920d626572c2",
+                "reference": "1d7989d8a368ecec0401420a57be920d626572c2",
                 "shasum": ""
             },
             "require": {
@@ -7250,7 +7258,7 @@
                 "illuminate/support": "^8.0|^9.0|^10.0",
                 "nesbot/carbon": "^2.63",
                 "php": "^8.0",
-                "spatie/crawler": "^7.0",
+                "spatie/crawler": "^8.0",
                 "spatie/laravel-package-tools": "^1.5",
                 "symfony/dom-crawler": "^5.1.14|^6.0"
             },
@@ -7295,7 +7303,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/laravel-sitemap/tree/6.4.0"
+                "source": "https://github.com/spatie/laravel-sitemap/tree/7.0.0"
             },
             "funding": [
                 {
@@ -7303,7 +7311,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-10-18T14:38:11+00:00"
+            "time": "2023-10-24T07:21:05+00:00"
         },
         {
             "name": "spatie/robots-txt",
