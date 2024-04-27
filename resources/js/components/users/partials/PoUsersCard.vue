@@ -17,7 +17,7 @@ defineProps({
 
         <div>
           <p class="font-weight-bold">
-            <po-link :href="$route('users.show', data.username)" class="stretched" inertia>
+            <po-link :href="route('users.show', data.username)" class="stretched" inertia>
               {{ $helper.userDisplayName(data) }}
             </po-link>
           </p>

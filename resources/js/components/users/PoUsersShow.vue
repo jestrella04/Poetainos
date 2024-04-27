@@ -30,7 +30,7 @@ const page = computed(() => usePage())
 
                 <template v-for="writing in page.props.writings.from_author" :key="writing.id">
                   <div class="mb-2 pos-relative">
-                    <po-link :href="$route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
                       {{ writing.title }}
                     </po-link>
 
@@ -48,7 +48,7 @@ const page = computed(() => usePage())
                 <p class="text-uppercase font-medium-weight mb-5">{{ $t('main.from-shelf') }}</p>
                 <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
                   <div class="mb-2 pos-relative">
-                    <po-link :href="$route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
                       {{ writing.title }}
                     </po-link>
 
@@ -66,7 +66,7 @@ const page = computed(() => usePage())
                 <p class="text-uppercase font-medium-weight mb-5">{{ $t('main.from-liked') }}</p>
                 <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
                   <div class="mb-2 pos-relative">
-                    <po-link :href="$route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
                       {{ writing.title }}
                     </po-link>
 

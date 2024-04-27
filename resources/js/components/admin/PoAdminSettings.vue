@@ -45,7 +45,7 @@ function submitForm() {
   <po-wrapper>
     <v-card-title>{{ $t('admin.settings') }}</v-card-title>
 
-    <v-form id="settings-form" :action="$route('admin.settings.edit')" class="mb-5" @submit.prevent="submitForm">
+    <v-form id="settings-form" :action="route('admin.settings.edit')" class="mb-5" @submit.prevent="submitForm">
       <v-textarea v-model="settings" :label="$t('admin.settings')" rows="20" :hint="$t('admin.settings-warning')"
         hide-details="auto" :error-messages="errors.json" persistent-hint required></v-textarea>
 

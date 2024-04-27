@@ -24,7 +24,7 @@ function share() {
 
 <template>
   <po-sharer v-model="sharer" :link-title="$helper.userDisplayName(user)"
-    :link-url="$route('users.show', [user.username])"></po-sharer>
+    :link-url="route('users.show', [user.username])"></po-sharer>
   <po-complainer v-model="complainer" comp-type="users" :comp-id="user.id"></po-complainer>
   <po-blocker v-model="blocker" :user="user"></po-blocker>
 
@@ -41,22 +41,22 @@ function share() {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('users.edit', [user.username])" prepend-icon="fas fa-user-pen" inertia>
+      <po-list-item :href="route('users.edit', [user.username])" prepend-icon="fas fa-user-pen" inertia>
         <span>{{ $t('accounts.update-profile') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('users.writings.index', [user.username])" prepend-icon="fas fa-feather" inertia>
+      <po-list-item :href="route('users.writings.index', [user.username])" prepend-icon="fas fa-feather" inertia>
         <span>{{ $t('users.view-writings') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('users.shelf.index', [user.username])" prepend-icon="fas fa-bookmark" inertia>
+      <po-list-item :href="route('users.shelf.index', [user.username])" prepend-icon="fas fa-bookmark" inertia>
         <span>{{ $t('users.view-shelf') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('users.likes.index', [user.username])" prepend-icon="fas fa-heart" inertia>
+      <po-list-item :href="route('users.likes.index', [user.username])" prepend-icon="fas fa-heart" inertia>
         <span>{{ $t('users.view-liked') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>

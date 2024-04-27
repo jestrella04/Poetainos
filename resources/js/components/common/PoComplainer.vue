@@ -78,13 +78,13 @@ async function submit() {
 
         <v-divider class="mt-3"></v-divider>
 
-        <v-form id="complaint-form" :action="$route('complaints.store')" @submit.prevent="submit">
+        <v-form id="complaint-form" :action="route('complaints.store')" @submit.prevent="submit">
           <p v-if="errors" class="text-caption text-error mt-3" style="margin-bottom: -10px;">{{
             $t('main.select-least-one') }}</p>
 
           <template v-for="reason in reasons" :key="reason">
-            <v-switch v-model="compReasons" style="margin-bottom: -20px;" color="primary" :label="reason" :value="reason"
-              multiple hide-details></v-switch>
+            <v-switch v-model="compReasons" style="margin-bottom: -20px;" color="primary" :label="reason"
+              :value="reason" multiple hide-details></v-switch>
           </template>
 
           <v-textarea v-model="compMessage" class="mt-5 mb-1" :label="$t('main.tell-bit-more-optional')"

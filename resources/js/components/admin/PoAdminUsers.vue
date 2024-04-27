@@ -61,11 +61,11 @@ async function loadItems(event) {
 
       <template v-slot:item.actions="{ item }">
         <div class="d-flex ga-2">
-          <po-button :href="$route('users.show', item.username)" size="x-small" color="secondary" icon inertia>
+          <po-button :href="route('users.show', item.username)" size="x-small" color="secondary" icon inertia>
             <v-icon icon="fas fa-eye"></v-icon>
           </po-button>
 
-          <po-button :href="$route('users.edit', item.username)" size="x-small" color="secondary" icon inertia>
+          <po-button :href="route('users.edit', item.username)" size="x-small" color="secondary" icon inertia>
             <v-icon icon="fas fa-edit"></v-icon>
           </po-button>
 

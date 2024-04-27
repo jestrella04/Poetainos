@@ -48,7 +48,7 @@ async function resendLink() {
       {{ $t('accounts.resend-verification') }}
     </po-button>
 
-    <po-button color="secondary" :href="$route('home')" variant="text" inertia block>
+    <po-button color="secondary" :href="route('home')" variant="text" inertia block>
       {{ $t('accounts.confirmed-continue-ask') }}
     </po-button>
   </div>

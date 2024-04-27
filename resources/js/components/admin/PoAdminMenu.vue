@@ -37,62 +37,62 @@ nav {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('home')" prepend-icon="fas fa-home" inertia>
+      <po-list-item :href="route('home')" prepend-icon="fas fa-home" inertia>
         <span class="d-none d-md-inline">{{ $t('main.home') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.index')" prepend-icon="fas fa-list" inertia>
+      <po-list-item :href="route('admin.index')" prepend-icon="fas fa-list" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.summary') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.settings')" prepend-icon="fas fa-cogs" inertia>
+      <po-list-item :href="route('admin.settings')" prepend-icon="fas fa-cogs" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.settings') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.categories')" prepend-icon="fas fa-folder-open" inertia>
+      <po-list-item :href="route('admin.categories')" prepend-icon="fas fa-folder-open" inertia>
         <span class="d-none d-md-inline">{{ $t('categories.category') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.tags')" prepend-icon="fas fa-hashtag" inertia>
+      <po-list-item :href="route('admin.tags')" prepend-icon="fas fa-hashtag" inertia>
         <span class="d-none d-md-inline">{{ $t('tags.tags') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.pages')" prepend-icon="fas fa-file" inertia>
+      <po-list-item :href="route('admin.pages')" prepend-icon="fas fa-file" inertia>
         <span class="d-none d-md-inline">{{ $t('pages.pages') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.users')" prepend-icon="fas fa-users" inertia>
+      <po-list-item :href="route('admin.users')" prepend-icon="fas fa-users" inertia>
         <span class="d-none d-md-inline">{{ $t('users.users') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.writings')" prepend-icon="fa fa-feather" inertia>
+      <po-list-item :href="route('admin.writings')" prepend-icon="fa fa-feather" inertia>
         <span class="d-none d-md-inline">{{ $t('writings.writings') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.complaints')" prepend-icon="fas fa-scale-balanced" inertia>
+      <po-list-item :href="route('admin.complaints')" prepend-icon="fas fa-scale-balanced" inertia>
         <span class="d-none d-md-inline">{{ $t('complaints.complaints') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.tools')" prepend-icon="fas fa-tools" inertia>
+      <po-list-item :href="route('admin.tools')" prepend-icon="fas fa-tools" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.tools') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.websockets')" prepend-icon="fas fa-network-wired" inertia>
+      <po-list-item :href="route('admin.websockets')" prepend-icon="fas fa-network-wired" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.websockets') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <po-list-item :href="$route('admin.analytics')" prepend-icon="fas fa-chart-pie" inertia>
+      <po-list-item :href="route('admin.analytics')" prepend-icon="fas fa-chart-pie" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.analytics') }}</span>
       </po-list-item>
       <v-divider class="my-0"></v-divider>

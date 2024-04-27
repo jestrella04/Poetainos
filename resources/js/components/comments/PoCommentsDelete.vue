@@ -56,7 +56,7 @@ async function submit() {
 
         <v-divider class="mt-3"></v-divider>
 
-        <v-form id="comment-delete-form" :action="$route('comments.destroy', comment.id)" @submit.prevent="submit">
+        <v-form id="comment-delete-form" :action="route('comments.destroy', comment.id)" @submit.prevent="submit">
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
             <v-progress-circular v-else indeterminate></v-progress-circular>

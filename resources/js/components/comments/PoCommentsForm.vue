@@ -38,7 +38,7 @@ async function submitForm() {
 </script>
 
 <template>
-  <v-form :id="formId" :action="$route('comments.store')" :data="writing.id" @submit.prevent="submitForm">
+  <v-form :id="formId" :action="route('comments.store')" :data="writing.id" @submit.prevent="submitForm">
     <v-textarea v-model="message" :label="$t('comments.comment')"
       :placeholder="$t('comments.comment-mention', { at: '@' })" rows="3" max-length="300" hide-details="auto"
       :error-messages="errorMessages" auto-grow clearable persistent-placeholder required></v-textarea>

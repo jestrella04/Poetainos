@@ -10,10 +10,10 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { vuetify } from './plugins/vuetify'
 import { i18n } from './plugins/i18n'
 import { helper } from './plugins/helper'
-import { route } from './plugins/route'
 import { push } from './plugins/push'
 import 'animate.css'
 import PoLayoutMain from './components/layouts/PoLayoutMain.vue'
+import { route } from 'ziggy-js'
 
 library.add(far)
 library.add(fas)
@@ -32,6 +32,14 @@ createServer((page) => {
       return page
     },
     setup({ App, props, plugin }) {
+      const Ziggy = {
+        // Pull the Ziggy config off of the props.
+        ...props.initialPage.props.ziggy,
+        // Build the location, since there is
+        // no window.location in Node.
+        location: new URL(props.initialPage.props.ziggy.url)
+      }
+
       const app = createSSRApp({
         render: () => h(App, props)
       })
@@ -44,6 +52,11 @@ createServer((page) => {
         .use(route)
         .use(push)
         .component('font-awesome-icon', FontAwesomeIcon)
+        .mixin({
+          methods: {
+            route: (name, params, absolute, config = Ziggy) => route(name, params, absolute, config)
+          }
+        })
       //.mount(el)
     }
   })

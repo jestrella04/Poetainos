@@ -48,7 +48,7 @@ async function loadItems(event) {
 
       <template v-slot:item.actions="{ item }">
         <div class="d-flex ga-2">
-          <po-button :href="$route('pages.show', item.slug)" size="x-small" color="secondary" icon inertia>
+          <po-button :href="route('pages.show', item.slug)" size="x-small" color="secondary" icon inertia>
             <v-icon icon="fas fa-eye"></v-icon>
           </po-button>
 

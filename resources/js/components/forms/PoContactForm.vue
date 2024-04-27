@@ -86,7 +86,7 @@ async function submitForm() {
 <template>
   <po-head></po-head>
   <v-card :title="$t('main.contact-form').toUpperCase()">
-    <v-form id="contact-form" :action="$route('contact.store')" class="px-5 pb-5" @submit.prevent="submitForm()">
+    <v-form id="contact-form" :action="route('contact.store')" class="px-5 pb-5" @submit.prevent="submitForm()">
       <v-text-field v-model="formData.name" :label="$t('main.name')" :placeholder="$t('main.enter-your-name')"
         minlength="3" maxlength="40" hide-details="auto" :error-messages="errors.name" persistent-placeholder clearable
         required></v-text-field>

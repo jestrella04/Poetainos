@@ -5,8 +5,14 @@ import laravel from 'laravel-vite-plugin'
 import Components from 'unplugin-vue-components/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import path from 'path'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      'ziggy-js': path.resolve('/vendor/tightenco/ziggy')
+    }
+  },
   ssr: {
     noExternal: ['@inertiajs/server', /\.css$/, /\?vue&type=style/, /^vuetify/]
   },

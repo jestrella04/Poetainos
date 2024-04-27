@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -39,9 +40,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $ziggy = new Ziggy($group = null, $request->url());
         $user = auth()->check() ? User::find(auth()->user()->id) : null;
 
         return array_merge(parent::share($request), [
+            'ziggy' => $ziggy->toArray(),
             'auth' => [
                 'user' => auth()->check()
                     ? User::select('id', 'username', 'name', 'extra_info->avatar AS avatar')->where('id', $user->id)->firstOrFail()

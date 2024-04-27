@@ -264,44 +264,43 @@ code {
     <v-toolbar color="primary" :elevation="8" class="po-navbar px-3 d-none d-lg-flex">
       <v-container class="d-inline-flex justify-space-between">
         <div class="align-self-center">
-          <po-link :href="$route('home')" variant="plain" size="x-large" class="font-weight-bold" inertia>
+          <po-link :href="route('home')" variant="plain" size="x-large" class="font-weight-bold" inertia>
             <v-img height="42" width="42" src="/images/logo.svg" class="logo-shadow"></v-img>
           </po-link>
         </div>
 
         <v-tabs v-model="page.props.route.name" centered>
-          <po-tab :href="$route('explore')" value="explore" inertia>{{ $t('main.explore') }}</po-tab>
-          <po-tab :href="$route('writings.awards')" value="writings.awards" inertia>{{ $t('main.awards') }}</po-tab>
-          <po-tab :href="$route('writings.random')" value="writings.random" inertia>{{ $t('main.random') }}</po-tab>
-          <po-tab :href="$route('users.index')" value="users.index" inertia>{{ $t('users.authors') }}</po-tab>
-          <po-tab :href="$route('writings.create')" value="writings.create" inertia>{{ $t('main.publish') }}</po-tab>
+          <po-tab :href="route('explore')" value="explore" inertia>{{ $t('main.explore') }}</po-tab>
+          <po-tab :href="route('writings.awards')" value="writings.awards" inertia>{{ $t('main.awards') }}</po-tab>
+          <po-tab :href="route('writings.random')" value="writings.random" inertia>{{ $t('main.random') }}</po-tab>
+          <po-tab :href="route('users.index')" value="users.index" inertia>{{ $t('users.authors') }}</po-tab>
+          <po-tab :href="route('writings.create')" value="writings.create" inertia>{{ $t('main.publish') }}</po-tab>
           <po-tab @click.prevent="desktopSiteMenu = true">
             <v-icon icon="fas fa-ellipsis-vertical"></v-icon>
             <v-menu v-model="desktopSiteMenu" target="parent">
               <v-list>
-                <po-list-item :href="$route('contact.create')" prepend-icon="fas fa-envelope" inertia>
+                <po-list-item :href="route('contact.create')" prepend-icon="fas fa-envelope" inertia>
                   <span>{{ $t('main.contact-us') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item :href="$route('pages.show', 'preguntas-frecuentes')" prepend-icon="fas fa-circle-question"
+                <po-list-item :href="route('pages.show', 'preguntas-frecuentes')" prepend-icon="fas fa-circle-question"
                   inertia>
                   <span>{{ $t('main.faq') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item :href="$route('pages.show', 'sobre-nosotros')" prepend-icon="fas fa-address-card" inertia>
+                <po-list-item :href="route('pages.show', 'sobre-nosotros')" prepend-icon="fas fa-address-card" inertia>
                   <span>{{ $t('main.about-us') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item :href="$route('pages.show', 'condiciones-de-uso')" prepend-icon="fas fa-pen-ruler"
-                  inertia>
+                <po-list-item :href="route('pages.show', 'condiciones-de-uso')" prepend-icon="fas fa-pen-ruler" inertia>
                   <span>{{ $t('main.terms-of-use') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item :href="$route('pages.show', 'politicas-de-privacidad')" variant="text"
+                <po-list-item :href="route('pages.show', 'politicas-de-privacidad')" variant="text"
                   prepend-icon="fas fa-shield-halved" inertia>
                   <span>{{ $t('main.privacy-policy') }}</span>
                 </po-list-item>
@@ -311,7 +310,7 @@ code {
         </v-tabs>
 
         <div v-if="!$helper.auth()" class="align-self-center">
-          <po-button prepend-icon="fas fa-arrow-right-to-bracket" variant="tonal" :href="$route('login')"
+          <po-button prepend-icon="fas fa-arrow-right-to-bracket" variant="tonal" :href="route('login')"
             style="font-size: 0.7rem;" inertia>
             {{ $t('accounts.login-alt') }}
           </po-button>
@@ -328,25 +327,25 @@ code {
             </template>
 
             <v-list>
-              <po-list-item :href="$route('users.account')" prepend-icon="fas fa-user" inertia>
+              <po-list-item :href="route('users.account')" prepend-icon="fas fa-user" inertia>
                 <span>{{ $t('accounts.my-account') }}</span>
               </po-list-item>
               <v-divider class="my-0"></v-divider>
 
-              <po-list-item :href="$route('notifications.index')" prepend-icon="fas fa-bell" inertia>
+              <po-list-item :href="route('notifications.index')" prepend-icon="fas fa-bell" inertia>
                 <span>{{ $t('accounts.notifications') }}</span>
                 <po-badge :count="unreadCount" inline></po-badge>
               </po-list-item>
               <v-divider class="my-0"></v-divider>
 
               <template v-if="$helper.admin()">
-                <po-list-item :href="$route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
+                <po-list-item :href="route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
                   <span>{{ $t('main.administration') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
               </template>
 
-              <po-list-item :href="$route('logout')" prepend-icon="fas fa-arrow-right-from-bracket" method="post"
+              <po-list-item :href="route('logout')" prepend-icon="fas fa-arrow-right-from-bracket" method="post"
                 inertia>
                 <span>{{ $t('accounts.logout') }}</span>
               </po-list-item>

@@ -35,7 +35,7 @@ provide('writing', props.data)
       <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)">
         <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" alt="" cover>
           <div class="text-center py-3">
-            <po-link :href="$route('users.show', data.author.username)" inertia>
+            <po-link :href="route('users.show', data.author.username)" inertia>
               <po-avatar size="64" color="secondary" :user="data.author" class="avatar-shadow" />
             </po-link>
           </div>
@@ -43,7 +43,7 @@ provide('writing', props.data)
       </template>
 
       <div v-else class="text-center pt-3">
-        <po-link :href="$route('users.show', data.author.username)" inertia>
+        <po-link :href="route('users.show', data.author.username)" inertia>
           <po-avatar size="64" color="secondary" :user="data.author" />
         </po-link>
       </div>
@@ -51,7 +51,7 @@ provide('writing', props.data)
       <v-card-text class="pos-relative pt-1">
         <div class="text-center mb-3">
           <p class="text-h6 text-uppercase writing-title">
-            <po-link v-if="!alone" :href="$route('writings.show', data.slug)" class="stretched" inertia>
+            <po-link v-if="!alone" :href="route('writings.show', data.slug)" class="stretched" inertia>
               {{ data.title }}
             </po-link>
             <span v-else>{{ data.title }}</span>
@@ -59,10 +59,10 @@ provide('writing', props.data)
 
           <p class="text-caption text-uppercase text-medium-emphasis">
             {{
-        `${$helper.toLocaleDate(data.created_at)}
+              `${$helper.toLocaleDate(data.created_at)}
             — ${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
             `
-      }}
+            }}
           </p>
         </div>
 
@@ -88,7 +88,7 @@ provide('writing', props.data)
 
               <div class="d-inline-flex flex-wrap ga-1">
                 <po-chip v-for="category in data.categories" :key="category.slug" color="secondary" variant="elevated"
-                  size="small" :href="$route('categories.show', category.slug)" inertia>
+                  size="small" :href="route('categories.show', category.slug)" inertia>
                   {{ category.name }}
                 </po-chip>
               </div>
@@ -101,7 +101,7 @@ provide('writing', props.data)
 
               <div class="d-inline-flex flex-wrap ga-1">
                 <po-chip v-for="tag in data.tags" :key="tag.slug" color="secondary" variant="elevated" size="small"
-                  :href="$route('tags.show', tag.slug)" inertia>
+                  :href="route('tags.show', tag.slug)" inertia>
                   {{ tag.name }}
                 </po-chip>
               </div>
@@ -113,7 +113,7 @@ provide('writing', props.data)
 
             <div class="d-inline-flex flex-wrap ga-2">
               <div v-for="liker in likers" :key="liker.id">
-                <po-button icon :href="$route('users.show', liker.username)" :title="$helper.userDisplayName(liker)"
+                <po-button icon :href="route('users.show', liker.username)" :title="$helper.userDisplayName(liker)"
                   inertia>
                   <po-avatar size="48" color="secondary" :user="liker" />
                 </po-button>

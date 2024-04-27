@@ -112,7 +112,7 @@ function file() {
   <po-wrapper class="w-100" style="max-width: 900px;">
     <po-head></po-head>
     <v-card :title="$t('accounts.update-profile').toUpperCase()">
-      <v-form id="profile-form" :action="$route('users.update', user.username)" class="px-5 pb-5"
+      <v-form id="profile-form" :action="route('users.update', user.username)" class="px-5 pb-5"
         @submit.prevent="submitForm">
         <div class="d-flex ga-3 mb-3 align-center">
           <po-avatar :user="user" size="72" color="secondary"></po-avatar>

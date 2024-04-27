@@ -130,7 +130,7 @@ function resetForm() {
     <v-card :title="isUpdate ? $t('writings.update-writing') : $t('writings.publish-writing').toUpperCase()"
       :subtitle="$t('main.required-fields-marked')">
       <v-form id="writing-form"
-        :action="isUpdate ? $route('writings.update', writing.data.slug) : $route('writings.store')" class="px-5 pb-5"
+        :action="isUpdate ? route('writings.update', writing.data.slug) : route('writings.store')" class="px-5 pb-5"
         @submit.prevent="submitForm" @reset.prevent="resetForm">
         <v-text-field v-model="formData.title" :label="$t('main.title') + ' *'" hide-details="auto"
           :error-messages="errors.title" :placeholder="$t('main.enter-title')" minlength="3" maxlength="100"

@@ -76,10 +76,10 @@ async function submit() {
 
         <v-divider class="mt-3"></v-divider>
 
-        <v-form id="user-delete-form" :action="$route('users.destroy', username)" @submit.prevent="submit">
+        <v-form id="user-delete-form" :action="route('users.destroy', username)" @submit.prevent="submit">
           <v-text-field v-model="formData.password" type="password" :label="$t('main.password')"
-            :placeholder="$t('main.enter-password-to-continue')" :error-messages="errors.password" persistent-placeholder
-            clearable required hide-details="auto">
+            :placeholder="$t('main.enter-password-to-continue')" :error-messages="errors.password"
+            persistent-placeholder clearable required hide-details="auto">
           </v-text-field>
 
           <po-button color="primary" type="submit" block :disabled="isPosting">

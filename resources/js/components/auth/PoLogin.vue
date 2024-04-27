@@ -258,19 +258,19 @@ async function resetPassword() {
     <template v-else>
       <div class="po-login d-flex flex-column ga-3">
         <div>
-          <po-button block color="primary" :href="$route('social.login', 'facebook')" prepend-icon="fab fa-facebook-f">
+          <po-button block color="primary" :href="route('social.login', 'facebook')" prepend-icon="fab fa-facebook-f">
             {{ $t('accounts.continue-with-facebook') }}
           </po-button>
         </div>
 
         <div>
-          <po-button block color="primary" :href="$route('social.login', 'twitter')" prepend-icon="fab fa-x-twitter">
+          <po-button block color="primary" :href="route('social.login', 'twitter')" prepend-icon="fab fa-x-twitter">
             {{ $t('accounts.continue-with-x-twitter') }}
           </po-button>
         </div>
 
         <div>
-          <po-button block color="primary" :href="$route('social.login', 'google')" prepend-icon="fab fa-google">
+          <po-button block color="primary" :href="route('social.login', 'google')" prepend-icon="fab fa-google">
             {{ $t('accounts.continue-with-google') }}
           </po-button>
         </div>
@@ -282,8 +282,8 @@ async function resetPassword() {
         </div>
 
         <div>
-          <po-button block color="primary" :href="$route('home')" prepend-icon="fas fa-ghost"
-            @click.prevent="$inertia.get($route('home'))">
+          <po-button block color="primary" :href="route('home')" prepend-icon="fas fa-ghost"
+            @click.prevent="$inertia.get(route('home'))">
             {{ $t('accounts.continue-as-guest') }}
           </po-button>
         </div>

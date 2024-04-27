@@ -10,7 +10,7 @@ const page = computed(() => usePage())
     <v-card-text>
       <v-list>
         <template v-for="data in page.props.pages" :key="data.slug">
-          <po-list-item :href="$route('pages.show', data.slug)" inertia>{{ data.title }}</po-list-item>
+          <po-list-item :href="route('pages.show', data.slug)" inertia>{{ data.title }}</po-list-item>
         </template>
       </v-list>
     </v-card-text>

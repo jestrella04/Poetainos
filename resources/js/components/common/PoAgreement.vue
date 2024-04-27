@@ -12,7 +12,7 @@ const formData = inject('formData')
     </div>
 
     <div class="pt-4 ps-4">
-      <po-link :href="$route('pages.show', 'condiciones-de-uso')" target="_blank" inertia>
+      <po-link :href="route('pages.show', 'condiciones-de-uso')" target="_blank" inertia>
         <v-icon icon="fas fa-arrow-up-right-from-square"></v-icon>
       </po-link>
     </div>
@@ -25,7 +25,7 @@ const formData = inject('formData')
     </div>
 
     <div class="pt-4 ps-4">
-      <po-link :href="$route('pages.show', 'politicas-de-privacidad')" inertia>
+      <po-link :href="route('pages.show', 'politicas-de-privacidad')" inertia>
         <v-icon icon="fas fa-arrow-up-right-from-square"></v-icon>
       </po-link>
     </div>

@@ -18,20 +18,20 @@ const unreadCount = inject('unreadCount')
 
 <template>
   <v-bottom-navigation v-model="page.props.route.name" bg-color="primary" class="hidden-lg-and-up">
-    <po-button value="home" :href="$route('home')" :title="$t('main.home')" inertia>
+    <po-button value="home" :href="route('home')" :title="$t('main.home')" inertia>
       <v-icon icon="fas fa-home" />
     </po-button>
 
-    <po-button value="explore" :href="$route('explore')" :title="$t('main.explore')" inertia>
+    <po-button value="explore" :href="route('explore')" :title="$t('main.explore')" inertia>
       <v-icon icon="fas fa-wand-magic-sparkles" />
     </po-button>
 
-    <po-button value="publish" :href="$route('writings.create')" :title="$t('main.publish')" inertia>
+    <po-button value="publish" :href="route('writings.create')" :title="$t('main.publish')" inertia>
       <v-icon icon="fas fa-pen-nib" />
     </po-button>
 
     <template v-if="!$helper.auth()">
-      <po-button value="login" :href="$route('login')" :title="$t('accounts.login-alt')" inertia>
+      <po-button value="login" :href="route('login')" :title="$t('accounts.login-alt')" inertia>
         <v-icon icon="fas fa-arrow-right-to-bracket" />
       </po-button>
     </template>

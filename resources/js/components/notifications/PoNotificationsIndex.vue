@@ -108,8 +108,7 @@ function update(notificationsData, nextPage) {
     <template v-else-if="!$helper.isEmpty(notifications)">
       <template v-if="'unread' === page.props.tab">
         <div class="mb-3 text-right">
-          <po-button :href="$route('notifications.clear')" size="x-small" method="post" inertia
-            @click="unreadCount = 0">
+          <po-button :href="route('notifications.clear')" size="x-small" method="post" inertia @click="unreadCount = 0">
             <v-icon icon="fas fa-check-double" class="me-2"></v-icon>
             {{ $t('main.mark-all-read') }}
           </po-button>
@@ -141,7 +140,7 @@ function update(notificationsData, nextPage) {
                     <po-button color="primary" size="small" variant="tonal">
                       {{ $t('main.view') }}
                     </po-button>
-                    <po-link :href="$route('notifications.show', notification.id)" class="stretched" inertia> </po-link>
+                    <po-link :href="route('notifications.show', notification.id)" class="stretched" inertia> </po-link>
                   </div>
                 </div>
               </div>

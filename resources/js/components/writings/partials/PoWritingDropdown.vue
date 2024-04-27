@@ -24,7 +24,8 @@ function share() {
 </script>
 
 <template>
-  <po-sharer v-model="sharer" :link-title="writing.title" :link-url="$route('writings.show', [writing.slug])"></po-sharer>
+  <po-sharer v-model="sharer" :link-title="writing.title"
+    :link-url="route('writings.show', [writing.slug])"></po-sharer>
   <po-complainer v-model="complainer" comp-type="writings" :comp-id="writing.id"></po-complainer>
   <po-blocker v-model="blocker" :user="writing.author"></po-blocker>
 
@@ -42,7 +43,7 @@ function share() {
       <v-divider class="my-0"></v-divider>
 
       <template v-if="$helper.canEdit(writing.author)">
-        <po-list-item :href="$route('writings.edit', [writing.slug])" prepend-icon="fas fa-pen-to-square" inertia>
+        <po-list-item :href="route('writings.edit', [writing.slug])" prepend-icon="fas fa-pen-to-square" inertia>
           <span>{{ $t('main.edit-delete') }}</span>
         </po-list-item>
         <v-divider class="my-0"></v-divider>
