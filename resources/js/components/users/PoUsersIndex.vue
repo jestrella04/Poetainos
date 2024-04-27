@@ -3,7 +3,7 @@ import { computed, ref, inject, onMounted, nextTick } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
-import Masonry from '@paper-folding/masonry-layout'
+import MasonrySimple from 'masonry-simple'
 import { useSwipe } from '@vueuse/core'
 
 const page = computed(() => usePage())
@@ -35,11 +35,7 @@ async function loadMore({ done }) {
     await axios
       .get(next.value)
       .then((response) => {
-        users.value.push(...response.data.data)
-        next.value = response.data.next_page_url
-        nextTick(() => {
-          new Masonry('.masonry', { "percentPosition": true })
-        })
+        update(response.data.data, response.data.next_page_url)
         done('ok')
       })
       .catch(() => {
@@ -81,7 +77,7 @@ function update(usersData, nextPage) {
   fetched.value = true
 
   nextTick(() => {
-    new Masonry('.masonry', { "percentPosition": true })
+    new MasonrySimple({ container: '.masonry' }).init()
   })
 }
 </script>
@@ -115,11 +111,13 @@ function update(usersData, nextPage) {
   </template>
 
   <template v-else-if="!$helper.isEmpty(users)">
-    <v-row class="masonry">
-      <v-col v-for="user in users" :key="user.id" tag="user" cols="12" sm="6" lg="4">
-        <po-users-card :alone="false" :data="user" />
-      </v-col>
-    </v-row>
+    <div class="masonry">
+      <template v-for="user in users" :key="user.id">
+        <user class="masonry__item">
+          <po-users-card :alone="false" :data="user" />
+        </user>
+      </template>
+    </div>
 
     <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
   </template>

@@ -13,7 +13,7 @@
     "cyberwizard/dbsafeguard": "dev-main",
     "doctrine/dbal": "^3.0",
     "guzzlehttp/guzzle": "^7.2",
-    "inertiajs/inertia-laravel": "^0.6.8",
+    "inertiajs/inertia-laravel": "^1.0",
     "laravel-notification-channels/facebook-poster": "^5.1",
     "laravel-notification-channels/twitter": "^8.0",
     "laravel-notification-channels/webpush": "^7.0",

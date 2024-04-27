@@ -27,9 +27,9 @@ createServer((page) => {
       const pages = import.meta.glob('./components/**/*.vue', {
         eager: true
       })
-      let component = pages[`./components/${name}.vue`]
-      component.default.layout = component.default.layout || PoLayoutMain
-      return component
+      let page = pages[`./components/${name}.vue`]
+      page.default.layout = page.default.layout || PoLayoutMain
+      return page
     },
     setup({ App, props, plugin }) {
       const app = createSSRApp({
