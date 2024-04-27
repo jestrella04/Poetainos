@@ -245,6 +245,14 @@ code {
     top: 0 !important;
   }
 }
+
+.masonry {
+  margin-top: 1rem !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-auto-flow: dense;
+  grid-gap: 16px;
+}
 </style>
 
 <template>

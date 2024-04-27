@@ -1,4 +1,4 @@
-import { createApp, h } from 'vue'
+import { createSSRApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -32,7 +32,7 @@ createInertiaApp({
     return page
   },
   setup({ el, App, props, plugin }) {
-    const app = createApp({
+    const app = createSSRApp({
       render: () => h(App, props)
     })
 

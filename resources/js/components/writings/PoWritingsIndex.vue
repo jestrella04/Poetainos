@@ -3,8 +3,8 @@ import { computed, ref, inject, onMounted, nextTick } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
-import Masonry from '@paper-folding/masonry-layout'
 import { useSwipe } from '@vueuse/core'
+import MasonrySimple from 'masonry-simple'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -77,7 +77,7 @@ function update(writingsData, nextPage) {
   fetched.value = true
 
   nextTick(() => {
-    new Masonry('.masonry', { "percentPosition": true })
+    new MasonrySimple({ container: '.masonry' }).init()
   })
 }
 
@@ -122,11 +122,13 @@ function liked(id, count) {
     </template>
 
     <template v-else-if="!$helper.isEmpty(writings)">
-      <v-row class="masonry">
-        <v-col v-for="writing in writings" :key="writing.slug" tag="writing" cols="12" md="6" lg="4">
-          <po-writings-entry @liked="liked" :alone="false" :data="writing" />
-        </v-col>
-      </v-row>
+      <div class="masonry">
+        <template v-for="writing in writings" :key="writing.slug">
+          <writing class="masonry__item">
+            <po-writings-entry @liked="liked" :alone="false" :data="writing" />
+          </writing>
+        </template>
+      </div>
 
       <po-infinite-scroll v-if="!$helper.strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
     </template>
