@@ -13,7 +13,7 @@ import { helper } from './plugins/helper'
 import { push } from './plugins/push'
 import 'animate.css'
 import PoLayoutMain from './components/layouts/PoLayoutMain.vue'
-import { route } from 'ziggy-js'
+import { ZiggyVue } from 'ziggy-js'
 
 library.add(far)
 library.add(fas)
@@ -49,12 +49,13 @@ createServer((page) => {
         .use(vuetify)
         .use(i18n)
         .use(helper)
-        .use(route)
+        .use(ZiggyVue)
         .use(push)
         .component('font-awesome-icon', FontAwesomeIcon)
         .mixin({
           methods: {
-            route: (name, params, absolute, config = Ziggy) => route(name, params, absolute, config)
+            route: (name, params, absolute, config = Ziggy) =>
+              ZiggyVue(name, params, absolute, config)
           }
         })
       //.mount(el)
