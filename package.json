@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write resources/js/",
-    "up": "cd laradock && docker-compose up -d nginx mariadb workspace && docker-compose exec --user=laradock workspace bash",
-    "down": "cd laradock && docker-compose stop",
+    "up": "cd laradock && docker compose up -d nginx mariadb workspace && docker compose exec --user=laradock workspace bash",
+    "down": "cd laradock && docker compose stop",
     "restart": "npm run workspace-stop && npm run workspace-start",
     "translate": "php artisan translatable:export es",
     "translate-check": "php artisan translatable:inspect-translations es"

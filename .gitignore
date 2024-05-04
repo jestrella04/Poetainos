@@ -21,6 +21,5 @@ auth.json
 npm-debug.log
 yarn-error.log
 ./idea
-/.vscode
 composer-setup.php
 composer.phar

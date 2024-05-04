@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "mehyaa.branch-cleanup",
+    "streetsidesoftware.code-spell-checker",
+    "ms-azuretools.vscode-docker",
+    "mikestead.dotenv",
+    "eamodio.gitlens",
+    "amiralizadeh9480.laravel-extra-intellisense",
+    "devsense.phptools-vscode",
+    "streetsidesoftware.code-spell-checker-spanish",
+    "gruntfuggly.todo-tree",
+    "vue.volar"
+  ]
+}
