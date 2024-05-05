@@ -3,6 +3,7 @@ import { inject, provide, reactive, computed, ref, watch, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoWritingDelete from './partials/PoWritingDelete.vue'
+import PoWritingKarma from './partials/PoWritingKarma.vue'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -120,15 +121,19 @@ function resetForm() {
   if (!isUpdate) {
     clearInputs()
   }
-}
+} 
 </script>
 
 <template>
   <po-wrapper class="w-100" style="max-width: 900px;">
     <po-head></po-head>
-
+    
     <v-card :title="isUpdate ? $t('writings.update-writing') : $t('writings.publish-writing').toUpperCase()"
       :subtitle="$t('main.required-fields-marked')">
+      <template v-if="!isUpdate">
+        <po-writing-karma />
+      </template>
+      
       <v-form id="writing-form"
         :action="isUpdate ? route('writings.update', writing.data.slug) : route('writings.store')" class="px-5 pb-5"
         @submit.prevent="submitForm" @reset.prevent="resetForm">

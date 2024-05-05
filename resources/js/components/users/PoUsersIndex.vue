@@ -113,9 +113,9 @@ function update(usersData, nextPage) {
   <template v-else-if="!$helper.isEmpty(users)">
     <div class="masonry">
       <template v-for="user in users" :key="user.id">
-        <user class="masonry__item">
+        <div class="masonry__item">
           <po-users-card :alone="false" :data="user" />
-        </user>
+        </div>
       </template>
     </div>
 

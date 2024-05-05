@@ -132,6 +132,10 @@
     "select-all-apply": "Selecciona todo lo que aplique"
   },
   "main": {
+    "karma-points": "Tu karma actual es {karma} / 100.",
+    "karma-low": "Sube de nivel y navega sin restricciones dando likes, comentando y recomendando los textos de otros autores.",
+    "karma-mid": "Nada mal, la verdad. Sigue dando likes, comentando, recomendando los textos de otros autores para subir de nivel.",
+    "karma-high": "¿Qué sería de la tribu sin personas como tú? ¡Gracias por tu apoyo incondicional!",
     "about-us": "Sobre Nosotros",
     "action-irreversible": "Esta acción es irreversible.",
     "actions": "Acciones",

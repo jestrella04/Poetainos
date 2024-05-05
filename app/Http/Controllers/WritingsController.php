@@ -19,7 +19,7 @@ class WritingsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Contracts\Pagination\Paginator
      */
     public function index()
     {
@@ -29,9 +29,11 @@ class WritingsController extends Controller
         $writings = Writing::whereNotIn('user_id', $this->getBlockedUsers())
             ->whereNotNull($filterAwards)
             ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query) {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }]);
+            ->with([
+                'author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }
+            ]);
 
         if ('latest' === $sort) {
             $writings = $writings->latest();
@@ -50,7 +52,7 @@ class WritingsController extends Controller
                 'title' => $awards ? getPageTitle([__('Golden Flowers')]) : getPageTitle([]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -58,7 +60,7 @@ class WritingsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function create()
     {
@@ -103,15 +105,21 @@ class WritingsController extends Controller
             ],
             'writing' => Writing::whereId($writing->id)
                 ->withCount(['likes', 'comments', 'shelf'])
-                ->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])
-                ->with(['categories' => function ($query) {
-                    $query->select('id', 'name', 'slug');
-                }])
-                ->with(['tags' => function ($query) {
-                    $query->select('id', 'name', 'slug');
-                }])
+                ->with([
+                    'author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    }
+                ])
+                ->with([
+                    'categories' => function ($query) {
+                        $query->select('id', 'name', 'slug');
+                    }
+                ])
+                ->with([
+                    'tags' => function ($query) {
+                        $query->select('id', 'name', 'slug');
+                    }
+                ])
                 ->first(),
             'likers' => $writing->likers()->shuffle()->take(5),
             'related' => [
@@ -123,9 +131,11 @@ class WritingsController extends Controller
                     DB::table('category_writing')
                         ->select('writing_id')
                         ->whereIn('category_id', $writing->categories()->pluck('id'))
-                )->with(['author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }])->inRandomOrder()->take(5)->get(),
+                )->with([
+                            'author' => function ($query) {
+                                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                            }
+                        ])->inRandomOrder()->take(5)->get(),
 
             ],
             'isAuthorBlocked' => auth()->check() ? $user->isAuthorBlocked($writing->author) : false
@@ -152,7 +162,7 @@ class WritingsController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Writing  $writing
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function edit(Writing $writing)
     {
@@ -163,9 +173,7 @@ class WritingsController extends Controller
 
         $mainCategories = Category::select('id', 'name')
             ->whereNull('parent_id')
-            ->with('descendants'/* ['descendants' => function ($query) {
-                $query->select('id', 'name');
-            }] */)
+            ->with('descendants')
             ->get();
 
         return Inertia::render('writings/PoWritingsForm', [
@@ -180,6 +188,10 @@ class WritingsController extends Controller
                 'categories' => $writing->exists ? $writing->altCategories()->pluck('id') : [],
                 'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
 
+            ],
+            'author' => [
+                'aura' => auth()->user()->aura,
+                'karma' => auth()->user()->karma,
             ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),

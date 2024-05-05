@@ -287,6 +287,20 @@ const Helper = class {
   asset(url) {
     return new URL(url, window.route('home')).toString()
   }
+
+  karmaLabel(karma) {
+    let label = null
+
+    if (karma < 25) {
+      label = 'error'
+    } else if (karma >= 25 && karma <= 50) {
+      label = 'warning'
+    } else if (karma > 50) {
+      label = 'success'
+    }
+
+    return label
+  }
 }
 
 export const helper = {

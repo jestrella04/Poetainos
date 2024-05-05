@@ -8,6 +8,12 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import path from 'path'
 
 export default defineConfig({
+  server: {
+    host: '0.0.0.0',
+    hmr: {
+      host: 'localhost'
+    }
+  },
   resolve: {
     alias: {
       'ziggy-js': path.resolve('/vendor/tightenco/ziggy')

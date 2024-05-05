@@ -124,9 +124,9 @@ function liked(id, count) {
     <template v-else-if="!$helper.isEmpty(writings)">
       <div class="masonry">
         <template v-for="writing in writings" :key="writing.slug">
-          <writing class="masonry__item">
+          <div class="masonry__item">
             <po-writings-entry @liked="liked" :alone="false" :data="writing" />
-          </writing>
+          </div>
         </template>
       </div>
 

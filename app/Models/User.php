@@ -34,7 +34,8 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -172,13 +173,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function updateAura()
     {
         // Count user content
-        $writings = $this->writings->count();
-        $likes = $this->likes->count();
-        $comments = $this->comments->count() + $this->replies->count();
-        $shelf = $this->shelf->count();
+        $user = User::whereId($this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
+        $writings = $user->writings_count;
+        $likes = $user->likes_count;
+        $comments = $user->comments_count;
+        $shelf = $user->shelf_count;
+        $awards = $user->awards_count;
         $views = $this->profile_views;
-        $hood = $this->hood->count();
-        $extendedHood = $this->fellowHood($sount = true);
+        //$hood = $this->hood->count();
+        //$extendedHood = $this->fellowHood($count = true);
 
         // Get points from settings
         $pointsWritings = getSiteConfig('aura.points.user.writing');
@@ -186,9 +189,10 @@ class User extends Authenticatable implements MustVerifyEmail
         $pointsComments = getSiteConfig('aura.points.user.comment');
         $pointsShelf = getSiteConfig('aura.points.user.shelf');
         $pointsViews = getSiteConfig('aura.points.user.views');
-        $pointsHood = getSiteConfig('aura.points.user.hood');
-        $pointsExtendedHood = getSiteConfig('aura.points.user.extended_hood');
-        $basePoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsHood + $pointsExtendedHood;
+        $pointsAwards = getSiteConfig('aura.points.user.award');
+        //$pointsHood = getSiteConfig('aura.points.user.hood');
+        //$pointsExtendedHood = getSiteConfig('aura.points.user.extended_hood');
+        $basePoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
 
         // Calculate points as per settings
         $pointsWritings = $pointsWritings * $writings;
@@ -196,16 +200,28 @@ class User extends Authenticatable implements MustVerifyEmail
         $pointsComments = $pointsComments * $comments;
         $pointsShelf = $pointsShelf * $shelf;
         $pointsViews = $pointsViews * $views;
-        $pointsHood = $pointsHood * $hood;
-        $pointsExtendedHood = $pointsExtendedHood * $extendedHood;
-        $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsHood + $pointsExtendedHood;
+        $pointsAwards = $pointsAwards * $awards;
+        //$pointsHood = $pointsHood * $hood;
+        //$pointsExtendedHood = $pointsExtendedHood * $extendedHood;
+        $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
+        $empathyPoints = $totalPoints - $pointsWritings - $pointsViews - $pointsAwards;
 
         // Do the math
-        $aura = ($totalPoints / $basePoints) * (1 + ($basePoints / 100));
-        $aura = number_format($aura, 2);
+        if ($totalPoints > 0) {
+            $aura = (($totalPoints / $basePoints) * ($basePoints / 6)) / $basePoints; // 6 is the count of countables (writings, likes, etc)
+            $karma = ($empathyPoints / $totalPoints) * 100;
 
-        // Persist to the database
-        DB::table($this->getTable())->whereId($this->id)->update(['aura' => $aura, 'aura_updated_at' => Carbon::now()]);
+            // Format numbers
+            $aura = number_format($aura, 2);
+            $karma = number_format($karma, 2);
+
+            // Persist to the database
+            DB::table('users')->whereId($this->id)->update([
+                'aura' => $aura,
+                'karma' => $karma,
+                'aura_updated_at' => Carbon::now()
+            ]);
+        }
     }
 
     public function isAllowed($task)
