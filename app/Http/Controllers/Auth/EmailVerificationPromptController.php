@@ -18,6 +18,12 @@ class EmailVerificationPromptController extends Controller
     {
         return $request->user()->hasVerifiedEmail()
             ? redirect()->intended(RouteServiceProvider::HOME)
-            : Inertia::render('auth/PoVerify', ['status' => session('status')]);
+            : Inertia::render('auth/PoVerify', [
+                'meta' => [
+                    'title' => getPageTitle([__('Verify Account')]),
+                    'canonical' => route('home'),
+                ],
+                'status' => session('status')
+            ]);
     }
 }

@@ -1,8 +1,15 @@
 {
     "editor.formatOnSave": true,
     "cSpell.words": [
+        "axios",
+        "goodreads",
+        "inertiajs",
         "laradock",
         "laravel",
-        "vuetify"
-    ]
+        "linkify",
+        "millify",
+        "vuetify",
+        "vueuse"
+    ],
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

@@ -132,9 +132,14 @@
     "select-all-apply": "Selecciona todo lo que aplique"
   },
   "main": {
+    "karma-inspire-1": "¡No sabes lo genial que es tenerte como parte de la tribu!",
+    "karma-inspire-2": "Queríamos aprovechar esta oportunidad para agradecerte por tu participación hasta ahora. Tu contribución ha sido valiosa y ha agregado mucho valor a la plataforma.",
+    "karma-inspire-3": "Sin embargo, nos encantaría ver más de ti por aquí. Tu experiencia y perspectiva son increíblemente importantes para hacer de esta comunidad un lugar aún mejor para todos.",
+    "karma-inspire-4": "¿Qué te parece si te animas a participar un poco más activamente? Estamos seguros de que tus ideas y opiniones van a inspirar a otros miembros y ayudar a crear un ambiente más vibrante y dinámico.",
+    "karma-inspire-5": "Es bien fácil, solo tienes que interactuar más seguido con el contenido de otros usuarios (dando likes, comentando, compartiendo, etc).",
     "karma-points": "Tu karma actual es {karma} / 100.",
-    "karma-low": "Sube de nivel y navega sin restricciones dando likes, comentando y recomendando los textos de otros autores.",
-    "karma-mid": "Nada mal, la verdad. Sigue dando likes, comentando, recomendando los textos de otros autores para subir de nivel.",
+    "karma-low": "Esto no luce bien, pero puedes corregirlo fácilmente.",
+    "karma-mid": "Nada mal, la verdad. ¡Gracias por tu apoyo!",
     "karma-high": "¿Qué sería de la tribu sin personas como tú? ¡Gracias por tu apoyo incondicional!",
     "about-us": "Sobre Nosotros",
     "action-irreversible": "Esta acción es irreversible.",
@@ -357,6 +362,7 @@
   "writings": {
     "awarded": "Condecorado con una Flor de Oro",
     "continue-reading": "Seguir leyendo",
+    "continue-publishing": "Continuar publicando",
     "delete-writing-ask": "¿Eliminar este texto?",
     "delete-writing-warning": "Eliminar un texto eliminará también todos los votos, estantes, comentarios y respuestas asociados.",
     "latest-writings": "Últimos textos",
