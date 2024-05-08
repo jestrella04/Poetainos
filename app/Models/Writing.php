@@ -135,13 +135,14 @@ class Writing extends Model
         $auraHome = getSiteConfig('aura.min_at_home');
 
         // Count user content
-        $likes = $this->likes()->count();
-        $comments = $this->comments()->count();
-        $shelf = $this->shelf()->count();
+        $writing = Writing::whereId($this->id)->withCount(['likes', 'comments', 'shelf'])->firstOrFail();
+        $likes = $writing->likes_count;
+        $comments = $writing->comments_count;
+        $shelf = $writing->shelf_count;
         $views = $this->views;
 
         // Get points from settings
-        $pointsLikes = getSiteConfig('aura.points.writing.upvote');
+        $pointsLikes = getSiteConfig('aura.points.writing.like');
         $pointsComments = getSiteConfig('aura.points.writing.comment');
         $pointsShelf = getSiteConfig('aura.points.writing.shelf');
         $pointsViews = getSiteConfig('aura.points.writing.views');
@@ -155,7 +156,7 @@ class Writing extends Model
         $totalPoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
 
         // Do the math
-        $auraNew = ($totalPoints / $basePoints) * (1 + ($basePoints / 100));
+        $auraNew = (($totalPoints / $basePoints) * ($basePoints / 4)) / $basePoints; // 4 is the count of countables (comments, likes, etc)
         $auraNew = number_format($auraNew, 2);
 
         // Check when writing was posted (in days)
