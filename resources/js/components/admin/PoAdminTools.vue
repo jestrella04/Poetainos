@@ -26,6 +26,9 @@ const tab = ref(null)
       </v-window-item>
 
       <v-window-item value="log" class="h-100">
+        <po-button color="secondary" size="x-small" :href="route('admin.log')" icon title="Download full copy" class="mb-2">
+        <v-icon icon="fas fa-download"></v-icon>
+        </po-button> 
         <v-textarea v-model="page.props.log" :label="$t('admin.log')" rows="20" readonly></v-textarea>
       </v-window-item>
     </v-window>

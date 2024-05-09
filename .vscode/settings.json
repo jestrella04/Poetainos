@@ -1,15 +1,18 @@
 {
-    "editor.formatOnSave": true,
-    "cSpell.words": [
-        "axios",
-        "goodreads",
-        "inertiajs",
-        "laradock",
-        "laravel",
-        "linkify",
-        "millify",
-        "vuetify",
-        "vueuse"
-    ],
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.formatOnSave": true,
+  "cSpell.words": [
+    "axios",
+    "goodreads",
+    "inertiajs",
+    "laradock",
+    "laravel",
+    "linkify",
+    "millify",
+    "vuetify",
+    "vueuse"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[php]": {
+    "editor.defaultFormatter": "DEVSENSE.phptools-vscode"
+  }
 }

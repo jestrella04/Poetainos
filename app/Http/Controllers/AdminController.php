@@ -16,6 +16,13 @@ use Inertia\Inertia;
 
 class AdminController extends Controller
 {
+    private $log;
+
+    public function __construct()
+    {
+        $this->log = storage_path('logs/laravel.log');
+    }
+
     public function index()
     {
         return Inertia::render('admin/PoAdminIndex', [
@@ -126,9 +133,11 @@ class AdminController extends Controller
     public function writings()
     {
         $writings = Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
-            ->with(['author' => function ($query) {
-                $query->select('id', 'username', 'name');
-            }]);
+            ->with([
+                'author' => function ($query) {
+                    $query->select('id', 'username', 'name');
+                }
+            ]);
 
         if (request()->expectsJson()) {
             return $writings->simplePaginate($this->pagination)->withQueryString();
@@ -169,8 +178,6 @@ class AdminController extends Controller
         $pinfo = ob_get_contents();
         ob_end_clean();
 
-        $log = storage_path('logs/laravel.log');
-
         return Inertia::render('admin/PoAdminTools', [
             'meta' => [
                 'title' => getPageTitle([
@@ -178,9 +185,22 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'log' => shell_exec('tail -n 100 ' . $log),
+            'log' => shell_exec('tail -n 100 ' . $this->log),
             'info' => $pinfo,
         ]);
+    }
+
+    public function log()
+    {
+        header('Content-Description: Log download');
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename="' . basename($this->log) . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($this->log));
+        readfile($this->log);
+        exit;
     }
 
     public function complaints()
