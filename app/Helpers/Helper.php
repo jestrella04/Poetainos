@@ -120,3 +120,12 @@ function isTruthy($string)
 
     return false;
 }
+
+function hydrateSettings($text)
+{
+    return preg_replace_callback(
+        '/{{([^}]+)}}/',
+        fn($matches) => getSiteConfig($matches[1]),
+        $text
+    );
+}

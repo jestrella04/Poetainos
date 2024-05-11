@@ -301,4 +301,31 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $this->update(['extra_info' => $info]);
     }
+
+    public function todayEmpathySummary()
+    {
+        $likes = $this->likes()
+            ->select('likeable_id')
+            ->where('likeable_type', 'App\Models\Writing')
+            ->whereDate('created_at', now()->today())
+            ->get()
+            ->pluck('likeable_id')
+            ->all();
+
+        $comments = $this->comments()
+            ->distinct('writing_id')
+            ->whereDate('created_at', now()->today())
+            ->get()
+            ->pluck('writing_id')
+            ->all();
+
+        $shelves = Shelf::where('user_id', $this->id)
+            ->distinct('writing_id')
+            ->whereDate('created_at', now()->today())
+            ->get()
+            ->pluck('writing_id')
+            ->all();
+
+        return count(array_unique(array_merge($likes, $comments, $shelves)));
+    }
 }

@@ -190,9 +190,8 @@ class WritingsController extends Controller
 
             ],
             'author' => [
-                'aura' => auth()->user()->aura,
                 'karma' => auth()->user()->karma,
-                'writings_count' => auth()->user()->writings->count(),
+                'today' => Inertia::lazy(fn() => auth()->user()->todayEmpathySummary()),
             ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),

@@ -1,6 +1,13 @@
 <script setup>
 import { inject } from 'vue'
 
+defineProps({
+  tooltip: {
+    type: Boolean,
+    default: false,
+  }
+})
+
 const karma = inject('karma')
 </script>
 
@@ -11,15 +18,19 @@ p {
 </style>
 
 <template>
-  <div>
-    <p>{{ $t('main.karma-inspire-1') }}</p>
-    <p>{{ $t('main.karma-inspire-2') }}</p>
-    <p>{{ $t('main.karma-inspire-3') }}</p>
-    <p>{{ $t('main.karma-inspire-4') }}</p>
-    <p>{{ $t('main.karma-inspire-5') }}</p>
+  <template v-if="tooltip">
+    <span>{{ $t('main.karma-points', { 'karma': karma.grade }) }}&nbsp;</span>
+    <template v-if="'error' !== karma.label">
+      <span>{{ $t('main.karma-inspire') }}&nbsp;</span>
+    </template>
+  </template>
 
-    <po-button color="primary" size="large" block @click="karma.ignore = true">
-      {{ $t('writings.continue-publishing') }}
-    </po-button>
-  </div>
+  <template v-else>
+    <p>
+      <span>{{ $t('main.karma-inspire') }}&nbsp;</span>
+      <span v-if="'error' == karma.label">{{ $t('main.karma-low-action') }}</span>
+      <span v-if="'warning' == karma.label">{{ $t('main.karma-mid-action') }}</span>
+      <span>&nbsp;{{ $t('main.karma-actions') }}</span>
+    </p>
+  </template>
 </template>

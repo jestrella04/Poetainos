@@ -290,12 +290,14 @@ const Helper = class {
 
   karmaLabel(karma) {
     let label = null
+    const low = 25
+    const high = 60
 
-    if (karma < 25) {
+    if (karma < low) {
       label = 'error'
-    } else if (karma >= 25 && karma <= 50) {
+    } else if (karma >= low && karma <= high) {
       label = 'warning'
-    } else if (karma > 50) {
+    } else if (karma > high) {
       label = 'success'
     }
 

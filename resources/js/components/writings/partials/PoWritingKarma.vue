@@ -18,7 +18,7 @@ const karma = inject('karma')
         <v-icon icon="fas fa-yin-yang" :color="karma.label" v-bind="props"></v-icon>
       </template>
 
-      <po-karma-message :karma="karma" />
+      <po-karma-inspire tooltip></po-karma-inspire>
     </v-tooltip>
   </div>
 </template>

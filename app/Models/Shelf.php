@@ -12,13 +12,14 @@ class Shelf extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'writing_id',
+        'user_id',
+        'writing_id',
     ];
 
-     /**
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 }

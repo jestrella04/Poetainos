@@ -24,11 +24,11 @@ const isPosting = ref(false)
 const isPosted = ref({})
 const isUpdate = !helper.strNullOrEmpty(writing.data.title)
 const isDelete = ref(false)
-const writingCount = page.value.props.author.writings_count
 const karma = reactive({
   grade: page.value.props.author.karma,
+  today: page.value.props.author.today,
   label: helper.karmaLabel(page.value.props.author.karma),
-  ignore: page.value.props.author.karma > 50 ? true : false
+  hideBanner: false
 })
 
 provide('formData', formData)
@@ -36,12 +36,12 @@ provide('isDelete', isDelete)
 provide('karma', karma)
 
 onMounted(() => {
-  // Ignore karma for the first time publishing
-  if (writingCount == 0) {
-    karma.ignore = true
+  // Check is karma banner should be displayed
+  if (karma.grade >= 25 || karma.today >= 3) {
+    karma.hideBanner = true
   }
 
-  // If updating trigger category update onMounted
+  // If updating, trigger category update
   if (!helper.strNullOrEmpty(writing.data.title)) {
     formData.main_category = writing.main_category
     formData.alt_categories = writing.categories
@@ -155,13 +155,19 @@ function resetForm() {
         <po-writing-karma />
       </template>
 
-      <v-card-text v-if="!karma.ignore">
+      <v-card-text v-if="!karma.hideBanner">
         <po-karma-inspire style="margin-top: -0.5rem" />
+
+        <template v-if="'error' == karma.label">
+          <po-button color="primary" size="large" class="mb-2" :href="route('home')" block inertia>
+            {{ $t('main.go-to-home') }}
+          </po-button>
+        </template>
       </v-card-text>
 
       <v-form
         id="writing-form"
-        v-if="karma.ignore"
+        v-if="karma.hideBanner"
         :action="isUpdate ? route('writings.update', writing.data.slug) : route('writings.store')"
         class="px-5 pb-5"
         @submit.prevent="submitForm"

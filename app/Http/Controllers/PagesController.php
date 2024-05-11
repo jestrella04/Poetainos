@@ -12,7 +12,7 @@ class PagesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Inertia\Response
      */
     public function index()
     {
@@ -25,7 +25,7 @@ class PagesController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response | void
      */
     public function create()
     {
@@ -36,7 +36,7 @@ class PagesController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response | void
      */
     public function store(Request $request)
     {
@@ -47,10 +47,12 @@ class PagesController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
+     * @return \Inertia\Response
      */
     public function show(Page $page)
     {
+        $page->text = hydrateSettings($page->text);
+
         return Inertia::render('pages/PoPagesShow', [
             'meta' => [
                 'title' => getPageTitle([$page->title]),
@@ -63,7 +65,7 @@ class PagesController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response | void
      */
     public function edit(Page $page)
     {
@@ -75,7 +77,7 @@ class PagesController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response | array
      */
     public function update(Request $request)
     {
@@ -117,7 +119,7 @@ class PagesController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Page  $page
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response | array
      */
     public function destroy(Page $page)
     {
