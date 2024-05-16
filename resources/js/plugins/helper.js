@@ -299,8 +299,6 @@ const Helper = class {
       label = 'success'
     }
 
-    console.log(karma.gradeLow)
-
     return label
   }
 }
