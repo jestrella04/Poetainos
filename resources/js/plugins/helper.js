@@ -288,18 +288,18 @@ const Helper = class {
     return new URL(url, window.route('home')).toString()
   }
 
-  karmaLabel(karma) {
+  karmaLabel(grade, karma) {
     let label = null
-    const low = 25
-    const high = 60
 
-    if (karma < low) {
+    if (grade < karma.gradeLow) {
       label = 'error'
-    } else if (karma >= low && karma <= high) {
+    } else if (grade < karma.gradeMid) {
       label = 'warning'
-    } else if (karma > high) {
+    } else if (grade >= karma.gradeMid) {
       label = 'success'
     }
+
+    console.log(karma.gradeLow)
 
     return label
   }

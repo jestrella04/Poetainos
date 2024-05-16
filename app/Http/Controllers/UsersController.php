@@ -52,7 +52,7 @@ class UsersController extends Controller
                 'canonical' => route('users.index'),
             ],
             'sort' => $sort,
-            'users' => Inertia::lazy(fn () => $users),
+            'users' => Inertia::lazy(fn() => $users),
         ]);
     }
 
@@ -104,8 +104,9 @@ class UsersController extends Controller
         // Increment writing views
         $user->incrementViews();
 
-        // Update Aura
+        // Update Aura / karma
         $user->updateAura();
+        $user->updateKarma();
 
         $authUser = auth()->check() ? User::find(auth()->user()->id) : null;
 
@@ -136,19 +137,25 @@ class UsersController extends Controller
                 ->firstOrFail(),
             'writings' => [
                 'from_author' => $user->writings()
-                    ->with(['author' => function ($query) {
-                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                    }])
+                    ->with([
+                        'author' => function ($query) {
+                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                        }
+                    ])
                     ->inRandomOrder()->take(5)->get(),
                 'from_shelf' => $user->shelf()
-                    ->with(['author' => function ($query) {
-                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                    }])
+                    ->with([
+                        'author' => function ($query) {
+                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                        }
+                    ])
                     ->inRandomOrder()->take(5)->get(),
                 'from_liked' => Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
-                    ->with(['author' => function ($query) {
-                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                    }])
+                    ->with([
+                        'author' => function ($query) {
+                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                        }
+                    ])
                     ->inRandomOrder()->take(5)->get(),
             ],
             'isAuthorBlocked' => auth()->check() ? $authUser->isAuthorBlocked($user) : false

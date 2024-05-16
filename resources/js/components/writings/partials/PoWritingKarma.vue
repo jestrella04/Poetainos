@@ -1,6 +1,7 @@
 <script setup>
 import { inject } from 'vue'
 
+const author = inject('author')
 const karma = inject('karma')
 </script>
 
@@ -15,7 +16,11 @@ const karma = inject('karma')
   <div class="karma-icon position-absolute">
     <v-tooltip location="bottom" max-width="400px" open-on-click>
       <template v-slot:activator="{ props }">
-        <v-icon icon="fas fa-yin-yang" :color="karma.label" v-bind="props"></v-icon>
+        <v-icon
+          icon="fas fa-yin-yang"
+          :color="$helper.karmaLabel(author.karma, karma)"
+          v-bind="props"
+        ></v-icon>
       </template>
 
       <po-karma-inspire tooltip></po-karma-inspire>

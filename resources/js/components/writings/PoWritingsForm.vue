@@ -24,20 +24,35 @@ const isPosting = ref(false)
 const isPosted = ref({})
 const isUpdate = !helper.strNullOrEmpty(writing.data.title)
 const isDelete = ref(false)
+const author = reactive({
+  karma: page.value.props.author.karma,
+  today: page.value.props.author.interactions_today
+})
 const karma = reactive({
-  grade: page.value.props.author.karma,
-  today: page.value.props.author.today,
-  label: helper.karmaLabel(page.value.props.author.karma),
+  gradeLow: page.value.props.karma.grade_low,
+  gradeMid: page.value.props.karma.grade_mid,
+  interactionsLow: page.value.props.karma.req_interactions_low,
+  interactionsMid: page.value.props.karma.req_interactions_mid,
+  interactionsHigh: page.value.props.karma.req_interactions_high,
   hideBanner: false
 })
 
 provide('formData', formData)
 provide('isDelete', isDelete)
+provide('author', author)
 provide('karma', karma)
 
 onMounted(() => {
   // Check is karma banner should be displayed
-  if (karma.grade >= 25 || karma.today >= 3) {
+  if (author.karma < karma.gradeLow && author.today >= karma.interactionsLow) {
+    karma.hideBanner = true
+  } else if (
+    author.karma >= karma.gradeLow &&
+    author.karma < karma.gradeMid &&
+    author.today >= karma.interactionsMid
+  ) {
+    karma.hideBanner = true
+  } else if (author.karma >= karma.gradeMid && author.today >= karma.interactionsHigh) {
     karma.hideBanner = true
   }
 
@@ -157,12 +172,6 @@ function resetForm() {
 
       <v-card-text v-if="!karma.hideBanner">
         <po-karma-inspire style="margin-top: -0.5rem" />
-
-        <template v-if="'error' == karma.label">
-          <po-button color="primary" size="large" class="mb-2" :href="route('home')" block inertia>
-            {{ $t('main.go-to-home') }}
-          </po-button>
-        </template>
       </v-card-text>
 
       <v-form

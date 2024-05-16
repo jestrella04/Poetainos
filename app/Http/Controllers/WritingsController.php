@@ -189,9 +189,16 @@ class WritingsController extends Controller
                 'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
 
             ],
+            'karma' => [
+                "grade_low" => 25,
+                "grade_mid" => 70,
+                "req_interactions_low" => 5,
+                "req_interactions_mid" => 3,
+                "req_interactions_high" => 0,
+            ],
             'author' => [
-                'karma' => auth()->user()->karma,
-                'today' => Inertia::lazy(fn() => auth()->user()->todayEmpathySummary()),
+                "karma" => auth()->user()->karma,
+                'interactions_today' => Inertia::lazy(fn() => auth()->user()->todayEmpathySummary()),
             ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
@@ -287,8 +294,9 @@ class WritingsController extends Controller
         // Persist tags
         $writing->tags()->sync($tagsToSync);
 
-        // Update user aura
+        // Update user aura / karma
         $writing->author->updateAura();
+        $writing->author->updateKarma();
 
         // Persist user agreements to avoid asking again
         if (!empty(request('service_agreement') && !empty(request('privacy_agreement')))) {

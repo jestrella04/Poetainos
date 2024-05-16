@@ -61,8 +61,9 @@ class LikesController extends Controller
 
         $like->save();
 
-        // Update aura
+        // Update aura / karma
         $like->user->updateAura();
+        $like->user->updateKarma();
 
         if ('writing' == $likeable) {
             $like->likeable->updateAura();

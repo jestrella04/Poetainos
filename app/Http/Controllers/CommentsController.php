@@ -29,9 +29,11 @@ class CommentsController extends Controller
 
         $comments = Comment::where('writing_id', $writing)
             ->whereNotIn('user_id', $filter)
-            ->with(['author' => function ($query) {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }])
+            ->with([
+                'author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }
+            ])
             ->withCount(['likes'])
             ->orderBy('created_at', 'desc')
             ->simplePaginate($this->pagination);
@@ -69,8 +71,9 @@ class CommentsController extends Controller
             'message' => $message,
         ]);
 
-        // Update aura
+        // Update aura / karma
         $comment->author->updateAura();
+        $comment->author->updateKarma();
         $comment->writing->updateAura();
 
         // Notify author

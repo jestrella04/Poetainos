@@ -31,8 +31,9 @@ class ShelvesController extends Controller
             'user_id' => $userId,
         ]);
 
-        // Update aura
+        // Update aura / karma
         User::find($userId)->updateAura();
+        User::find($userId)->updateKarma();
         Writing::find($writing->id)->updateAura();
 
         // Notify author

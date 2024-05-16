@@ -26,6 +26,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'password_updated_at',
         'extra_info',
+        'aura',
+        'karma',
+        'aura_updated_at'
     ];
 
     /**
@@ -170,15 +173,13 @@ class User extends Authenticatable implements MustVerifyEmail
         DB::table($this->getTable())->whereId($this->id)->increment('profile_views');
     }
 
-    public function updateAura()
+    private function calcPoints(array $count)
     {
-        // Count user content
-        $user = User::whereId($this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
-        $writings = $user->writings_count;
-        $likes = $user->likes_count;
-        $comments = $user->comments_count;
-        $shelf = $user->shelf_count;
-        $awards = $user->awards_count;
+        $writings = $count['writings'] || 0;
+        $likes = $count['likes'] || 0;
+        $comments = $count['comments'] || 0;
+        $shelf = $count['shelf'] || 0;
+        $awards = $count['awards'] || 0;
         $views = $this->profile_views;
         //$hood = $this->hood->count();
         //$extendedHood = $this->fellowHood($count = true);
@@ -206,22 +207,72 @@ class User extends Authenticatable implements MustVerifyEmail
         $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
         $empathyPoints = $totalPoints - $pointsWritings - $pointsViews - $pointsAwards;
 
+        return ['base' => $basePoints, 'total' => $totalPoints, 'empathy' => $empathyPoints];
+    }
+
+    public function updateAura()
+    {
+        // Count user content
+        $user = User::whereId($this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
+
+        $count = [];
+        $count['writings'] = $user->writings_count;
+        $count['likes'] = $user->likes_count;
+        $count['comments'] = $user->comments_count;
+        $count['shelf'] = $user->shelf_count;
+        $count['awards'] = $user->awards_count;
+        $count['views'] = $this->profile_views;
+        //$hood = $this->hood->count();
+        //$extendedHood = $this->fellowHood($count = true);
+
+        $points = $this->calcPoints($count);
+
         // Do the math
-        if ($totalPoints > 0) {
-            $aura = (($totalPoints / $basePoints) * ($basePoints / 6)) / $basePoints; // 6 is the count of countables (writings, likes, etc)
-            $karma = ($empathyPoints / $totalPoints) * 100;
+        if ($points['total'] > 0) {
+            $aura = (($points['total'] / $points['base']) * ($points['base'] / 6)) / $points['base']; // 6 is the count of countables (writings, likes, etc)
 
             // Format numbers
             $aura = number_format($aura, 2);
-            $karma = number_format($karma, 2);
 
             // Persist to the database
             DB::table('users')->whereId($this->id)->update([
                 'aura' => $aura,
+                'aura_updated_at' => Carbon::now()
+            ]);
+        }
+    }
+
+    public function updateKarma()
+    {
+        // Count user content
+        $dateTrigger = Carbon::now()->subDays(30);
+        $count = [];
+        $count['writings'] = $this->writings()->whereDate('created_at', '>=', $dateTrigger)->count();
+        $count['likes'] = $this->likes()->whereDate('created_at', '>=', $dateTrigger)->count();
+        $count['comments'] = $this->comments()->whereDate('created_at', '>=', $dateTrigger)->count();
+        $count['shelf'] = Shelf::where('user_id', $this->id)->whereDate('created_at', '>=', $dateTrigger)->count();
+        $count['awards'] = $this->awards()->whereDate('created_at', '>=', $dateTrigger)->count();
+        $count['views'] = $this->profile_views;
+        //$hood = $this->hood->count();
+        //$extendedHood = $this->fellowHood($count = true);
+
+        $points = $this->calcPoints($count);
+
+        // Do the math
+        if ($points['total'] > 0) {
+            $karma = ($points['empathy'] / $points['total']) * 100;
+
+            // Format numbers
+            $karma = number_format($karma, 2);
+
+            // Persist to the database
+            $this->update([
                 'karma' => $karma,
                 'aura_updated_at' => Carbon::now()
             ]);
         }
+
+        return $this;
     }
 
     public function isAllowed($task)
