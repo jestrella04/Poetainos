@@ -20,7 +20,17 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Artisan::command('karma', function () {
+Artisan::command('aura-update', function () {
+    DB::table('users')
+        ->chunkById(100, function ($users) {
+            foreach ($users as $user) {
+                $user = User::find($user->id);
+                Http::put(route("api.aura.update", $user));
+            }
+        });
+});
+
+Artisan::command('karma-update', function () {
     DB::table('users')
         ->chunkById(100, function ($users) {
             foreach ($users as $user) {
