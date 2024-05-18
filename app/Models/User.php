@@ -252,7 +252,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $count['comments'] = $this->comments()->whereDate('created_at', '>=', $dateTrigger)->count();
         $count['shelf'] = Shelf::where('user_id', $this->id)->whereDate('created_at', '>=', $dateTrigger)->count();
         $count['awards'] = $this->awards()->whereDate('created_at', '>=', $dateTrigger)->count();
-        $count['views'] = $this->profile_views;
+        //$count['views'] = $this->profile_views;
         //$hood = $this->hood->count();
         //$extendedHood = $this->fellowHood($count = true);
 
