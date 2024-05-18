@@ -175,12 +175,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     private function calcPoints(array $count)
     {
-        $writings = $count['writings'] || 0;
-        $likes = $count['likes'] || 0;
-        $comments = $count['comments'] || 0;
-        $shelf = $count['shelf'] || 0;
-        $awards = $count['awards'] || 0;
-        $views = $this->profile_views;
+        $writings = $count['writings'] ?? 0;
+        $likes = $count['likes'] ?? 0;
+        $comments = $count['comments'] ?? 0;
+        $shelf = $count['shelf'] ?? 0;
+        $awards = $count['awards'] ?? 0;
+        $views = $count['views'] ?? 0;
         //$hood = $this->hood->count();
         //$extendedHood = $this->fellowHood($count = true);
 
