@@ -106,7 +106,7 @@ class UsersController extends Controller
 
         // Update Aura / karma
         $user->updateAura();
-        $user->updateKarma();
+        //$user->updateKarma();
 
         $authUser = auth()->check() ? User::find(auth()->user()->id) : null;
 

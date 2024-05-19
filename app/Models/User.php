@@ -205,27 +205,33 @@ class User extends Authenticatable implements MustVerifyEmail
         //$pointsHood = $pointsHood * $hood;
         //$pointsExtendedHood = $pointsExtendedHood * $extendedHood;
         $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
-        $empathyPoints = $totalPoints - $pointsWritings - $pointsViews - $pointsAwards;
 
-        return ['base' => $basePoints, 'total' => $totalPoints, 'empathy' => $empathyPoints];
+        return [
+            'base' => $basePoints,
+            'total' => $totalPoints
+        ];
     }
 
-    public function updateAura()
+    public function updateAura($return = false)
     {
         // Count user content
         $user = User::whereId($this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
-
-        $count = [];
-        $count['writings'] = $user->writings_count;
-        $count['likes'] = $user->likes_count;
-        $count['comments'] = $user->comments_count;
-        $count['shelf'] = $user->shelf_count;
-        $count['awards'] = $user->awards_count;
-        $count['views'] = $this->profile_views;
-        //$hood = $this->hood->count();
-        //$extendedHood = $this->fellowHood($count = true);
+        $count = [
+            'writings' => $user->writings_count,
+            'likes' => $user->likes_count,
+            'comments' => $user->comments_count,
+            'shelf' => $user->shelf_count,
+            'awards' => $user->awards_count,
+            'views' => $this->profile_views,
+            //'hood' => $this->hood->count(),
+            //'extendedHood' => $this->fellowHood($count = true),
+        ];
 
         $points = $this->calcPoints($count);
+
+        if ($return) {
+            return $points;
+        }
 
         // Do the math
         if ($points['total'] > 0) {
@@ -246,24 +252,29 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         // Count user content
         $dateTrigger = Carbon::now()->subDays(30);
-        $count = [];
-        $count['writings'] = $this->writings()->whereDate('created_at', '>=', $dateTrigger)->count();
-        $count['likes'] = $this->likes()->whereDate('created_at', '>=', $dateTrigger)->count();
-        $count['comments'] = $this->comments()->whereDate('created_at', '>=', $dateTrigger)->count();
-        $count['shelf'] = Shelf::where('user_id', $this->id)->whereDate('created_at', '>=', $dateTrigger)->count();
-        $count['awards'] = $this->awards()->whereDate('created_at', '>=', $dateTrigger)->count();
-        //$count['views'] = $this->profile_views;
-        //$hood = $this->hood->count();
-        //$extendedHood = $this->fellowHood($count = true);
+        $count = [
+            'writings' => $this->writings()->whereDate('created_at', '>=', $dateTrigger)->count(),
+            'likes' => $this->likes()->whereDate('created_at', '>=', $dateTrigger)->count(),
+            'comments' => $this->comments()->whereDate('created_at', '>=', $dateTrigger)->count(),
+            'shelf' => Shelf::where('user_id', $this->id)->whereDate('created_at', '>=', $dateTrigger)->count(),
+            'awards' => $this->awards()->whereDate('created_at', '>=', $dateTrigger)->count(),
+        ];
 
         $points = $this->calcPoints($count);
 
         // Do the math
         if ($points['total'] > 0) {
-            $karma = ($points['empathy'] / $points['total']) * 100;
-
-            // Format numbers
-            $karma = number_format($karma, 2);
+            if (inRange($points['total'], 1, 1000)) {
+                $karma = 'F';
+            } else if (inRange($points['total'], 1000, 1500)) {
+                $karma = 'D';
+            } else if (inRange($points['total'], 1500, 2000)) {
+                $karma = 'C';
+            } else if (inRange($points['total'], 2000, 2500)) {
+                $karma = 'B';
+            } else {
+                $karma = 'A';
+            }
 
             // Persist to the database
             $this->update([

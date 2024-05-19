@@ -29,8 +29,6 @@ const author = reactive({
   today: page.value.props.author.interactions_today
 })
 const karma = reactive({
-  gradeLow: page.value.props.karma.grade_low,
-  gradeMid: page.value.props.karma.grade_mid,
   interactionsLow: page.value.props.karma.req_interactions_low,
   interactionsMid: page.value.props.karma.req_interactions_mid,
   interactionsHigh: page.value.props.karma.req_interactions_high,
@@ -44,15 +42,11 @@ provide('karma', karma)
 
 onMounted(() => {
   // Check is karma banner should be displayed
-  if (author.karma < karma.gradeLow && author.today >= karma.interactionsLow) {
+  if (['F', 'D'].includes(author.karma) && author.today >= karma.interactionsLow) {
     karma.hideBanner = true
-  } else if (
-    author.karma >= karma.gradeLow &&
-    author.karma < karma.gradeMid &&
-    author.today >= karma.interactionsMid
-  ) {
+  } else if (['C', 'B'].includes(author.karma) && author.today >= karma.interactionsMid) {
     karma.hideBanner = true
-  } else if (author.karma >= karma.gradeMid && author.today >= karma.interactionsHigh) {
+  } else if (['A'].includes(author.karma) && author.today >= karma.interactionsHigh) {
     karma.hideBanner = true
   }
 

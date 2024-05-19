@@ -133,11 +133,12 @@
   },
   "main": {
     "go-to-home": "Ir a la portada",
+    "karma-null": "No hemos podido calcular tu karma.",
     "karma-contrib-not-met": "No has alcanzado el mínimo de karma para poder publicar sin limitaciones.",
     "karma-contrib-important": "Recuerda que tus contribuciones son importantes y nos ayudan a crear un ambiente más vibrante y dinámico.",
     "karma-contrib-missing": "Te animamos a interactuar con al menos {count} textos de otros autores antes de continuar.",
     "karma-contrib-actions": "Se vale un me gusta, un comentario, un marcador... (o todo a la vez 😉).",
-    "karma-points": "Tu karma actual es {karma} / 100.",
+    "karma-points": "Tienes un karma nivel \"{karma}\".",
     "about-us": "Sobre Nosotros",
     "action-irreversible": "Esta acción es irreversible.",
     "actions": "Acciones",

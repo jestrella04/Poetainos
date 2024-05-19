@@ -190,9 +190,7 @@ class WritingsController extends Controller
 
             ],
             'karma' => [
-                "grade_low" => 25,
-                "grade_mid" => 70,
-                "req_interactions_low" => 5,
+                "req_interactions_low" => 6,
                 "req_interactions_mid" => 3,
                 "req_interactions_high" => 0,
             ],
@@ -296,7 +294,7 @@ class WritingsController extends Controller
 
         // Update user aura / karma
         $writing->author->updateAura();
-        $writing->author->updateKarma();
+        //$writing->author->updateKarma();
 
         // Persist user agreements to avoid asking again
         if (!empty(request('service_agreement') && !empty(request('privacy_agreement')))) {

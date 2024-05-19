@@ -18,7 +18,7 @@ const karma = inject('karma')
       <template v-slot:activator="{ props }">
         <v-icon
           icon="fas fa-yin-yang"
-          :color="$helper.karmaLabel(author.karma, karma)"
+          :color="$helper.karmaLabel(author.karma)"
           v-bind="props"
         ></v-icon>
       </template>

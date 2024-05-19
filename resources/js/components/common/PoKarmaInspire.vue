@@ -10,15 +10,16 @@ defineProps({
 
 const author = inject('author')
 const karma = inject('karma')
+const helper = inject('helper')
 const neededActions = ref(0)
 
 onMounted(() => {
   // Check how many interactions left before user can publish
-  if (author.karma < karma.gradeLow) {
+  if (helper.isNull(author.karma) || ['F', 'D'].includes(author.karma)) {
     neededActions.value = karma.interactionsLow - author.today
-  } else if (author.karma < karma.gradeMid) {
+  } else if (['C', 'B'].includes(author.karma)) {
     neededActions.value = karma.interactionsMid - author.today
-  } else if (author.karma >= karma.gradeMid) {
+  } else if (['A'].includes(author.karma)) {
     neededActions.value = karma.interactionsHigh - author.today
   }
 })
@@ -32,7 +33,8 @@ p {
 
 <template>
   <template v-if="tooltip">
-    <span>{{ $t('main.karma-points', { karma: author.karma }) }}&nbsp;</span>
+    <span v-if="$helper.isNull(author.karma)">{{ $t('main.karma-null') }}</span>
+    <span v-else>{{ $t('main.karma-points', { karma: author.karma }) }}&nbsp;</span>
   </template>
 
   <template v-else>
