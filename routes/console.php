@@ -20,14 +20,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Artisan::command('aura-update', function () {
-    $users = User::all(['username']);
-
-    foreach ($users as $user) {
-        $this->line("Updating aura for user: " . $user->username);
-        Http::put(route("api.aura.update", $user->username));
-    }
-});
 
 Artisan::command('karma-update', function () {
     $users = User::all(['username']);
@@ -35,5 +27,6 @@ Artisan::command('karma-update', function () {
     foreach ($users as $user) {
         $this->line("Updating karma for user: " . $user->username);
         Http::put(route("api.karma.update", $user->username));
+        sleep(3);
     }
 });

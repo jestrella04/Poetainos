@@ -19,11 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::put('/aura/{user}', function (User $user) {
-    $user->updateAura();
-    return response($user->aura);
-})->name('api.aura.update');
-
 Route::put('/karma/{user}', function (User $user) {
     $user->updateKarma();
     return response($user->karma);
