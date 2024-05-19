@@ -153,11 +153,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Comment::class);
     }
 
-    public function replies()
-    {
-        return $this->hasMany(Reply::class);
-    }
-
     public function likes()
     {
         return $this->hasMany(Like::class);
@@ -212,7 +207,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function updateAura($return = false)
+    public function updateAura()
     {
         // Count user content
         $user = User::whereId($this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
@@ -228,10 +223,6 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
 
         $points = $this->calcPoints($count);
-
-        if ($return) {
-            return $points;
-        }
 
         // Do the math
         if ($points['total'] > 0) {
@@ -253,11 +244,10 @@ class User extends Authenticatable implements MustVerifyEmail
         // Count user content
         $dateTrigger = Carbon::now()->subDays(30);
         $count = [
-            'writings' => $this->writings()->whereDate('created_at', '>=', $dateTrigger)->count(),
             'likes' => $this->likes()->whereDate('created_at', '>=', $dateTrigger)->count(),
             'comments' => $this->comments()->whereDate('created_at', '>=', $dateTrigger)->count(),
             'shelf' => Shelf::where('user_id', $this->id)->whereDate('created_at', '>=', $dateTrigger)->count(),
-            'awards' => $this->awards()->whereDate('created_at', '>=', $dateTrigger)->count(),
+            'awards' => $this->writings()->whereDate('home_posted_at', '>=', $dateTrigger)->count(),
         ];
 
         $points = $this->calcPoints($count);
@@ -272,7 +262,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 $karma = 'C';
             } else if (inRange($points['total'], 2000, 2500)) {
                 $karma = 'B';
-            } else {
+            } elseif ($points['total'] >= 2500) {
                 $karma = 'A';
             }
 

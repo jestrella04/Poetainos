@@ -113,7 +113,7 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::select('id', 'username', 'name', 'email', 'created_at');
+        $users = User::select('id', 'username', 'name', 'email', 'created_at', 'aura', 'karma');
 
         if (request()->expectsJson()) {
             return $users->simplePaginate($this->pagination)->withQueryString();

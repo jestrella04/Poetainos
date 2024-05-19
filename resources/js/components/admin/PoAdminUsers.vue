@@ -5,7 +5,7 @@ import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import axios from 'axios'
 
 defineOptions({
-  layout: PoLayoutAdmin,
+  layout: PoLayoutAdmin
 })
 
 const page = computed(() => usePage())
@@ -15,7 +15,9 @@ const headers = [
   { title: 'Full Name', align: 'start', sortable: false, key: 'name' },
   { title: 'Email', align: 'start', sortable: false, key: 'email' },
   { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' },
+  { title: 'Aura', align: 'start', sortable: false, key: 'aura' },
+  { title: 'Karma', align: 'start', sortable: false, key: 'karma' },
+  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
 ]
 const items = ref([])
 const totalItems = ref(page.value.props.total)
@@ -41,8 +43,15 @@ async function loadItems(event) {
   <po-wrapper>
     <v-card-title>{{ $t('users.users') }}</v-card-title>
 
-    <v-data-table-server v-model:items-per-page="page.props.site.pagination" :headers="headers"
-      :items-length="totalItems" :items="items" :loading="isLoading" item-value="id" @update:options="loadItems">
+    <v-data-table-server
+      v-model:items-per-page="page.props.site.pagination"
+      :headers="headers"
+      :items-length="totalItems"
+      :items="items"
+      :loading="isLoading"
+      item-value="id"
+      @update:options="loadItems"
+    >
       <template v-slot:item.username="{ item }">
         {{ item.username }}
       </template>
@@ -59,13 +68,33 @@ async function loadItems(event) {
         {{ $helper.toLocaleDate(item.created_at) }}
       </template>
 
+      <template v-slot:item.aura="{ item }">
+        {{ item.aura }}
+      </template>
+
+      <template v-slot:item.karma="{ item }">
+        {{ item.karma }}
+      </template>
+
       <template v-slot:item.actions="{ item }">
         <div class="d-flex ga-2">
-          <po-button :href="route('users.show', item.username)" size="x-small" color="secondary" icon inertia>
+          <po-button
+            :href="route('users.show', item.username)"
+            size="x-small"
+            color="secondary"
+            icon
+            inertia
+          >
             <v-icon icon="fas fa-eye"></v-icon>
           </po-button>
 
-          <po-button :href="route('users.edit', item.username)" size="x-small" color="secondary" icon inertia>
+          <po-button
+            :href="route('users.edit', item.username)"
+            size="x-small"
+            color="secondary"
+            icon
+            inertia
+          >
             <v-icon icon="fas fa-edit"></v-icon>
           </po-button>
 

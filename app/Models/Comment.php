@@ -12,13 +12,10 @@ class Comment extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'writing_id', 'message',
+        'user_id',
+        'writing_id',
+        'message',
     ];
-
-    public function replies()
-    {
-        return $this->hasMany(Reply::class);
-    }
 
     public function writing()
     {
