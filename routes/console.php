@@ -21,21 +21,19 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Artisan::command('aura-update', function () {
-    DB::table('users')
-        ->chunkById(100, function ($users) {
-            foreach ($users as $user) {
-                $user = User::find($user->id);
-                Http::put(route("api.aura.update", $user));
-            }
-        });
+    $users = User::all(['username']);
+
+    foreach ($users as $user) {
+        $this->line("Updating aura for user: " . $user->username);
+        Http::put(route("api.aura.update", $user->username));
+    }
 });
 
 Artisan::command('karma-update', function () {
-    DB::table('users')
-        ->chunkById(100, function ($users) {
-            foreach ($users as $user) {
-                $user = User::find($user->id);
-                Http::put(route("api.karma.update", $user));
-            }
-        });
+    $users = User::all(['username']);
+
+    foreach ($users as $user) {
+        $this->line("Updating karma for user: " . $user->username);
+        Http::put(route("api.karma.update", $user->username));
+    }
 });
