@@ -202,8 +202,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
 
         return [
-            'base' => $basePoints,
-            'total' => $totalPoints
+            'base' => (int) $basePoints,
+            'total' => (int) $totalPoints
         ];
     }
 
@@ -253,25 +253,23 @@ class User extends Authenticatable implements MustVerifyEmail
         $points = $this->calcPoints($count);
 
         // Do the math
-        if ($points['total'] > 0) {
-            if (inRange($points['total'], 1, 1000)) {
-                $karma = 'F';
-            } else if (inRange($points['total'], 1000, 1500)) {
-                $karma = 'D';
-            } else if (inRange($points['total'], 1500, 2000)) {
-                $karma = 'C';
-            } else if (inRange($points['total'], 2000, 2500)) {
-                $karma = 'B';
-            } elseif ($points['total'] >= 2500) {
-                $karma = 'A';
-            }
-
-            // Persist to the database
-            $this->update([
-                'karma' => $karma,
-                'aura_updated_at' => Carbon::now()
-            ]);
+        if (inRange($points['total'], 0, 1000)) {
+            $karma = 'F';
+        } else if (inRange($points['total'], 1000, 1500)) {
+            $karma = 'D';
+        } else if (inRange($points['total'], 1500, 2000)) {
+            $karma = 'C';
+        } else if (inRange($points['total'], 2000, 2500)) {
+            $karma = 'B';
+        } else if ($points['total'] >= 2500) {
+            $karma = 'A';
         }
+
+        // Persist to the database
+        $this->update([
+            'karma' => $karma,
+            'aura_updated_at' => Carbon::now()
+        ]);
 
         return $this;
     }
