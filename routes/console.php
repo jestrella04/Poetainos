@@ -27,6 +27,6 @@ Artisan::command('karma-update', function () {
     foreach ($users as $user) {
         $this->line("Updating karma for user: " . $user->username);
         Http::put(route("api.karma.update", $user->username));
-        sleep(3);
+        sleep(1);
     }
 });

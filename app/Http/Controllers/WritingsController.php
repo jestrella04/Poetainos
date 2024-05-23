@@ -329,15 +329,16 @@ class WritingsController extends Controller
     public function destroy(Writing $writing)
     {
         $this->authorize('delete', $writing);
-        $writing->delete();
+        $writing->deleteOrFail();
 
         // Delete related notifications
         DatabaseNotification::where('data->writing_id', $writing->id)->delete();
-        DB::delete('DELETE FROM `notifications` WHERE JSON_EXTRACT(`data`, "$.writing_id") = ?', [$writing->id]);
 
         // Delete related likes
-        //Like::where('likeable_type', 'App\Models\Writing')->whereAnd('likeable_id', $writing->id)->delete();
-        // TODO: delete likes using DB facade
+        Like::where([
+            ['likeable_type', 'App\Models\Writing'],
+            ['likeable_id', $writing->id]
+        ])->delete();
 
         if (request('redirect')) {
             request()->session()->flash('flash', __('Writing deleted successfully'));

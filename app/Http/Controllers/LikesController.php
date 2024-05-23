@@ -35,7 +35,7 @@ class LikesController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function store($likeable, $likeable_id)
     {
@@ -50,10 +50,11 @@ class LikesController extends Controller
         }
 
         // Check existence
-        $exist = Like::where('user_id', $like->user_id)
-            ->where('likeable_type', $like->likeable_type)
-            ->where('likeable_id', $like->likeable_id)
-            ->count();
+        $exist = Like::where([
+            ['user_id', $like->user_id],
+            ['likeable_type', $like->likeable_type],
+            ['likeable_id', $like->likeable_id],
+        ])->count();
 
         if ($exist > 0) {
             return $this->destroy($likeable, $likeable_id);
@@ -129,17 +130,23 @@ class LikesController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Like  $like
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy($likeable, $likeable_id)
     {
-        // TODO: review
-
         if ('writing' == $likeable) {
-            //Writing::find($likeable_id)->likes()->where('user_id', auth()->user()->id)->delete();
+            Like::where([
+                ['likeable_type', 'App\Models\Writing'],
+                ['likeable_id', $likeable_id],
+                ['user_id', auth()->user()->id],
+            ])->delete();
             $count = Writing::find($likeable_id)->likes()->count();
         } elseif ('comment' == $likeable) {
-            //Comment::find($likeable_id)->likes()->where('user_id', auth()->user()->id)->delete();
+            Like::where([
+                ['likeable_type', 'App\Models\Comment'],
+                ['likeable_id', $likeable_id],
+                ['user_id', auth()->user()->id],
+            ])->delete();
             $count = Comment::find($likeable_id)->likes()->count();
         }
 

@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Inertia\Inertia;
 use Intervention\Image\Facades\Image;
 
@@ -289,9 +290,14 @@ class UsersController extends Controller
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
-        $user->delete();
+        $user->deleteOrFail();
+
+        // Delete related notifications
         $user->notifications()->delete();
-        // TODO: delete likes
+        DatabaseNotification::where('data->user_id', $user->id)->delete();
+
+        // Delete related likes
+        $user->likes()->delete();
 
         if (auth()->user()->id === $user->id) {
             request()->session()->flash('flash', __('Your account and related data have been deleted successfully!'));

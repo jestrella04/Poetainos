@@ -137,19 +137,21 @@ class CommentsController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Comment  $comment
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function destroy(Comment $comment)
     {
         $this->authorize('delete', $comment);
-        $comment->delete();
+        $comment->deleteOrFail();
 
         // Delete related notifications
         DatabaseNotification::where('data->comment_id', $comment->id)->delete();
 
         // Delete related likes
-        //Like::where('likeable_type', 'App\Models\Comment')->whereAnd('likeable_id', $comment->id)->delete();
-        // TODO: delete likes using DB facade
+        Like::where([
+            ['likeable_type', 'App\Models\Comment'],
+            ['likeable_id', $comment->id]
+        ])->delete();
 
         return [];
     }
