@@ -22,7 +22,7 @@ const mainCategories = ref(page.value.props.main_categories)
 const altCategories = ref([])
 const isPosting = ref(false)
 const isPosted = ref({})
-const isUpdate = !helper.strNullOrEmpty(writing.data.title)
+const isUpdate = ref(false)
 const isDelete = ref(false)
 const author = reactive({
   karma: page.value.props.author.karma,
@@ -41,6 +41,9 @@ provide('author', author)
 provide('karma', karma)
 
 onMounted(() => {
+  // Is the user updating?
+  isUpdate.value = !helper.strNullOrEmpty(writing.data.title)
+
   // Check is karma banner should be displayed
   if (['F', 'D'].includes(author.karma) && author.today >= karma.interactionsLow) {
     karma.hideBanner = true
@@ -51,9 +54,10 @@ onMounted(() => {
   }
 
   // If updating, trigger category update
-  if (!helper.strNullOrEmpty(writing.data.title)) {
+  if (isUpdate.value) {
     formData.main_category = writing.main_category
     formData.alt_categories = writing.categories
+    karma.hideBanner = true
   }
 
   // Logic needed to assign below values
@@ -117,7 +121,7 @@ async function submitForm() {
 
   await axios
     .postForm(form.action, {
-      _method: isUpdate ? 'PUT' : 'POST',
+      _method: isUpdate.value ? 'PUT' : 'POST',
       title: formData.title,
       main_category: formData.main_category,
       categories: formData.alt_categories,
@@ -145,7 +149,7 @@ async function submitForm() {
 function resetForm() {
   clearErrors()
 
-  if (!isUpdate) {
+  if (!isUpdate.value) {
     clearInputs()
   }
 }
