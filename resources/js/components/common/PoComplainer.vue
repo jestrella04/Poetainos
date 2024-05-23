@@ -19,7 +19,7 @@ const forceSnackBar = inject('forceSnackBar')
 watch(complainer, async () => {
   if (complainer.value) {
     await axios
-      .get(window.route('complaints.reasons'))
+      .get(route('complaints.reasons'))
       .then((response) => {
         reasons.value = response.data.reasons
       })
@@ -79,16 +79,28 @@ async function submit() {
         <v-divider class="mt-3"></v-divider>
 
         <v-form id="complaint-form" :action="route('complaints.store')" @submit.prevent="submit">
-          <p v-if="errors" class="text-caption text-error mt-3" style="margin-bottom: -10px;">{{
-            $t('main.select-least-one') }}</p>
+          <p v-if="errors" class="text-caption text-error mt-3" style="margin-bottom: -10px">
+            {{ $t('main.select-least-one') }}
+          </p>
 
           <template v-for="reason in reasons" :key="reason">
-            <v-switch v-model="compReasons" style="margin-bottom: -20px;" color="primary" :label="reason"
-              :value="reason" multiple hide-details></v-switch>
+            <v-switch
+              v-model="compReasons"
+              style="margin-bottom: -20px"
+              color="primary"
+              :label="reason"
+              :value="reason"
+              multiple
+              hide-details
+            ></v-switch>
           </template>
 
-          <v-textarea v-model="compMessage" class="mt-5 mb-1" :label="$t('main.tell-bit-more-optional')"
-            rows="2"></v-textarea>
+          <v-textarea
+            v-model="compMessage"
+            class="mt-5 mb-1"
+            :label="$t('main.tell-bit-more-optional')"
+            rows="2"
+          ></v-textarea>
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.send') }}</span>
             <v-progress-circular v-else indeterminate></v-progress-circular>

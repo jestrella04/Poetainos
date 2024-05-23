@@ -4,7 +4,7 @@ import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 
 defineProps({
-  comment: { type: Object, required: true },
+  comment: { type: Object, required: true }
 })
 
 const helper = inject('helper')
@@ -22,10 +22,10 @@ async function submit() {
 
   await axios
     .post(form.action, {
-      '_method': 'DELETE',
+      _method: 'DELETE'
     })
     .then(() => {
-      router.visit(window.route('writings.show', writing.slug))
+      router.visit(route('writings.show', writing.slug))
       helper.setSnackBar({
         message: 'comments.comment-deleted',
         color: 'success',
@@ -56,7 +56,11 @@ async function submit() {
 
         <v-divider class="mt-3"></v-divider>
 
-        <v-form id="comment-delete-form" :action="route('comments.destroy', comment.id)" @submit.prevent="submit">
+        <v-form
+          id="comment-delete-form"
+          :action="route('comments.destroy', comment.id)"
+          @submit.prevent="submit"
+        >
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
             <v-progress-circular v-else indeterminate></v-progress-circular>

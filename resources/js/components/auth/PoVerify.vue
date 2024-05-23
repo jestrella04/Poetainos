@@ -1,26 +1,30 @@
 <script setup>
-import { defineOptions, } from 'vue'
+import { defineOptions } from 'vue'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
-import axios from 'axios';
+import axios from 'axios'
 
 defineOptions({
-  layout: PoLayoutLogin,
+  layout: PoLayoutLogin
 })
 
 async function resendLink() {
   await axios
-    .post(window.route('verification.send'))
+    .post(route('verification.send'))
     .then(() => {
       const alert = document.querySelector('.po-success')
       alert.classList.remove('d-none')
 
-      setTimeout(() => { alert.classList.add('d-none') }, 6000)
+      setTimeout(() => {
+        alert.classList.add('d-none')
+      }, 6000)
     })
     .catch(() => {
       const alert = document.querySelector('.po-error')
       alert.classList.remove('d-none')
 
-      setTimeout(() => { alert.classList.add('d-none') }, 6000)
+      setTimeout(() => {
+        alert.classList.add('d-none')
+      }, 6000)
     })
     .finally()
 }
@@ -28,11 +32,21 @@ async function resendLink() {
 
 <template>
   <div class="px-10">
-    <v-alert :text="$t('accounts.verification-link-sent')" class="text-caption po-success text-center mb-10 d-none"
-      color="success" variant="tonal" rounded></v-alert>
+    <v-alert
+      :text="$t('accounts.verification-link-sent')"
+      class="text-caption po-success text-center mb-10 d-none"
+      color="success"
+      variant="tonal"
+      rounded
+    ></v-alert>
 
-    <v-alert :text="$t('main.error-try-again')" class="text-caption po-error text-center mb-10 d-none" color="error"
-      variant="tonal" rounded></v-alert>
+    <v-alert
+      :text="$t('main.error-try-again')"
+      class="text-caption po-error text-center mb-10 d-none"
+      color="error"
+      variant="tonal"
+      rounded
+    ></v-alert>
 
     <p class="text-center text-uppercase font-weight-bold mb-3">
       {{ $t('accounts.verify-email') }}

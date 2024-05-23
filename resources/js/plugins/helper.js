@@ -106,7 +106,7 @@ const Helper = class {
   linkify(text) {
     const options = {
       formatHref: {
-        mention: (href) => `${window.route('users.index')}${href}`
+        mention: (href) => `${route('users.index')}${href}`
       }
     }
 
@@ -285,7 +285,7 @@ const Helper = class {
   }
 
   asset(url) {
-    return new URL(url, window.route('home')).toString()
+    return new URL(url, route('home')).toString()
   }
 
   karmaLabel(grade) {

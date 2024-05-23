@@ -29,7 +29,7 @@ onMounted(() => {
 
 async function loadItems(event) {
   await axios
-    .get(window.route('admin.users', { page: event.page }))
+    .get(route('admin.users', { page: event.page }))
     .then((response) => {
       items.value = response.data.data
       isLoading.value = false

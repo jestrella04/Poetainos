@@ -1,5 +1,4 @@
 <script setup>
-
 import { ref, onMounted, inject, computed, provide } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
@@ -21,12 +20,10 @@ onMounted(() => {
 })
 
 async function loadComments() {
-  await axios.
-    get(window.route('comments.index', writing.id))
-    .then(response => {
-      comments.value = response.data
-      loadingComments.value = false
-    })
+  await axios.get(route('comments.index', writing.id)).then((response) => {
+    comments.value = response.data
+    loadingComments.value = false
+  })
 }
 
 async function like(event, id) {
@@ -34,7 +31,7 @@ async function like(event, id) {
 
   if (helper.auth()) {
     await axios
-      .post(window.route('likes.store', ['comment', id]))
+      .post(route('likes.store', ['comment', id]))
       .then((response) => {
         doer.querySelector('span.count').textContent = helper.readable(response.data.count)
 
@@ -46,7 +43,7 @@ async function like(event, id) {
       })
       .catch()
       .finally(() => {
-        helper.animate(doer.querySelector("i"), "heartBeat")
+        helper.animate(doer.querySelector('i'), 'heartBeat')
       })
   } else {
     loginModal.value = true
@@ -73,7 +70,7 @@ function reply(comment) {
     initialText.push(mention[0].trim())
   }
 
-  return [... new Set(initialText)].join(' ') + ' '
+  return [...new Set(initialText)].join(' ') + ' '
 }
 </script>
 
@@ -111,9 +108,17 @@ function reply(comment) {
           </v-card-text>
 
           <v-card-actions class="justify-end">
-            <po-button variant="tonal" size="small" class="do-like"
-              :class="{ 'liked': page.props.auth.liked.comments.includes(comment.id) }"
-              @click="(event) => { like(event, comment.id) }">
+            <po-button
+              variant="tonal"
+              size="small"
+              class="do-like"
+              :class="{ liked: page.props.auth.liked.comments.includes(comment.id) }"
+              @click="
+                (event) => {
+                  like(event, comment.id)
+                }
+              "
+            >
               <v-icon class="me-2" icon="fas fa-heart"></v-icon>
               <span class="count">{{ helper.readable(comment.likes_count) }}</span>
             </po-button>
@@ -126,8 +131,11 @@ function reply(comment) {
 
           <template v-if="$helper.auth() && replyBox === comment.id">
             <div id="" class="reply-box pa-3">
-              <po-comments-form :form-id="`reply-${comment.id}-form`" :reply-to="reply(comment)"
-                @comment-posted="loadComments" />
+              <po-comments-form
+                :form-id="`reply-${comment.id}-form`"
+                :reply-to="reply(comment)"
+                @comment-posted="loadComments"
+              />
             </div>
           </template>
         </v-card>
@@ -135,8 +143,12 @@ function reply(comment) {
     </template>
 
     <template v-else>
-      <po-msg-block :msg-title="$t('comments.comments-empty')" :msg-body="$t('comments.be-first-ask')"
-        icon="fas fa-comment" class="py-10" />
+      <po-msg-block
+        :msg-title="$t('comments.comments-empty')"
+        :msg-body="$t('comments.be-first-ask')"
+        icon="fas fa-comment"
+        class="py-10"
+      />
     </template>
   </po-wrapper>
 </template>

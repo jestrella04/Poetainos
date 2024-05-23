@@ -1,5 +1,5 @@
 <script setup>
-import { provide } from 'vue';
+import { provide } from 'vue'
 import { ref, inject } from 'vue'
 
 const writing = inject('writing')
@@ -15,8 +15,8 @@ function share() {
   if (navigator.share) {
     navigator.share({
       title: writing.title,
-      url: window.route('writings.show', [writing.slug]),
-    });
+      url: route('writings.show', [writing.slug])
+    })
   } else {
     sharer.value = true
   }
@@ -24,15 +24,25 @@ function share() {
 </script>
 
 <template>
-  <po-sharer v-model="sharer" :link-title="writing.title"
-    :link-url="route('writings.show', [writing.slug])"></po-sharer>
+  <po-sharer
+    v-model="sharer"
+    :link-title="writing.title"
+    :link-url="route('writings.show', [writing.slug])"
+  ></po-sharer>
   <po-complainer v-model="complainer" comp-type="writings" :comp-id="writing.id"></po-complainer>
   <po-blocker v-model="blocker" :user="writing.author"></po-blocker>
 
   <v-menu>
     <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" icon="fas fa-ellipsis-vertical" color="secondary" size="x-small" variant="tonal"
-        class="po-btn-more" :aria-label="$t('main.more-actions')">
+      <v-btn
+        v-bind="props"
+        icon="fas fa-ellipsis-vertical"
+        color="secondary"
+        size="x-small"
+        variant="tonal"
+        class="po-btn-more"
+        :aria-label="$t('main.more-actions')"
+      >
       </v-btn>
     </template>
 
@@ -43,7 +53,11 @@ function share() {
       <v-divider class="my-0"></v-divider>
 
       <template v-if="$helper.canEdit(writing.author)">
-        <po-list-item :href="route('writings.edit', [writing.slug])" prepend-icon="fas fa-pen-to-square" inertia>
+        <po-list-item
+          :href="route('writings.edit', [writing.slug])"
+          prepend-icon="fas fa-pen-to-square"
+          inertia
+        >
           <span>{{ $t('main.edit-delete') }}</span>
         </po-list-item>
         <v-divider class="my-0"></v-divider>

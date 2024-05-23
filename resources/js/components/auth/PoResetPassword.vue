@@ -5,7 +5,7 @@ import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
 
 defineOptions({
-  layout: PoLayoutLogin,
+  layout: PoLayoutLogin
 })
 
 const page = computed(() => usePage())
@@ -15,11 +15,11 @@ const email = page.value.props.email
 
 const formData = reactive({
   password: '',
-  confirmPassword: '',
+  confirmPassword: ''
 })
 
 const errors = reactive({
-  password: [],
+  password: []
 })
 
 function clearInputs() {
@@ -53,14 +53,14 @@ async function submitForm() {
   clearErrors()
 
   await axios
-    .post(window.route('password.store'), {
+    .post(route('password.store'), {
       token: token,
       email: email,
       password: formData.password,
-      password_confirmation: formData.confirmPassword,
+      password_confirmation: formData.confirmPassword
     })
     .then(() => {
-      router.get(window.route('login', { isReset: 1, isEmail: 1, email: email }))
+      router.get(route('login', { isReset: 1, isEmail: 1, email: email }))
     })
     .catch((error) => {
       errors.password = error.response.data.errors.password
@@ -86,17 +86,37 @@ async function submitForm() {
       {{ $t('accounts.reset-password') }}
     </p>
 
-    <v-form id="reset-form" class="po-login" @submit.prevent="submitForm()" @reset.prevent="resetForm()">
-      <v-text-field v-model="formData.password" type="password" :label="$t('main.password')"
+    <v-form
+      id="reset-form"
+      class="po-login"
+      @submit.prevent="submitForm()"
+      @reset.prevent="resetForm()"
+    >
+      <v-text-field
+        v-model="formData.password"
+        type="password"
+        :label="$t('main.password')"
         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-        :placeholder="$t('main.enter-your-password')" :error-messages="errors.password" persistent-placeholder clearable
-        required hide-details="auto">
+        :placeholder="$t('main.enter-your-password')"
+        :error-messages="errors.password"
+        persistent-placeholder
+        clearable
+        required
+        hide-details="auto"
+      >
       </v-text-field>
 
-      <v-text-field v-model="formData.confirmPassword" type="password" :label="$t('accounts.confirm-password')"
+      <v-text-field
+        v-model="formData.confirmPassword"
+        type="password"
+        :label="$t('accounts.confirm-password')"
         pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-        :placeholder="$t('main.enter-your-password')" :error-messages="errors.password" persistent-placeholder clearable
-        hide-details="auto">
+        :placeholder="$t('main.enter-your-password')"
+        :error-messages="errors.password"
+        persistent-placeholder
+        clearable
+        hide-details="auto"
+      >
       </v-text-field>
 
       <po-button type="submit" color="primary" size="large" block :disabled="isLoading">

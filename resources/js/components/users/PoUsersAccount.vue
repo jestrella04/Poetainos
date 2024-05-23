@@ -1,8 +1,8 @@
 <script setup>
 import { inject, ref, provide, reactive, computed } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
-import { usePage } from '@inertiajs/vue3';
-import axios from 'axios';
+import { usePage } from '@inertiajs/vue3'
+import axios from 'axios'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -10,7 +10,7 @@ const push = inject('push')
 const username = helper.authUser().username
 const isDelete = ref(false)
 const notifications = reactive({
-  email: page.value.props.notifications.email ??= true,
+  email: (page.value.props.notifications.email ??= true),
   push: false
 })
 
@@ -32,15 +32,15 @@ navigator.serviceWorker.ready.then((registration) => {
       }
     })
     .catch((e) => {
-      console.log("Error thrown checking subscription status.", e);
+      console.log('Error thrown checking subscription status.', e)
     })
-});
+})
 
 function email() {
   notifications.email = !notifications.email
 
   axios
-    .post(window.route('notifications.email', [notifications.email]))
+    .post(route('notifications.email', [notifications.email]))
     .then()
     .catch()
     .finally()
@@ -62,7 +62,7 @@ function pusher() {
     <po-head></po-head>
 
     <v-card>
-      <v-card-text style="max-width: 400px;">
+      <v-card-text style="max-width: 400px">
         <div class="d-flex mb-5 pos-relative">
           <div class="d-flex ga-4 mb-2">
             <div>
@@ -71,7 +71,11 @@ function pusher() {
 
             <div>
               <p class="font-weight-bold">
-                <po-link :href="route('users.show', $helper.authUser().username)" class="stretched" inertia>
+                <po-link
+                  :href="route('users.show', $helper.authUser().username)"
+                  class="stretched"
+                  inertia
+                >
                   {{ $helper.userDisplayName($helper.authUser()) }}
                 </po-link>
               </p>
@@ -79,7 +83,7 @@ function pusher() {
             </div>
           </div>
         </div>
-        <div class=" mb-5">
+        <div class="mb-5">
           <p class="text-caption text-uppercase text-disabled">
             {{ $t('accounts.my-account') }}
           </p>
@@ -106,19 +110,42 @@ function pusher() {
             </po-list-item>
           </v-list>
         </div>
-        <div class=" mb-5">
-          <p class="text-caption text-uppercase text-disabled mb-3">{{ $t('accounts.notifications') }}</p>
+        <div class="mb-5">
+          <p class="text-caption text-uppercase text-disabled mb-3">
+            {{ $t('accounts.notifications') }}
+          </p>
 
-          <v-switch v-model="notifications.email" :label="$t('main.email')" class="mb-0" hide-details="auto"
-            color="primary" @click.prevent="email"></v-switch>
+          <v-switch
+            v-model="notifications.email"
+            :label="$t('main.email')"
+            class="mb-0"
+            hide-details="auto"
+            color="primary"
+            @click.prevent="email"
+          ></v-switch>
 
-          <v-switch v-model="notifications.push" :label="$t('main.push')" class="mb-0" hide-details="auto"
-            color="primary" @click.prevent="pusher"></v-switch>
+          <v-switch
+            v-model="notifications.push"
+            :label="$t('main.push')"
+            class="mb-0"
+            hide-details="auto"
+            color="primary"
+            @click.prevent="pusher"
+          ></v-switch>
         </div>
-        <div class=" mb-5">
-          <p class="text-caption text-uppercase text-disabled mb-3">{{ $t('accounts.danger-zone') }}</p>
+        <div class="mb-5">
+          <p class="text-caption text-uppercase text-disabled mb-3">
+            {{ $t('accounts.danger-zone') }}
+          </p>
 
-          <po-button class="w-100 mb-1" color="secondary" size="small" :href="route('logout')" method="post" inertia>
+          <po-button
+            class="w-100 mb-1"
+            color="secondary"
+            size="small"
+            :href="route('logout')"
+            method="post"
+            inertia
+          >
             {{ $t('accounts.logout') }}
           </po-button>
 

@@ -2,10 +2,10 @@
 import { ref, inject } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
-import { reactive } from 'vue';
+import { reactive } from 'vue'
 
 defineProps({
-  username: { type: String, required: true },
+  username: { type: String, required: true }
 })
 
 const helper = inject('helper')
@@ -28,16 +28,17 @@ async function submit() {
   errors.value = false
 
   await axios
-    .post(window.route('password.confirmer'), {
+    .post(route('password.confirmer'), {
       //'_method': 'DELETE',
       password: formData.password
     })
     .then(() => {
       axios
         .post(form.action, {
-          '_method': 'DELETE',
-        }).then(() => {
-          router.visit(window.route('home'))
+          _method: 'DELETE'
+        })
+        .then(() => {
+          router.visit(route('home'))
           helper.setSnackBar({
             message: 'accounts.account-deleted',
             color: 'success',
@@ -76,10 +77,22 @@ async function submit() {
 
         <v-divider class="mt-3"></v-divider>
 
-        <v-form id="user-delete-form" :action="route('users.destroy', username)" @submit.prevent="submit">
-          <v-text-field v-model="formData.password" type="password" :label="$t('main.password')"
-            :placeholder="$t('main.enter-password-to-continue')" :error-messages="errors.password"
-            persistent-placeholder clearable required hide-details="auto">
+        <v-form
+          id="user-delete-form"
+          :action="route('users.destroy', username)"
+          @submit.prevent="submit"
+        >
+          <v-text-field
+            v-model="formData.password"
+            type="password"
+            :label="$t('main.password')"
+            :placeholder="$t('main.enter-password-to-continue')"
+            :error-messages="errors.password"
+            persistent-placeholder
+            clearable
+            required
+            hide-details="auto"
+          >
           </v-text-field>
 
           <po-button color="primary" type="submit" block :disabled="isPosting">

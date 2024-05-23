@@ -5,7 +5,7 @@ import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import axios from 'axios'
 
 defineOptions({
-  layout: PoLayoutAdmin,
+  layout: PoLayoutAdmin
 })
 
 const page = computed(() => usePage())
@@ -14,7 +14,7 @@ const headers = [
   { title: 'Type', align: 'start', sortable: false, key: 'type' },
   { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
   { title: 'Closed at', align: 'start', sortable: false, key: 'closed_at' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' },
+  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
 ]
 const items = ref([])
 const totalItems = ref(page.value.props.total)
@@ -26,7 +26,7 @@ onMounted(() => {
 
 async function loadItems(event) {
   await axios
-    .get(window.route('admin.complaints', { page: event.page }))
+    .get(route('admin.complaints', { page: event.page }))
     .then((response) => {
       items.value = response.data.data
       isLoading.value = false
@@ -40,9 +40,15 @@ async function loadItems(event) {
   <po-wrapper>
     <v-card-title>{{ $t('complaints.complaints') }}</v-card-title>
 
-    <v-data-table-server v-model:items-per-page="page.props.site.pagination" :headers="headers"
-      :items-length="totalItems" :items="items" :loading="isLoading" item-value="id" @update:options="loadItems">
-
+    <v-data-table-server
+      v-model:items-per-page="page.props.site.pagination"
+      :headers="headers"
+      :items-length="totalItems"
+      :items="items"
+      :loading="isLoading"
+      item-value="id"
+      @update:options="loadItems"
+    >
       <template v-slot:item.type="{ item }">
         {{ item.complainable_type }}
       </template>
