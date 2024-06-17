@@ -242,7 +242,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function updateKarma()
     {
         // Count user content
-        $dateTrigger = Carbon::now()->subDays(30);
+        $dateTrigger = Carbon::now()->subDays(90);
         $count = [
             'likes' => $this->likes()->whereDate('created_at', '>=', $dateTrigger)->count(),
             'comments' => $this->comments()->whereDate('created_at', '>=', $dateTrigger)->count(),
@@ -255,13 +255,13 @@ class User extends Authenticatable implements MustVerifyEmail
         // Do the math
         if (inRange($points['total'], 0, 1000)) {
             $karma = 'F';
-        } else if (inRange($points['total'], 1000, 1500)) {
+        } else if (inRange($points['total'], 1000, 2000)) {
             $karma = 'D';
-        } else if (inRange($points['total'], 1500, 2000)) {
+        } else if (inRange($points['total'], 2000, 3000)) {
             $karma = 'C';
-        } else if (inRange($points['total'], 2000, 2500)) {
+        } else if (inRange($points['total'], 3000, 4000)) {
             $karma = 'B';
-        } else if ($points['total'] >= 2500) {
+        } else if ($points['total'] >= 4000) {
             $karma = 'A';
         }
 
