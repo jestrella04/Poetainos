@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "require": {
-    "php": "^8.1.2",
+    "php": "^8.3",
     "beyondcode/laravel-websockets": "^1.14",
     "cyberwizard/dbsafeguard": "dev-main",
     "doctrine/dbal": "^3.0",
