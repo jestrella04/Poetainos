@@ -57,6 +57,8 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
+      },
+      injectManifest: {
         maximumFileSizeToCacheInBytes: 3000000
       }
     })
