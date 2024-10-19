@@ -3,7 +3,6 @@ import { inject, provide, reactive, computed, ref, watch, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoWritingDelete from './partials/PoWritingDelete.vue'
-import PoWritingKarma from './partials/PoWritingKarma.vue'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -24,40 +23,18 @@ const isPosting = ref(false)
 const isPosted = ref({})
 const isUpdate = ref(false)
 const isDelete = ref(false)
-const author = reactive({
-  karma: page.value.props.author.karma,
-  today: page.value.props.author.interactions_today
-})
-const karma = reactive({
-  interactionsLow: page.value.props.karma.req_interactions_low,
-  interactionsMid: page.value.props.karma.req_interactions_mid,
-  interactionsHigh: page.value.props.karma.req_interactions_high,
-  hideBanner: false
-})
 
 provide('formData', formData)
 provide('isDelete', isDelete)
-provide('author', author)
-provide('karma', karma)
 
 onMounted(() => {
   // Is the user updating?
   isUpdate.value = !helper.strNullOrEmpty(writing.data.title)
 
-  // Check is karma banner should be displayed
-  if (['F', 'D'].includes(author.karma) && author.today >= karma.interactionsLow) {
-    karma.hideBanner = true
-  } else if (['C', 'B'].includes(author.karma) && author.today >= karma.interactionsMid) {
-    karma.hideBanner = true
-  } else if (['A'].includes(author.karma) && author.today >= karma.interactionsHigh) {
-    karma.hideBanner = true
-  }
-
   // If updating, trigger category update
   if (isUpdate.value) {
     formData.main_category = writing.main_category
     formData.alt_categories = writing.categories
-    karma.hideBanner = true
   }
 
   // Logic needed to assign below values
@@ -128,7 +105,7 @@ async function submitForm() {
       tags: formData.tags,
       text: formData.text,
       link: formData.link,
-      cover: formData.cover[0],
+      cover: formData.cover,
       service_agreement: formData.serviceAgreement,
       privacy_agreement: formData.privacyAgreement
     })
@@ -164,17 +141,8 @@ function resetForm() {
         isUpdate ? $t('writings.update-writing') : $t('writings.publish-writing').toUpperCase()
       "
     >
-      <template v-if="!isUpdate">
-        <po-writing-karma />
-      </template>
-
-      <v-card-text v-if="!karma.hideBanner">
-        <po-karma-inspire style="margin-top: -0.5rem" />
-      </v-card-text>
-
       <v-form
         id="writing-form"
-        v-if="karma.hideBanner"
         :action="isUpdate ? route('writings.update', writing.data.slug) : route('writings.store')"
         class="px-5 pb-5"
         @submit.prevent="submitForm"

@@ -27,7 +27,7 @@ const unreadCount = inject('unreadCount')
     </po-button>
 
     <po-button value="publish" :href="route('writings.create')" :title="$t('main.publish')" inertia>
-      <v-icon icon="fas fa-pen-nib" />
+      <v-icon icon="fas fa-plus" />
     </po-button>
 
     <template v-if="!$helper.auth()">
@@ -37,7 +37,11 @@ const unreadCount = inject('unreadCount')
     </template>
 
     <template v-else>
-      <po-button value="account" :title="$t('accounts.my-account')" @click.prevent="mobileUserMenu = !mobileUserMenu">
+      <po-button
+        value="account"
+        :title="$t('accounts.my-account')"
+        @click.prevent="mobileUserMenu = !mobileUserMenu"
+      >
         <po-badge :count="unreadCount">
           <po-avatar size="24" color="secondary" :user="$helper.authUser()" />
         </po-badge>
@@ -46,7 +50,11 @@ const unreadCount = inject('unreadCount')
       <po-menu-mobile-user />
     </template>
 
-    <po-button value="menu" :title="$t('main.menu')" @click.prevent="mobileSiteMenu = !mobileSiteMenu">
+    <po-button
+      value="menu"
+      :title="$t('main.menu')"
+      @click.prevent="mobileSiteMenu = !mobileSiteMenu"
+    >
       <v-icon icon="fas fa-bars" />
     </po-button>
 

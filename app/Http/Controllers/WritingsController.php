@@ -8,11 +8,14 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Models\Like;
 use App\Models\Writing;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
-use Intervention\Image\Facades\Image;
+use Illuminate\Validation\ValidationException;
+use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Spatie\ImageOptimizer\OptimizerChain;
 
 class WritingsController extends Controller
 {
@@ -189,15 +192,6 @@ class WritingsController extends Controller
                 'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
 
             ],
-            'karma' => [
-                "req_interactions_low" => 6,
-                "req_interactions_mid" => 3,
-                "req_interactions_high" => 0,
-            ],
-            'author' => [
-                "karma" => auth()->user()->karma,
-                'interactions_today' => Inertia::lazy(fn() => auth()->user()->todayEmpathySummary()),
-            ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
             'agreement' => User::find(auth()->user()->id)->isInAgreement(),
@@ -221,6 +215,15 @@ class WritingsController extends Controller
             $action = 'update';
         }
 
+        // Check number of posts by user
+        $posts = auth()->user()->writings()->whereDate("created_at", "=", Carbon::today())->count();
+
+        if ($posts >= 3) {
+            throw ValidationException::withMessages([
+                'title' => __('You have reached your maximum number of posts for today. Please try again tomorrow.')
+            ]);
+        }
+
         // Validate user input
         request()->validate([
             'title' => 'required|string|min:3|max:100',
@@ -234,6 +237,8 @@ class WritingsController extends Controller
             'privacy_agreement' => 'sometimes|required|accepted',
         ]);
 
+        //dd($request);
+
         // Process the uploaded cover, if any
         if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
             // Persist the image
@@ -241,12 +246,10 @@ class WritingsController extends Controller
             $coverRealPath = storage_path('app/' . $cover);
 
             // Scale image and enforce 16:9 aspect ratio
-            Image::make($coverRealPath)->resize(1280, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->crop(1280, 720)->save();
+            Image::read($coverRealPath)->cover(1280, 720)->save();
 
             // Optimize the image
-            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize($coverRealPath);
+            app(OptimizerChain::class)->optimize($coverRealPath);
         }
 
         // Create the extra info array

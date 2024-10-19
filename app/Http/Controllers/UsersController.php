@@ -9,14 +9,15 @@ use App\Models\Writing;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
 use Inertia\Inertia;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
+use Spatie\ImageOptimizer\OptimizerChain;
 
 class UsersController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Inertia\Response
+     * @return \App\Models\User|\Illuminate\Contracts\Pagination\Paginator|\Inertia\Response
      */
     public function index()
     {
@@ -60,7 +61,7 @@ class UsersController extends Controller
     /**
      * Query list of matching resources.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function query()
     {
@@ -78,7 +79,7 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): void
     {
         //
     }
@@ -89,7 +90,7 @@ class UsersController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request): void
     {
         //
     }
@@ -98,7 +99,7 @@ class UsersController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function show(User $user)
     {
@@ -167,7 +168,7 @@ class UsersController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function edit(User $user)
     {
@@ -227,12 +228,10 @@ class UsersController extends Controller
             $avatarRealPath = storage_path('app/' . $avatar);
 
             // Scale the image
-            Image::make($avatarRealPath)->resize(128, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->crop(128, 128)->save();
+            Image::read($avatarRealPath)->cover(512, 512)->save();
 
             // Optimize the image
-            app(\Spatie\ImageOptimizer\OptimizerChain::class)->optimize($avatarRealPath);
+            app(OptimizerChain::class)->optimize($avatarRealPath);
         }
 
         // Create the extra info array
@@ -285,7 +284,7 @@ class UsersController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\User  $user
-     * @return array
+     * @return array|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function destroy(User $user)
     {
@@ -325,7 +324,7 @@ class UsersController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Contracts\View\View
+     * @return \Inertia\Response
      */
     public function account()
     {
