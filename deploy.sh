@@ -54,8 +54,5 @@ npm install
 # Build assets using Vite
 npm run build
 
-# Restart SSR server
-php artisan inertia:stop-ssr #Supervisor.d will start it again
-
 # Turn off maintenance mode
 php artisan up

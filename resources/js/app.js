@@ -1,4 +1,4 @@
-import { createSSRApp, h } from 'vue'
+import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { ZiggyVue } from 'ziggy-js'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -32,7 +32,7 @@ createInertiaApp({
     return page
   },
   setup({ el, App, props, plugin }) {
-    const app = createSSRApp({
+    const app = createApp({
       render: () => h(App, props)
     })
 

@@ -19,9 +19,6 @@ export default defineConfig({
       'ziggy-js': path.resolve('/vendor/tightenco/ziggy')
     }
   },
-  ssr: {
-    noExternal: ['@inertiajs/server', /\.css$/, /\?vue&type=style/, /^vuetify/]
-  },
   build: {
     sourcemap: true
   },
@@ -56,7 +53,7 @@ export default defineConfig({
         suppressWarnings: true
       },
       workbox: {
-        cleanupOutdatedCaches: true,
+        cleanupOutdatedCaches: true
       },
       injectManifest: {
         maximumFileSizeToCacheInBytes: 3000000

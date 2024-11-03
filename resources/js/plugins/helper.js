@@ -290,7 +290,6 @@ const Helper = class {
 
   karmaMedal(grade) {
     let medal = null
-    console.log(grade)
 
     if ('C' == grade) {
       medal = 'deep-orange-accent-1'
