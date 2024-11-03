@@ -28,6 +28,7 @@ class UsersController extends Controller
             'name',
             'profile_views',
             'aura',
+            'karma',
             'extra_info->bio AS bio',
             //'extra_info->social AS social',
             'extra_info->avatar AS avatar',
@@ -39,9 +40,13 @@ class UsersController extends Controller
         if ('latest' === $sort) {
             $users = $users->latest()->simplePaginate($this->pagination)->withQueryString();
         } elseif ('popular' === $sort) {
-            $users = $users->orderBy('profile_views', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $users = $users->orderBy('profile_views', 'desc')
+                ->simplePaginate($this->pagination)
+                ->withQueryString();
         } elseif ('featured' === $sort) {
-            $users = $users->orderBy('aura', 'desc')->simplePaginate($this->pagination)->withQueryString();
+            $users = $users->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
+                ->simplePaginate($this->pagination)
+                ->withQueryString();
         }
 
         if (request()->expectsJson()) {
@@ -126,6 +131,7 @@ class UsersController extends Controller
                 'name',
                 'profile_views',
                 'aura',
+                'karma',
                 'created_at',
                 'extra_info->bio AS bio',
                 'extra_info->social AS social',

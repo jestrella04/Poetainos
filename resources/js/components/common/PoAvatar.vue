@@ -17,8 +17,11 @@ if (!helper.strNullOrEmpty(props.user.avatar)) {
 
 <template>
   <v-avatar>
-    <v-img v-if="!helper.strNullOrEmpty(avatar)" :src="$helper.storage(avatar)"
-      :alt="$helper.userDisplayName(user)"></v-img>
+    <v-img
+      v-if="!helper.strNullOrEmpty(avatar)"
+      :src="$helper.storage(avatar)"
+      :alt="$helper.userDisplayName(user)"
+    ></v-img>
     <span v-else>{{ $helper.userInitials(user) }}</span>
   </v-avatar>
 </template>

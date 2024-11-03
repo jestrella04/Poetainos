@@ -10,7 +10,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { vuetify } from './plugins/vuetify'
 import { i18n } from './plugins/i18n'
 import { helper } from './plugins/helper'
-import { push } from './plugins/push'
+//import { push } from './plugins/push'
 import 'animate.css'
 import PoLayoutMain from './components/layouts/PoLayoutMain.vue'
 import { ZiggyVue } from 'ziggy-js'
@@ -50,7 +50,7 @@ createServer((page) => {
         .use(i18n)
         .use(helper)
         .use(ZiggyVue)
-        .use(push)
+        //.use(push)
         .component('font-awesome-icon', FontAwesomeIcon)
         .mixin({
           methods: {

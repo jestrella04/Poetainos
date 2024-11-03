@@ -288,20 +288,19 @@ const Helper = class {
     return new URL(url, route('home')).toString()
   }
 
-  karmaLabel(grade) {
-    let label = null
+  karmaMedal(grade) {
+    let medal = null
+    console.log(grade)
 
-    if (_.isNull(grade)) {
-      label = 'secondary'
-    } else if (['F', 'D'].includes(grade)) {
-      label = 'error'
-    } else if (['C', 'B'].includes(grade)) {
-      label = 'warning'
-    } else if (['A'].includes(grade)) {
-      label = 'success'
+    if ('C' == grade) {
+      medal = 'deep-orange-accent-1'
+    } else if ('B' == grade) {
+      medal = 'blue-grey-lighten-3'
+    } else if ('A' == grade) {
+      medal = 'amber-accent-4'
     }
 
-    return label
+    return medal
   }
 }
 

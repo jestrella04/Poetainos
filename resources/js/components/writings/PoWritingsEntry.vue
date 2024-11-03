@@ -2,19 +2,18 @@
 import { ref, provide } from 'vue'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
 import PoWritingStats from './partials/PoWritingStats.vue'
-import PoWritingDropdown from './partials/PoWritingDropdown.vue';
+import PoWritingDropdown from './partials/PoWritingDropdown.vue'
 
 const props = defineProps({
   alone: { type: Boolean, default: true },
   data: { type: Object, required: true },
-  likers: Object,
+  likers: Object
 })
 
 const loadingComments = ref(true)
 
 provide('loadingComments', loadingComments)
 provide('writing', props.data)
-
 </script>
 
 <style scoped>
@@ -32,11 +31,32 @@ provide('writing', props.data)
   <po-wrapper>
     <v-card class="pos-relative" elevation="2" rounded>
       <po-writing-dropdown></po-writing-dropdown>
-      <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)">
-        <v-img class="align-end text-white" height="200" :src="$helper.storage(data.extra_info.cover)" alt="" cover>
+      <template
+        v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)"
+      >
+        <v-img
+          class="align-end text-white"
+          height="200"
+          :src="$helper.storage(data.extra_info.cover)"
+          alt=""
+          cover
+        >
           <div class="text-center py-3">
             <po-link :href="route('users.show', data.author.username)" inertia>
-              <po-avatar size="64" color="secondary" :user="data.author" class="avatar-shadow" />
+              <po-avatar-award
+                v-if="data.author.karma && ['A', 'B', 'C'].includes(data.author.karma)"
+                :user="data.author"
+                avatar-size="64"
+                avatar-color="secondary"
+                avatar-class="avatar-shadow"
+              />
+              <po-avatar
+                v-else
+                size="64"
+                color="secondary"
+                :user="data.author"
+                class="avatar-shadow"
+              />
             </po-link>
           </div>
         </v-img>
@@ -44,14 +64,25 @@ provide('writing', props.data)
 
       <div v-else class="text-center pt-3">
         <po-link :href="route('users.show', data.author.username)" inertia>
-          <po-avatar size="64" color="secondary" :user="data.author" />
+          <po-avatar-award
+            v-if="data.author.karma && ['A', 'B', 'C'].includes(data.author.karma)"
+            :user="data.author"
+            avatar-size="64"
+            avatar-color="secondary"
+          />
+          <po-avatar v-else size="64" color="secondary" :user="data.author" />
         </po-link>
       </div>
 
       <v-card-text class="pos-relative pt-1">
         <div class="text-center mb-3">
           <p class="text-h6 text-uppercase writing-title">
-            <po-link v-if="!alone" :href="route('writings.show', data.slug)" class="stretched" inertia>
+            <po-link
+              v-if="!alone"
+              :href="route('writings.show', data.slug)"
+              class="stretched"
+              inertia
+            >
               {{ data.title }}
             </po-link>
             <span v-else>{{ data.title }}</span>
@@ -71,7 +102,11 @@ provide('writing', props.data)
             {{ data.text }}
           </blockquote>
 
-          <template v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.link)">
+          <template
+            v-if="
+              !$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.link)
+            "
+          >
             <div class="d-flex align-center mb-4">
               <v-icon icon="fas fa-link" size="24" class="mr-3"></v-icon>
               <po-link :href="data.extra_info.link" target="_blank" rel="nofollow noopener">
@@ -87,8 +122,15 @@ provide('writing', props.data)
               </div>
 
               <div class="d-inline-flex flex-wrap ga-1">
-                <po-chip v-for="category in data.categories" :key="category.slug" color="secondary" variant="elevated"
-                  size="small" :href="route('categories.show', category.slug)" inertia>
+                <po-chip
+                  v-for="category in data.categories"
+                  :key="category.slug"
+                  color="secondary"
+                  variant="elevated"
+                  size="small"
+                  :href="route('categories.show', category.slug)"
+                  inertia
+                >
                   {{ category.name }}
                 </po-chip>
               </div>
@@ -100,8 +142,15 @@ provide('writing', props.data)
               </div>
 
               <div class="d-inline-flex flex-wrap ga-1">
-                <po-chip v-for="tag in data.tags" :key="tag.slug" color="secondary" variant="elevated" size="small"
-                  :href="route('tags.show', tag.slug)" inertia>
+                <po-chip
+                  v-for="tag in data.tags"
+                  :key="tag.slug"
+                  color="secondary"
+                  variant="elevated"
+                  size="small"
+                  :href="route('tags.show', tag.slug)"
+                  inertia
+                >
                   {{ tag.name }}
                 </po-chip>
               </div>
@@ -113,8 +162,12 @@ provide('writing', props.data)
 
             <div class="d-inline-flex flex-wrap ga-2">
               <div v-for="liker in likers" :key="liker.id">
-                <po-button icon :href="route('users.show', liker.username)" :title="$helper.userDisplayName(liker)"
-                  inertia>
+                <po-button
+                  icon
+                  :href="route('users.show', liker.username)"
+                  :title="$helper.userDisplayName(liker)"
+                  inertia
+                >
                   <po-avatar size="48" color="secondary" :user="liker" />
                 </po-button>
               </div>
@@ -139,9 +192,24 @@ provide('writing', props.data)
     </v-card>
 
     <template v-if="alone">
-      <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
-      <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
-      <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
+      <v-skeleton-loader
+        v-if="loadingComments"
+        :elevation="3"
+        type="list-item-avatar"
+        class="mb-2"
+      ></v-skeleton-loader>
+      <v-skeleton-loader
+        v-if="loadingComments"
+        :elevation="3"
+        type="list-item-avatar"
+        class="mb-2"
+      ></v-skeleton-loader>
+      <v-skeleton-loader
+        v-if="loadingComments"
+        :elevation="3"
+        type="list-item-avatar"
+        class="mb-2"
+      ></v-skeleton-loader>
 
       <po-comments-index />
     </template>

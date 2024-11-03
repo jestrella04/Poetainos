@@ -4,7 +4,7 @@ import PoUsersStats from './partials/PoUsersStats.vue'
 import PoUserDropdown from './partials/PoUserDropdown.vue'
 
 const props = defineProps({
-  data: { type: Object, required: true },
+  data: { type: Object, required: true }
 })
 
 provide('user', props.data)
@@ -16,12 +16,20 @@ provide('user', props.data)
 
     <v-card-text>
       <div class="text-center mb-5">
-        <po-avatar size="96" color="secondary" class="mb-2" :user="data" />
+        <po-avatar-award
+          v-if="data.karma && ['A', 'B', 'C'].includes(data.karma)"
+          :user="data"
+          avatar-size="96"
+          avatar-color="secondary"
+        />
+        <po-avatar v-else size="96" color="secondary" :user="data" />
         <p class="font-weight-bold">{{ $helper.userDisplayName(data) }}</p>
         <p class="text-medium-emphasis">@{{ data.username }}</p>
       </div>
 
-      <template v-if="!$helper.strNullOrEmpty(data.website) || !$helper.isEmpty(JSON.parse(data.social))">
+      <template
+        v-if="!$helper.strNullOrEmpty(data.website) || !$helper.isEmpty(JSON.parse(data.social))"
+      >
         <div class="d-flex flex-wrap justify-center ga-3 mb-5">
           <template v-if="!$helper.strNullOrEmpty(data.website)">
             <div>
@@ -33,7 +41,13 @@ provide('user', props.data)
 
           <template v-for="(user, network) in JSON.parse(data.social)" :key="network">
             <div v-if="!$helper.strNullOrEmpty(user)">
-              <po-button icon color="primary" size="x-small" :href="$helper.socialLink(user, network)" target="_blank">
+              <po-button
+                icon
+                color="primary"
+                size="x-small"
+                :href="$helper.socialLink(user, network)"
+                target="_blank"
+              >
                 <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`"></v-icon>
                 <v-icon v-else :icon="`fab fa-${network}`"></v-icon>
               </po-button>
@@ -42,7 +56,7 @@ provide('user', props.data)
         </div>
       </template>
 
-      <div class="mx-auto" style="width: 100%; max-width: 400px;">
+      <div class="mx-auto" style="width: 100%; max-width: 400px">
         <p>{{ data.bio }}</p>
       </div>
     </v-card-text>
@@ -88,7 +102,8 @@ provide('user', props.data)
       <v-row v-if="!$helper.strNullOrEmpty(data.interests)">
         <v-col cols="12" md="4">
           <v-icon icon="fas fa-masks-theater" class="mr-2"></v-icon>
-          {{ $t('main.interests') }}:</v-col>
+          {{ $t('main.interests') }}:</v-col
+        >
         <v-col cols="12" md="8">
           {{ data.interests }}
         </v-col>

@@ -2,18 +2,21 @@
 import PoUsersStats from './PoUsersStats.vue'
 
 defineProps({
-  data: { type: Object, required: true },
+  data: { type: Object, required: true }
 })
-
 </script>
 
 <template>
   <v-card rounded elevation="2">
     <v-card-text class="pos-relative">
       <div class="d-flex ga-4 mb-2">
-        <div>
-          <po-avatar size="48" color="secondary" :user="data" />
-        </div>
+        <po-avatar-award
+          v-if="data.karma && ['A', 'B', 'C'].includes(data.karma)"
+          :user="data"
+          avatar-size="48"
+          avatar-color="secondary"
+        />
+        <po-avatar v-else size="48" color="secondary" :user="data" />
 
         <div>
           <p class="font-weight-bold">

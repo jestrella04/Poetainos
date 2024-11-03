@@ -15,9 +15,11 @@ class GenericController extends Controller
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
         $writings = $user->writings()->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query) {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }]);
+            ->with([
+                'author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }
+            ]);
 
         if ('latest' === $sort) {
             $writings = $writings->latest();
@@ -36,7 +38,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Writings'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -47,9 +49,11 @@ class GenericController extends Controller
         $writings = Writing::whereIn('id', $user->shelf()->pluck('id'))
             ->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query) {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }]);
+            ->with([
+                'author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }
+            ]);
 
         if ('latest' === $sort) {
             $writings = $writings->latest();
@@ -68,7 +72,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Shelf'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -80,9 +84,11 @@ class GenericController extends Controller
             ->whereNotIn('user_id', $this->getBlockedUsers())
             ->whereNot('user_id', $user->id)
             ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query) {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }]);
+            ->with([
+                'author' => function ($query) {
+                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                }
+            ]);
 
         if ('latest' === $sort) {
             $writings = $writings->latest();
@@ -101,7 +107,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Likes'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -113,20 +119,30 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Explore')]),
             ],
             'categories' => [
-                'main' => Category::withCount('writings')->whereNull('parent_id')->orderByDesc('writings_count')
-                    ->having('writings_count', '>', 0)->get(),
-                'alt' => Category::withCount('writings')->whereNotNull('parent_id')->orderByDesc('writings_count')
-                    ->having('writings_count', '>', 0)->get(),
+                'main' => Category::withCount('writings')
+                    ->whereNull('parent_id')
+                    ->orderByDesc('writings_count')
+                    ->having('writings_count', '>', 0)
+                    ->get(),
+                'alt' => Category::withCount('writings')
+                    ->whereNotNull('parent_id')
+                    ->orderByDesc('writings_count')
+                    ->having('writings_count', '>', 0)
+                    ->get(),
             ],
-            'tags' => Tag::withCount('writings')->orderByDesc('writings_count')
+            'tags' => Tag::withCount('writings')
+                ->orderByDesc('writings_count')
                 ->having('writings_count', '>', 0)->get()
                 ->take(20),
             'authors' => User::select(
                 'id',
                 'username',
                 'name',
+                'karma',
                 'extra_info->avatar AS avatar',
-            )->orderByDesc('aura')->take(20)->get()
+            )->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
+                ->take(20)
+                ->get()
         ]);
     }
 

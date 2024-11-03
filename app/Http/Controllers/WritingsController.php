@@ -34,7 +34,7 @@ class WritingsController extends Controller
             ->withCount(['likes', 'comments', 'shelf'])
             ->with([
                 'author' => function ($query) {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
                 }
             ]);
 
@@ -110,7 +110,7 @@ class WritingsController extends Controller
                 ->withCount(['likes', 'comments', 'shelf'])
                 ->with([
                     'author' => function ($query) {
-                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                        $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
                     }
                 ])
                 ->with([
