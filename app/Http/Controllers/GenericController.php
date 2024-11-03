@@ -141,6 +141,7 @@ class GenericController extends Controller
                 'karma',
                 'extra_info->avatar AS avatar',
             )->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
+                ->orderBy('aura', 'desc')
                 ->take(20)
                 ->get()
         ]);

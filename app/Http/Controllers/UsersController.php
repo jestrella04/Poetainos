@@ -45,6 +45,7 @@ class UsersController extends Controller
                 ->withQueryString();
         } elseif ('featured' === $sort) {
             $users = $users->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
+                ->orderBy('aura', 'desc')
                 ->simplePaginate($this->pagination)
                 ->withQueryString();
         }
