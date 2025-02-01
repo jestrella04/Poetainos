@@ -139,13 +139,7 @@ body {
   height: 100% !important;
 }
 
-main,
-.po-container,
-.po-wrapper {
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 !important;
-}
+
 
 pre,
 code {
@@ -238,6 +232,7 @@ code {
   top: 64px !important;
   z-index: 990;
   background-color: rgb(var(--v-theme-background));
+  margin-bottom: .8rem;
 }
 
 @media screen and (max-width: 1280px) {
@@ -247,11 +242,12 @@ code {
 }
 
 .masonry {
-  margin-top: 1rem !important;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  max-width: 100% !important;
+  grid-template-columns:repeat(auto-fill, minmax(18rem, 1fr));
   grid-auto-flow: dense;
-  grid-gap: 16px;
+  
 }
 </style>
 

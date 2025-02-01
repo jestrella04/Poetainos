@@ -41,9 +41,9 @@ class WritingsController extends Controller
         if ('latest' === $sort) {
             $writings = $writings->latest();
         } elseif ('popular' === $sort) {
-            $writings = $writings->orderBy('views', 'desc');
+            $writings = $writings->orderBy('views', 'desc')->orderBy('aura', 'desc');
         } elseif ('likes' === $sort) {
-            $writings = $writings->orderBy('likes_count', 'desc');
+            $writings = $writings->orderBy('likes_count', 'desc')->orderBy('aura', 'desc');
         }
 
         if (request()->expectsJson()) {

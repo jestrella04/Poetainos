@@ -1,7 +1,7 @@
 <script setup>
 const props = defineProps({
   user: { type: Object, required: true },
-  avatarSize: { type: Number, required: true },
+  avatarSize: { type: String, required: true },
   avatarColor: { type: String, required: true },
   avatarClass: { type: String, required: false }
 })
