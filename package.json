@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write resources/js/",
-    "docker-build": "cd laradock && docker compose build nginx mariadb php-fpm workspace",
+    "docker-build": "cd ../laradock && docker compose build --no-cache nginx mariadb php-fpm workspace",
     "docker-up": "cd laradock && docker compose up -d nginx mariadb workspace && docker compose exec --user=laradock workspace bash",
     "docker-down": "cd laradock && docker compose stop",
     "docker-restart": "npm run workspace-stop && npm run workspace-start",
