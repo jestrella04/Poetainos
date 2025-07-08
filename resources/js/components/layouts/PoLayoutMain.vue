@@ -39,7 +39,7 @@ const intervalMS = 60 * 60 * 1000
 
 echo.Pusher = Pusher
 document.body.appendChild(installComponent)
-theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
+window.matchMedia("(prefers-color-scheme: dark)").matches ? theme.change('dark') : theme.change('light')
 
 useRegisterSW({
   onRegisteredSW(swUrl, r) {
