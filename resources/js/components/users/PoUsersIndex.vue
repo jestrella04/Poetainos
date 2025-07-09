@@ -3,7 +3,6 @@ import { computed, ref, inject, onMounted, nextTick } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
-import MasonrySimple from 'masonry-simple'
 import { useSwipe } from '@vueuse/core'
 
 const page = computed(() => usePage())
@@ -75,10 +74,6 @@ function update(usersData, nextPage) {
   users.value.push(...usersData)
   next.value = nextPage
   fetched.value = true
-
-  nextTick(() => {
-    new MasonrySimple({ container: '.masonry' }).init()
-  })
 }
 </script>
 
@@ -111,13 +106,9 @@ function update(usersData, nextPage) {
   </template>
 
   <template v-else-if="!$helper.isEmpty(users)">
-    <div class="masonry">
-      <template v-for="user in users" :key="user.id">
-        <div class="masonry__item">
-          <po-users-card :alone="false" :data="user" />
-        </div>
-      </template>
-    </div>
+    <template v-for="user in users" :key="user.id">
+      <po-users-card :alone="false" :data="user" />
+    </template>
 
     <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
   </template>

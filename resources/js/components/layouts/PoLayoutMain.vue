@@ -139,8 +139,6 @@ body {
   height: 100% !important;
 }
 
-
-
 pre,
 code {
   font-family:
@@ -241,13 +239,12 @@ code {
   }
 }
 
-.masonry {
-  display: grid;
-  gap: 1rem;
-  max-width: 100% !important;
-  grid-template-columns:repeat(auto-fill, minmax(18rem, 1fr));
-  grid-auto-flow: dense;
-  
+.user-container,
+.writing-container {
+  width: 100% !important;
+  max-width: 35rem;
+  margin: 0 auto !important;
+  margin-bottom: 1.5rem !important;
 }
 </style>
 

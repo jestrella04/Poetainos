@@ -1,5 +1,4 @@
 {
-  "editor.formatOnSave": true,
   "cSpell.words": [
     "axios",
     "goodreads",
@@ -10,9 +9,5 @@
     "millify",
     "vuetify",
     "vueuse"
-  ],
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[php]": {
-    "editor.defaultFormatter": "DEVSENSE.phptools-vscode"
-  }
+  ]
 }

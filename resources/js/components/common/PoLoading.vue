@@ -1,16 +1,12 @@
 <script setup>
 defineProps({
-  type: { type: String, default: 'image, article' },
-  cols: { type: String, default: "12" },
-  md: { type: String, default: "6" },
-  lg: { type: String, default: "4" },
+  type: { type: String, default: 'image, article' }
 })
 </script>
 
 <template>
-  <v-row>
-    <v-col v-for="n in 20" :key="n" :cols="cols" :md="md" :lg="lg">
-      <v-skeleton-loader class="border" :type="type" elevation="2"></v-skeleton-loader>
-    </v-col>
-  </v-row>
+  <div v-for="n in 20" :key="n">
+    <v-skeleton-loader class="border mx-auto mb-6" :type="type" elevation="2"
+      style="width:100%; max-width: 35rem;"></v-skeleton-loader>
+  </div>
 </template>

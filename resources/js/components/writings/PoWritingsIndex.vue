@@ -4,7 +4,6 @@ import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
 import { useSwipe } from '@vueuse/core'
-import MasonrySimple from 'masonry-simple'
 
 const page = computed(() => usePage())
 const helper = inject('helper')
@@ -75,10 +74,6 @@ function update(writingsData, nextPage) {
   writings.value.push(...writingsData)
   next.value = nextPage
   fetched.value = true
-
-  nextTick(() => {
-    new MasonrySimple({ container: '.masonry' }).init()
-  })
 }
 
 function liked(id, count) {
@@ -122,13 +117,9 @@ function liked(id, count) {
     </template>
 
     <template v-else-if="!$helper.isEmpty(writings)">
-      <div class="masonry">
-        <template v-for="writing in writings" :key="writing.slug">
-          <div class="masonry__item">
-            <po-writings-entry @liked="liked" :alone="false" :data="writing" />
-          </div>
-        </template>
-      </div>
+      <template v-for="writing in writings" :key="writing.slug">
+        <po-writings-entry @liked="liked" :alone="false" :data="writing" />
+      </template>
 
       <po-infinite-scroll v-if="!$helper.strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
     </template>

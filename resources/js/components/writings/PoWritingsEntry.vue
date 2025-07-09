@@ -29,7 +29,7 @@ provide('writing', props.data)
 
 <template>
   <po-wrapper>
-    <v-card class="pos-relative" elevation="2" rounded>
+    <v-card :class="{'pos-relative': true, 'writing-container': !alone}" elevation="2" rounded>
       <po-writing-dropdown></po-writing-dropdown>
       <template
         v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)"
@@ -62,7 +62,7 @@ provide('writing', props.data)
         </v-img>
       </template>
 
-      <div v-else class="text-center pt-3">
+      <div v-else class="text-center pt-6">
         <po-link :href="route('users.show', data.author.username)" inertia>
           <po-avatar-award
             v-if="data.author.karma && ['A', 'B', 'C'].includes(data.author.karma)"

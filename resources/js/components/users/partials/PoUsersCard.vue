@@ -7,15 +7,11 @@ defineProps({
 </script>
 
 <template>
-  <v-card rounded elevation="2">
+  <v-card rounded elevation="2" class="user-container">
     <v-card-text class="pos-relative">
       <div class="d-flex ga-4 mb-2">
-        <po-avatar-award
-          v-if="data.karma && ['A', 'B', 'C'].includes(data.karma)"
-          :user="data"
-          avatar-size="48"
-          avatar-color="secondary"
-        />
+        <po-avatar-award v-if="data.karma && ['A', 'B', 'C'].includes(data.karma)" :user="data" avatar-size="48"
+          avatar-color="secondary" />
         <po-avatar v-else size="48" color="secondary" :user="data" />
 
         <div>
