@@ -29,7 +29,7 @@ defineProps({
 
     <v-divider></v-divider>
     <v-card-actions>
-      <po-users-stats :data="data" :alone="false" />
+      <po-users-stats :data="data" />
     </v-card-actions>
   </v-card>
 </template>

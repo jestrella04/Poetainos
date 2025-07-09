@@ -132,6 +132,7 @@
     "select-all-apply": "Selecciona todo lo que aplique"
   },
   "main": {
+    "reading": "Leyendo",
     "go-to-home": "Ir a la portada",
     "karma-null": "No hemos podido calcular tu karma.",
     "karma-contrib-not-met": "No has alcanzado el mínimo de karma para poder publicar sin limitaciones.",
@@ -216,8 +217,8 @@
     "follow-on": "Síguenos en {app}",
     "more-from-author": "Más del autor",
     "from-categories": "De las categorías",
-    "from-liked": "De sus me gusta",
-    "from-shelf": "De su estante",
+    "more-from-liked": "Más de sus me gusta",
+    "more-from-shelf": "Más de sus favoritos",
     "get-the-app": "Descarga la app",
     "go-back": "Regresar",
     "goodreads": "Goodreads",

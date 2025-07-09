@@ -135,7 +135,8 @@ html {
 }
 
 html,
-body {
+body,
+.po-container {
   height: 100% !important;
 }
 

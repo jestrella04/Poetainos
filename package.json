@@ -23,7 +23,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@inertiajs/vue3": "^1.2.0",
-    "@khmyznikov/pwa-install": "^0.4.8",
+    "@khmyznikov/pwa-install": "^0.5.7",
     "@prettier/plugin-php": "^0.22.2",
     "@rushstack/eslint-patch": "^1.10.4",
     "@vitejs/plugin-vue": "^5.1.4",

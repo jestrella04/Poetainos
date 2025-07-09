@@ -88,7 +88,7 @@ function liked(id, count) {
 </script>
 
 <template>
-  <po-wrapper>
+  <po-wrapper class="h-100">
     <po-head></po-head>
 
     <v-row class="sticky-tabs">
@@ -115,6 +115,7 @@ function liked(id, count) {
     <template v-if="!fetched">
       <po-loading></po-loading>
     </template>
+
 
     <template v-else-if="!$helper.isEmpty(writings)">
       <template v-for="writing in writings" :key="writing.slug">

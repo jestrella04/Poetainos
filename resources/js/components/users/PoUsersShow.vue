@@ -23,60 +23,60 @@ const page = computed(() => usePage())
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-card :title="$t('main.explore-more').toLocaleUpperCase()">
+          <v-card v-if="!$helper.isEmpty(page.props.writings.from_author)" class="mb-6">
             <v-card-text class="mt-3">
-              <div v-if="!$helper.isEmpty(page.props.writings.from_author)">
-                <p class="text-uppercase font-medium-weight mb-5">{{ $t('main.from-author') }}</p>
+              <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-author') }}</p>
 
-                <template v-for="writing in page.props.writings.from_author" :key="writing.id">
-                  <div class="mb-2 pos-relative">
-                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
-                      {{ writing.title }}
-                    </po-link>
+              <template v-for="writing in page.props.writings.from_author" :key="writing.id">
+                <div class="mb-2 pos-relative">
+                  <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    {{ writing.title }}
+                  </po-link>
 
-                    <p class="text-caption text-disabled">
-                      {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                      {{ $helper.relativeDate(writing.created_at) }}
-                    </p>
-                  </div>
-                </template>
+                  <p class="text-caption text-disabled">
+                    {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
+                    {{ $helper.relativeDate(writing.created_at) }}
+                  </p>
+                </div>
+              </template>
+            </v-card-text>
+          </v-card>
 
-                <v-divider class="my-8"></v-divider>
-              </div>
+          <v-card v-if="!$helper.isEmpty(page.props.writings.from_shelf)" class="mb-6">
+            <v-card-text>
+              <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-shelf') }}</p>
 
-              <div v-if="!$helper.isEmpty(page.props.writings.from_shelf)">
-                <p class="text-uppercase font-medium-weight mb-5">{{ $t('main.from-shelf') }}</p>
-                <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
-                  <div class="mb-2 pos-relative">
-                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
-                      {{ writing.title }}
-                    </po-link>
+              <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
+                <div class="mb-2 pos-relative">
+                  <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    {{ writing.title }}
+                  </po-link>
 
-                    <p class="text-caption text-disabled">
-                      {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                      {{ $helper.relativeDate(writing.created_at) }}
-                    </p>
-                  </div>
-                </template>
+                  <p class="text-caption text-disabled">
+                    {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
+                    {{ $helper.relativeDate(writing.created_at) }}
+                  </p>
+                </div>
+              </template>
+            </v-card-text>
+          </v-card>
 
-                <v-divider class="my-8"></v-divider>
-              </div>
+          <v-card v-if="!$helper.isEmpty(page.props.writings.from_liked)">
+            <v-card-text>
+              <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-liked') }}</p>
 
-              <div v-if="!$helper.isEmpty(page.props.writings.from_liked)">
-                <p class="text-uppercase font-medium-weight mb-5">{{ $t('main.from-liked') }}</p>
-                <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
-                  <div class="mb-2 pos-relative">
-                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
-                      {{ writing.title }}
-                    </po-link>
+              <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
+                <div class="mb-2 pos-relative">
+                  <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    {{ writing.title }}
+                  </po-link>
 
-                    <p class="text-caption text-disabled">
-                      {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                      {{ $helper.relativeDate(writing.created_at) }}
-                    </p>
-                  </div>
-                </template>
-              </div>
+                  <p class="text-caption text-disabled">
+                    {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
+                    {{ $helper.relativeDate(writing.created_at) }}
+                  </p>
+                </div>
+              </template>
             </v-card-text>
           </v-card>
         </v-col>

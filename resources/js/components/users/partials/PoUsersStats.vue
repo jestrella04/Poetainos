@@ -1,7 +1,6 @@
 <script setup>
 
 defineProps({
-  alone: { type: Boolean, default: true },
   data: { type: Object, required: true },
 })
 </script>
@@ -38,7 +37,7 @@ defineProps({
       <div>{{ $helper.readable(data.profile_views) }}</div>
     </div>
 
-    <div v-if="alone" class="d-flex flex-column" :title="$t('main.aura-value', { aura: data.aura })">
+    <div class="d-flex flex-column" :title="$t('main.aura-value', { aura: data.aura })">
       <div><v-icon icon="fas fa-dove"></v-icon></div>
       <div>{{ data.aura }}</div>
     </div>
