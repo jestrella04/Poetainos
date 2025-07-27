@@ -14,343 +14,358 @@ use Spatie\ImageOptimizer\OptimizerChain;
 
 class UsersController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \App\Models\User|\Illuminate\Contracts\Pagination\Paginator|\Inertia\Response
-     */
-    public function index()
-    {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'featured']) ? request('sort') : 'featured';
-        $users = User::select(
-            'id',
-            'username',
-            'name',
-            'profile_views',
-            'aura',
-            'karma',
-            'extra_info->bio AS bio',
-            //'extra_info->social AS social',
-            'extra_info->avatar AS avatar',
-            //'extra_info->website AS website',
-            //'extra_info->location AS location',
-            //'extra_info->interests AS interests',
-        )->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
+  /**
+   * Display a listing of the resource.
+   *
+   * @return \App\Models\User|\Illuminate\Contracts\Pagination\Paginator|\Inertia\Response
+   */
+  public function index()
+  {
+    $sort = in_array(request('sort'), ['latest', 'popular', 'featured'])
+      ? request('sort')
+      : 'featured';
+    $users = User::select(
+      'id',
+      'username',
+      'name',
+      'profile_views',
+      'aura',
+      'karma',
+      'extra_info->bio AS bio',
+      //'extra_info->social AS social',
+      'extra_info->avatar AS avatar',
+      //'extra_info->website AS website',
+      //'extra_info->location AS location',
+      //'extra_info->interests AS interests',
+    )
+      ->has('writings')
+      ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
 
-        if ('latest' === $sort) {
-            $users = $users->latest()->simplePaginate($this->pagination)->withQueryString();
-        } elseif ('popular' === $sort) {
-            $users = $users->orderBy('profile_views', 'desc')
-                ->simplePaginate($this->pagination)
-                ->withQueryString();
-        } elseif ('featured' === $sort) {
-            $users = $users->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
-                ->orderBy('aura', 'desc')
-                ->simplePaginate($this->pagination)
-                ->withQueryString();
-        }
-
-        if (request()->expectsJson()) {
-            return $users;
-        }
-
-        return Inertia::render('users/PoUsersIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Writers')]),
-                'canonical' => route('users.index'),
-            ],
-            'sort' => $sort,
-            'users' => Inertia::lazy(fn() => $users),
-        ]);
+    if ('latest' === $sort) {
+      $users = $users->latest()->simplePaginate($this->pagination)->withQueryString();
+    } elseif ('popular' === $sort) {
+      $users = $users
+        ->orderBy('profile_views', 'desc')
+        ->simplePaginate($this->pagination)
+        ->withQueryString();
+    } elseif ('featured' === $sort) {
+      $users = $users
+        ->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
+        ->orderBy('aura', 'desc')
+        ->simplePaginate($this->pagination)
+        ->withQueryString();
     }
 
-    /**
-     * Query list of matching resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function query()
-    {
-        $wildcard = '%' . request('query') . '%';
-
-        return User::where('name', 'like', $wildcard)
-            ->orWhere('username', 'like', $wildcard)
-            ->select('name', 'username')
-            ->take($this->pagination)
-            ->get();
+    if (request()->expectsJson()) {
+      return $users;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(): void
-    {
-        //
+    return Inertia::render('users/PoUsersIndex', [
+      'meta' => [
+        'title' => getPageTitle([__('Writers')]),
+        'canonical' => route('users.index'),
+      ],
+      'sort' => $sort,
+      'users' => Inertia::lazy(fn() => $users),
+    ]);
+  }
+
+  /**
+   * Query list of matching resources.
+   *
+   * @return \Illuminate\Database\Eloquent\Collection
+   */
+  public function query()
+  {
+    $wildcard = '%' . request('query') . '%';
+
+    return User::where('name', 'like', $wildcard)
+      ->orWhere('username', 'like', $wildcard)
+      ->select('name', 'username')
+      ->take($this->pagination)
+      ->get();
+  }
+
+  /**
+   * Show the form for creating a new resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function create(): void
+  {
+    //
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\Response
+   */
+  public function store(Request $request): void
+  {
+    //
+  }
+
+  /**
+   * Display the specified resource.
+   *
+   * @param  \App\Models\User  $user
+   * @return \Inertia\Response
+   */
+  public function show(User $user)
+  {
+    // Increment writing views
+    $user->incrementViews();
+
+    // Update Aura / karma
+    $user->updateAura();
+    //$user->updateKarma();
+
+    $authUser = auth()->check() ? User::find(auth()->user()->id) : null;
+
+    return Inertia::render('users/PoUsersShow', [
+      'meta' => [
+        'title' => getPageTitle([$user->getName(), __('Writers')]),
+        'canonical' => $user->path(),
+      ],
+      'user' => User::select(
+        'id',
+        'username',
+        'name',
+        'profile_views',
+        'aura',
+        'karma',
+        'created_at',
+        'extra_info->bio AS bio',
+        'extra_info->social AS social',
+        'extra_info->avatar AS avatar',
+        'extra_info->website AS website',
+        'extra_info->location AS location',
+        'extra_info->interests AS interests',
+      )
+        ->whereId($user->id)
+        ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
+        ->firstOrFail(),
+      'writings' => [
+        'from_author' => $user
+          ->writings()
+          ->with([
+            'author' => function ($query) {
+              $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            },
+          ])
+          ->inRandomOrder()
+          ->take(5)
+          ->get(),
+        'from_shelf' => $user
+          ->shelf()
+          ->with([
+            'author' => function ($query) {
+              $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            },
+          ])
+          ->inRandomOrder()
+          ->take(5)
+          ->get(),
+        'from_liked' => Writing::whereIn(
+          'id',
+          $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'),
+        )
+          ->with([
+            'author' => function ($query) {
+              $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+            },
+          ])
+          ->inRandomOrder()
+          ->take(5)
+          ->get(),
+      ],
+      'isAuthorBlocked' => auth()->check() ? $authUser->isAuthorBlocked($user) : false,
+    ]);
+  }
+
+  /**
+   * Show the form for editing the specified resource.
+   *
+   * @param  \App\Models\User  $user
+   * @return \Inertia\Response
+   */
+  public function edit(User $user)
+  {
+    $this->authorize('update', $user);
+
+    return Inertia::render('users/PoUsersForm', [
+      'meta' => [
+        'title' => getPageTitle([__('Update profile')]),
+      ],
+      'user' => $user,
+      'agreement' => $user->isInAgreement(),
+      'roles' => Role::select('id', 'name')->get(),
+    ]);
+  }
+
+  /**
+   * Update the specified resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @param  \App\Models\User  $user
+   * @return array
+   */
+  public function update(Request $request, User $user)
+  {
+    $this->authorize('update', $user);
+
+    // Validate user input
+    request()->validate([
+      'role' => 'nullable|integer|exists:roles,id',
+      'name' => 'required|string|min:3|max:60',
+      'email' => 'required|email|min:3|max:40',
+      'bio' => 'nullable|string|min:3|max:300',
+      'location' => 'nullable|string|min:3|max:40',
+      'occupation' => 'nullable|string|min:3|max:40',
+      'interests' => 'nullable|string|min:3|max:100',
+      'website' => 'nullable|url|max:250',
+      'twitter' => 'nullable|string|min:3|max:40',
+      'threads' => 'nullable|string|min:3|max:40',
+      'instagram' => 'nullable|string|min:3|max:40',
+      'facebook' => 'nullable|string|min:3|max:40',
+      'youtube' => 'nullable|string|min:3|max:40',
+      'goodreads' => 'nullable|string|min:3|max:40',
+      'avatar' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size'),
+      'avatar-remove' => 'nullable|boolean',
+      'service_agreement' => 'sometimes|required|accepted',
+      'privacy_agreement' => 'sometimes|required|accepted',
+    ]);
+
+    // Working with avatars
+    $remove = request('avatar-remove') || false;
+
+    if ($remove) {
+      $avatar = '';
+    } elseif ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+      // Persist the image
+      $avatar = $request->file('avatar')->store('avatars');
+      $avatarRealPath = storage_path('app/' . $avatar);
+
+      // Scale the image
+      Image::read($avatarRealPath)->cover(512, 512)->save();
+
+      // Optimize the image
+      app(OptimizerChain::class)->optimize($avatarRealPath);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request): void
-    {
-        //
+    // Create the extra info array
+    $extraInfo = [
+      'bio' => request('bio') ?? '',
+      'social' => [
+        'twitter' => request('twitter') ?? '',
+        'threads' => request('threads') ?? '',
+        'instagram' => request('instagram') ?? '',
+        'facebook' => request('facebook') ?? '',
+        'youtube' => request('youtube') ?? '',
+        'goodreads' => request('goodreads') ?? '',
+      ],
+      'avatar' =>
+        $avatar ?? (isset($user->extra_info['avatar']) ? $user->extra_info['avatar'] : ''),
+      'website' => request('website') ?? '',
+      'location' => request('location') ?? '',
+      'interests' => request('interests') ?? '',
+      'occupation' => request('occupation') ?? '',
+    ];
+
+    // Check if already accepted agreements
+    if ($user->isInAgreement()) {
+      $extraInfo['agreement']['terms_of_use'] = 'on';
+      $extraInfo['agreement']['privacy_policy'] = 'on';
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Inertia\Response
-     */
-    public function show(User $user)
-    {
-        // Increment writing views
-        $user->incrementViews();
-
-        // Update Aura / karma
-        $user->updateAura();
-        //$user->updateKarma();
-
-        $authUser = auth()->check() ? User::find(auth()->user()->id) : null;
-
-        return Inertia::render('users/PoUsersShow', [
-            'meta' => [
-                'title' => getPageTitle([
-                    $user->getName(),
-                    __('Writers'),
-                ]),
-                'canonical' => $user->path(),
-            ],
-            'user' => User::select(
-                'id',
-                'username',
-                'name',
-                'profile_views',
-                'aura',
-                'karma',
-                'created_at',
-                'extra_info->bio AS bio',
-                'extra_info->social AS social',
-                'extra_info->avatar AS avatar',
-                'extra_info->website AS website',
-                'extra_info->location AS location',
-                'extra_info->interests AS interests',
-            )
-                ->whereId($user->id)
-                ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
-                ->firstOrFail(),
-            'writings' => [
-                'from_author' => $user->writings()
-                    ->with([
-                        'author' => function ($query) {
-                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                        }
-                    ])
-                    ->inRandomOrder()->take(5)->get(),
-                'from_shelf' => $user->shelf()
-                    ->with([
-                        'author' => function ($query) {
-                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                        }
-                    ])
-                    ->inRandomOrder()->take(5)->get(),
-                'from_liked' => Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
-                    ->with([
-                        'author' => function ($query) {
-                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                        }
-                    ])
-                    ->inRandomOrder()->take(5)->get(),
-            ],
-            'isAuthorBlocked' => auth()->check() ? $authUser->isAuthorBlocked($user) : false
-        ]);
+    // Check if a user role is set
+    if (!empty(request('role'))) {
+      $user->role_id = request('role');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Inertia\Response
-     */
-    public function edit(User $user)
-    {
-        $this->authorize('update', $user);
+    // Persist to database
+    $user->name = request('name');
+    $user->email = request('email');
+    $user->extra_info = $extraInfo;
+    $user->save();
 
-        return Inertia::render('users/PoUsersForm', [
-            'meta' => [
-                'title' => getPageTitle([__('Update profile')]),
-            ],
-            'user' => $user,
-            'agreement' => $user->isInAgreement(),
-            'roles' => Role::select('id', 'name')->get(),
-        ]);
+    // Persist user agreements to avoid asking again
+    if (!empty(request('service_agreement') && !empty(request('privacy_agreement')))) {
+      $user->acceptAgreements();
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
-     * @return array
-     */
-    public function update(Request $request, User $user)
-    {
-        $this->authorize('update', $user);
+    // Set response data
+    return [
+      'url' => $user->path(),
+    ];
+  }
 
-        // Validate user input
-        request()->validate([
-            'role' => 'nullable|integer|exists:roles,id',
-            'name' => 'required|string|min:3|max:60',
-            'email' => 'required|email|min:3|max:40',
-            'bio' => 'nullable|string|min:3|max:300',
-            'location' => 'nullable|string|min:3|max:40',
-            'occupation' => 'nullable|string|min:3|max:40',
-            'interests' => 'nullable|string|min:3|max:100',
-            'website' => 'nullable|url|max:250',
-            'twitter' => 'nullable|string|min:3|max:40',
-            'threads' => 'nullable|string|min:3|max:40',
-            'instagram' => 'nullable|string|min:3|max:40',
-            'facebook' => 'nullable|string|min:3|max:40',
-            'youtube' => 'nullable|string|min:3|max:40',
-            'goodreads' => 'nullable|string|min:3|max:40',
-            'avatar' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size'),
-            'avatar-remove' => 'nullable|boolean',
-            'service_agreement' => 'sometimes|required|accepted',
-            'privacy_agreement' => 'sometimes|required|accepted',
-        ]);
+  /**
+   * Remove the specified resource from storage.
+   *
+   * @param  \App\Models\User  $user
+   * @return array|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+   */
+  public function destroy(User $user)
+  {
+    $this->authorize('delete', $user);
+    $user->deleteOrFail();
 
-        // Working with avatars
-        $remove = request('avatar-remove') || false;
+    // Delete related notifications
+    $user->notifications()->delete();
+    DatabaseNotification::where('data->user_id', $user->id)->delete();
 
-        if ($remove) {
-            $avatar = '';
-        } else if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
-            // Persist the image
-            $avatar = $request->file('avatar')->store('avatars');
-            $avatarRealPath = storage_path('app/' . $avatar);
+    // Delete related likes
+    $user->likes()->delete();
 
-            // Scale the image
-            Image::read($avatarRealPath)->cover(512, 512)->save();
-
-            // Optimize the image
-            app(OptimizerChain::class)->optimize($avatarRealPath);
-        }
-
-        // Create the extra info array
-        $extraInfo = [
-            'bio' => request('bio') ?? '',
-            'social' => [
-                'twitter' => request('twitter') ?? '',
-                'threads' => request('threads') ?? '',
-                'instagram' => request('instagram') ?? '',
-                'facebook' => request('facebook') ?? '',
-                'youtube' => request('youtube') ?? '',
-                'goodreads' => request('goodreads') ?? '',
-            ],
-            'avatar' => $avatar ?? (isset($user->extra_info['avatar']) ? $user->extra_info['avatar'] : ''),
-            'website' => request('website') ?? '',
-            'location' => request('location') ?? '',
-            'interests' => request('interests') ?? '',
-            'occupation' => request('occupation') ?? '',
-        ];
-
-        // Check if already accepted agreements
-        if ($user->isInAgreement()) {
-            $extraInfo['agreement']['terms_of_use'] = 'on';
-            $extraInfo['agreement']['privacy_policy'] = 'on';
-        }
-
-        // Check if a user role is set
-        if (!empty(request('role'))) {
-            $user->role_id = request('role');
-        }
-
-        // Persist to database
-        $user->name = request('name');
-        $user->email = request('email');
-        $user->extra_info = $extraInfo;
-        $user->save();
-
-        // Persist user agreements to avoid asking again
-        if (!empty(request('service_agreement') && !empty(request('privacy_agreement')))) {
-            $user->acceptAgreements();
-        }
-
-        // Set response data
-        return [
-            'url' => $user->path()
-        ];
+    if (auth()->user()->id === $user->id) {
+      request()
+        ->session()
+        ->flash('flash', __('Your account and related data have been deleted successfully!'));
+      return redirect(route('home'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\User  $user
-     * @return array|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function destroy(User $user)
-    {
-        $this->authorize('delete', $user);
-        $user->deleteOrFail();
+    return [];
+  }
 
-        // Delete related notifications
-        $user->notifications()->delete();
-        DatabaseNotification::where('data->user_id', $user->id)->delete();
+  /**
+   * Block another user.
+   *
+   * @param  \App\Models\User  $user
+   * @return array
+   */
+  public function blockUser(User $user)
+  {
+    $blockingUser = User::find(auth()->user()->id);
+    $blockingUser->block($user);
 
-        // Delete related likes
-        $user->likes()->delete();
+    return [];
+  }
 
-        if (auth()->user()->id === $user->id) {
-            request()->session()->flash('flash', __('Your account and related data have been deleted successfully!'));
-            return redirect(route('home'));
-        }
+  /**
+   * Display the specified resource.
+   *
+   * @param  \App\Models\User  $user
+   * @return \Inertia\Response
+   */
+  public function account()
+  {
+    $user = User::find(auth()->user()->id);
+    $this->authorize('delete', $user);
 
-        return [];
-    }
+    $params = [];
 
-    /**
-     * Block another user.
-     *
-     * @param  \App\Models\User  $user
-     * @return array
-     */
-    public function blockUser(User $user)
-    {
-        $blockingUser = User::find(auth()->user()->id);
-        $blockingUser->block($user);
-
-        return [];
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Inertia\Response
-     */
-    public function account()
-    {
-        $user = User::find(auth()->user()->id);
-        $this->authorize('delete', $user);
-
-        $params = [];
-
-        return Inertia::render('users/PoUsersAccount', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('My account'),
-                ]),
-            ],
-            'notifications' => [
-                'email' => isset($user->extra_info['notifications']['email'])
-                    ? isTruthy($user->extra_info['notifications']['email'])
-                    : true,
-            ]
-        ]);
-    }
+    return Inertia::render('users/PoUsersAccount', [
+      'meta' => [
+        'title' => getPageTitle([__('My account')]),
+      ],
+      'notifications' => [
+        'email' => isset($user->extra_info['notifications']['email'])
+          ? isTruthy($user->extra_info['notifications']['email'])
+          : true,
+      ],
+    ]);
+  }
 }
