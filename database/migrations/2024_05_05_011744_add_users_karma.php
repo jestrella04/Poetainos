@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table("users", function (Blueprint $table) {
-            $table->unsignedDouble("karma")->default(0)->after('aura');
+            $table->double("karma")->default(0)->after('aura');
         });
     }
 

@@ -14,7 +14,8 @@ class MoveRepliesToComments extends Migration
      */
     public function up()
     {
-        \App\Models\Reply::all()->each(function ($reply) {
+        try {
+            \App\Models\Reply::all()->each(function ($reply) {
             DB::table('comments')->insert([
                 'user_id' => $reply->author->id,
                 'writing_id' => $reply->comment->writing->id,
@@ -25,6 +26,10 @@ class MoveRepliesToComments extends Migration
 
             $reply->delete();
         });
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        
     }
 
     /**

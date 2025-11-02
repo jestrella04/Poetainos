@@ -4,19 +4,20 @@ namespace Database\Factories;
 
 use App\Models\Writing;
 use App\Models\User;
+use App\Models\Like;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Writing>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Like>
  */
-class WritingFactory extends Factory
+class LikeFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Writing::class;
+    protected $model = Like::class;
 
     /**
      * Define the model's default state.
@@ -26,10 +27,9 @@ class WritingFactory extends Factory
     public function definition(): array
     {
         return [
+            'writing_id' => Writing::factory(),
             'user_id' => User::factory(),
-            'title' => $this->faker->text(45),
-            'slug' => $this->faker->unique()->slug(3),
-            'text' => $this->faker->paragraph
+            'like' => $this->faker->boolean(68)
         ];
     }
 }

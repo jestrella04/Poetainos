@@ -4,6 +4,12 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Writing;
+use App\Models\Like;
+use App\Models\Comment;
+use App\Models\Category;
+use App\Models\Tag;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,15 +22,15 @@ class DatabaseSeeder extends Seeder
     {
         $count = 10;
 
-        factory(App\Models\User::class, $count)->create()->each(function ($user) {
-            $user->writings()->save(factory(App\Models\Writing::class)->make());
-            $user->likes()->save(factory(App\Models\Like::class)->make());
-            $user->comments()->save(factory(App\Models\Comment::class)->make());
+        User::factory($count)->create()->each(function ($user) {
+            $user->writings()->save(Writing::factory()->make());
+            $user->likes()->save(Like::factory()->make());
+            $user->comments()->save(Comment::factory()->make());
         });
 
-        factory(App\Models\Writing::class, $count)->create()->each(function ($writing) {
-            $writing->categories()->save(factory(App\Models\Category::class)->make());
-            $writing->tags()->save(factory(App\Models\Tag::class)->make());
+        Writing::factory($count)->create()->each(function ($writing) {
+            $writing->categories()->save(Category::factory()->make());
+            $writing->tags()->save(Tag::factory()->make());
         });
 
         //factory(App\Models\Hood::class, $count)->make();

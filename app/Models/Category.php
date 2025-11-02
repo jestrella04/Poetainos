@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Category extends Model
 {
-    use \Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
+    use HasRecursiveRelationships, HasFactory;
 
     public function getRouteKeyName()
     {
