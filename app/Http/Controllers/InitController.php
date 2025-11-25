@@ -11,21 +11,16 @@ use Illuminate\Support\Facades\Hash;
 
 class InitController extends Controller
 {
-    public function init(Request $request)
+    public function init()
     {
-        // Validate user input
-        request()->validate([
-            'site_name' => 'required|string|min:3|max:100',
-            'site_slogan' => 'required|string|min:10|max:255',
-            'admin_username' => ['required', 'string', 'min:3', 'max:45', 'unique:users,username', 'regex:/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/'],
-            'admin_email' => 'required|email|max:45',
-            'admin_password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'],
-        ]);
+        if (null !== Setting::where('name', 'site')->first()) {
+            abort(403, 'App already initialized');
+        }
 
         // Create default JSON settings
         $site = file_get_contents(base_path('resources/json/settings.default.json'));
-        $site = str_replace('{{site_name}}', request('site_name'), $site);
-        $site = str_replace('{{site_slogan}}', request('site_slogan'), $site);
+        $site = str_replace('{{site_name}}', "Poetainos", $site);
+        $site = str_replace('{{site_slogan}}', "La tribu virtual", $site);
 
         Setting::create([
             'name' => 'site',
@@ -51,37 +46,16 @@ class InitController extends Controller
         ]);
 
         $user = User::create([
-            'username' => request('admin_username'),
+            'username' => "jon",
             'role_id' => $role->id,
-            'email' => request('admin_email'),
-            'password' => Hash::make(request('admin_password')),
+            'email' => "jon@jon.jon",
+            'password' => Hash::make("1234@1234"),
         ]);
 
         // Authenticate admin user
         Auth::login($user);
 
-        // Set flash message
-        request()->session()->flash('init', true);
-
         // Redirect to the init success page
-        return redirect(route(('init.success')));
-    }
-
-    public function show()
-    {
-        if (null === Setting::where('name', 'site')->first()) {
-            return view('init.install');
-        }
-
-        abort(404);
-    }
-
-    public function success()
-    {
-        if (session('init')) {
-            return view('init.success');
-        }
-
-        abort(404);
+        return redirect(route(('home')));
     }
 }

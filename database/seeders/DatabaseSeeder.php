@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
 
         User::factory($count)->create()->each(function ($user) {
             $user->writings()->save(Writing::factory()->make());
-            $user->likes()->save(Like::factory()->make());
+            //$user->likes()->save(Like::factory()->make());
             $user->comments()->save(Comment::factory()->make());
         });
 

@@ -105,9 +105,7 @@ Route::middleware(['verified'])->group(function () {
 /* Public routes */
 
 // Installation
-Route::get('/init', [InitController::class, 'show'])->name('init.show');
-Route::post('/init', [InitController::class, 'init'])->name('init.init');
-Route::get('/init/success', [InitController::class, 'success'])->name('init.success');
+Route::get('/init', [InitController::class, 'init'])->name('init.show');
 
 // Generic
 Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.manifest');

@@ -6,8 +6,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Setting;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
@@ -45,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
                 $route = $this->app->request->getRequestUri();
 
                 if ('/init' !== substr($route, 0, 5)) {
-                    abort(403);
+                    abort(503, 'App not configured');
                 }
             }
         }

@@ -1,0 +1,17 @@
+{
+  "name": "poetainos-dev-container",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "workspace",
+  "workspaceFolder": "/var/www/poetainos",
+  "postStartCommand": "php artisan serve",
+  "remoteUser": "jon",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "felixfbecker.php-debug",
+        "bmewburn.vscode-intelephense-client",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}
