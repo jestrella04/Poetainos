@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -19,8 +18,8 @@ class InitController extends Controller
 
         // Create default JSON settings
         $site = file_get_contents(base_path('resources/json/settings.default.json'));
-        $site = str_replace('{{site_name}}', "Poetainos", $site);
-        $site = str_replace('{{site_slogan}}', "La tribu virtual", $site);
+        $site = str_replace('{{site_name}}', "", $site);
+        $site = str_replace('{{site_slogan}}', "", $site);
 
         Setting::create([
             'name' => 'site',
@@ -46,10 +45,10 @@ class InitController extends Controller
         ]);
 
         $user = User::create([
-            'username' => "jon",
+            'username' => "",
             'role_id' => $role->id,
-            'email' => "jon@jon.jon",
-            'password' => Hash::make("1234@1234"),
+            'email' => "",
+            'password' => Hash::make(""),
         ]);
 
         // Authenticate admin user
