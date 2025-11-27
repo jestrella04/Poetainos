@@ -11,6 +11,7 @@
     "devsense.phptools-vscode",
     "streetsidesoftware.code-spell-checker-spanish",
     "gruntfuggly.todo-tree",
-    "vue.volar"
+    "vue.volar",
+    "mskelton.npm-outdated"
   ]
 }
