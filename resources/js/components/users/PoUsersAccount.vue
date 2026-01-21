@@ -1,40 +1,49 @@
 <script setup>
-import { inject, ref, provide, reactive, computed } from 'vue'
+import { inject, ref, provide, reactive } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 
-const page = computed(() => usePage())
+const page = usePage()
 const helper = inject('helper')
 const push = inject('push')
+
+if (!helper) {
+  throw new Error('helper plugin not provided')
+}
+
 const username = helper.authUser().username
 const isDelete = ref(false)
 const notifications = reactive({
-  email: (page.value.props.notifications.email ??= true),
+  email: (page.props.notifications?.email ?? true),
   push: false
 })
 
 provide('isDelete', isDelete)
 
-navigator.serviceWorker.ready.then((registration) => {
-  registration.pushManager
-    .getSubscription()
-    .then((subscription) => {
-      // Keep subscription in sync with server
-      if (subscription) {
-        push.subscribe()
-        notifications.push = true
-      }
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.ready.then((registration) => {
+    registration.pushManager
+      .getSubscription()
+      .then((subscription) => {
+        // Keep subscription in sync with server
+        if (subscription) {
+          push.subscribe()
+          notifications.push = true
+        }
 
-      // Uncheck the push switcher
-      if (!subscription) {
-        notifications.push = false
-      }
-    })
-    .catch((e) => {
-      console.log('Error thrown checking subscription status.', e)
-    })
-})
+        // Uncheck the push switcher
+        if (!subscription) {
+          notifications.push = false
+        }
+      })
+      .catch((e) => {
+        console.log('Error thrown checking subscription status.', e)
+      })
+  }).catch((e) => {
+    console.log('Service worker not available:', e)
+  })
+}
 
 function email() {
   notifications.email = !notifications.email

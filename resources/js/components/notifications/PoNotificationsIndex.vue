@@ -86,7 +86,7 @@ function update(notificationsData, nextPage) {
 
   <v-row class="sticky-tabs mb-5 flex-grow-0">
     <v-col cols="12">
-      <v-tabs v-model="page.props.tab" fixed-tabs>
+      <v-tabs :model-value="page.props.tab" fixed-tabs>
         <po-tab href="?tab=unread" value="unread" :aria-label="$t('main.unread')" inertia>
           <v-icon icon="fas fa-envelope" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.unread') }}</span>

@@ -1,5 +1,5 @@
 <script setup>
-import { defineOptions, ref, reactive, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'

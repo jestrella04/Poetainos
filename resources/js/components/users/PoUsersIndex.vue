@@ -82,7 +82,7 @@ function update(usersData, nextPage) {
 
   <v-row class="sticky-tabs">
     <v-col cols="12">
-      <v-tabs v-model="page.props.sort" fixed-tabs>
+      <v-tabs :model-value="page.props.sort" fixed-tabs>
         <po-tab href="?sort=featured" value="featured" :aria-label="$t('main.featured')" inertia>
           <v-icon icon="fas fa-fan" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.featured') }}</span>

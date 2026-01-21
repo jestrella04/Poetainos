@@ -1,5 +1,4 @@
 <script setup>
-import { defineOptions } from 'vue'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
 

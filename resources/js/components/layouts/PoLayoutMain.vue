@@ -263,7 +263,7 @@ code {
           </po-link>
         </div>
 
-        <v-tabs v-model="page.props.route.name">
+        <v-tabs :model-value="page.props.route.name">
           <po-tab :href="route('explore')" value="explore" inertia>{{ $t('main.explore') }}</po-tab>
           <po-tab :href="route('writings.awards')" value="writings.awards" inertia>{{ $t('main.awards') }}</po-tab>
           <po-tab :href="route('writings.random')" value="writings.random" inertia>{{ $t('main.random') }}</po-tab>

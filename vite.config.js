@@ -1,8 +1,9 @@
-import { defineConfig, splitVendorChunkPlugin } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import laravel from 'laravel-vite-plugin'
 import Components from 'unplugin-vue-components/vite'
+import { VuetifyResolver } from 'unplugin-vue-components/resolvers'
 import { VitePWA } from 'vite-plugin-pwa'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import path from 'path'
@@ -20,7 +21,16 @@ export default defineConfig({
     }
   },
   build: {
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', '@vue/runtime-dom', '@vue/runtime-core'],
+          'vendor-vuetify': ['vuetify'],
+          'vendor-inertia': ['@inertiajs/vue3']
+        }
+      }
+    }
   },
   plugins: [
     nodePolyfills(),
@@ -33,9 +43,9 @@ export default defineConfig({
     vuetify(),
     Components({
       dirs: ['resources/js/components/common'],
-      extensions: ['vue']
+      resolvers: [VuetifyResolver()],
+      include: [/\.vue$/, /\.vue\?vue/, /\.vue\.[tj]sx?\?vue/, /\.md$/],
     }),
-    splitVendorChunkPlugin(),
     VitePWA({
       scope: '/',
       base: '/',

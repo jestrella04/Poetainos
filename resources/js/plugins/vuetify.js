@@ -1,7 +1,7 @@
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
-import { aliases, fa } from 'vuetify/iconsets/fa-svg'
 import colors from 'vuetify/util/colors'
+import { aliases, fa } from 'vuetify/iconsets/fa-svg'
 
 export const vuetify = createVuetify({
   theme: {
