@@ -1,11 +1,16 @@
 <script setup>
-import { inject, provide, reactive, computed, ref } from 'vue'
+import { inject, provide, reactive, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 
-const page = computed(() => usePage())
+const page = usePage()
 const helper = inject('helper')
-const user = page.value.props.user
+
+if (!helper) {
+  throw new Error('helper plugin not provided')
+}
+
+const user = page.props.user
 const formData = reactive({
   avatar: [],
   role: '',
@@ -31,25 +36,25 @@ const isPosted = ref({})
 provide('formData', formData)
 
 // Init form data
-formData.role = user.role_id ??= ''
-formData.name = user.name ??= ''
-formData.username = user.username ??= ''
-formData.email = user.email ??= ''
+formData.role = user.role_id ?? ''
+formData.name = user.name ?? ''
+formData.username = user.username ?? ''
+formData.email = user.email ?? ''
 
-if ('extra_info' in user) {
-  formData.bio = user.extra_info.bio ??= ''
-  formData.location = user.extra_info.location ??= ''
-  formData.occupation = user.extra_info.occupation ??= ''
-  formData.interests = user.extra_info.interests ??= ''
-  formData.website = user.extra_info.website ??= ''
+if (user.extra_info) {
+  formData.bio = user.extra_info.bio ?? ''
+  formData.location = user.extra_info.location ?? ''
+  formData.occupation = user.extra_info.occupation ?? ''
+  formData.interests = user.extra_info.interests ?? ''
+  formData.website = user.extra_info.website ?? ''
 
-  if ('social' in user.extra_info) {
-    formData.twitter = user.extra_info.social.twitter ??= ''
-    formData.threads = user.extra_info.social.threads ??= ''
-    formData.instagram = user.extra_info.social.instagram ??= ''
-    formData.facebook = user.extra_info.social.facebook ??= ''
-    formData.youtube = user.extra_info.social.youtube ??= ''
-    formData.goodreads = user.extra_info.social.goodreads ??= ''
+  if (user.extra_info.social) {
+    formData.twitter = user.extra_info.social.twitter ?? ''
+    formData.threads = user.extra_info.social.threads ?? ''
+    formData.instagram = user.extra_info.social.instagram ?? ''
+    formData.facebook = user.extra_info.social.facebook ?? ''
+    formData.youtube = user.extra_info.social.youtube ?? ''
+    formData.goodreads = user.extra_info.social.goodreads ?? ''
   }
 }
 

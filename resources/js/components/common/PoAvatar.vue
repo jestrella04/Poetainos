@@ -1,18 +1,24 @@
 <script setup>
-import { inject, ref } from 'vue'
+import { inject, ref, computed } from 'vue'
 
 const props = defineProps({
   user: { type: Object, required: true }
 })
 
 const helper = inject('helper')
-const avatar = ref('')
 
-if (!helper.strNullOrEmpty(props.user.avatar)) {
-  avatar.value = props.user.avatar
-} else if ('extra_info' in props.user) {
-  avatar.value = props.user.extra_info.avatar
+if (!helper) {
+  throw new Error('helper plugin not provided')
 }
+
+const avatar = computed(() => {
+  if (!helper.strNullOrEmpty(props.user?.avatar)) {
+    return props.user.avatar
+  } else if (props.user?.extra_info?.avatar) {
+    return props.user.extra_info.avatar
+  }
+  return ''
+})
 </script>
 
 <template>
