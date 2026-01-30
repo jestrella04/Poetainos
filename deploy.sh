@@ -18,7 +18,7 @@ sh ./getcomposer.sh
 # Move Composer to $PATH
 sudo mv composer.phar /usr/local/bin/composer
 
-# Install/update composer dependecies
+# Install/update composer dependencies
 composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
 # Run database migrations
@@ -49,7 +49,7 @@ php artisan queue:restart
 php artisan generate:assetlinks
 
 # Install node modules
-npm install
+npm ci
 
 # Build assets using Vite
 npm run build
