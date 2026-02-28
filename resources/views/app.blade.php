@@ -34,6 +34,12 @@
         <script src="https://cdn.counter.dev/script.js" data-id="{{ config('services.counter.tracking_id') }}"
             data-utcoffset="-4" defer></script>
     @endif
+
+    @if(!empty(config('services.google.adsense.client_id')))
+        <!-- Google AdSense -->
+         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ config('services.google.adsense.client_id') }}"
+     crossorigin="anonymous"></script>
+    @endif
 </head>
 
 <body>

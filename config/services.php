@@ -66,8 +66,10 @@ return [
         'play_store' => [
             'id' => env('PLAY_STORE_ID'),
             'url' => env('PLAY_STORE_URL'),
-        ]
-
+        ],
+        'adsense' => [
+            'client_id' => env('GOOGLE_ADSENSE_CLIENT_ID'),
+        ],
     ],
 
     'compliance' => [
