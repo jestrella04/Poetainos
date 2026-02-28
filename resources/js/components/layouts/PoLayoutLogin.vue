@@ -77,7 +77,7 @@ body {
     <po-head />
 
     <v-main>
-      <v-row class="flex-column flex-md-row" style="height: 100%;" no-gutters>
+      <v-row class="flex-column flex-md-row" style="height: 100%; gap: 0;">
         <po-head :title="page.props.title" />
         <v-col class="login-col d-none d-md-block">
           <v-sheet class="d-flex align-center justify-center bg-gradient">

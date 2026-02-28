@@ -4,7 +4,9 @@ import colors from 'vuetify/util/colors'
 import { aliases, fa } from 'vuetify/iconsets/fa-svg'
 
 export const vuetify = createVuetify({
+  ssr: true,
   theme: {
+    defaultTheme: 'light',
     themes: {
       light: {
         dark: false,
@@ -30,5 +32,10 @@ export const vuetify = createVuetify({
     sets: {
       fa
     }
+  },
+  defaults: {
+    VBtn: {
+      class: 'text-uppercase',
+    },
   }
 })

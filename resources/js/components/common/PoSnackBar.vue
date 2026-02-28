@@ -13,8 +13,8 @@ const snackBar = inject('snackBar')
 </style>
 
 <template>
-  <v-snackbar v-model="snackBar.active" :timeout="snackBar.timeout" :color="snackBar.color" elevation="24" location="top"
-    multi-line rounded timer="blue-grey-lighten-1">
+  <v-snackbar v-model="snackBar.active" :timeout="snackBar.timeout" :color="snackBar.color" elevation="5" location="top"
+    min-height="68" rounded timer="blue-grey-lighten-1">
     <div class="d-flex ga-4">
       <div>
         <v-avatar size="48" color="primary" :image="snackBar.avatar" />

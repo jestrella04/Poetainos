@@ -144,9 +144,9 @@ provide('writing', props.data)
     </v-card>
 
     <template v-if="alone">
-      <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
-      <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
-      <v-skeleton-loader v-if="loadingComments" :elevation="3" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
+      <v-skeleton-loader v-if="loadingComments" :elevation="2" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
+      <v-skeleton-loader v-if="loadingComments" :elevation="2" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
+      <v-skeleton-loader v-if="loadingComments" :elevation="2" type="list-item-avatar" class="mb-2"></v-skeleton-loader>
 
       <po-comments-index />
     </template>

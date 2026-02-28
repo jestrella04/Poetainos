@@ -255,7 +255,7 @@ code {
     <po-snack-bar></po-snack-bar>
     <po-login-modal v-model="loginModal"></po-login-modal>
 
-    <v-toolbar color="primary" :elevation="8" class="po-navbar px-3 d-none d-lg-flex">
+    <v-toolbar color="primary" :elevation="4" class="po-navbar px-3 d-none d-lg-flex">
       <v-container class="d-inline-flex justify-space-between">
         <div class="align-self-center">
           <po-link :href="route('home')" variant="plain" size="x-large" class="font-weight-bold" inertia>

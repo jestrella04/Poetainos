@@ -20,6 +20,13 @@ export default defineConfig({
       'ziggy-js': path.resolve('/vendor/tightenco/ziggy')
     }
   },
+  optimizeDeps: {
+    include: ['vuetify']
+  },
+  ssr: {
+    // avoid bundling vuetify for server build, helps with ESM resolution
+    external: ['vuetify']
+  },
   build: {
     sourcemap: true,
     rollupOptions: {
@@ -40,7 +47,7 @@ export default defineConfig({
       refresh: true
     }),
     vue(),
-    vuetify(),
+    vuetify({ autoImport: true }),
     Components({
       dirs: ['resources/js/components/common'],
       resolvers: [VuetifyResolver()],
