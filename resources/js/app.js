@@ -1,5 +1,6 @@
 import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { ZiggyVue } from 'ziggy-js'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -23,11 +24,11 @@ createInertiaApp({
     color: '#B39DDB',
     showSpinner: true
   },
-  resolve: (name) => {
-    const pages = import.meta.glob('./components/**/*.vue', {
-      eager: true
-    })
-    let page = pages[`./components/${name}.vue`]
+  resolve: async (name) => {
+    const page = await resolvePageComponent(
+      `./components/${name}.vue`,
+      import.meta.glob('./components/**/*.vue')
+    )
     page.default.layout = page.default.layout || PoLayoutMain
     return page
   },

@@ -34,7 +34,19 @@ export default defineConfig({
         manualChunks: {
           'vendor-vue': ['vue', '@vue/runtime-dom', '@vue/runtime-core'],
           'vendor-vuetify': ['vuetify'],
-          'vendor-inertia': ['@inertiajs/vue3']
+          'vendor-inertia': ['@inertiajs/vue3'],
+          'vendor-fontawesome': [
+            '@fortawesome/fontawesome-svg-core',
+            '@fortawesome/vue-fontawesome',
+            '@fortawesome/free-solid-svg-icons',
+            '@fortawesome/free-regular-svg-icons',
+            '@fortawesome/free-brands-svg-icons'
+          ],
+          'vendor-realtime': ['laravel-echo', 'pusher-js'],
+          'vendor-i18n': ['vue-i18n'],
+          'vendor-vueuse': ['@vueuse/core'],
+          'vendor-utils': ['date-fns', 'lodash-es', 'millify', 'crop-url', 'linkifyjs'],
+          'vendor-markdown': ['markdown-it']
         }
       }
     }
