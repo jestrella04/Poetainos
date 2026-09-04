@@ -6,21 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateWritingsTable extends Migration
 {
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('writings', function(Blueprint $table)
-		{
-			$table->bigIncrements('id');
-			$table->unsignedBigInteger('user_id');
-			$table->string('title');
-			$table->string('slug')->unique();
-			$table->text('text');
-			$table->unsignedBigInteger('views')->default(0);
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('writings', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->text('text');
+            $table->unsignedBigInteger('views')->default(0);
             $table->double('aura')->unsigned()->default(0);
             $table->json('extra_info')->nullable();
             $table->timestamps();
@@ -28,16 +27,16 @@ class CreateWritingsTable extends Migration
             $table->timestamp('home_posted_at')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
-		});
-	}
+        });
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::dropIfExists('writings');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('writings');
+    }
 }

@@ -6,17 +6,17 @@ use App\Models\Writing;
 use App\Notifications\WritingPublished;
 use Illuminate\Support\Facades\Notification;
 
-test('index renders for each sort option', function (string $sort) {
+test('index renders for each sort option', function (string $sort): void {
     Writing::factory()->count(3)->create();
 
     $this->get('/?sort='.$sort)->assertOk();
 })->with(['latest', 'popular', 'likes']);
 
-test('awards page can be rendered', function () {
+test('awards page can be rendered', function (): void {
     $this->get(route('writings.awards'))->assertOk();
 });
 
-test('show increments views and calculates a finite aura', function () {
+test('show increments views and calculates a finite aura', function (): void {
     $writing = Writing::factory()->create();
 
     $this->get($writing->path())->assertOk();
@@ -26,21 +26,21 @@ test('show increments views and calculates a finite aura', function () {
     expect(is_numeric($fresh->aura))->toBeTrue();
 });
 
-test('random redirects to an existing writing', function () {
+test('random redirects to an existing writing', function (): void {
     $writing = Writing::factory()->create();
 
     $this->get('/writings/random')->assertRedirect($writing->path());
 });
 
-test('random 404s when there are no writings', function () {
+test('random 404s when there are no writings', function (): void {
     $this->get('/writings/random')->assertNotFound();
 });
 
-test('guests are redirected away from writings create', function () {
+test('guests are redirected away from writings create', function (): void {
     $this->get('/writings/create')->assertRedirect(route('verification.notice'));
 });
 
-test('verified users can publish a writing', function () {
+test('verified users can publish a writing', function (): void {
     Notification::fake();
 
     $user = User::factory()->create();
@@ -61,7 +61,7 @@ test('verified users can publish a writing', function () {
     Notification::assertSentTo($user, WritingPublished::class);
 });
 
-test('users cannot publish more than 3 writings a day', function () {
+test('users cannot publish more than 3 writings a day', function (): void {
     $user = User::factory()->create();
     $mainCategory = Category::factory()->create(['parent_id' => null]);
 
@@ -75,7 +75,7 @@ test('users cannot publish more than 3 writings a day', function () {
     ])->assertSessionHasErrors('title');
 });
 
-test('the author can edit and delete their own writing', function () {
+test('the author can edit and delete their own writing', function (): void {
     $author = User::factory()->create();
     $writing = Writing::factory()->for($author, 'author')->create();
 
@@ -85,7 +85,7 @@ test('the author can edit and delete their own writing', function () {
     expect(Writing::find($writing->id))->toBeNull();
 });
 
-test('a different verified user cannot edit or delete someone else\'s writing', function () {
+test('a different verified user cannot edit or delete someone else\'s writing', function (): void {
     $writing = Writing::factory()->create();
     $other = User::factory()->create();
 
@@ -93,7 +93,7 @@ test('a different verified user cannot edit or delete someone else\'s writing', 
     $this->actingAs($other)->delete('/writings/delete/'.$writing->slug)->assertForbidden();
 });
 
-test('an admin can edit and delete any writing', function () {
+test('an admin can edit and delete any writing', function (): void {
     $writing = Writing::factory()->create();
     $admin = actingAsAdmin();
 

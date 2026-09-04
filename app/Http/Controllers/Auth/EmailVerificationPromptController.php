@@ -23,7 +23,7 @@ class EmailVerificationPromptController extends Controller
                     'title' => getPageTitle([__('Verify Account')]),
                     'canonical' => route('home'),
                 ],
-                'status' => session('status')
+                'status' => session('status'),
             ]);
     }
 }

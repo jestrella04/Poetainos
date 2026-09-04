@@ -1,11 +1,12 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var Factory $factory */
 
-use App\Models\Category;
 use App\CategoryWriting;
+use App\Models\Category;
 use App\Models\Writing;
 use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factory;
 
 $factory->define(CategoryWriting::class, function (Faker $faker) {
     return [

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class TagsController extends Controller
 {
@@ -25,15 +26,15 @@ class TagsController extends Controller
      */
     public function query()
     {
-        $wildcard = '%' . request('query') . '%';
+        $wildcard = '%'.request('query').'%';
 
         return Tag::where('name', 'like', $wildcard)
             ->take($this->pagination)
             ->get()
             ->map(function ($tag, $key) {
                 return [
-                    "value" => $tag['name'],
-                    "label" => $tag['name'],
+                    'value' => $tag['name'],
+                    'label' => $tag['name'],
                 ];
             });
     }
@@ -51,7 +52,6 @@ class TagsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -62,8 +62,7 @@ class TagsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Tag  $tag
-     * @return \Inertia\Response
+     * @return Response
      */
     public function show(Tag $tag)
     {
@@ -75,15 +74,15 @@ class TagsController extends Controller
         $writings = $tag->writings()
             ->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query) {
+            ->with(['author' => function ($query): void {
                 $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
             }]);
 
-        if ('latest' === $sort) {
+        if ($sort === 'latest') {
             $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ('popular' === $sort) {
+        } elseif ($sort === 'popular') {
             $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ('likes' === $sort) {
+        } elseif ($sort === 'likes') {
             $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
         }
 
@@ -107,7 +106,6 @@ class TagsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Tag  $tag
      * @return \Illuminate\Http\Response
      */
     public function edit(Tag $tag)
@@ -118,8 +116,6 @@ class TagsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Tag  $tag
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Tag $tag)
@@ -130,7 +126,6 @@ class TagsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Tag  $tag
      * @return \Illuminate\Http\Response
      */
     public function destroy(Tag $tag)
@@ -138,7 +133,7 @@ class TagsController extends Controller
         $tag->delete();
 
         return [
-            'message' => __('Tag deleted successfully')
+            'message' => __('Tag deleted successfully'),
         ];
     }
 }

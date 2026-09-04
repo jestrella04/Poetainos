@@ -3,23 +3,23 @@
 use App\Models\Role;
 use App\Models\User;
 
-test('guests are redirected away from the admin area', function () {
+test('guests are redirected away from the admin area', function (): void {
     $this->get('/admin')->assertRedirect(route('login'));
 });
 
-test('authenticated non-admins are redirected to login from the admin area', function () {
+test('authenticated non-admins are redirected to login from the admin area', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user)->get('/admin')->assertRedirect(route('login'));
 });
 
-test('admins can access the admin area', function () {
+test('admins can access the admin area', function (): void {
     $admin = actingAsAdmin();
 
     $this->actingAs($admin)->get('/admin')->assertOk();
 });
 
-test('isAllowed reflects the role\'s admin permission', function () {
+test('isAllowed reflects the role\'s admin permission', function (): void {
     $noRole = User::factory()->create();
     expect($noRole->isAllowed('admin'))->toBeFalse();
 

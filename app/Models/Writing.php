@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class Writing extends Model
 {
     use HasFactory;
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -76,7 +76,7 @@ class Writing extends Model
             return $this->text;
         }
 
-        return mb_substr($this->text, 0, 400) . '...';
+        return mb_substr($this->text, 0, 400).'...';
     }
 
     public function comments()
@@ -92,6 +92,7 @@ class Writing extends Model
     public function likers()
     {
         $likes = $this->likes()->pluck('user_id');
+
         return User::select('id', 'username', 'name', 'extra_info->avatar AS avatar')->whereIn('id', $likes)->get();
     }
 
@@ -169,7 +170,7 @@ class Writing extends Model
         $awarded = isset($this->home_posted_at);
 
         // Persist to the database
-        if ($auraNew >= $auraHome && $postedAt <= 31 && !$awarded) {
+        if ($auraNew >= $auraHome && $postedAt <= 31 && ! $awarded) {
             DB::table($this->getTable())->whereId($this->id)->update([
                 'aura' => $auraNew,
                 'aura_updated_at' => Carbon::now(),
@@ -180,22 +181,22 @@ class Writing extends Model
         } else {
             DB::table($this->getTable())->whereId($this->id)->update([
                 'aura' => $auraNew,
-                'aura_updated_at' => Carbon::now()
+                'aura_updated_at' => Carbon::now(),
             ]);
         }
     }
 
     public function externalLink()
     {
-        if (!empty($this->extra_info['link'])) {
+        if (! empty($this->extra_info['link'])) {
             return $this->extra_info['link'];
         }
     }
 
     public function coverPath()
     {
-        if (!empty($this->extra_info['cover'])) {
-            $path = '/storage/' . $this->extra_info['cover'];
+        if (! empty($this->extra_info['cover'])) {
+            $path = '/storage/'.$this->extra_info['cover'];
 
             if (is_file(public_path($path))) {
                 return $path;

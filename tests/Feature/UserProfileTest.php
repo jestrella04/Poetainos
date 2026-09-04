@@ -2,7 +2,7 @@
 
 use App\Models\User;
 
-test('a user can view and update their own profile', function () {
+test('a user can view and update their own profile', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user)->get('/users/edit/'.$user->username)->assertOk();
@@ -18,7 +18,7 @@ test('a user can view and update their own profile', function () {
     expect($fresh->extra_info['bio'])->toBe('A short bio.');
 });
 
-test('a different verified user cannot view or update someone else\'s profile', function () {
+test('a different verified user cannot view or update someone else\'s profile', function (): void {
     $user = User::factory()->create();
     $other = User::factory()->create();
 
@@ -29,7 +29,7 @@ test('a different verified user cannot view or update someone else\'s profile', 
     ])->assertForbidden();
 });
 
-test('an admin can view and update any profile', function () {
+test('an admin can view and update any profile', function (): void {
     $user = User::factory()->create();
     $admin = actingAsAdmin();
 
@@ -42,7 +42,7 @@ test('an admin can view and update any profile', function () {
     expect($user->fresh()->name)->toBe('Admin Edited');
 });
 
-test('a user can delete their own account after confirming their password', function () {
+test('a user can delete their own account after confirming their password', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user)
@@ -53,7 +53,7 @@ test('a user can delete their own account after confirming their password', func
     expect(User::find($user->id))->toBeNull();
 });
 
-test('an admin can delete a different user without confirming a password', function () {
+test('an admin can delete a different user without confirming a password', function (): void {
     $user = User::factory()->create();
     $admin = actingAsAdmin();
 
@@ -62,7 +62,7 @@ test('an admin can delete a different user without confirming a password', funct
     expect(User::find($user->id))->toBeNull();
 });
 
-test('a user can block another user', function () {
+test('a user can block another user', function (): void {
     $user = User::factory()->create();
     $author = User::factory()->create();
 

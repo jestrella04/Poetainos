@@ -21,5 +21,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::put('/karma/{user}', function (User $user) {
     $user->updateKarma();
+
     return response($user->karma);
 })->name('api.karma.update');

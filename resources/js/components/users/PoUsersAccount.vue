@@ -15,34 +15,36 @@ if (!helper) {
 const username = helper.authUser().username
 const isDelete = ref(false)
 const notifications = reactive({
-  email: (page.props.notifications?.email ?? true),
+  email: page.props.notifications?.email ?? true,
   push: false
 })
 
 provide('isDelete', isDelete)
 
 if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.ready.then((registration) => {
-    registration.pushManager
-      .getSubscription()
-      .then((subscription) => {
-        // Keep subscription in sync with server
-        if (subscription) {
-          push.subscribe()
-          notifications.push = true
-        }
+  navigator.serviceWorker.ready
+    .then((registration) => {
+      registration.pushManager
+        .getSubscription()
+        .then((subscription) => {
+          // Keep subscription in sync with server
+          if (subscription) {
+            push.subscribe()
+            notifications.push = true
+          }
 
-        // Uncheck the push switcher
-        if (!subscription) {
-          notifications.push = false
-        }
-      })
-      .catch((e) => {
-        console.log('Error thrown checking subscription status.', e)
-      })
-  }).catch((e) => {
-    console.log('Service worker not available:', e)
-  })
+          // Uncheck the push switcher
+          if (!subscription) {
+            notifications.push = false
+          }
+        })
+        .catch((e) => {
+          console.log('Error thrown checking subscription status.', e)
+        })
+    })
+    .catch((e) => {
+      console.log('Service worker not available:', e)
+    })
 }
 
 function email() {

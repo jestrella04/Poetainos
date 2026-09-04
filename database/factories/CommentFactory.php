@@ -8,7 +8,7 @@ use App\Models\Writing;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Comment>
+ * @extends Factory<Comment>
  */
 class CommentFactory extends Factory
 {
@@ -29,7 +29,7 @@ class CommentFactory extends Factory
         return [
             'user_id' => User::factory(),
             'writing_id' => Writing::factory(),
-            'message' => $this->faker->paragraph
+            'message' => $this->faker->paragraph,
         ];
     }
 }

@@ -12,9 +12,13 @@ class ContactFormSubmitted extends Notification implements ShouldQueue
     use Queueable;
 
     protected $name;
+
     protected $email;
+
     protected $subject;
+
     protected $message;
+
     protected $site;
 
     /**
@@ -46,19 +50,19 @@ class ContactFormSubmitted extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->replyTo($this->email)
-                    ->subject('[' . $this->site . '] ' . $this->subject)
-                    ->line(__(':name just sent a message to the site administrators using the contact form at :site', [
-                        'name' => $this->name,
-                        'site' => $this->site
-                    ]))
-                    ->line(__('Verbatim message is displayed below:'))
-                    ->line($this->message);
+            ->replyTo($this->email)
+            ->subject('['.$this->site.'] '.$this->subject)
+            ->line(__(':name just sent a message to the site administrators using the contact form at :site', [
+                'name' => $this->name,
+                'site' => $this->site,
+            ]))
+            ->line(__('Verbatim message is displayed below:'))
+            ->line($this->message);
     }
 
     /**

@@ -4,20 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Like;
+use App\Models\User;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index($writing)
     {
@@ -30,9 +29,9 @@ class CommentsController extends Controller
         $comments = Comment::where('writing_id', $writing)
             ->whereNotIn('user_id', $filter)
             ->with([
-                'author' => function ($query) {
+                'author' => function ($query): void {
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }
+                },
             ])
             ->withCount(['likes'])
             ->orderBy('created_at', 'desc')
@@ -44,7 +43,7 @@ class CommentsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -54,8 +53,7 @@ class CommentsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -73,11 +71,11 @@ class CommentsController extends Controller
 
         // Update aura / karma
         $comment->author->updateAura();
-        //$comment->author->updateKarma();
+        // $comment->author->updateKarma();
         $comment->writing->updateAura();
 
         // Notify author
-        if (!$comment->writing->author->is(auth()->user())) {
+        if (! $comment->writing->author->is(auth()->user())) {
             $comment->writing->author->notify(new WritingCommented($comment->writing, auth()->user()));
         }
 
@@ -90,9 +88,9 @@ class CommentsController extends Controller
             $mention = User::where('username', '=', substr($mention, 1))->first();
 
             if (
-                null !== $mention
-                && !$mention->is($comment->writing->author)
-                && !$mention->is(auth()->user())
+                $mention !== null
+                && ! $mention->is($comment->writing->author)
+                && ! $mention->is(auth()->user())
             ) {
                 $mention->notify(new WritingCommentMentioned($comment, auth()->user()));
             }
@@ -102,8 +100,7 @@ class CommentsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Comment  $comment
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Comment $comment)
     {
@@ -113,8 +110,7 @@ class CommentsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Comment  $comment
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Comment $comment)
     {
@@ -124,9 +120,7 @@ class CommentsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Comment  $comment
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Comment $comment)
     {
@@ -136,7 +130,6 @@ class CommentsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Comment  $comment
      * @return array
      */
     public function destroy(Comment $comment)
@@ -150,7 +143,7 @@ class CommentsController extends Controller
         // Delete related likes
         Like::where([
             ['likeable_type', 'App\Models\Comment'],
-            ['likeable_id', $comment->id]
+            ['likeable_id', $comment->id],
         ])->delete();
 
         return [];

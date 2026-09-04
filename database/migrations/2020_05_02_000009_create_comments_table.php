@@ -6,33 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateCommentsTable extends Migration
 {
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('comments', function(Blueprint $table)
-		{
-			$table->bigIncrements('id');
-			$table->unsignedBigInteger('user_id');
-			$table->unsignedBigInteger('writing_id');
-			$table->text('message');
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('comments', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('writing_id');
+            $table->text('message');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
-			$table->foreign('writing_id')->references('id')->on('writings')->onDelete('CASCADE');
-		});
-	}
+            $table->foreign('writing_id')->references('id')->on('writings')->onDelete('CASCADE');
+        });
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::dropIfExists('comments');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('comments');
+    }
 }

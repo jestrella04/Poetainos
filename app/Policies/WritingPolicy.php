@@ -13,8 +13,6 @@ class WritingPolicy
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Writing  $writing
      * @return mixed
      */
     public function update(User $user, Writing $writing)
@@ -27,8 +25,6 @@ class WritingPolicy
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Writing  $writing
      * @return mixed
      */
     public function delete(User $user, Writing $writing)

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table("users", function (Blueprint $table) {
-            $table->double("karma")->default(0)->after('aura');
+        Schema::table('users', function (Blueprint $table) {
+            $table->double('karma')->default(0)->after('aura');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-       Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('karma');
-       });
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('karma');
+        });
     }
 };

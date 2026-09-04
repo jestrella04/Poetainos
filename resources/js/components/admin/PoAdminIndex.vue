@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 
 defineOptions({
-  layout: PoLayoutAdmin,
+  layout: PoLayoutAdmin
 })
 
 const page = computed(() => usePage())

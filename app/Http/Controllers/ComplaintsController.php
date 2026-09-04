@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Complaint;
-use App\Notifications\ComplaintSubmitted;
 use App\Models\User;
 use App\Models\Writing;
+use App\Notifications\ComplaintSubmitted;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 
 class ComplaintsController extends Controller
@@ -15,7 +16,7 @@ class ComplaintsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -25,11 +26,11 @@ class ComplaintsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function reasons()
     {
-        return  [
+        return [
             'reasons' => getSiteConfig('complaints'),
         ];
     }
@@ -37,8 +38,8 @@ class ComplaintsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(Complaint $complaint)
     {
@@ -53,11 +54,11 @@ class ComplaintsController extends Controller
         $id = request('complainable_id');
 
         // Update accordingly
-        if ('writings' == request('complainable_type')) {
+        if (request('complainable_type') == 'writings') {
             $complaint->complainable()->associate(Writing::find($id));
-        } elseif ('comments' == request('complainable_type')) {
+        } elseif (request('complainable_type') == 'comments') {
             $complaint->complainable()->associate(Comment::find($id));
-        } elseif ('users' == request('complainable_type')) {
+        } elseif (request('complainable_type') == 'users') {
             $complaint->complainable()->associate(User::find($id));
         }
 
@@ -76,7 +77,7 @@ class ComplaintsController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
@@ -87,7 +88,7 @@ class ComplaintsController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Complaint $complaint)
     {
@@ -98,9 +99,8 @@ class ComplaintsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $id)
     {
@@ -111,7 +111,7 @@ class ComplaintsController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {

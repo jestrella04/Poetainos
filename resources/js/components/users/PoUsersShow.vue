@@ -11,9 +11,12 @@ const page = computed(() => usePage())
     <po-head></po-head>
 
     <template v-if="page.props.isAuthorBlocked">
-      <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px;">
-        <po-msg-block :msg-title="$t('users.user-is-blocked')" :msg-body="$t('main.author-blocked')"
-          icon="fas fa-ban"></po-msg-block>
+      <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px">
+        <po-msg-block
+          :msg-title="$t('users.user-is-blocked')"
+          :msg-body="$t('main.author-blocked')"
+          icon="fas fa-ban"
+        ></po-msg-block>
       </div>
     </template>
     <template v-else>
@@ -29,7 +32,11 @@ const page = computed(() => usePage())
 
               <template v-for="writing in page.props.writings.from_author" :key="writing.id">
                 <div class="mb-2 pos-relative">
-                  <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                  <po-link
+                    :href="route('writings.show', writing.slug)"
+                    class="text-bold stretched"
+                    inertia
+                  >
                     {{ writing.title }}
                   </po-link>
 
@@ -48,7 +55,11 @@ const page = computed(() => usePage())
 
               <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
                 <div class="mb-2 pos-relative">
-                  <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                  <po-link
+                    :href="route('writings.show', writing.slug)"
+                    class="text-bold stretched"
+                    inertia
+                  >
                     {{ writing.title }}
                   </po-link>
 
@@ -67,7 +78,11 @@ const page = computed(() => usePage())
 
               <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
                 <div class="mb-2 pos-relative">
-                  <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                  <po-link
+                    :href="route('writings.show', writing.slug)"
+                    class="text-bold stretched"
+                    inertia
+                  >
                     {{ writing.title }}
                   </po-link>
 

@@ -15,11 +15,11 @@ class CreateBlockedUsersTable extends Migration
     {
         Schema::create('blocked_users', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
-			$table->unsignedBigInteger('blocked_user_id');
-            $table->primary(['user_id','blocked_user_id']);
+            $table->unsignedBigInteger('blocked_user_id');
+            $table->primary(['user_id', 'blocked_user_id']);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
-			$table->foreign('blocked_user_id')->references('id')->on('users')->onDelete('CASCADE');
+            $table->foreign('blocked_user_id')->references('id')->on('users')->onDelete('CASCADE');
         });
     }
 

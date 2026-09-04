@@ -7,8 +7,14 @@ const formData = inject('formData')
 <template>
   <div class="d-flex">
     <div class="flex-shrink-1">
-      <v-switch v-model="formData.serviceAgreement" :label="$t('accounts.i-accept-terms')" color="primary" class="mb-0"
-        required hide-details></v-switch>
+      <v-switch
+        v-model="formData.serviceAgreement"
+        :label="$t('accounts.i-accept-terms')"
+        color="primary"
+        class="mb-0"
+        required
+        hide-details
+      ></v-switch>
     </div>
 
     <div class="pt-4 ps-4">
@@ -20,8 +26,13 @@ const formData = inject('formData')
 
   <div class="d-flex">
     <div class="flex-shrink-1">
-      <v-switch v-model="formData.privacyAgreement" :label="$t('accounts.i-accept-privacy')" color="primary" required
-        hide-details></v-switch>
+      <v-switch
+        v-model="formData.privacyAgreement"
+        :label="$t('accounts.i-accept-privacy')"
+        color="primary"
+        required
+        hide-details
+      ></v-switch>
     </div>
 
     <div class="pt-4 ps-4">

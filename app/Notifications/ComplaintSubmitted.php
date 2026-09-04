@@ -12,9 +12,13 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
     use Queueable;
 
     protected $subject;
+
     protected $greeting;
+
     protected $message;
+
     protected $link;
+
     protected $action;
 
     /**
@@ -26,8 +30,8 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
     {
         $this->subject = __('[:site] Action required: content at your site received a complaint from a user.', ['site' => getSiteConfig('name')]);
         $this->greeting = __('Hello!');
-        $this->message = __('Your action is required.') . ' ' .
-            __('User generated content (UGC) at :site just received a new complaint from a user.', ['site' => getSiteConfig('name')]) . ' ' .
+        $this->message = __('Your action is required.').' '.
+            __('User generated content (UGC) at :site just received a new complaint from a user.', ['site' => getSiteConfig('name')]).' '.
             __('Please login to the admin panel or click the link below to manage all user complaints.');
         $this->link = route('admin.complaints');
         $this->action = __('Manage Complaints');
@@ -48,7 +52,7 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {

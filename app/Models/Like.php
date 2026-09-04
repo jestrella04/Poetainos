@@ -36,7 +36,7 @@ class Like extends Model
      */
     protected static function booted(): void
     {
-        static::creating(function (self $like) {
+        static::creating(function (self $like): void {
             $like->created_at ??= now();
         });
     }

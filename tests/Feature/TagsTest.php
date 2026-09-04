@@ -3,7 +3,7 @@
 use App\Models\Tag;
 use App\Models\User;
 
-test('query returns matching tags', function () {
+test('query returns matching tags', function (): void {
     Tag::factory()->create(['name' => 'poetry']);
     Tag::factory()->create(['name' => 'prose']);
 
@@ -14,13 +14,13 @@ test('query returns matching tags', function () {
     $response->assertJsonMissing(['value' => 'prose']);
 });
 
-test('show renders for each sort option', function (string $sort) {
+test('show renders for each sort option', function (string $sort): void {
     $tag = Tag::factory()->create();
 
     $this->get($tag->path().'?sort='.$sort)->assertOk();
 })->with(['latest', 'popular', 'likes']);
 
-test('admin can delete a tag', function () {
+test('admin can delete a tag', function (): void {
     $admin = actingAsAdmin();
     $tag = Tag::factory()->create();
 
@@ -29,7 +29,7 @@ test('admin can delete a tag', function () {
     expect(Tag::find($tag->id))->toBeNull();
 });
 
-test('non-admins are redirected to login for admin tag routes', function () {
+test('non-admins are redirected to login for admin tag routes', function (): void {
     $user = User::factory()->create();
     $tag = Tag::factory()->create();
 

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Notifications\WritingRandom;
 use App\Models\User;
+use App\Notifications\WritingRandom;
 use Illuminate\Console\Command;
 
 class PostRandomWriting extends Command

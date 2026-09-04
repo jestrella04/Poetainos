@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
@@ -16,11 +17,11 @@ class SocialAuthController extends Controller
     /**
      * Redirect the user to the external authentication page.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function redirectToProvider($service)
     {
-        if (!empty(request('redirect'))) {
+        if (! empty(request('redirect'))) {
             Redirect::setIntendedUrl(request('redirect'));
         }
 
@@ -30,7 +31,7 @@ class SocialAuthController extends Controller
     /**
      * Obtain the user information from the external service.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function handleProviderCallback($service)
     {
@@ -42,7 +43,7 @@ class SocialAuthController extends Controller
         // Check if user already exists
         // If not, one will be created
         $user = User::firstOrCreate([
-            'email' => $social->getEmail()
+            'email' => $social->getEmail(),
         ], [
             'name' => $social->getName(),
             'username' => slugify('users', $nick, 'username', '_'),
@@ -57,7 +58,7 @@ class SocialAuthController extends Controller
             $size = getimagesize($social->getAvatar());
             $extension = image_type_to_extension($size[2]);
             $base = bin2hex(random_bytes(20));
-            $path = 'avatars/' . $base . $extension;
+            $path = 'avatars/'.$base.$extension;
             Storage::disk('local')->put($path, $avatar);
             $user->extra_info = ['avatar' => $path];
         }
@@ -80,7 +81,7 @@ class SocialAuthController extends Controller
         if ($exists) {
             $message = 'accounts.welcome-back';
         } else {
-            $message  =  'accounts.welcome-aboard';
+            $message = 'accounts.welcome-aboard';
         }
 
         // Set flash message

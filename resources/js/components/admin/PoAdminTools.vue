@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 
 defineOptions({
-  layout: PoLayoutAdmin,
+  layout: PoLayoutAdmin
 })
 
 const page = computed(() => usePage())
@@ -22,14 +22,30 @@ const tab = ref(null)
 
     <v-window v-model="tab" class="h-100">
       <v-window-item value="info" class="h-100">
-        <iframe :srcdoc="page.props.info" frameborder="0" style="height: 100%; width: 100%;"></iframe>
+        <iframe
+          :srcdoc="page.props.info"
+          frameborder="0"
+          style="height: 100%; width: 100%"
+        ></iframe>
       </v-window-item>
 
       <v-window-item value="log" class="h-100">
-        <po-button color="secondary" size="x-small" :href="route('admin.log')" icon title="Download full copy" class="mb-2">
-        <v-icon icon="fas fa-download"></v-icon>
-        </po-button> 
-        <v-textarea v-model="page.props.log" :label="$t('admin.log')" rows="20" readonly></v-textarea>
+        <po-button
+          color="secondary"
+          size="x-small"
+          :href="route('admin.log')"
+          icon
+          title="Download full copy"
+          class="mb-2"
+        >
+          <v-icon icon="fas fa-download"></v-icon>
+        </po-button>
+        <v-textarea
+          v-model="page.props.log"
+          :label="$t('admin.log')"
+          rows="20"
+          readonly
+        ></v-textarea>
       </v-window-item>
     </v-window>
   </po-wrapper>

@@ -6,8 +6,7 @@ import { useTheme } from 'vuetify'
 const page = computed(() => usePage())
 const theme = useTheme()
 
-theme.change(window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light')
-
+theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
 </script>
 
 <style>
@@ -27,7 +26,11 @@ body {
 }
 
 .bg-gradient {
-  background: linear-gradient(180deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-surface)) 100%) !important;
+  background: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-primary)) 0%,
+    rgb(var(--v-theme-surface)) 100%
+  ) !important;
 }
 </style>
 
@@ -50,7 +53,11 @@ body {
 
 @media screen and (max-width: 960px) {
   .login-col .v-sheet {
-    background: linear-gradient(180deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-surface)) 100%) !important;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--v-theme-primary)) 0%,
+      rgb(var(--v-theme-surface)) 100%
+    ) !important;
   }
 
   login-btns {
@@ -77,7 +84,7 @@ body {
     <po-head />
 
     <v-main>
-      <v-row class="flex-column flex-md-row" style="height: 100%; gap: 0;">
+      <v-row class="flex-column flex-md-row" style="height: 100%; gap: 0">
         <po-head :title="page.props.title" />
         <v-col class="login-col d-none d-md-block">
           <v-sheet class="d-flex align-center justify-center bg-gradient">
@@ -87,7 +94,7 @@ body {
 
         <v-col class="login-col">
           <v-sheet class="d-flex align-center justify-center">
-            <div style="width: 100%; max-width: 100%;">
+            <div style="width: 100%; max-width: 100%">
               <div class="d-flex align-center justify-center pb-10 d-md-none">
                 <v-img src="/images/logo.svg" class="logo logo-shadow"></v-img>
               </div>

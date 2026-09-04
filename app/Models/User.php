@@ -7,13 +7,13 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasPushSubscriptions, HasFactory;
+    use HasFactory, HasPushSubscriptions, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -29,7 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'extra_info',
         'aura',
         'karma',
-        'aura_updated_at'
+        'aura_updated_at',
     ];
 
     /**
@@ -74,8 +74,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function avatarPath()
     {
-        if (!empty($this->extra_info['avatar'])) {
-            $path = '/storage/' . $this->extra_info['avatar'];
+        if (! empty($this->extra_info['avatar'])) {
+            $path = '/storage/'.$this->extra_info['avatar'];
 
             if (is_file(public_path($path))) {
                 return $path;
@@ -85,7 +85,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getName()
     {
-        if (!empty($this->name)) {
+        if (! empty($this->name)) {
             return $this->name;
         }
 
@@ -94,7 +94,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function firstName()
     {
-        if (!empty($this->name)) {
+        if (! empty($this->name)) {
             return explode(' ', $this->name)[0];
         }
 
@@ -103,8 +103,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function initials()
     {
-        if (!empty($this->name) && !empty($this->last_name)) {
-            return strtoupper(substr($this->name, 0, 1) . substr($this->last_name, 0, 1));
+        if (! empty($this->name) && ! empty($this->last_name)) {
+            return strtoupper(substr($this->name, 0, 1).substr($this->last_name, 0, 1));
         }
 
         return strtoupper(substr($this->username, 0, 1));
@@ -112,8 +112,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getTwitterUsername()
     {
-        if (!empty($this->extra_info['social']['twitter'])) {
-            return '@' . $this->extra_info['social']['twitter'];
+        if (! empty($this->extra_info['social']['twitter'])) {
+            return '@'.$this->extra_info['social']['twitter'];
         }
 
         return $this->getName();
@@ -143,6 +143,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if ($count) {
             $count = DB::select('SELECT count(`user_id`) AS user_count FROM `hoods` WHERE `fellow_user_id` = ?', [$this->id]);
+
             return $count[0]->user_count;
         }
 
@@ -177,8 +178,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $shelf = $count['shelf'] ?? 0;
         $awards = $count['awards'] ?? 0;
         $views = $count['views'] ?? 0;
-        //$hood = $this->hood->count();
-        //$extendedHood = $this->fellowHood($count = true);
+        // $hood = $this->hood->count();
+        // $extendedHood = $this->fellowHood($count = true);
 
         // Get points from settings
         $pointsWritings = getSiteConfig('aura.points.user.writing');
@@ -187,8 +188,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $pointsShelf = getSiteConfig('aura.points.user.shelf');
         $pointsViews = getSiteConfig('aura.points.user.views');
         $pointsAwards = getSiteConfig('aura.points.user.award');
-        //$pointsHood = getSiteConfig('aura.points.user.hood');
-        //$pointsExtendedHood = getSiteConfig('aura.points.user.extended_hood');
+        // $pointsHood = getSiteConfig('aura.points.user.hood');
+        // $pointsExtendedHood = getSiteConfig('aura.points.user.extended_hood');
         $basePoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
 
         // Calculate points as per settings
@@ -198,13 +199,13 @@ class User extends Authenticatable implements MustVerifyEmail
         $pointsShelf = $pointsShelf * $shelf;
         $pointsViews = $pointsViews * $views;
         $pointsAwards = $pointsAwards * $awards;
-        //$pointsHood = $pointsHood * $hood;
-        //$pointsExtendedHood = $pointsExtendedHood * $extendedHood;
+        // $pointsHood = $pointsHood * $hood;
+        // $pointsExtendedHood = $pointsExtendedHood * $extendedHood;
         $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
 
         return [
             'base' => (int) $basePoints,
-            'total' => (int) $totalPoints
+            'total' => (int) $totalPoints,
         ];
     }
 
@@ -219,8 +220,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'shelf' => $user->shelf_count,
             'awards' => $user->awards_count,
             'views' => $this->profile_views,
-            //'hood' => $this->hood->count(),
-            //'extendedHood' => $this->fellowHood($count = true),
+            // 'hood' => $this->hood->count(),
+            // 'extendedHood' => $this->fellowHood($count = true),
         ];
 
         $points = $this->calcPoints($count);
@@ -235,7 +236,7 @@ class User extends Authenticatable implements MustVerifyEmail
             // Persist to the database
             DB::table('users')->whereId($this->id)->update([
                 'aura' => $aura,
-                'aura_updated_at' => Carbon::now()
+                'aura_updated_at' => Carbon::now(),
             ]);
         }
     }
@@ -256,20 +257,20 @@ class User extends Authenticatable implements MustVerifyEmail
         // Do the math
         if (inRange($points['total'], 0, 1000)) {
             $karma = 'F';
-        } else if (inRange($points['total'], 1000, 2000)) {
+        } elseif (inRange($points['total'], 1000, 2000)) {
             $karma = 'D';
-        } else if (inRange($points['total'], 2000, 3000)) {
+        } elseif (inRange($points['total'], 2000, 3000)) {
             $karma = 'C';
-        } else if (inRange($points['total'], 3000, 4000)) {
+        } elseif (inRange($points['total'], 3000, 4000)) {
             $karma = 'B';
-        } else if ($points['total'] >= 4000) {
+        } elseif ($points['total'] >= 4000) {
             $karma = 'A';
         }
 
         // Persist to the database
         $this->update([
             'karma' => $karma,
-            'aura_updated_at' => Carbon::now()
+            'aura_updated_at' => Carbon::now(),
         ]);
 
         return $this;

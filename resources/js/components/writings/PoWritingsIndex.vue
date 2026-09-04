@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, inject, onMounted, nextTick } from 'vue'
+import { computed, ref, inject, onMounted } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
@@ -12,22 +12,19 @@ const next = ref('')
 const fetched = ref(false)
 const target = document.body
 
-useSwipe(
-  target,
-  {
-    passive: true,
-    onSwipe() {
-      //
-    },
-    onSwipeEnd(e, direction) {
-      if (direction === 'left') {
-        swipeRight()
-      } else if (direction === 'right') {
-        swipeLeft()
-      }
-    },
+useSwipe(target, {
+  passive: true,
+  onSwipe() {
+    //
   },
-)
+  onSwipeEnd(e, direction) {
+    if (direction === 'left') {
+      swipeRight()
+    } else if (direction === 'right') {
+      swipeLeft()
+    }
+  }
+})
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -46,17 +43,17 @@ async function loadMore({ done }) {
 }
 
 function swipeRight() {
-  if ("latest" === page.value.props.sort) {
+  if ('latest' === page.value.props.sort) {
     document.querySelector('.v-tab[value="popular"]').click()
-  } else if ("popular" === page.value.props.sort) {
+  } else if ('popular' === page.value.props.sort) {
     document.querySelector('.v-tab[value="likes"]').click()
   }
 }
 
 function swipeLeft() {
-  if ("likes" === page.value.props.sort) {
+  if ('likes' === page.value.props.sort) {
     document.querySelector('.v-tab[value="popular"]').click()
-  } else if ("popular" === page.value.props.sort) {
+  } else if ('popular' === page.value.props.sort) {
     document.querySelector('.v-tab[value="latest"]').click()
   }
 }
@@ -99,7 +96,12 @@ function liked(id, count) {
             <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
           </po-tab>
 
-          <po-tab href="?sort=popular" value="popular" :aria-label="$t('main.most-popular')" inertia>
+          <po-tab
+            href="?sort=popular"
+            value="popular"
+            :aria-label="$t('main.most-popular')"
+            inertia
+          >
             <v-icon icon="fas fa-fire" class="d-md-none" />
             <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
           </po-tab>
@@ -116,18 +118,24 @@ function liked(id, count) {
       <po-loading></po-loading>
     </template>
 
-
     <template v-else-if="!$helper.isEmpty(writings)">
       <template v-for="writing in writings" :key="writing.slug">
         <po-writings-entry @liked="liked" :alone="false" :data="writing" />
       </template>
 
-      <po-infinite-scroll v-if="!$helper.strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
+      <po-infinite-scroll
+        v-if="!$helper.strNullOrEmpty(next)"
+        @load="loadMore"
+      ></po-infinite-scroll>
     </template>
 
     <template v-else>
-      <po-msg-block class="py-15" msg-title="" :msg-body="$t('main.nothing-to-display')"
-        icon="fas fa-sad-tear"></po-msg-block>
+      <po-msg-block
+        class="py-15"
+        msg-title=""
+        :msg-body="$t('main.nothing-to-display')"
+        icon="fas fa-sad-tear"
+      ></po-msg-block>
     </template>
   </po-wrapper>
 </template>

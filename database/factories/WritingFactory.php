@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Writing;
 use App\Models\User;
+use App\Models\Writing;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Writing>
+ * @extends Factory<Writing>
  */
 class WritingFactory extends Factory
 {
@@ -29,7 +29,7 @@ class WritingFactory extends Factory
             'user_id' => User::factory(),
             'title' => $this->faker->text(45),
             'slug' => $this->faker->unique()->slug(3),
-            'text' => $this->faker->paragraph
+            'text' => $this->faker->paragraph,
         ];
     }
 }

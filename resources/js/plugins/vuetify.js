@@ -35,7 +35,7 @@ export const vuetify = createVuetify({
   },
   defaults: {
     VBtn: {
-      class: 'text-uppercase',
-    },
+      class: 'text-uppercase'
+    }
   }
 })

@@ -5,20 +5,22 @@ namespace App\Notifications;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Twitter\TwitterChannel;
-use NotificationChannels\Twitter\TwitterStatusUpdate;
-use NotificationChannels\WebPush\WebPushMessage;
-use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterPost;
+use NotificationChannels\Twitter\TwitterChannel;
+use NotificationChannels\Twitter\TwitterStatusUpdate;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class WritingFeatured extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $writing;
+
     protected $notification;
 
     /**
@@ -66,7 +68,7 @@ class WritingFeatured extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -82,7 +84,7 @@ class WritingFeatured extends Notification implements ShouldQueue
     {
         $msg = implode(' ', $this->notification['body_social']);
         $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $msg);
-        $msg = $msg . ' ' . $this->notification['url'];
+        $msg = $msg.' '.$this->notification['url'];
 
         return new TwitterStatusUpdate($msg);
     }
@@ -100,7 +102,7 @@ class WritingFeatured extends Notification implements ShouldQueue
      *
      * @param  mixed  $notifiable
      * @param  mixed  $notification
-     * @return \Illuminate\Notifications\Messages\DatabaseMessage
+     * @return DatabaseMessage
      */
     public function toWebPush($notifiable, $notification)
     {

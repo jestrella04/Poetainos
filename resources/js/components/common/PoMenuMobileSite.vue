@@ -29,24 +29,39 @@ const mobileSiteMenu = inject('mobileSiteMenu', false)
           </po-list-item>
           <v-divider class="my-0"></v-divider>
 
-          <po-list-item :href="route('pages.show', 'preguntas-frecuentes')" prepend-icon="fas fa-circle-question"
-            inertia>
+          <po-list-item
+            :href="route('pages.show', 'preguntas-frecuentes')"
+            prepend-icon="fas fa-circle-question"
+            inertia
+          >
             <span>{{ $t('main.faq') }}</span>
           </po-list-item>
           <v-divider class="my-0"></v-divider>
 
-          <po-list-item :href="route('pages.show', 'sobre-nosotros')" prepend-icon="fas fa-address-card" inertia>
+          <po-list-item
+            :href="route('pages.show', 'sobre-nosotros')"
+            prepend-icon="fas fa-address-card"
+            inertia
+          >
             <span>{{ $t('main.about-us') }}</span>
           </po-list-item>
           <v-divider class="my-0"></v-divider>
 
-          <po-list-item :href="route('pages.show', 'condiciones-de-uso')" prepend-icon="fas fa-pen-ruler" inertia>
+          <po-list-item
+            :href="route('pages.show', 'condiciones-de-uso')"
+            prepend-icon="fas fa-pen-ruler"
+            inertia
+          >
             <span>{{ $t('main.terms-of-use') }}</span>
           </po-list-item>
           <v-divider class="my-0"></v-divider>
 
-          <po-list-item :href="route('pages.show', 'politicas-de-privacidad')" variant="text"
-            prepend-icon="fas fa-shield-halved" inertia>
+          <po-list-item
+            :href="route('pages.show', 'politicas-de-privacidad')"
+            variant="text"
+            prepend-icon="fas fa-shield-halved"
+            inertia
+          >
             <span>{{ $t('main.privacy-policy') }}</span>
           </po-list-item>
         </v-list>

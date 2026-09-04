@@ -1,5 +1,5 @@
 <script setup>
-import { inject } from 'vue';
+import { inject } from 'vue'
 
 const unreadCount = inject('unreadCount')
 const mobileUserMenu = inject('mobileUserMenu', false)
@@ -28,7 +28,12 @@ const mobileUserMenu = inject('mobileUserMenu', false)
             <v-divider class="my-0"></v-divider>
           </template>
 
-          <po-list-item :href="route('logout')" prepend-icon="fas fa-arrow-right-from-bracket" method="post" inertia>
+          <po-list-item
+            :href="route('logout')"
+            prepend-icon="fas fa-arrow-right-from-bracket"
+            method="post"
+            inertia
+          >
             <span>{{ $t('accounts.logout') }}</span>
           </po-list-item>
         </v-list>

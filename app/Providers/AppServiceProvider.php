@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 use App\Models\Setting;
-use Illuminate\Support\Facades\App;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //Resources
+        // Resources
         $this->registerResources();
     }
 
@@ -29,20 +29,20 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // Check the app is not running in CLI mode
-        if (!App::runningInConsole()) {
+        if (! App::runningInConsole()) {
             // Getting App settings from database
             try {
                 if (Schema::hasTable('settings')) {
                     $settings = Setting::where('name', 'site')->first()->pluck('data');
 
                     config([
-                        'writerhood' => $settings[0]
+                        'writerhood' => $settings[0],
                     ]);
                 }
             } catch (\Throwable $th) {
                 $route = $this->app->request->getRequestUri();
 
-                if ('/init' !== substr($route, 0, 5)) {
+                if (substr($route, 0, 5) !== '/init') {
                     abort(503, 'App not configured');
                 }
             }
@@ -63,8 +63,6 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Register the package resources
-     *
-     * @return void
      */
     protected function registerResources(): void
     {

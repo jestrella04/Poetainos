@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 
 function getSiteConfig($path = '')
 {
-    if (!empty($path)) {
-        $path = config('writerhood.' . $path);
+    if (! empty($path)) {
+        $path = config('writerhood.'.$path);
     } else {
         $path = config('writerhood');
     }
@@ -30,27 +30,27 @@ function slugify($table, $title, $column = 'slug', $separator = '-')
     $allSlugs = getRelatedIdentifiers($table, $slug, $column);
 
     // If we haven't used it before then we are all good.
-    if (!$allSlugs->contains($column, $slug)) {
+    if (! $allSlugs->contains($column, $slug)) {
         return $slug;
     }
 
     // Just append numbers like a savage until we find one not used.
     for ($i = 1; $i <= 10; $i++) {
-        $newSlug = $slug . $separator . $i;
+        $newSlug = $slug.$separator.$i;
 
-        if (!$allSlugs->contains($column, $newSlug)) {
+        if (! $allSlugs->contains($column, $newSlug)) {
             return $newSlug;
         }
     }
 
-    throw new \Exception('Can not create a unique slug');
+    throw new Exception('Can not create a unique slug');
 }
 
 function getRelatedIdentifiers($table, $slug, $column)
 {
     return DB::table($table)
         ->select($column)
-        ->where($column, 'like', $slug . '%')
+        ->where($column, 'like', $slug.'%')
         ->get();
 }
 
@@ -107,6 +107,7 @@ function getNotificationMessage($notification)
 function getPageTitle(array $titleParts, $separator = '–')
 {
     $titleParts[] = getSiteConfig(('name'));
+
     return implode(" {$separator} ", $titleParts);
 }
 
@@ -114,7 +115,7 @@ function isTruthy($string)
 {
     $string = strtolower($string);
 
-    if (!empty($string) && in_array($string, [1, "1", true, "true", "on", "yes"], true)) {
+    if (! empty($string) && in_array($string, [1, '1', true, 'true', 'on', 'yes'], true)) {
         return true;
     }
 
@@ -125,7 +126,7 @@ function hydrateSettings($text)
 {
     return preg_replace_callback(
         '/{{([^}]+)}}/',
-        fn($matches) => getSiteConfig($matches[1]),
+        fn ($matches) => getSiteConfig($matches[1]),
         $text
     );
 }

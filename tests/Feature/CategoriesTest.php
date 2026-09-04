@@ -4,13 +4,13 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Writing;
 
-test('show renders for each sort option', function (string $sort) {
+test('show renders for each sort option', function (string $sort): void {
     $category = Category::factory()->create();
 
     $this->get($category->path().'?sort='.$sort)->assertOk();
 })->with(['latest', 'popular', 'likes']);
 
-test('writingsRecursive includes writings attached to descendant categories', function () {
+test('writingsRecursive includes writings attached to descendant categories', function (): void {
     $parent = Category::factory()->create(['parent_id' => null]);
     $child = Category::factory()->create(['parent_id' => $parent->id]);
     $writing = Writing::factory()->create();
@@ -21,7 +21,7 @@ test('writingsRecursive includes writings attached to descendant categories', fu
     expect($writings->all())->toContain($writing->id);
 });
 
-test('admin can create and update a category', function () {
+test('admin can create and update a category', function (): void {
     $admin = actingAsAdmin();
 
     $this->actingAs($admin)->put('/admin/categories/edit', [
@@ -41,7 +41,7 @@ test('admin can create and update a category', function () {
     expect($category->fresh()->description)->toBe('An updated description.');
 });
 
-test('admin can delete a category', function () {
+test('admin can delete a category', function (): void {
     $admin = actingAsAdmin();
     $category = Category::factory()->create();
 
@@ -50,7 +50,7 @@ test('admin can delete a category', function () {
     expect(Category::find($category->id))->toBeNull();
 });
 
-test('non-admins are redirected to login for admin category routes', function () {
+test('non-admins are redirected to login for admin category routes', function (): void {
     $user = User::factory()->create();
     $category = Category::factory()->create();
 

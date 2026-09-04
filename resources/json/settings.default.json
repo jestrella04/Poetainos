@@ -1,123 +1,123 @@
 {
-    "name": {
-        "value": "{{site_name}}",
-        "description": "Site name to be displayed across the app."
+  "name": {
+    "value": "{{site_name}}",
+    "description": "Site name to be displayed across the app."
+  },
+  "slogan": {
+    "value": "{{site_slogan}}",
+    "description": "Site slogan to be displayed across the app."
+  },
+  "pagination": {
+    "value": 20,
+    "description": "The number of items per page to be displayed."
+  },
+  "uploads_max_file_size": {
+    "value": 4096,
+    "description": "Maximum filesize allowed for file uploads (measured in kb)."
+  },
+  "social": {
+    "twitter": {
+      "value": "",
+      "description": "The official X (Twitter) profile of the site."
     },
-    "slogan": {
-        "value": "{{site_slogan}}",
-        "description": "Site slogan to be displayed across the app."
+    "instagram": {
+      "value": "",
+      "description": "The official Instagran profile of the site."
     },
-    "pagination": {
-        "value": 20,
-        "description": "The number of items per page to be displayed."
+    "facebook": {
+      "value": "",
+      "description": "The official Facebook profile of the site."
     },
-    "uploads_max_file_size": {
-        "value": 4096,
-        "description": "Maximum filesize allowed for file uploads (measured in kb)."
-    },
-    "social": {
-        "twitter": {
-            "value": "",
-            "description": "The official X (Twitter) profile of the site."
-        },
-        "instagram": {
-            "value": "",
-            "description": "The official Instagran profile of the site."
-        },
-        "facebook": {
-            "value": "",
-            "description": "The official Facebook profile of the site."
-        },
-        "youtube": {
-            "value": "",
-            "description": "The official Youtube profile of the site."
-        }
-    },
-    "aura": {
-        "min_at_home": {
-            "value": 10,
-            "description": "The minimum aura for a writing to be displayed on homepage."
-        },
-        "points": {
-            "writing": {
-                "uplike": {
-                    "value": 200,
-                    "description": "How many points a writing will earn every time it gets a new uplike."
-                },
-                "downlike": {
-                    "value": 1,
-                    "description": "How many points a writing will earn every time it gets a new downlike."
-                },
-                "comment": {
-                    "value": 100,
-                    "description": "How many points a writing will earn every time it gets a new comment."
-                },
-                "shelf": {
-                    "value": 100,
-                    "description": "How many points a writing will earn every time it is saved to a user shelf."
-                },
-                "views": {
-                    "value": 1,
-                    "description": "How many points a writing will earn every time it is viewed."
-                }
-            },
-            "user": {
-                "writing": {
-                    "value": 300,
-                    "description": "How many points a user will earn every time he posts a new writing."
-                },
-                "like": {
-                    "value": 10,
-                    "description": "How many points a user will earn every time he posts a new like for an existing writing."
-                },
-                "comment": {
-                    "value": 100,
-                    "description": "How many points a user will earn every time he posts a new comment for an existing writing."
-                },
-                "shelf": {
-                    "value": 10,
-                    "description": "How many points a user will earn every time he saves an existing writing to his shelf."
-                },
-                "views": {
-                    "value": 1,
-                    "description": "How many points a user will earn every time his profile is viewed."
-                },
-                "hood": {
-                    "value": 10,
-                    "description": "How many points a user will earn every time he adds another user to his hood."
-                },
-                "extended_hood": {
-                    "value": 50,
-                    "description": "How many points a user will earn every time he is added to another users hood."
-                }
-            }
-        }
-    },
-    "stores": {
-        "Google Play": {
-            "value": "",
-            "icon": "fab fa-google-play",
-            "description": "URL to get the application on Google Play."
-        },
-        "AppStore": {
-            "value": "",
-            "icon": "fab fa-apple",
-            "description": "URL to get the application on Apple AppStore."
-        },
-        "Microsoft Store": {
-            "value": "",
-            "icon": "fab fa-microsoft",
-            "description": "URL to get the application on Microsoft Store."
-        },
-        "AppGallery": {
-            "value": "",
-            "icon": "fas fa-shopping-bag",
-            "description": "URL to get the application on Huawei AppGallery."
-        },
-        "Samsung Finder": {
-            "value": "",
-            "icon": "fas fa-shopping-bag",
-            "description": "URL to get the application on Samsung Finder."
-        }
+    "youtube": {
+      "value": "",
+      "description": "The official Youtube profile of the site."
     }
+  },
+  "aura": {
+    "min_at_home": {
+      "value": 10,
+      "description": "The minimum aura for a writing to be displayed on homepage."
+    },
+    "points": {
+      "writing": {
+        "uplike": {
+          "value": 200,
+          "description": "How many points a writing will earn every time it gets a new uplike."
+        },
+        "downlike": {
+          "value": 1,
+          "description": "How many points a writing will earn every time it gets a new downlike."
+        },
+        "comment": {
+          "value": 100,
+          "description": "How many points a writing will earn every time it gets a new comment."
+        },
+        "shelf": {
+          "value": 100,
+          "description": "How many points a writing will earn every time it is saved to a user shelf."
+        },
+        "views": {
+          "value": 1,
+          "description": "How many points a writing will earn every time it is viewed."
+        }
+      },
+      "user": {
+        "writing": {
+          "value": 300,
+          "description": "How many points a user will earn every time he posts a new writing."
+        },
+        "like": {
+          "value": 10,
+          "description": "How many points a user will earn every time he posts a new like for an existing writing."
+        },
+        "comment": {
+          "value": 100,
+          "description": "How many points a user will earn every time he posts a new comment for an existing writing."
+        },
+        "shelf": {
+          "value": 10,
+          "description": "How many points a user will earn every time he saves an existing writing to his shelf."
+        },
+        "views": {
+          "value": 1,
+          "description": "How many points a user will earn every time his profile is viewed."
+        },
+        "hood": {
+          "value": 10,
+          "description": "How many points a user will earn every time he adds another user to his hood."
+        },
+        "extended_hood": {
+          "value": 50,
+          "description": "How many points a user will earn every time he is added to another users hood."
+        }
+      }
+    }
+  },
+  "stores": {
+    "Google Play": {
+      "value": "",
+      "icon": "fab fa-google-play",
+      "description": "URL to get the application on Google Play."
+    },
+    "AppStore": {
+      "value": "",
+      "icon": "fab fa-apple",
+      "description": "URL to get the application on Apple AppStore."
+    },
+    "Microsoft Store": {
+      "value": "",
+      "icon": "fab fa-microsoft",
+      "description": "URL to get the application on Microsoft Store."
+    },
+    "AppGallery": {
+      "value": "",
+      "icon": "fas fa-shopping-bag",
+      "description": "URL to get the application on Huawei AppGallery."
+    },
+    "Samsung Finder": {
+      "value": "",
+      "icon": "fas fa-shopping-bag",
+      "description": "URL to get the application on Samsung Finder."
+    }
+  }
 }

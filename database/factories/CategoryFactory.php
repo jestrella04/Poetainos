@@ -6,7 +6,7 @@ use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
+ * @extends Factory<Category>
  */
 class CategoryFactory extends Factory
 {
@@ -27,7 +27,7 @@ class CategoryFactory extends Factory
         return [
             'name' => $this->faker->unique()->word,
             'slug' => $this->faker->unique()->slug(3),
-            'description' => $this->faker->optional()->paragraph
+            'description' => $this->faker->optional()->paragraph,
         ];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Notifications\AuthorFeaturedRandom;
 use App\Models\User;
+use App\Notifications\AuthorFeaturedRandom;
 use Illuminate\Console\Command;
 
 class PostRandomFeaturedAuthor extends Command

@@ -7,17 +7,19 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Twitter\TwitterChannel;
-use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\FacebookPoster\FacebookPosterChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterPost;
+use NotificationChannels\Twitter\TwitterChannel;
+use NotificationChannels\Twitter\TwitterStatusUpdate;
 
 class WritingPublished extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $writing;
+
     protected $msg;
+
     protected $url;
 
     /**
@@ -31,7 +33,7 @@ class WritingPublished extends Notification implements ShouldQueue
         $this->msg = __('":title" by :author has just been published on our site.', [
             'title' => $this->writing->title,
         ]);
-        $this->msg = $this->msg . ' ' . __('Go read it, what are you waiting for? #poetry');
+        $this->msg = $this->msg.' '.__('Go read it, what are you waiting for? #poetry');
         $this->url = $this->writing->path();
     }
 
@@ -50,7 +52,7 @@ class WritingPublished extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -62,12 +64,15 @@ class WritingPublished extends Notification implements ShouldQueue
 
     public function toTwitter($notifiable)
     {
-        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $this->msg) . ' ' . $this->url;
+        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $this->msg).' '.$this->url;
+
         return new TwitterStatusUpdate($msg);
     }
 
-    public function toFacebookPoster($notifiable) {
+    public function toFacebookPoster($notifiable)
+    {
         $msg = str_replace(':author', $this->writing->author->getName(), $this->msg);
+
         return (new FacebookPosterPost($msg))->withLink($this->url);
     }
 

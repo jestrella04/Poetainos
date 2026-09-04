@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, inject, onMounted, nextTick } from 'vue'
+import { computed, ref, inject, onMounted } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
@@ -12,22 +12,19 @@ const next = ref('')
 const fetched = ref(false)
 const target = document.body
 
-useSwipe(
-  target,
-  {
-    passive: true,
-    onSwipe() {
-      //
-    },
-    onSwipeEnd(e, direction) {
-      if (direction === 'left') {
-        swipeRight()
-      } else if (direction === 'right') {
-        swipeLeft()
-      }
-    },
+useSwipe(target, {
+  passive: true,
+  onSwipe() {
+    //
   },
-)
+  onSwipeEnd(e, direction) {
+    if (direction === 'left') {
+      swipeRight()
+    } else if (direction === 'right') {
+      swipeLeft()
+    }
+  }
+})
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -46,17 +43,17 @@ async function loadMore({ done }) {
 }
 
 function swipeRight() {
-  if ("featured" === page.value.props.sort) {
+  if ('featured' === page.value.props.sort) {
     document.querySelector('.v-tab[value="latest"]').click()
-  } else if ("latest" === page.value.props.sort) {
+  } else if ('latest' === page.value.props.sort) {
     document.querySelector('.v-tab[value="popular"]').click()
   }
 }
 
 function swipeLeft() {
-  if ("popular" === page.value.props.sort) {
+  if ('popular' === page.value.props.sort) {
     document.querySelector('.v-tab[value="latest"]').click()
-  } else if ("latest" === page.value.props.sort) {
+  } else if ('latest' === page.value.props.sort) {
     document.querySelector('.v-tab[value="featured"]').click()
   }
 }
@@ -114,7 +111,11 @@ function update(usersData, nextPage) {
   </template>
 
   <template v-else>
-    <po-msg-block class="py-15" msg-title="" :msg-body="$t('main.nothing-to-display')"
-      icon="fas fa-sad-tear"></po-msg-block>
+    <po-msg-block
+      class="py-15"
+      msg-title=""
+      :msg-body="$t('main.nothing-to-display')"
+      icon="fas fa-sad-tear"
+    ></po-msg-block>
   </template>
 </template>

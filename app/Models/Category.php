@@ -8,7 +8,7 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Category extends Model
 {
-    use HasRecursiveRelationships, HasFactory;
+    use HasFactory, HasRecursiveRelationships;
 
     public function getRouteKeyName()
     {
@@ -27,7 +27,7 @@ class Category extends Model
 
     public function writingsRecursive()
     {
-        return Writing::with('categories')->whereHas('categories', function ($q) {
+        return Writing::with('categories')->whereHas('categories', function ($q): void {
             $q->whereIn('category_id', $this->descendantsAndSelf()->pluck('id'));
         });
     }

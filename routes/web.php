@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\CommentsController;
@@ -17,10 +16,11 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShelvesController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\UsersController;
-//use App\Http\Controllers\UsersHoodsController;
-//use App\Http\Controllers\UsersHoodsWritingsController;
 use App\Http\Controllers\UsersNotificationsController;
+// use App\Http\Controllers\UsersHoodsController;
+// use App\Http\Controllers\UsersHoodsWritingsController;
 use App\Http\Controllers\WritingsController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,10 +30,10 @@ use App\Http\Controllers\WritingsController;
 
 /* Authentication routes */
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 /* Administration */
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('settings', [AdminController::class, 'settings'])->name('settings');
     Route::get('categories', [AdminController::class, 'categories'])->name('categories');
@@ -61,7 +61,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 /* Non public routes */
-Route::middleware(['verified'])->group(function () {
+Route::middleware(['verified'])->group(function (): void {
     // Writings
     Route::get('/writings/create', [WritingsController::class, 'create'])->name('writings.create');
     Route::post('/writings/create', [WritingsController::class, 'store'])->name('writings.store');
@@ -125,19 +125,19 @@ Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show'
 Route::get('/users/{user}/writings', [GenericController::class, 'writings'])->name('users.writings.index');
 Route::get('/users/{user}/shelf', [GenericController::class, 'shelf'])->name('users.shelf.index');
 Route::get('/users/{user}/likes', [GenericController::class, 'likes'])->name('users.likes.index');
-//Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('users.hood.index');
-//Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
+// Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('users.hood.index');
+// Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
 
 // Pages
 Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
 Route::get('/pages/{page}', [PagesController::class, 'show'])->name('pages.show');
 
 // Categories
-//Route::get('/categories', [CategoriesController::class, 'index'])->name('categories.index');
+// Route::get('/categories', [CategoriesController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoriesController::class, 'show'])->name('categories.show');
 
 // Tags
-//Route::get('/tags', [TagsController::class, 'index'])->name('tags.index');
+// Route::get('/tags', [TagsController::class, 'index'])->name('tags.index');
 Route::get('/tags/query', [TagsController::class, 'query'])->name('tags.query');
 Route::get('/tags/{tag}', [TagsController::class, 'show'])->name('tags.show');
 

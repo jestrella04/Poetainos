@@ -2,7 +2,6 @@
 import { inject } from 'vue'
 
 const author = inject('author')
-const karma = inject('karma')
 </script>
 
 <style scoped>

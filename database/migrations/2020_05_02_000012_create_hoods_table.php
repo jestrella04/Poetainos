@@ -6,31 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateHoodsTable extends Migration
 {
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('hoods', function(Blueprint $table)
-		{
-			$table->unsignedBigInteger('user_id');
-			$table->unsignedBigInteger('fellow_user_id');
-            $table->primary(['user_id','fellow_user_id']);
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('hoods', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('fellow_user_id');
+            $table->primary(['user_id', 'fellow_user_id']);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
-			$table->foreign('fellow_user_id')->references('id')->on('users')->onDelete('CASCADE');
-		});
-	}
+            $table->foreign('fellow_user_id')->references('id')->on('users')->onDelete('CASCADE');
+        });
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::dropIfExists('hoods');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('hoods');
+    }
 }

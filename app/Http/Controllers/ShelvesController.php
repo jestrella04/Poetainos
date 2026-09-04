@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Notifications\WritingShelved;
 use App\Models\Shelf;
 use App\Models\User;
 use App\Models\Writing;
+use App\Notifications\WritingShelved;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ShelvesController extends Controller
 {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(Writing $writing)
     {
@@ -33,11 +35,11 @@ class ShelvesController extends Controller
 
         // Update aura / karma
         User::find($userId)->updateAura();
-        //User::find($userId)->updateKarma();
+        // User::find($userId)->updateKarma();
         Writing::find($writing->id)->updateAura();
 
         // Notify author
-        if (!Writing::find($writing->id)->author->is(auth()->user())) {
+        if (! Writing::find($writing->id)->author->is(auth()->user())) {
             Writing::find($writing->id)->author->notify(
                 new WritingShelved(Writing::find($writing->id), auth()->user())
             );
@@ -54,8 +56,7 @@ class ShelvesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Writing  $writing
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Writing $writing)
     {

@@ -18,6 +18,11 @@ export default [
         ...globals.node,
         route: 'readonly'
       }
+    },
+    rules: {
+      // Vuetify's data-table dot-named slots (e.g. `item.name`) are parsed as
+      // v-slot modifiers by this rule; allow them for that convention.
+      'vue/valid-v-slot': ['error', { allowModifiers: true }]
     }
   },
   skipFormatting

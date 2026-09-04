@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Notification;
 
 // The GET /forgot-password "screen" route is commented out in routes/auth.php —
 // only POST /forgot-password (password.email) exists in this app.
-test('reset password link can be requested', function () {
+test('reset password link can be requested', function (): void {
     Notification::fake();
 
     $user = User::factory()->create();
@@ -16,7 +16,7 @@ test('reset password link can be requested', function () {
     Notification::assertSentTo($user, ResetPassword::class);
 });
 
-test('reset password screen can be rendered', function () {
+test('reset password screen can be rendered', function (): void {
     Notification::fake();
 
     $user = User::factory()->create();
@@ -32,7 +32,7 @@ test('reset password screen can be rendered', function () {
     });
 });
 
-test('password can be reset with valid token', function () {
+test('password can be reset with valid token', function (): void {
     Notification::fake();
 
     $user = User::factory()->create();

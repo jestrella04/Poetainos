@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Notifications\ContactFormSubmitted;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 
@@ -12,22 +13,21 @@ class ContactsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
         return Inertia::render('forms/PoContactForm', [
             'meta' => [
-                'title' => __('Contact form')
-            ]
+                'title' => __('Contact form'),
+            ],
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -38,7 +38,7 @@ class ContactsController extends Controller
             'subject' => 'required|string|min:3|max:40',
             'message' => 'required|string|min:100',
             'key' => 'required|string|min:1',
-            'captcha' => 'required|captcha_api:' . request('key') . ',math'
+            'captcha' => 'required|captcha_api:'.request('key').',math',
         ]);
 
         $name = request('name');

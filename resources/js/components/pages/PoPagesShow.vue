@@ -27,8 +27,8 @@ const data = page.value.props.page
 
 *:deep(ul) *:deep(li),
 *:deep(ol) *:deep(li) {
-  padding-left: .5rem;
-  margin-bottom: .5rem;
+  padding-left: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 *:deep(code),

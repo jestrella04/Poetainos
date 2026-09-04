@@ -21,7 +21,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        if (!empty(request('redirect'))) {
+        if (! empty(request('redirect'))) {
             Redirect::setIntendedUrl(request('redirect'));
         }
 

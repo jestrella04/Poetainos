@@ -5,7 +5,7 @@ const props = defineProps({
   href: String,
   inertia: Boolean,
   method: { type: String, default: 'get' },
-  data: Object,
+  data: Object
 })
 
 function visit() {

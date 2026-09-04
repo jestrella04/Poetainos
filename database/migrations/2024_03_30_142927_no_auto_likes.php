@@ -2,8 +2,6 @@
 
 use App\Models\Like;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -15,7 +13,7 @@ return new class extends Migration
         $likes = Like::where('likeable_type', 'App\Models\Writing')->get();
 
         foreach ($likes as $like) {
-            if (null !== $like->likeable) {
+            if ($like->likeable !== null) {
                 $likeable_author_id = $like->likeable->user_id;
                 $liker_id = $like->user_id;
 

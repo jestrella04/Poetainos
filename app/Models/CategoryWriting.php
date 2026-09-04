@@ -13,7 +13,7 @@ class CategoryWriting extends Model
      */
     protected $table = 'category_writing';
 
-     /**
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool

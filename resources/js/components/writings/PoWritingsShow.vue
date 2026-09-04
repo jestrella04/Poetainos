@@ -12,8 +12,11 @@ const page = computed(() => usePage())
 
     <template v-if="page.props.isAuthorBlocked">
       <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px">
-        <po-msg-block :msg-title="$t('users.user-is-blocked')" :msg-body="$t('main.author-blocked')"
-          icon="fas fa-ban"></po-msg-block>
+        <po-msg-block
+          :msg-title="$t('users.user-is-blocked')"
+          :msg-body="$t('main.author-blocked')"
+          icon="fas fa-ban"
+        ></po-msg-block>
       </div>
     </template>
     <template v-else>
@@ -30,7 +33,11 @@ const page = computed(() => usePage())
 
                 <template v-for="writing in page.props.related.from_author" :key="writing.id">
                   <div class="mb-2 pos-relative">
-                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    <po-link
+                      :href="route('writings.show', writing.slug)"
+                      class="text-bold stretched"
+                      inertia
+                    >
                       {{ writing.title }}
                     </po-link>
 
@@ -54,7 +61,11 @@ const page = computed(() => usePage())
                 <p class="text-uppercase text-caption mb-5">{{ $t('main.related-writings') }}</p>
                 <template v-for="writing in page.props.related.from_category" :key="writing.id">
                   <div class="mb-2 pos-relative">
-                    <po-link :href="route('writings.show', writing.slug)" class="text-bold stretched" inertia>
+                    <po-link
+                      :href="route('writings.show', writing.slug)"
+                      class="text-bold stretched"
+                      inertia
+                    >
                       {{ writing.title }}
                     </po-link>
 

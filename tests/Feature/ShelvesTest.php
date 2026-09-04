@@ -5,7 +5,7 @@ use App\Models\Writing;
 use App\Notifications\WritingShelved;
 use Illuminate\Support\Facades\Notification;
 
-test('a user can shelve and unshelve a writing', function () {
+test('a user can shelve and unshelve a writing', function (): void {
     Notification::fake();
 
     $author = User::factory()->create();
@@ -21,7 +21,7 @@ test('a user can shelve and unshelve a writing', function () {
         ->assertJson(['method' => 'destroy', 'count' => 0]);
 });
 
-test('shelving your own writing does not notify you', function () {
+test('shelving your own writing does not notify you', function (): void {
     Notification::fake();
 
     $author = User::factory()->create();
@@ -32,7 +32,7 @@ test('shelving your own writing does not notify you', function () {
     Notification::assertNothingSent();
 });
 
-test('deleting a shelf entry only detaches the acting user', function () {
+test('deleting a shelf entry only detaches the acting user', function (): void {
     $writing = Writing::factory()->create();
     $reader = User::factory()->create();
     $otherReader = User::factory()->create();

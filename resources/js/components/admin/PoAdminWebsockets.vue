@@ -2,7 +2,7 @@
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 
 defineOptions({
-  layout: PoLayoutAdmin,
+  layout: PoLayoutAdmin
 })
 </script>
 

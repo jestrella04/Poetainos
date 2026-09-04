@@ -1,6 +1,6 @@
 <script setup>
 import { provide, ref } from 'vue'
-import PoCommentsDelete from './PoCommentsDelete.vue';
+import PoCommentsDelete from './PoCommentsDelete.vue'
 
 defineProps({
   comment: { type: Object, required: true }
@@ -13,7 +13,6 @@ const isDelete = ref(false)
 provide('complainer', complainer)
 provide('blocker', blocker)
 provide('isDelete', isDelete)
-
 </script>
 
 <template>
@@ -23,8 +22,14 @@ provide('isDelete', isDelete)
 
   <v-menu>
     <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" icon="fas fa-ellipsis-vertical" color="secondary" size="x-small" variant="tonal"
-        :aria-label="$t('main.more-actions')">
+      <v-btn
+        v-bind="props"
+        icon="fas fa-ellipsis-vertical"
+        color="secondary"
+        size="x-small"
+        variant="tonal"
+        :aria-label="$t('main.more-actions')"
+      >
       </v-btn>
     </template>
 

@@ -153,7 +153,7 @@ class UsersController extends Controller
                 'from_author' => $user
                     ->writings()
                     ->with([
-                        'author' => function ($query) {
+                        'author' => function ($query): void {
                             $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                         },
                     ])
@@ -163,10 +163,10 @@ class UsersController extends Controller
                 'from_shelf' => $user
                     ->shelf()
                     ->with([
-                        'author' => function ($query) {
+                        'author' => function ($query): void {
                             $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                         },
-                ])
+                    ])
                     ->inRandomOrder()
                     ->take(5)
                     ->get(),
@@ -175,7 +175,7 @@ class UsersController extends Controller
                     $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'),
                 )
                     ->with([
-                        'author' => function ($query) {
+                        'author' => function ($query): void {
                             $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                         },
                     ])

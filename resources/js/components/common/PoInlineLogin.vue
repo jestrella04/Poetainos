@@ -1,8 +1,7 @@
 <script setup>
 defineProps({
-  message: { type: String, default: '' },
+  message: { type: String, default: '' }
 })
-
 </script>
 
 <template>
@@ -13,32 +12,46 @@ defineProps({
 
     <div class="d-inline-flex flex-wrap justify-center ga-4">
       <div>
-        <po-button icon color="primary"
+        <po-button
+          icon
+          color="primary"
           :href="route('social.login', { service: 'facebook', redirect: $helper.asset($page.url) })"
-          :title="$t('accounts.continue-with-facebook')">
+          :title="$t('accounts.continue-with-facebook')"
+        >
           <v-icon icon="fab fa-facebook-f"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button icon color="primary"
+        <po-button
+          icon
+          color="primary"
           :href="route('social.login', { service: 'twitter', redirect: $helper.asset($page.url) })"
-          :title="$t('accounts.continue-with-x-twitter')">
+          :title="$t('accounts.continue-with-x-twitter')"
+        >
           <v-icon icon="fab fa-x-twitter"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button icon color="primary"
+        <po-button
+          icon
+          color="primary"
           :href="route('social.login', { service: 'google', redirect: $helper.asset($page.url) })"
-          :title="$t('accounts.continue-with-google')">
+          :title="$t('accounts.continue-with-google')"
+        >
           <v-icon icon="fab fa-google"></v-icon>
         </po-button>
       </div>
 
       <div>
-        <po-button icon color="primary" :href="route('login', { isEmail: true, redirect: $helper.asset($page.url) })"
-          :title="$t('accounts.continue-with-email')" inertia>
+        <po-button
+          icon
+          color="primary"
+          :href="route('login', { isEmail: true, redirect: $helper.asset($page.url) })"
+          :title="$t('accounts.continue-with-email')"
+          inertia
+        >
           <v-icon icon="fas fa-at"></v-icon>
         </po-button>
       </div>

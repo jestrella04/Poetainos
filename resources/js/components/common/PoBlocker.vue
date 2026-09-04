@@ -3,7 +3,7 @@ import { ref, inject } from 'vue'
 import axios from 'axios'
 
 const props = defineProps({
-  user: { type: Object, required: true },
+  user: { type: Object, required: true }
 })
 
 const helper = inject('helper')
@@ -20,7 +20,7 @@ async function submit() {
 
   await axios
     .post(form.action, {
-      user: props.user.username,
+      user: props.user.username
     })
     .then(() => {
       helper.setSnackBar({
@@ -54,7 +54,11 @@ async function submit() {
 
         <v-divider class="mt-3"></v-divider>
 
-        <v-form id="blocking-form" :action="route('users.block', user.username)" @submit.prevent="submit">
+        <v-form
+          id="blocking-form"
+          :action="route('users.block', user.username)"
+          @submit.prevent="submit"
+        >
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.block') }}</span>
             <v-progress-circular v-else indeterminate></v-progress-circular>

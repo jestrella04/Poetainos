@@ -26,7 +26,7 @@ class UsersNotificationsController extends Controller
             $notifications = User::find($user->id)->notifications()->paginate($this->pagination)->withQueryString();
         }
 
-        $notifications->map(function ($notification) {
+        $notifications->map(function ($notification): void {
             $notification['notifier_user'] =
                 isset($notification->data['user_id'])
                 ? User::select(

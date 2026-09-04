@@ -12,22 +12,19 @@ const unreadCount = inject('unreadCount')
 const fetched = ref(false)
 const target = document.body
 
-useSwipe(
-  target,
-  {
-    passive: true,
-    onSwipe() {
-      //
-    },
-    onSwipeEnd(e, direction) {
-      if (direction === 'left') {
-        swipeRight()
-      } else if (direction === 'right') {
-        swipeLeft()
-      }
-    },
+useSwipe(target, {
+  passive: true,
+  onSwipe() {
+    //
   },
-)
+  onSwipeEnd(e, direction) {
+    if (direction === 'left') {
+      swipeRight()
+    } else if (direction === 'right') {
+      swipeLeft()
+    }
+  }
+})
 
 async function loadMore({ done }) {
   if (!helper.strNullOrEmpty(next.value)) {
@@ -47,13 +44,13 @@ async function loadMore({ done }) {
 }
 
 function swipeRight() {
-  if ("unread" === page.value.props.tab) {
+  if ('unread' === page.value.props.tab) {
     document.querySelector('.v-tab[value="all"]').click()
   }
 }
 
 function swipeLeft() {
-  if ("all" === page.value.props.tab) {
+  if ('all' === page.value.props.tab) {
     document.querySelector('.v-tab[value="unread"]').click()
   }
 }
@@ -102,13 +99,25 @@ function update(notificationsData, nextPage) {
 
   <div class="mx-auto column-full">
     <template v-if="!fetched">
-      <po-loading type="avatar, paragraph, button" cols="12" md="12" lg="12" class="mx-auto"></po-loading>
+      <po-loading
+        type="avatar, paragraph, button"
+        cols="12"
+        md="12"
+        lg="12"
+        class="mx-auto"
+      ></po-loading>
     </template>
 
     <template v-else-if="!$helper.isEmpty(notifications)">
       <template v-if="'unread' === page.props.tab">
         <div class="mb-3 text-right">
-          <po-button :href="route('notifications.clear')" size="x-small" method="post" inertia @click="unreadCount = 0">
+          <po-button
+            :href="route('notifications.clear')"
+            size="x-small"
+            method="post"
+            inertia
+            @click="unreadCount = 0"
+          >
             <v-icon icon="fas fa-check-double" class="me-2"></v-icon>
             {{ $t('main.mark-all-read') }}
           </po-button>
@@ -128,7 +137,9 @@ function update(notificationsData, nextPage) {
                 </template>
               </div>
               <div class="w-100">
-                <p class="text-caption font-weight-medium">{{ $helper.relativeDate(notification.created_at) }}</p>
+                <p class="text-caption font-weight-medium">
+                  {{ $helper.relativeDate(notification.created_at) }}
+                </p>
                 <div class="d-flex w-100 justify-space-between">
                   <div>
                     <p>{{ $helper.notificationMessage(notification, $t) }}.</p>
@@ -140,7 +151,12 @@ function update(notificationsData, nextPage) {
                     <po-button color="primary" size="small" variant="tonal">
                       {{ $t('main.view') }}
                     </po-button>
-                    <po-link :href="route('notifications.show', notification.id)" class="stretched" inertia> </po-link>
+                    <po-link
+                      :href="route('notifications.show', notification.id)"
+                      class="stretched"
+                      inertia
+                    >
+                    </po-link>
                   </div>
                 </div>
               </div>
@@ -153,8 +169,12 @@ function update(notificationsData, nextPage) {
     </template>
 
     <template v-else>
-      <po-msg-block class="py-15" msg-title="" :msg-body="$t('accounts.notifications-empty')"
-        icon="fas fa-bell-slash"></po-msg-block>
+      <po-msg-block
+        class="py-15"
+        msg-title=""
+        :msg-body="$t('accounts.notifications-empty')"
+        icon="fas fa-bell-slash"
+      ></po-msg-block>
     </template>
   </div>
 </template>

@@ -4,20 +4,21 @@ namespace App\Notifications;
 
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Twitter\TwitterChannel;
-use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\FacebookPoster\FacebookPosterChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterPost;
+use NotificationChannels\Twitter\TwitterChannel;
+use NotificationChannels\Twitter\TwitterStatusUpdate;
 
 class WritingRandom extends Notification
 {
     use Queueable;
 
     protected $writing;
+
     protected $msg;
+
     protected $url;
 
     /**
@@ -31,7 +32,7 @@ class WritingRandom extends Notification
         $this->msg = __('":title" by :author is our #SelectionOfTheDay.', [
             'title' => $this->writing->title,
         ]);
-        $this->msg = $this->msg . ' ' . __('Go read it, what are you waiting for? #poetry');
+        $this->msg = $this->msg.' '.__('Go read it, what are you waiting for? #poetry');
         $this->url = $this->writing->path();
     }
 
@@ -50,14 +51,14 @@ class WritingRandom extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -75,12 +76,15 @@ class WritingRandom extends Notification
 
     public function toTwitter($notifiable)
     {
-        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $this->msg) . ' ' . $this->url;
+        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $this->msg).' '.$this->url;
+
         return new TwitterStatusUpdate($msg);
     }
 
-    public function toFacebookPoster($notifiable) {
+    public function toFacebookPoster($notifiable)
+    {
         $msg = str_replace(':author', $this->writing->author->getName(), $this->msg);
+
         return (new FacebookPosterPost($msg))->withLink($this->url);
     }
 }

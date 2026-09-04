@@ -48,9 +48,9 @@ class GenerateAssetLinks extends Command
                     'package_name' => config('services.google.android.assetlinks.package_name'),
                     'sha256_cert_fingerprints' => [
                         0 => config('services.google.android.assetlinks.fingerprint'),
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
 
         if ($this->write($path, json_encode($assetLinks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))) {
@@ -71,7 +71,7 @@ class GenerateAssetLinks extends Command
         array_pop($parts);
         $dir = implode('/', $parts);
 
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0775, true);
         }
 

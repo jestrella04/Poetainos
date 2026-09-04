@@ -12,14 +12,14 @@ class InitController extends Controller
 {
     public function init()
     {
-        if (null !== Setting::where('name', 'site')->first()) {
+        if (Setting::where('name', 'site')->first() !== null) {
             abort(403, 'App already initialized');
         }
 
         // Create default JSON settings
         $site = file_get_contents(base_path('resources/json/settings.default.json'));
-        $site = str_replace('{{site_name}}', "", $site);
-        $site = str_replace('{{site_slogan}}', "", $site);
+        $site = str_replace('{{site_name}}', '', $site);
+        $site = str_replace('{{site_slogan}}', '', $site);
 
         Setting::create([
             'name' => 'site',
@@ -31,10 +31,10 @@ class InitController extends Controller
         $permissions = json_decode(file_get_contents(base_path('resources/json/roles_permissions.json')));
         $permissions = $permissions->permissions;
 
-        foreach($permissions as $permission) {
+        foreach ($permissions as $permission) {
             $extra_info['permissions'][] = [
                 'name' => $permission,
-                'enabled' => true
+                'enabled' => true,
             ];
         }
 
@@ -45,10 +45,10 @@ class InitController extends Controller
         ]);
 
         $user = User::create([
-            'username' => "",
+            'username' => '',
             'role_id' => $role->id,
-            'email' => "",
-            'password' => Hash::make(""),
+            'email' => '',
+            'password' => Hash::make(''),
         ]);
 
         // Authenticate admin user

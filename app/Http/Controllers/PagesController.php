@@ -6,13 +6,14 @@ use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PagesController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     public function index()
     {
@@ -35,7 +36,6 @@ class PagesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response | void
      */
     public function store(Request $request)
@@ -46,8 +46,7 @@ class PagesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Page  $page
-     * @return \Inertia\Response
+     * @return Response
      */
     public function show(Page $page)
     {
@@ -64,7 +63,6 @@ class PagesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Page  $page
      * @return \Illuminate\Http\Response | void
      */
     public function edit(Page $page)
@@ -75,8 +73,7 @@ class PagesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return \Illuminate\Http\Response | array
      */
     public function update(Request $request)
@@ -95,14 +92,14 @@ class PagesController extends Controller
         $page->title = request('title');
         $page->text = request('text');
 
-        if (!$page->exists) {
+        if (! $page->exists) {
             $action = 'create';
             $page->slug = slugify($page->getTable(), request('title'));
         }
 
         $page->save();
 
-        if (isset($action) && 'create' === $action) {
+        if (isset($action) && $action === 'create') {
             $message = __('Page created successfully');
         } else {
             $message = __('Page updated successfully');
@@ -118,7 +115,6 @@ class PagesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Page  $page
      * @return \Illuminate\Http\Response | array
      */
     public function destroy(Page $page)
@@ -126,7 +122,7 @@ class PagesController extends Controller
         $page->delete();
 
         return [
-            'message' => __('Page deleted successfully')
+            'message' => __('Page deleted successfully'),
         ];
     }
 }

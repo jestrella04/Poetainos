@@ -10,14 +10,15 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
     console.log(`Service Worker at: ${swUrl}`)
 
     if (reloadSW === 'true') {
-      r && setInterval(async () => {
-        console.log('Checking for sw update')
-        await r.update()
-      }, intervalMS)
+      r &&
+        setInterval(async () => {
+          console.log('Checking for sw update')
+          await r.update()
+        }, intervalMS)
     } else {
       console.log(`SW Registered: ${r}`)
     }
-  },
+  }
 })
 </script>
 
@@ -29,8 +30,15 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
 
 <template>
   <div v-if="needRefresh" class="d-flex w-100 justify-center">
-    <v-snackbar :model-value="true" color="secondary" elevation="4" :timeout="-1" location="bottom" width="100%"
-      max-width="600">
+    <v-snackbar
+      :model-value="true"
+      color="secondary"
+      elevation="4"
+      :timeout="-1"
+      location="bottom"
+      width="100%"
+      max-width="600"
+    >
       <div class="w-100 d-flex align-center ga-5">
         <div>
           <v-avatar size="48">
@@ -49,4 +57,3 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
     </v-snackbar>
   </div>
 </template>
-

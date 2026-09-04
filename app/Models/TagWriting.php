@@ -13,7 +13,7 @@ class TagWriting extends Model
      */
     protected $table = 'tag_writing';
 
-     /**
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool

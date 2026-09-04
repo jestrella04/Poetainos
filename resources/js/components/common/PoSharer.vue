@@ -3,7 +3,7 @@ import { inject } from 'vue'
 
 const props = defineProps({
   linkTitle: { type: String, required: true },
-  linkUrl: { type: String, required: true },
+  linkUrl: { type: String, required: true }
 })
 
 const helper = inject('helper')
@@ -13,7 +13,7 @@ const social = helper.shareLinks(props.linkTitle, props.linkUrl)
 function copy(event) {
   if ('copy' === event.target.closest('.social').id) {
     event.preventDefault()
-    navigator.clipboard.writeText(props.linkUrl);
+    navigator.clipboard.writeText(props.linkUrl)
   }
 
   sharer.value = false
@@ -32,8 +32,16 @@ function copy(event) {
       <div class="d-flex flex-wrap pa-5 ga-3 w-100 justify-center">
         <template v-for="data in social" :key="data.name">
           <div :id="data.name" class="social">
-            <po-button icon color="primary" size="64" :href="data.url" rel="noindex noopener" target="_blank"
-              :title="'copy' === data.name ? $t('main.copy-link') : data.name" @click="copy">
+            <po-button
+              icon
+              color="primary"
+              size="64"
+              :href="data.url"
+              rel="noindex noopener"
+              target="_blank"
+              :title="'copy' === data.name ? $t('main.copy-link') : data.name"
+              @click="copy"
+            >
               <v-icon :icon="data.icon"></v-icon>
             </po-button>
           </div>

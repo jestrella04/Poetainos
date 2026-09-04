@@ -2,22 +2,25 @@
 
 namespace App\Notifications;
 
-use App\Models\User;
-use App\Models\Comment;
 use App\Events\NotificationEvent;
+use App\Models\Comment;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class CommentLiked extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $comment;
+
     protected $user;
+
     protected $notification;
 
     /**
@@ -32,12 +35,12 @@ class CommentLiked extends Notification implements ShouldQueue
         $this->notification = [
             'title' => __('Updates from :name at :site', [
                 'name' => $this->user->getName(),
-                'site' => getSiteConfig('name')
+                'site' => getSiteConfig('name'),
             ]),
             'greeting' => __('Hello!'),
             'body' => __('Isn\'t it amazing?, :name likes your comment at :site.', [
                 'name' => $this->user->getName(),
-                'site' => getSiteConfig('name')
+                'site' => getSiteConfig('name'),
             ]),
             'footer' => __('Thank you for being part of the hood!'),
             'url' => $this->comment->writing->path(),
@@ -62,7 +65,7 @@ class CommentLiked extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -77,7 +80,7 @@ class CommentLiked extends Notification implements ShouldQueue
      *
      * @param  mixed  $notifiable
      * @param  mixed  $notification
-     * @return \Illuminate\Notifications\Messages\DatabaseMessage
+     * @return DatabaseMessage
      */
     public function toWebPush($notifiable, $notification)
     {

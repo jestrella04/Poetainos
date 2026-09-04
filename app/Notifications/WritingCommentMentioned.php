@@ -2,22 +2,25 @@
 
 namespace App\Notifications;
 
+use App\Events\NotificationEvent;
 use App\Models\Comment;
 use App\Models\User;
-use App\Events\NotificationEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class WritingCommentMentioned extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $comment;
+
     protected $user;
+
     protected $notification;
 
     /**
@@ -32,15 +35,15 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
         $this->notification = [
             'title' => __('Updates from :name at :site', [
                 'name' => $this->user->getName(),
-                'site' => getSiteConfig('name')
+                'site' => getSiteConfig('name'),
             ]),
             'greeting' => __('Hello!'),
             'body' => __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', [
                 'name' => $this->user->getName(),
-                'site' => getSiteConfig('name')
+                'site' => getSiteConfig('name'),
             ]),
             'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('writings.show', $this->comment->writing) . '#comment-' . $this->comment->id,
+            'url' => route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id,
             'action' => __('View comment'),
             'icon' => asset('images/logo-192.png'),
             'tag' => getSiteConfig('name'),
@@ -62,7 +65,7 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -79,7 +82,7 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
      *
      * @param  mixed  $notifiable
      * @param  mixed  $notification
-     * @return \Illuminate\Notifications\Messages\DatabaseMessage
+     * @return DatabaseMessage
      */
     public function toWebPush($notifiable, $notification)
     {
@@ -122,7 +125,7 @@ class WritingCommentMentioned extends Notification implements ShouldQueue
         return [
             'writing_id' => $this->comment->writing->id,
             'user_id' => $this->user->id,
-            'url' => $this->notification['url']
+            'url' => $this->notification['url'],
         ];
     }
 }

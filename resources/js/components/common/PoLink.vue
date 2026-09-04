@@ -1,7 +1,7 @@
 <script setup>
 defineProps({
   href: String,
-  inertia: Boolean,
+  inertia: Boolean
 })
 </script>
 

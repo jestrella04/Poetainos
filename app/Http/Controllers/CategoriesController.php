@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Writing;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CategoriesController extends Controller
 {
@@ -33,7 +33,6 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -44,28 +43,27 @@ class CategoriesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Category  $category
-     * @return \Inertia\Response
+     * @return Response
      */
     public function show(Category $category)
     {
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
         $params = [
-            'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]) . ' ' . $category->description,
+            'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]).' '.$category->description,
         ];
 
         $writings = $category->writingsRecursive()
             ->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query) {
+            ->with(['author' => function ($query): void {
                 $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
             }]);
 
-        if ('latest' === $sort) {
+        if ($sort === 'latest') {
             $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ('popular' === $sort) {
+        } elseif ($sort === 'popular') {
             $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ('likes' === $sort) {
+        } elseif ($sort === 'likes') {
             $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
         }
 
@@ -77,7 +75,7 @@ class CategoriesController extends Controller
             'meta' => [
                 'title' => getPageTitle([
                     $category->name,
-                    __('Categories')
+                    __('Categories'),
                 ]),
                 'canonical' => route('home'),
                 'description' => $category->description,
@@ -90,7 +88,6 @@ class CategoriesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
     public function edit(Category $category)
@@ -101,8 +98,6 @@ class CategoriesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Category $category)
@@ -123,14 +118,14 @@ class CategoriesController extends Controller
         $category->parent_id = request('parent');
         $category->description = request('description');
 
-        if (!$category->exists) {
+        if (! $category->exists) {
             $action = 'create';
             $category->slug = slugify($category->getTable(), request('name'));
         }
 
         $category->save();
 
-        if (isset($action) && 'create' === $action) {
+        if (isset($action) && $action === 'create') {
             $message = __('Category created successfully');
         } else {
             $message = __('Category updated successfully');
@@ -146,7 +141,6 @@ class CategoriesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
     public function destroy(Category $category)
@@ -154,7 +148,7 @@ class CategoriesController extends Controller
         $category->delete();
 
         return [
-            'message' => __('Category deleted successfully')
+            'message' => __('Category deleted successfully'),
         ];
     }
 }

@@ -16,7 +16,7 @@ class GenericController extends Controller
         $writings = $user->writings()->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
             ->with([
-                'author' => function ($query) {
+                'author' => function ($query): void {
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                 },
             ]);
@@ -50,7 +50,7 @@ class GenericController extends Controller
             ->whereNotIn('user_id', $this->getBlockedUsers())
             ->withCount(['likes', 'comments', 'shelf'])
             ->with([
-                'author' => function ($query) {
+                'author' => function ($query): void {
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                 },
             ]);
@@ -85,7 +85,7 @@ class GenericController extends Controller
             ->whereNot('user_id', $user->id)
             ->withCount(['likes', 'comments', 'shelf'])
             ->with([
-                'author' => function ($query) {
+                'author' => function ($query): void {
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                 },
             ]);

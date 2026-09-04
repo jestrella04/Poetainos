@@ -8,7 +8,7 @@ use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use Illuminate\Support\Facades\Notification;
 
-test('comments index excludes comments from authors the viewer has blocked', function () {
+test('comments index excludes comments from authors the viewer has blocked', function (): void {
     $writing = Writing::factory()->create();
     $visibleAuthor = User::factory()->create();
     $blockedAuthor = User::factory()->create();
@@ -28,7 +28,7 @@ test('comments index excludes comments from authors the viewer has blocked', fun
     $response->assertJsonCount(1, 'data');
 });
 
-test('commenting notifies the writing author unless the commenter is the author', function () {
+test('commenting notifies the writing author unless the commenter is the author', function (): void {
     Notification::fake();
 
     $author = User::factory()->create();
@@ -52,7 +52,7 @@ test('commenting notifies the writing author unless the commenter is the author'
     Notification::assertNotSentTo($author, WritingCommented::class);
 });
 
-test('mentioning a user notifies them unless they are the author or the commenter', function () {
+test('mentioning a user notifies them unless they are the author or the commenter', function (): void {
     Notification::fake();
 
     $author = User::factory()->create();
@@ -70,7 +70,7 @@ test('mentioning a user notifies them unless they are the author or the commente
     Notification::assertNotSentTo($commenter, WritingCommentMentioned::class);
 });
 
-test('the author can delete their comment but another user cannot', function () {
+test('the author can delete their comment but another user cannot', function (): void {
     $author = User::factory()->create();
     $comment = Comment::factory()->for($author, 'author')->create();
     $other = User::factory()->create();
@@ -81,7 +81,7 @@ test('the author can delete their comment but another user cannot', function () 
     expect(Comment::find($comment->id))->toBeNull();
 });
 
-test('an admin can delete any comment', function () {
+test('an admin can delete any comment', function (): void {
     $comment = Comment::factory()->create();
     $admin = actingAsAdmin();
 

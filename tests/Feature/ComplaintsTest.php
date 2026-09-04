@@ -6,7 +6,7 @@ use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Illuminate\Support\Facades\Notification;
 
-test('reasons returns the configured complaint reasons', function () {
+test('reasons returns the configured complaint reasons', function (): void {
     $this->getJson('/complaints/reasons')->assertOk()->assertJson([
         'reasons' => [
             ['value' => 'spam', 'label' => 'Spam or advertising'],
@@ -15,7 +15,7 @@ test('reasons returns the configured complaint reasons', function () {
     ]);
 });
 
-test('a complaint can be submitted for a writing, a comment, or a user', function (string $type, Closure $makeSubject) {
+test('a complaint can be submitted for a writing, a comment, or a user', function (string $type, Closure $makeSubject): void {
     Notification::fake();
 
     $subject = $makeSubject();
@@ -37,7 +37,7 @@ test('a complaint can be submitted for a writing, a comment, or a user', functio
     'a user' => ['users', fn () => User::factory()->create()],
 ]);
 
-test('submitting a complaint requires at least one reason', function () {
+test('submitting a complaint requires at least one reason', function (): void {
     $writing = Writing::factory()->create();
 
     $this->postJson('/complaints/store', [

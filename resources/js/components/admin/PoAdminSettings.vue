@@ -2,10 +2,10 @@
 import { computed, ref, inject } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios';
+import axios from 'axios'
 
 defineOptions({
-  layout: PoLayoutAdmin,
+  layout: PoLayoutAdmin
 })
 
 const helper = inject('helper')
@@ -36,7 +36,9 @@ function submitForm() {
       errors.value = error.response.data.errors
     })
     .finally(
-      setTimeout(() => { isPosting.value = false }, 1000)
+      setTimeout(() => {
+        isPosting.value = false
+      }, 1000)
     )
 }
 </script>
@@ -45,17 +47,38 @@ function submitForm() {
   <po-wrapper>
     <v-card-title>{{ $t('admin.settings') }}</v-card-title>
 
-    <v-form id="settings-form" :action="route('admin.settings.edit')" class="mb-5" @submit.prevent="submitForm">
-      <v-textarea v-model="settings" :label="$t('admin.settings')" rows="20" :hint="$t('admin.settings-warning')"
-        hide-details="auto" :error-messages="errors.json" persistent-hint required></v-textarea>
+    <v-form
+      id="settings-form"
+      :action="route('admin.settings.edit')"
+      class="mb-5"
+      @submit.prevent="submitForm"
+    >
+      <v-textarea
+        v-model="settings"
+        :label="$t('admin.settings')"
+        rows="20"
+        :hint="$t('admin.settings-warning')"
+        hide-details="auto"
+        :error-messages="errors.json"
+        persistent-hint
+        required
+      ></v-textarea>
 
       <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-        <template v-if="isPosting"><v-progress-circular indeterminate></v-progress-circular></template>
+        <template v-if="isPosting"
+          ><v-progress-circular indeterminate></v-progress-circular
+        ></template>
         <template v-else>{{ $t('main.save') }}</template>
       </po-button>
     </v-form>
 
-    <v-alert v-if="isPosted" type="success" variant="tonal" class="mb-5 mx-auto" style="width: 85%; max-width: 600px;">
+    <v-alert
+      v-if="isPosted"
+      type="success"
+      variant="tonal"
+      class="mb-5 mx-auto"
+      style="width: 85%; max-width: 600px"
+    >
       {{ $t('admin.settings-saved') }}
     </v-alert>
   </po-wrapper>

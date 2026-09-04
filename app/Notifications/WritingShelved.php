@@ -2,9 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Events\NotificationEvent;
 use App\Models\User;
 use App\Models\Writing;
-use App\Events\NotificationEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -15,6 +15,7 @@ class WritingShelved extends Notification implements ShouldQueue
     use Queueable;
 
     protected $writing;
+
     protected $user;
 
     /**
@@ -43,7 +44,7 @@ class WritingShelved extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {

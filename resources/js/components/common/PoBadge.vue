@@ -15,6 +15,5 @@ defineProps({
     <div>
       <slot />
     </div>
-
   </template>
 </template>

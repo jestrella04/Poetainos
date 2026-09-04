@@ -7,7 +7,7 @@ use App\Notifications\CommentLiked;
 use App\Notifications\WritingLiked;
 use Illuminate\Support\Facades\Notification;
 
-test('a user can like and unlike a writing', function () {
+test('a user can like and unlike a writing', function (): void {
     Notification::fake();
 
     $author = User::factory()->create();
@@ -23,7 +23,7 @@ test('a user can like and unlike a writing', function () {
         ->assertJson(['method' => 'destroy', 'count' => 0]);
 });
 
-test('liking your own writing does not notify you', function () {
+test('liking your own writing does not notify you', function (): void {
     Notification::fake();
 
     $author = User::factory()->create();
@@ -34,7 +34,7 @@ test('liking your own writing does not notify you', function () {
     Notification::assertNothingSent();
 });
 
-test('a user can like and unlike a comment', function () {
+test('a user can like and unlike a comment', function (): void {
     Notification::fake();
 
     $author = User::factory()->create();
@@ -50,7 +50,7 @@ test('a user can like and unlike a comment', function () {
         ->assertJson(['method' => 'destroy', 'count' => 0]);
 });
 
-test('deleting a like only removes the acting user\'s own like', function () {
+test('deleting a like only removes the acting user\'s own like', function (): void {
     $writing = Writing::factory()->create();
     $liker = User::factory()->create();
     $otherLiker = User::factory()->create();

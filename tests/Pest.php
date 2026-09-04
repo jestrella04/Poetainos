@@ -18,7 +18,7 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->beforeEach(function () {
+    ->beforeEach(function (): void {
         // AppServiceProvider only loads the `writerhood` config from the `settings`
         // table when NOT running in console, which is always true for artisan test/pest
         // (even inside a simulated HTTP request), so it never loads here. Seed the

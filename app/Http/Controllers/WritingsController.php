@@ -37,7 +37,7 @@ class WritingsController extends Controller
             ->whereNotNull($filterAwards)
             ->withCount(['likes', 'comments', 'shelf'])
             ->with([
-                'author' => function ($query) {
+                'author' => function ($query): void {
                     $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
                 },
             ]);
@@ -111,17 +111,17 @@ class WritingsController extends Controller
             'writing' => Writing::whereId($writing->id)
                 ->withCount(['likes', 'comments', 'shelf'])
                 ->with([
-                    'author' => function ($query) {
+                    'author' => function ($query): void {
                         $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
                     },
                 ])
                 ->with([
-                    'categories' => function ($query) {
+                    'categories' => function ($query): void {
                         $query->select('id', 'name', 'slug');
                     },
                 ])
                 ->with([
-                    'tags' => function ($query) {
+                    'tags' => function ($query): void {
                         $query->select('id', 'name', 'slug');
                     },
                 ])
@@ -137,7 +137,7 @@ class WritingsController extends Controller
                         ->select('writing_id')
                         ->whereIn('category_id', $writing->categories()->pluck('id'))
                 )->with([
-                    'author' => function ($query) {
+                    'author' => function ($query): void {
                         $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
                     },
                 ])->inRandomOrder()->take(5)->get(),

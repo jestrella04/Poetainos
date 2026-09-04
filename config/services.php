@@ -61,7 +61,7 @@ return [
                 'namespace' => env('ANDROID_ASSETLINKS_NAMESPACE'),
                 'package_name' => env('ANDROID_ASSETLINKS_PACKAGE_NAME'),
                 'fingerprint' => env('ANDROID_ASSETLINKS_FINGERPRINT'),
-            ]
+            ],
         ],
         'play_store' => [
             'id' => env('PLAY_STORE_ID'),

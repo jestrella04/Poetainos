@@ -4,20 +4,21 @@ namespace App\Notifications;
 
 use App\Models\Category;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Twitter\TwitterChannel;
-use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\FacebookPoster\FacebookPosterChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterPost;
+use NotificationChannels\Twitter\TwitterChannel;
+use NotificationChannels\Twitter\TwitterStatusUpdate;
 
 class CategoryFeaturedRandom extends Notification
 {
     use Queueable;
 
     protected $category;
+
     protected $msg;
+
     protected $url;
 
     /**
@@ -49,14 +50,14 @@ class CategoryFeaturedRandom extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -74,11 +75,13 @@ class CategoryFeaturedRandom extends Notification
 
     public function toTwitter($notifiable)
     {
-        $msg = $this->msg . ' ' . $this->url;
+        $msg = $this->msg.' '.$this->url;
+
         return new TwitterStatusUpdate($msg);
     }
 
-    public function toFacebookPoster($notifiable) {
+    public function toFacebookPoster($notifiable)
+    {
         return (new FacebookPosterPost($this->msg))->withLink($this->url);
     }
 }

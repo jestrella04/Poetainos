@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref, computed } from 'vue'
+import { inject, computed } from 'vue'
 
 const props = defineProps({
   user: { type: Object, required: true }

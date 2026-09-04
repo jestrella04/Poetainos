@@ -2,7 +2,7 @@
 defineProps({
   msgTitle: { type: String, required: true },
   msgBody: { type: String, required: true },
-  icon: { type: String, default: '' },
+  icon: { type: String, default: '' }
 })
 </script>
 

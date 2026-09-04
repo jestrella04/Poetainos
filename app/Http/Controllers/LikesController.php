@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Notifications\WritingLiked;
-use App\Models\Like;
 use App\Models\Comment;
+use App\Models\Like;
 use App\Models\Writing;
 use App\Notifications\CommentLiked;
+use App\Notifications\WritingLiked;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class LikesController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -24,7 +25,7 @@ class LikesController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -34,7 +35,7 @@ class LikesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function store($likeable, $likeable_id)
@@ -43,9 +44,9 @@ class LikesController extends Controller
         $like->user_id = auth()->user()->id;
         $like->vote = 1;
 
-        if ('writing' == $likeable) {
+        if ($likeable == 'writing') {
             $like->likeable()->associate(Writing::find($likeable_id));
-        } elseif ('comment' == $likeable) {
+        } elseif ($likeable == 'comment') {
             $like->likeable()->associate(Comment::find($likeable_id));
         }
 
@@ -64,9 +65,9 @@ class LikesController extends Controller
 
         // Update aura / karma
         $like->user->updateAura();
-        //$like->user->updateKarma();
+        // $like->user->updateKarma();
 
-        if ('writing' == $likeable) {
+        if ($likeable == 'writing') {
             $like->likeable->updateAura();
 
             // Notify writing author
@@ -77,7 +78,7 @@ class LikesController extends Controller
             }
         }
 
-        if ('comment' == $likeable) {
+        if ($likeable == 'comment') {
             // Notify comment author
             if ($like->likeable->author->isNot(auth()->user())) {
                 $like->likeable->author->notify(
@@ -95,8 +96,7 @@ class LikesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Like  $like
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Like $like)
     {
@@ -106,8 +106,7 @@ class LikesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Like  $like
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Like $like)
     {
@@ -117,9 +116,7 @@ class LikesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Like  $like
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Like $like)
     {
@@ -129,19 +126,19 @@ class LikesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Like  $like
+     * @param  Like  $like
      * @return array
      */
     public function destroy($likeable, $likeable_id)
     {
-        if ('writing' == $likeable) {
+        if ($likeable == 'writing') {
             Like::where([
                 ['likeable_type', 'App\Models\Writing'],
                 ['likeable_id', $likeable_id],
                 ['user_id', auth()->user()->id],
             ])->delete();
             $count = Writing::find($likeable_id)->likes()->count();
-        } elseif ('comment' == $likeable) {
+        } elseif ($likeable == 'comment') {
             Like::where([
                 ['likeable_type', 'App\Models\Comment'],
                 ['likeable_id', $likeable_id],

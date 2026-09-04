@@ -5,14 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,7 +27,7 @@ class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function store(Request $request): Response
     {
@@ -41,7 +39,7 @@ class RegisteredUserController extends Controller
             'privacy_agreement' => ['required', 'accepted'],
         ]);
 
-        $user =  User::create([
+        $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -50,12 +48,12 @@ class RegisteredUserController extends Controller
                 'agreement' => [
                     'terms_of_use' => $request->service_agreement,
                     'privacy_policy' => $request->privacy_agreement,
-                ]
+                ],
             ],
             'role_id' => Role::where('name', 'user')->first()->id,
         ]);
 
-        //event(new Registered($user));
+        // event(new Registered($user));
 
         Auth::login($user);
         $user->sendEmailVerificationNotification();

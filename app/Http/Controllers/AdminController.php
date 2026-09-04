@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Comment;
 use App\Models\Complaint;
+use App\Models\Like;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\Like;
-use App\Models\Shelf;
 use App\Models\Writing;
 use Inertia\Inertia;
 
@@ -134,9 +134,9 @@ class AdminController extends Controller
     {
         $writings = Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
             ->with([
-                'author' => function ($query) {
+                'author' => function ($query): void {
                     $query->select('id', 'username', 'name');
-                }
+                },
             ]);
 
         if (request()->expectsJson()) {
@@ -185,7 +185,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'log' => shell_exec('tail -n 100 ' . $this->log),
+            'log' => shell_exec('tail -n 100 '.$this->log),
             'info' => $pinfo,
         ]);
     }
@@ -194,11 +194,11 @@ class AdminController extends Controller
     {
         header('Content-Description: Log download');
         header('Content-Type: text/plain');
-        header('Content-Disposition: attachment; filename="' . basename($this->log) . '"');
+        header('Content-Disposition: attachment; filename="'.basename($this->log).'"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($this->log));
+        header('Content-Length: '.filesize($this->log));
         readfile($this->log);
         exit;
     }
@@ -244,7 +244,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'counter' => "https://counter.dev/dashboard.html?user=$user&token=$token%3D"
+            'counter' => "https://counter.dev/dashboard.html?user=$user&token=$token%3D",
         ]);
     }
 }
