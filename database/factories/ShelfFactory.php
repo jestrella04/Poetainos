@@ -1,15 +1,34 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
 use App\Models\Shelf;
 use App\Models\User;
 use App\Models\Writing;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Shelf::class, function (Faker $faker) {
-    return [
-        'user_id' => factory(User::class),
-        'writing_id' => factory((Writing::class))
-    ];
-});
+/**
+ * @extends Factory<Shelf>
+ */
+class ShelfFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Shelf::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'user_id' => User::factory(),
+            'writing_id' => Writing::factory(),
+        ];
+    }
+}

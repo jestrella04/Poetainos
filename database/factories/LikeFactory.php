@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Writing;
-use App\Models\User;
 use App\Models\Like;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Like>
+ * @extends Factory<Like>
  */
 class LikeFactory extends Factory
 {
@@ -27,9 +26,8 @@ class LikeFactory extends Factory
     public function definition(): array
     {
         return [
-            'writing_id' => Writing::factory(),
             'user_id' => User::factory(),
-            'like' => $this->faker->boolean(68)
+            'vote' => 1,
         ];
     }
 }

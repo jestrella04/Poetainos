@@ -2,20 +2,20 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Models\Complaint;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<User>
+ * @extends Factory<Complaint>
  */
-class UserFactory extends Factory
+class ComplaintFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = User::class;
+    protected $model = Complaint::class;
 
     /**
      * Define the model's default state.
@@ -25,10 +25,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'username' => $this->faker->unique()->userName,
-            'email' => $this->faker->unique()->safeEmail,
-            'password' => '$2y$10$Qh9yxR9v6OfLQU5Lw61hQOLVvdegUt7WxG9/HXGVvxZB2Wd.Si.aK', // password
-            'email_verified_at' => now(),
+            'reasons' => [$this->faker->randomElement(['spam', 'abuse'])],
+            'comment' => $this->faker->optional()->sentence(),
         ];
     }
 }

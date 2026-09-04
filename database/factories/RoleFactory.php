@@ -1,24 +1,46 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
 use App\Models\Role;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-/*
-|--------------------------------------------------------------------------
-| Model Factories
-|--------------------------------------------------------------------------
-|
-| This directory should contain each of the model factory definitions for
-| your application. Factories provide a convenient way to generate new
-| model instances for testing / seeding your application's database.
-|
-*/
+/**
+ * @extends Factory<Role>
+ */
+class RoleFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Role::class;
 
-$factory->define(Role::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->word(),
-        'description' => $faker->optional()->sentence(),
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => $this->faker->unique()->word(),
+            'description' => $this->faker->optional()->sentence(),
+        ];
+    }
+
+    /**
+     * Indicate that the role grants admin access.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'extra_info' => [
+                'permissions' => [
+                    ['name' => 'admin', 'enabled' => true],
+                ],
+            ],
+        ]);
+    }
+}
