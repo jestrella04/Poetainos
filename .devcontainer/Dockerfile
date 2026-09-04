@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y \
         libjpeg62-turbo-dev \
         libpng-dev \
         && docker-php-ext-configure gd --with-jpeg --with-freetype \
-        && docker-php-ext-install -j$(nproc) pdo_mysql gd \
-        && docker-php-ext-enable pdo_mysql gd \
+        && docker-php-ext-install -j$(nproc) pdo_mysql gd pcntl \
+        && docker-php-ext-enable pdo_mysql gd pcntl \
         && apt-get purge -y --auto-remove build-essential \
         && rm -rf /var/lib/apt/lists/*
 

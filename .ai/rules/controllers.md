@@ -24,7 +24,7 @@ Type-hint models directly in controller method signatures for route model bindin
 Check authorization inline in controller actions with `$this->authorize('ability', $model)`, not `Gate::authorize()`, `->can()`, or route `can:` middleware.
 
 ## Pass raw Eloquent data as Inertia props
-Return `Inertia::render()` with models/collections/paginators passed directly as props (optionally `Inertia::lazy()` for deferred data). Do not build API Resources or manual `toArray()` transforms.
+Return `Inertia::render()` with models/collections/paginators passed directly as props (optionally `Inertia::optional()` for deferred data). Do not build API Resources or manual `toArray()` transforms.
 
 ## Use route() for links
 Prefer `route('name', ...)` for all links. `url('/')` is used only as the fixed target for generic notification action buttons.

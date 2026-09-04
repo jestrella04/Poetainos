@@ -3,18 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Notifications\WritingPublished;
+use App\Models\Like;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\Like;
 use App\Models\Writing;
+use App\Notifications\WritingPublished;
 use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Validation\ValidationException;
-use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
+use Intervention\Image\Laravel\Facades\Image;
 use Spatie\ImageOptimizer\OptimizerChain;
 
 class WritingsController extends Controller
@@ -22,11 +26,11 @@ class WritingsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Inertia\Response|\Illuminate\Contracts\Pagination\Paginator
+     * @return Response|Paginator
      */
     public function index()
     {
-        $awards = 'writings.awards' === request()->route()->getName();
+        $awards = request()->route()->getName() === 'writings.awards';
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
         $filterAwards = $awards ? 'home_posted_at' : 'id';
         $writings = Writing::whereNotIn('user_id', $this->getBlockedUsers())
@@ -35,14 +39,14 @@ class WritingsController extends Controller
             ->with([
                 'author' => function ($query) {
                     $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
-                }
+                },
             ]);
 
-        if ('latest' === $sort) {
+        if ($sort === 'latest') {
             $writings = $writings->latest();
-        } elseif ('popular' === $sort) {
+        } elseif ($sort === 'popular') {
             $writings = $writings->orderBy('views', 'desc')->orderBy('aura', 'desc');
-        } elseif ('likes' === $sort) {
+        } elseif ($sort === 'likes') {
             $writings = $writings->orderBy('likes_count', 'desc')->orderBy('aura', 'desc');
         }
 
@@ -55,7 +59,7 @@ class WritingsController extends Controller
                 'title' => $awards ? getPageTitle([__('Golden Flowers')]) : getPageTitle([]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -63,29 +67,27 @@ class WritingsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     public function create()
     {
-        return $this->edit(new Writing());
+        return $this->edit(new Writing);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function store(Request $request)
     {
-        return $this->update($request, new Writing());
+        return $this->update($request, new Writing);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Writing  $writing
-     * @return \Inertia\Response
+     * @return Response
      */
     public function show(Writing $writing)
     {
@@ -94,7 +96,7 @@ class WritingsController extends Controller
 
         // Update Aura
         $writing->updateAura();
-        //$writing->author->updateAura();
+        // $writing->author->updateAura();
 
         $user = auth()->check() ? User::find(auth()->user()->id) : null;
 
@@ -111,17 +113,17 @@ class WritingsController extends Controller
                 ->with([
                     'author' => function ($query) {
                         $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
-                    }
+                    },
                 ])
                 ->with([
                     'categories' => function ($query) {
                         $query->select('id', 'name', 'slug');
-                    }
+                    },
                 ])
                 ->with([
                     'tags' => function ($query) {
                         $query->select('id', 'name', 'slug');
-                    }
+                    },
                 ])
                 ->first(),
             'likers' => $writing->likers()->shuffle()->take(5),
@@ -135,20 +137,20 @@ class WritingsController extends Controller
                         ->select('writing_id')
                         ->whereIn('category_id', $writing->categories()->pluck('id'))
                 )->with([
-                            'author' => function ($query) {
-                                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                            }
-                        ])->inRandomOrder()->take(5)->get(),
+                    'author' => function ($query) {
+                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    },
+                ])->inRandomOrder()->take(5)->get(),
 
             ],
-            'isAuthorBlocked' => auth()->check() ? $user->isAuthorBlocked($writing->author) : false
+            'isAuthorBlocked' => auth()->check() ? $user->isAuthorBlocked($writing->author) : false,
         ]);
     }
 
     /**
      * Display a random resource.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      */
     public function random()
     {
@@ -158,14 +160,14 @@ class WritingsController extends Controller
             ->writings()
             ->inRandomOrder()
             ->firstOrFail();
+
         return redirect($writing->path());
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Writing  $writing
-     * @return \Inertia\Response
+     * @return Response
      */
     public function edit(Writing $writing)
     {
@@ -183,7 +185,7 @@ class WritingsController extends Controller
             'meta' => [
                 'title' => request()->route()->getName() === 'writings.edit'
                     ? getPageTitle([__('Update writing')])
-                    : getPageTitle([__('Publish a writing')])
+                    : getPageTitle([__('Publish a writing')]),
             ],
             'writing' => [
                 'data' => $writing,
@@ -201,8 +203,6 @@ class WritingsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Writing  $writing
      * @return array
      */
     public function update(Request $request, Writing $writing)
@@ -216,11 +216,11 @@ class WritingsController extends Controller
         }
 
         // Check number of posts by user
-        $posts = auth()->user()->writings()->whereDate("created_at", "=", Carbon::today())->count();
+        $posts = auth()->user()->writings()->whereDate('created_at', '=', Carbon::today())->count();
 
         if ($posts >= 3) {
             throw ValidationException::withMessages([
-                'title' => __('You have reached your maximum number of posts for today. Please try again tomorrow.')
+                'title' => __('You have reached your maximum number of posts for today. Please try again tomorrow.'),
             ]);
         }
 
@@ -232,18 +232,18 @@ class WritingsController extends Controller
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
-            'cover' => 'nullable|file|image|max:' . getSiteConfig('uploads_max_file_size'),
+            'cover' => 'nullable|file|image|max:'.getSiteConfig('uploads_max_file_size'),
             'service_agreement' => 'sometimes|required|accepted',
             'privacy_agreement' => 'sometimes|required|accepted',
         ]);
 
-        //dd($request);
+        // dd($request);
 
         // Process the uploaded cover, if any
         if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
             // Persist the image
             $cover = $request->file('cover')->store('covers');
-            $coverRealPath = storage_path('app/' . $cover);
+            $coverRealPath = storage_path('app/'.$cover);
 
             // Scale image and enforce 16:9 aspect ratio
             Image::read($coverRealPath)->cover(1280, 720)->save();
@@ -261,7 +261,7 @@ class WritingsController extends Controller
         // Persist to database
         $writing->title = request('title');
 
-        if (!$writing->exists) {
+        if (! $writing->exists) {
             $writing->user_id = auth()->user()->id;
             $writing->slug = slugify($writing->getTable(), $writing->title);
         }
@@ -276,7 +276,7 @@ class WritingsController extends Controller
         $tagsToSync = [];
 
         // Let's grab the entered tags
-        if (!empty(request('tags'))) {
+        if (! empty(request('tags'))) {
             foreach (request('tags') as $tag) {
                 $tag = preg_replace('/\s+/', ' ', $tag);
                 $tag = trim($tag);
@@ -297,15 +297,15 @@ class WritingsController extends Controller
 
         // Update user aura / karma
         $writing->author->updateAura();
-        //$writing->author->updateKarma();
+        // $writing->author->updateKarma();
 
         // Persist user agreements to avoid asking again
-        if (!empty(request('service_agreement') && !empty(request('privacy_agreement')))) {
+        if (! empty(request('service_agreement') && ! empty(request('privacy_agreement')))) {
             $writing->author->acceptAgreements();
         }
 
         // Set response message and trigger notification
-        if ('create' === $action) {
+        if ($action === 'create') {
             // Share on social media
             $writing->author->notify(new WritingPublished($writing));
 
@@ -326,7 +326,6 @@ class WritingsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Writing  $writing
      * @return array
      */
     public function destroy(Writing $writing)
@@ -340,7 +339,7 @@ class WritingsController extends Controller
         // Delete related likes
         Like::where([
             ['likeable_type', 'App\Models\Writing'],
-            ['likeable_id', $writing->id]
+            ['likeable_id', $writing->id],
         ])->delete();
 
         if (request('redirect')) {

@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Writing;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class UsersNotificationsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     public function index()
     {
@@ -53,13 +54,14 @@ class UsersNotificationsController extends Controller
         return Inertia::render('notifications/PoNotificationsIndex', [
             'meta' => [],
             'tab' => $tab,
-            'notifications' => Inertia::lazy(fn () => $notifications),
+            'notifications' => Inertia::optional(fn () => $notifications),
         ]);
     }
 
     public function clear()
     {
         auth()->user()->unreadNotifications->markAsRead();
+
         return redirect(route('notifications.index'));
     }
 
@@ -85,6 +87,7 @@ class UsersNotificationsController extends Controller
     public function email($enable)
     {
         User::find(auth()->user()->id)->emailNotifications($enable);
+
         return response()->json(null, 204);
     }
 

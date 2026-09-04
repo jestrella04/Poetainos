@@ -3,7 +3,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "workspace",
   "workspaceFolder": "/var/www/poetainos",
-  "postStartCommand": "php artisan serve",
+  "postStartCommand": "composer dev",
   "remoteUser": "jon",
   "customizations": {
     "vscode": {

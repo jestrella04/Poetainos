@@ -18,14 +18,14 @@ class GenericController extends Controller
             ->with([
                 'author' => function ($query) {
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }
+                },
             ]);
 
-        if ('latest' === $sort) {
+        if ($sort === 'latest') {
             $writings = $writings->latest();
-        } elseif ('popular' === $sort) {
+        } elseif ($sort === 'popular') {
             $writings = $writings->orderBy('views', 'desc');
-        } elseif ('likes' === $sort) {
+        } elseif ($sort === 'likes') {
             $writings = $writings->orderBy('likes_count', 'desc');
         }
 
@@ -38,7 +38,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Writings'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -52,14 +52,14 @@ class GenericController extends Controller
             ->with([
                 'author' => function ($query) {
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }
+                },
             ]);
 
-        if ('latest' === $sort) {
+        if ($sort === 'latest') {
             $writings = $writings->latest();
-        } elseif ('popular' === $sort) {
+        } elseif ($sort === 'popular') {
             $writings = $writings->orderBy('views', 'desc');
-        } elseif ('likes' === $sort) {
+        } elseif ($sort === 'likes') {
             $writings = $writings->orderBy('likes_count', 'desc');
         }
 
@@ -72,7 +72,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Shelf'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -87,14 +87,14 @@ class GenericController extends Controller
             ->with([
                 'author' => function ($query) {
                     $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                }
+                },
             ]);
 
-        if ('latest' === $sort) {
+        if ($sort === 'latest') {
             $writings = $writings->latest();
-        } elseif ('popular' === $sort) {
+        } elseif ($sort === 'popular') {
             $writings = $writings->orderBy('views', 'desc');
-        } elseif ('likes' === $sort) {
+        } elseif ($sort === 'likes') {
             $writings = $writings->orderBy('likes_count', 'desc');
         }
 
@@ -107,7 +107,7 @@ class GenericController extends Controller
                 'title' => getPageTitle([__('Likes'), $user->getName()]),
                 'canonical' => route('home'),
             ],
-            'writings' => Inertia::lazy(fn() => $writings->simplePaginate($this->pagination)->withQueryString()),
+            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
         ]);
     }
@@ -143,7 +143,7 @@ class GenericController extends Controller
             )->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
                 ->orderBy('aura', 'desc')
                 ->take(20)
-                ->get()
+                ->get(),
         ]);
     }
 
@@ -157,51 +157,58 @@ class GenericController extends Controller
         $json->description = getSiteConfig('slogan');
 
         foreach ($json->shortcuts as $shortcut) {
-            if ("account" === $shortcut->name) {
+            if ($shortcut->name === 'account') {
                 $shortcut->name = __('My account');
                 $shortcut->short_name = __('My account');
                 $shortcut->url = route('users.account');
+
                 continue;
             }
 
-            if ("publish" === $shortcut->name) {
+            if ($shortcut->name === 'publish') {
                 $shortcut->name = __('Publish');
                 $shortcut->short_name = __('Publish');
                 $shortcut->url = route('writings.create');
+
                 continue;
             }
 
-            if ("featured" === $shortcut->name) {
+            if ($shortcut->name === 'featured') {
                 $shortcut->name = __('Golden Flowers');
                 $shortcut->short_name = __('Golden Flowers');
                 $shortcut->url = route('writings.awards');
+
                 continue;
             }
 
-            if ("random" === $shortcut->name) {
+            if ($shortcut->name === 'random') {
                 $shortcut->name = __('Random');
                 $shortcut->short_name = __('Random');
                 $shortcut->url = route('writings.random');
+
                 continue;
             }
 
-            if ("authors" === $shortcut->name) {
+            if ($shortcut->name === 'authors') {
                 $shortcut->name = __('Writers');
                 $shortcut->short_name = __('Writers');
                 $shortcut->url = route('users.index');
+
                 continue;
             }
         }
 
         foreach ($json->related_applications as $app) {
-            if ("webapp" === $app->platform) {
+            if ($app->platform === 'webapp') {
                 $app->url = route('pwa.manifest');
+
                 continue;
             }
 
-            if ("play" === $app->platform) {
+            if ($app->platform === 'play') {
                 $app->url = config('services.google.play_store.url');
                 $app->id = config('services.google.play_store.id');
+
                 continue;
             }
         }
@@ -214,7 +221,7 @@ class GenericController extends Controller
     public function offline()
     {
         Inertia::render('generic/PoOffline', [
-            'meta' => []
+            'meta' => [],
         ]);
     }
 }

@@ -6,7 +6,7 @@ import { useTheme } from 'vuetify'
 const page = computed(() => usePage())
 const theme = useTheme()
 
-theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
+theme.change(window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light')
 
 </script>
 

@@ -3,7 +3,7 @@ import { useTheme } from 'vuetify'
 import PoAdminMenu from '../admin/PoAdminMenu.vue';
 
 const theme = useTheme()
-theme.global.name.value = window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light'
+theme.change(window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light')
 </script>
 
 <style>

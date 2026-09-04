@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import laravel from 'laravel-vite-plugin'
@@ -8,13 +8,47 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import path from 'path'
 
-export default defineConfig({
-  server: {
-    host: '0.0.0.0',
-    hmr: {
-      host: 'localhost'
+const manualChunkGroups = {
+  'vendor-vue': ['vue', '@vue/runtime-dom', '@vue/runtime-core'],
+  'vendor-vuetify': ['vuetify'],
+  'vendor-inertia': ['@inertiajs/vue3'],
+  'vendor-fontawesome': [
+    '@fortawesome/fontawesome-svg-core',
+    '@fortawesome/vue-fontawesome',
+    '@fortawesome/free-solid-svg-icons',
+    '@fortawesome/free-regular-svg-icons',
+    '@fortawesome/free-brands-svg-icons'
+  ],
+  'vendor-realtime': ['laravel-echo', 'pusher-js'],
+  'vendor-i18n': ['vue-i18n'],
+  'vendor-vueuse': ['@vueuse/core'],
+  'vendor-utils': ['date-fns', 'lodash-es', 'millify', 'crop-url', 'linkifyjs'],
+  'vendor-markdown': ['markdown-it']
+}
+
+function manualChunks(id) {
+  if (!id.includes('node_modules')) {
+    return
+  }
+
+  for (const [chunk, packages] of Object.entries(manualChunkGroups)) {
+    if (packages.some((pkg) => id.includes(`/node_modules/${pkg}/`))) {
+      return chunk
     }
-  },
+  }
+}
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
+    server: {
+      cors: true,
+      host: '0.0.0.0',
+      hmr: {
+        host: env.VITE_HMR_HOST || 'localhost',
+      },
+    },
   resolve: {
     alias: {
       'ziggy-js': path.resolve('/vendor/tightenco/ziggy')
@@ -31,23 +65,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-vue': ['vue', '@vue/runtime-dom', '@vue/runtime-core'],
-          'vendor-vuetify': ['vuetify'],
-          'vendor-inertia': ['@inertiajs/vue3'],
-          'vendor-fontawesome': [
-            '@fortawesome/fontawesome-svg-core',
-            '@fortawesome/vue-fontawesome',
-            '@fortawesome/free-solid-svg-icons',
-            '@fortawesome/free-regular-svg-icons',
-            '@fortawesome/free-brands-svg-icons'
-          ],
-          'vendor-realtime': ['laravel-echo', 'pusher-js'],
-          'vendor-i18n': ['vue-i18n'],
-          'vendor-vueuse': ['@vueuse/core'],
-          'vendor-utils': ['date-fns', 'lodash-es', 'millify', 'crop-url', 'linkifyjs'],
-          'vendor-markdown': ['markdown-it']
-        }
+        manualChunks
       }
     }
   },
@@ -63,7 +81,7 @@ export default defineConfig({
     Components({
       dirs: ['resources/js/components/common'],
       resolvers: [VuetifyResolver()],
-      include: [/\.vue$/, /\.vue\?vue/, /\.vue\.[tj]sx?\?vue/, /\.md$/],
+      include: [/\.vue$/, /\.vue\?vue/, /\.vue\.[tj]sx?\?vue/, /\.md$/]
     }),
     VitePWA({
       scope: '/',
@@ -89,4 +107,4 @@ export default defineConfig({
       }
     })
   ]
-})
+}});

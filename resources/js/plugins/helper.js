@@ -1,7 +1,9 @@
 // plugins/helper.js
 
 import * as _ from 'lodash-es'
-import millify from 'millify'
+import millifyModule from 'millify'
+
+const millify = typeof millifyModule === 'function' ? millifyModule : millifyModule.default
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import crop from 'crop-url'
