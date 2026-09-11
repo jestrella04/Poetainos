@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import { useFormatting } from '@/composables/useFormatting'
 import type { CategoryLike, TagLike, UserLike } from '@/types/models'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -13,6 +14,7 @@ interface ExploreProps {
   authors: UserLike[]
 }
 
+const { userDisplayName } = useFormatting()
 const page = computed(() => usePage<InertiaPageProps<ExploreProps>>())
 </script>
 
@@ -84,7 +86,7 @@ const page = computed(() => usePage<InertiaPageProps<ExploreProps>>())
             <template v-for="author in page.props.authors" :key="author.id">
               <po-link
                 :href="route('users.show', author.username)"
-                :title="$helper.userDisplayName(author)"
+                :title="userDisplayName(author)"
                 inertia
               >
                 <po-avatar-award

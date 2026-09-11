@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { onMounted, reactive, ref } from 'vue'
-import { helperKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { useFormValidation } from '@/composables/useFormValidation'
 import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
 interface Captcha {
@@ -10,7 +9,7 @@ interface Captcha {
   img: string
 }
 
-const helper = injectStrict(helperKey)
+const { checkFormValidity } = useFormValidation()
 const isPosting = ref(false)
 const isPosted = ref(false)
 const captcha = ref<Captcha>({ key: '', img: '' })
@@ -58,7 +57,7 @@ function resetForm() {
 async function submitForm() {
   const form = document.querySelector<HTMLFormElement>('#contact-form')
 
-  if (!form || !helper.checkFormValidity(form)) {
+  if (!form || !checkFormValidity(form)) {
     return
   }
 

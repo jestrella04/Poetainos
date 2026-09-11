@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useFormatting } from '@/composables/useFormatting'
 import type { UserLike } from '@/types/models'
 
 defineProps<{
@@ -7,6 +8,8 @@ defineProps<{
   avatarColor: string
   avatarClass?: string
 }>()
+
+const { karmaMedal } = useFormatting()
 </script>
 
 <template>
@@ -14,7 +17,7 @@ defineProps<{
     v-if="user.karma && ['A', 'B', 'C'].includes(user.karma)"
     icon="fas fa-award"
     color="transparent"
-    :text-color="$helper.karmaMedal(user.karma) ?? undefined"
+    :text-color="karmaMedal(user.karma) ?? undefined"
     location="bottom end"
     offset-x="8"
     offset-y="8"

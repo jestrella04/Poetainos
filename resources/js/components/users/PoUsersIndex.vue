@@ -5,8 +5,7 @@ import PoUsersCard from './partials/PoUsersCard.vue'
 import axios from 'axios'
 import { useSwipe } from '@vueuse/core'
 import type { UseSwipeDirection } from '@vueuse/core'
-import { helperKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { useTypeGuards } from '@/composables/useTypeGuards'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { User } from '@/types/models'
 
@@ -18,7 +17,7 @@ interface UsersPage {
 }
 
 const page = computed(() => usePage<InertiaPageProps<{ sort: string; users: UsersPage }>>())
-const helper = injectStrict(helperKey)
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const users = ref<User[]>([])
 const next = ref('')
 const fetched = ref(false)
@@ -39,7 +38,7 @@ useSwipe(target, {
 })
 
 async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
-  if (!helper.strNullOrEmpty(next.value)) {
+  if (!strNullOrEmpty(next.value)) {
     await axios
       .get<UsersPage>(next.value)
       .then((response) => {
@@ -115,7 +114,7 @@ function update(usersData: User[], nextPage: string | null) {
     <po-loading type="avatar, paragraph, divider, text"></po-loading>
   </template>
 
-  <template v-else-if="!$helper.isEmpty(users)">
+  <template v-else-if="!isEmpty(users)">
     <template v-for="user in users" :key="user.id">
       <po-users-card :alone="false" :data="user" />
     </template>

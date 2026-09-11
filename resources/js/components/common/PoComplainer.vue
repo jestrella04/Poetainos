@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import axios from 'axios'
-import { complainerKey, forceSnackBarKey, helperKey } from '@/composables/keys'
+import { complainerKey, forceSnackBarKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useSnackbar } from '@/composables/useSnackbar'
 
 const props = defineProps<{
   compType: string
   compId: number
 }>()
 
-const helper = injectStrict(helperKey)
+const { isEmpty } = useTypeGuards()
+const { setSnackBar } = useSnackbar()
 const complainer = injectStrict(complainerKey)
 const reasons = ref<string[]>([])
 const compReasons = ref<string[]>([])
@@ -37,7 +40,7 @@ async function submit() {
     return
   }
 
-  if (helper.isEmpty(compReasons.value)) {
+  if (isEmpty(compReasons.value)) {
     errors.value = true
     return
   }
@@ -53,7 +56,7 @@ async function submit() {
       message: compMessage.value
     })
     .then(() => {
-      helper.setSnackBar({
+      setSnackBar({
         message: 'complaints.complaint-received',
         color: 'success',
         active: true

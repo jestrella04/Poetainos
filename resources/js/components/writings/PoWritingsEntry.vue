@@ -4,6 +4,8 @@ import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
 import PoWritingStats from './partials/PoWritingStats.vue'
 import PoWritingDropdown from './partials/PoWritingDropdown.vue'
 import { loadingCommentsKey, writingKey } from '@/composables/keys'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
 import type { UserLike, Writing } from '@/types/models'
 
 const props = withDefaults(
@@ -17,6 +19,8 @@ const props = withDefaults(
   }
 )
 
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { storage, toLocaleDate, userDisplayName, cropUrl, excerpt } = useFormatting()
 const loadingComments = ref(true)
 
 provide(loadingCommentsKey, loadingComments)
@@ -38,13 +42,11 @@ provide(writingKey, props.data)
   <po-wrapper>
     <v-card :class="{ 'pos-relative': true, 'writing-container': !alone }" elevation="2" rounded>
       <po-writing-dropdown></po-writing-dropdown>
-      <template
-        v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info?.cover)"
-      >
+      <template v-if="!isEmpty(data.extra_info) && !strNullOrEmpty(data.extra_info?.cover)">
         <v-img
           class="align-end text-white"
           height="200"
-          :src="$helper.storage(data.extra_info?.cover ?? '')"
+          :src="storage(data.extra_info?.cover ?? '')"
           alt=""
           cover
         >
@@ -97,8 +99,8 @@ provide(writingKey, props.data)
 
           <p class="text-caption text-uppercase text-medium-emphasis">
             {{
-              `${$helper.toLocaleDate(data.created_at)}
-            — ${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
+              `${toLocaleDate(data.created_at)}
+            — ${$t('main.by-name', { name: userDisplayName(data.author) })}
             `
             }}
           </p>
@@ -109,21 +111,17 @@ provide(writingKey, props.data)
             {{ data.text }}
           </blockquote>
 
-          <template
-            v-if="
-              !$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info?.link)
-            "
-          >
+          <template v-if="!isEmpty(data.extra_info) && !strNullOrEmpty(data.extra_info?.link)">
             <div class="d-flex align-center mb-4">
               <v-icon icon="fas fa-link" size="24" class="mr-3"></v-icon>
               <po-link :href="data.extra_info?.link" target="_blank" rel="nofollow noopener">
-                {{ $helper.cropUrl(data.extra_info?.link ?? '') }}
+                {{ cropUrl(data.extra_info?.link ?? '') }}
               </po-link>
             </div>
           </template>
 
           <div class="d-flex flex-column ga-3 mb-4">
-            <div v-if="!$helper.isEmpty(data.categories)" class="d-flex">
+            <div v-if="!isEmpty(data.categories)" class="d-flex">
               <div class="mr-3">
                 <v-icon icon="fas fa-folder-open" size="24"></v-icon>
               </div>
@@ -143,7 +141,7 @@ provide(writingKey, props.data)
               </div>
             </div>
 
-            <div v-if="!$helper.isEmpty(data.tags)" class="d-flex">
+            <div v-if="!isEmpty(data.tags)" class="d-flex">
               <div class="mr-3">
                 <v-icon icon="fas fa-hashtag" size="24"></v-icon>
               </div>
@@ -164,7 +162,7 @@ provide(writingKey, props.data)
             </div>
           </div>
 
-          <div v-if="!$helper.isEmpty(likers)">
+          <div v-if="!isEmpty(likers)">
             <p class="text-caption mb-2">{{ $t('main.liked-by') }}</p>
 
             <div class="d-inline-flex flex-wrap ga-2">
@@ -172,7 +170,7 @@ provide(writingKey, props.data)
                 <po-button
                   icon
                   :href="route('users.show', liker.username)"
-                  :title="$helper.userDisplayName(liker)"
+                  :title="userDisplayName(liker)"
                   inertia
                 >
                   <po-avatar size="48" color="secondary" :user="liker" />
@@ -187,7 +185,7 @@ provide(writingKey, props.data)
 
         <template v-else>
           <blockquote class="writing-body">
-            {{ $helper.excerpt(data.text) }}
+            {{ excerpt(data.text) }}
           </blockquote>
         </template>
       </v-card-text>

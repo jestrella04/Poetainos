@@ -1,5 +1,4 @@
 import type { InjectionKey, Ref } from 'vue'
-import type { Helper } from '../plugins/helper'
 import type { Push } from '../plugins/push'
 import type { User, Writing } from '../types/models'
 
@@ -25,7 +24,6 @@ export const mobileSiteMenuKey: InjectionKey<Ref<boolean>> = Symbol('mobileSiteM
 export const mobileUserMenuKey: InjectionKey<Ref<boolean>> = Symbol('mobileUserMenu')
 export const forceSnackBarKey: InjectionKey<Ref<boolean>> = Symbol('forceSnackBar')
 export const unreadCountKey: InjectionKey<Ref<number>> = Symbol('unreadCount')
-export const helperKey: InjectionKey<Helper> = Symbol('helper')
 export const pushKey: InjectionKey<Push> = Symbol('push')
 
 export interface SnackBarState {

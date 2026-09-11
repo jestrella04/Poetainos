@@ -3,7 +3,9 @@ import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { mobileSiteMenuKey, mobileUserMenuKey, unreadCountKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
 
+const { auth, authUser } = useAuth()
 const page = computed(() => usePage())
 const mobileSiteMenu = injectStrict(mobileSiteMenuKey)
 const mobileUserMenu = injectStrict(mobileUserMenuKey)
@@ -32,7 +34,7 @@ const unreadCount = injectStrict(unreadCountKey)
       <v-icon icon="fas fa-plus" />
     </po-button>
 
-    <template v-if="!$helper.auth()">
+    <template v-if="!auth()">
       <po-button value="login" :href="route('login')" :title="$t('accounts.login-alt')" inertia>
         <v-icon icon="fas fa-arrow-right-to-bracket" />
       </po-button>
@@ -45,7 +47,7 @@ const unreadCount = injectStrict(unreadCountKey)
         @click.prevent="mobileUserMenu = !mobileUserMenu"
       >
         <po-badge :count="unreadCount">
-          <po-avatar size="24" color="secondary" :user="$helper.authUser()!" />
+          <po-avatar size="24" color="secondary" :user="authUser()!" />
         </po-badge>
       </po-button>
 

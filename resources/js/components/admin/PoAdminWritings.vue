@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import { useServerTable } from '@/composables/useServerTable'
+import { useFormatting } from '@/composables/useFormatting'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { UserLike } from '@/types/models'
@@ -22,6 +23,7 @@ interface WritingAdmin {
 }
 
 const { t } = useI18n()
+const { userDisplayName, toLocaleDate } = useFormatting()
 const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
 const headers: DataTableHeader[] = [
   { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
@@ -51,11 +53,11 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>
       @update:options="loadItems"
     >
       <template v-slot:item.author="{ item }">
-        {{ $helper.userDisplayName(item.author) }}
+        {{ userDisplayName(item.author) }}
       </template>
 
       <template v-slot:item.created_at="{ item }">
-        {{ $helper.toLocaleDate(item.created_at) }}
+        {{ toLocaleDate(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">

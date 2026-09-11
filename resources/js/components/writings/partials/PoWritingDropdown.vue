@@ -2,7 +2,9 @@
 import { provide, ref } from 'vue'
 import { blockerKey, complainerKey, sharerKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
 
+const { auth, authUser, canEdit } = useAuth()
 const writing = injectStrict(writingKey)
 const sharer = ref(false)
 const complainer = ref(false)
@@ -53,7 +55,7 @@ function share() {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <template v-if="$helper.canEdit(writing.author)">
+      <template v-if="canEdit(writing.author)">
         <po-list-item
           :href="route('writings.edit', [writing.slug])"
           prepend-icon="fas fa-pen-to-square"
@@ -68,7 +70,7 @@ function share() {
         <span>{{ $t('complaints.report-writing') }}</span>
       </po-list-item>
 
-      <template v-if="$helper.auth() && $helper.authUser()!.username !== writing.author.username">
+      <template v-if="auth() && authUser()!.username !== writing.author.username">
         <v-divider class="my-0"></v-divider>
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>

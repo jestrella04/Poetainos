@@ -7,17 +7,20 @@ import Pusher from 'pusher-js'
 import '@khmyznikov/pwa-install'
 import {
   forceSnackBarKey,
-  helperKey,
   loginModalKey,
   mobileSiteMenuKey,
   mobileUserMenuKey,
   snackBarKey,
   unreadCountKey
 } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useSnackbar } from '@/composables/useSnackbar'
 
 const page = computed(() => usePage())
-const helper = injectStrict(helperKey)
+const { auth, authUser, admin } = useAuth()
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { getSnackBar } = useSnackbar()
 const theme = useTheme()
 const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
@@ -62,17 +65,17 @@ provide(loginModalKey, loginModal)
 onMounted(() => {
   getFlashMessages()
 
-  if (helper.auth() && 'setAppBadge' in navigator) {
+  if (auth() && 'setAppBadge' in navigator) {
     void navigator.setAppBadge(unreadCount.value)
   }
 
   // Listen for new user notification events coming from the server
-  if (helper.auth()) {
-    const authUser = helper.authUser()
+  if (auth()) {
+    const user = authUser()
 
-    if (authUser) {
+    if (user) {
       echo
-        .private(`notifications.${authUser.id}`)
+        .private(`notifications.${user.id}`)
         .listen('NotificationEvent', (payload: { notifications: { unread: number } }) => {
           unreadCount.value = payload.notifications.unread
 
@@ -96,18 +99,18 @@ watch(forceSnackBar, () => {
 })
 
 function getFlashMessages() {
-  const snack = helper.getSnackBar()
+  const snack = getSnackBar()
   const flash = page.value.props.flash.message
 
   // Check for client side flash messages
-  if (snack !== null && !helper.isEmpty(snack)) {
+  if (snack !== null && !isEmpty(snack)) {
     snackBar.message = snack.message ?? snackBar.message
     snackBar.active = snack.active ?? snackBar.active
     snackBar.color = snack.color ?? snackBar.color
   }
 
   // Check for server side flash messages
-  if (flash !== null && !helper.strNullOrEmpty(flash)) {
+  if (flash !== null && !strNullOrEmpty(flash)) {
     snackBar.message = flash
     snackBar.active = true
     snackBar.color = 'primary'
@@ -332,7 +335,7 @@ code {
           </po-tab>
         </v-tabs>
 
-        <div v-if="!$helper.auth()" class="align-self-center">
+        <div v-if="!auth()" class="align-self-center">
           <po-button
             prepend-icon="fas fa-arrow-right-to-bracket"
             variant="tonal"
@@ -349,7 +352,7 @@ code {
             <template v-slot:activator="{ props }">
               <po-button icon v-bind="props" style="font-size: 0.7rem">
                 <po-badge :count="unreadCount">
-                  <po-avatar size="32" color="secondary" :user="$helper.authUser()!" />
+                  <po-avatar size="32" color="secondary" :user="authUser()!" />
                 </po-badge>
               </po-button>
             </template>
@@ -366,7 +369,7 @@ code {
               </po-list-item>
               <v-divider class="my-0"></v-divider>
 
-              <template v-if="$helper.admin()">
+              <template v-if="admin()">
                 <po-list-item :href="route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
                   <span>{{ $t('main.administration') }}</span>
                 </po-list-item>

@@ -2,12 +2,14 @@
 import { provide, ref } from 'vue'
 import PoCommentsDelete from './PoCommentsDelete.vue'
 import { blockerKey, complainerKey, isDeleteKey } from '@/composables/keys'
+import { useAuth } from '@/composables/useAuth'
 import type { Comment } from '@/types/models'
 
 defineProps<{
   comment: Comment
 }>()
 
+const { auth, authUser, canEdit } = useAuth()
 const complainer = ref(false)
 const blocker = ref(false)
 const isDelete = ref(false)
@@ -36,7 +38,7 @@ provide(isDeleteKey, isDelete)
     </template>
 
     <v-list>
-      <template v-if="$helper.canEdit(comment.author)">
+      <template v-if="canEdit(comment.author)">
         <po-list-item prepend-icon="fas fa-eraser" @click.prevent="isDelete = true">
           <span>{{ $t('comments.delete-comment') }}</span>
         </po-list-item>
@@ -47,7 +49,7 @@ provide(isDeleteKey, isDelete)
         <span>{{ $t('complaints.report-comment') }}</span>
       </po-list-item>
 
-      <template v-if="$helper.auth() && $helper.authUser()!.username !== comment.author.username">
+      <template v-if="auth() && authUser()!.username !== comment.author.username">
         <v-divider class="my-0"></v-divider>
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>

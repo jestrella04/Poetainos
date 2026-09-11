@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { mobileUserMenuKey, unreadCountKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
 
+const { admin } = useAuth()
 const unreadCount = injectStrict(unreadCountKey)
 const mobileUserMenu = injectStrict(mobileUserMenuKey)
 </script>
@@ -22,7 +24,7 @@ const mobileUserMenu = injectStrict(mobileUserMenuKey)
           </po-list-item>
           <v-divider class="my-0"></v-divider>
 
-          <template v-if="$helper.admin()">
+          <template v-if="admin()">
             <po-list-item :href="route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
               <span>{{ $t('main.administration') }}</span>
             </po-list-item>

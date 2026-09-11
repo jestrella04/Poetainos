@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
-import { blockerKey, forceSnackBarKey, helperKey } from '@/composables/keys'
+import { blockerKey, forceSnackBarKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useFormatting } from '@/composables/useFormatting'
+import { useSnackbar } from '@/composables/useSnackbar'
 import type { UserLike } from '@/types/models'
 
 const props = defineProps<{
   user: UserLike
 }>()
 
-const helper = injectStrict(helperKey)
+const { userDisplayName } = useFormatting()
+const { setSnackBar } = useSnackbar()
 const blocker = injectStrict(blockerKey)
 const isPosting = ref(false)
 const errors = ref(false)
@@ -30,7 +33,7 @@ async function submit() {
       user: props.user.username
     })
     .then(() => {
-      helper.setSnackBar({
+      setSnackBar({
         message: 'users.user-blocked',
         color: 'success',
         active: true
@@ -56,7 +59,7 @@ async function submit() {
       <v-card-text>
         <p>
           {{ $t('accounts.block-user-warning') }}
-          {{ $t('users.block-user-ask', { name: $helper.userDisplayName(user) }) }}
+          {{ $t('users.block-user-ask', { name: userDisplayName(user) }) }}
         </p>
 
         <v-divider class="mt-3"></v-divider>

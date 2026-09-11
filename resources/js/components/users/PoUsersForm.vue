@@ -2,8 +2,10 @@
 import { provide, reactive, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
-import { formDataKey, helperKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { formDataKey } from '@/composables/keys'
+import { useAuth } from '@/composables/useAuth'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormValidation } from '@/composables/useFormValidation'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
@@ -37,7 +39,9 @@ interface PostedResult {
 }
 
 const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
-const helper = injectStrict(helperKey)
+const { authUser, admin } = useAuth()
+const { isEmpty } = useTypeGuards()
+const { checkFormValidity } = useFormValidation()
 
 const user = page.props.user
 const formData = reactive({
@@ -98,7 +102,7 @@ async function submitForm() {
 
   clearErrors()
 
-  if (!form || !helper.checkFormValidity(form)) {
+  if (!form || !checkFormValidity(form)) {
     return
   }
 
@@ -170,7 +174,7 @@ function file() {
           ></v-file-input>
         </div>
 
-        <template v-if="$helper.admin()">
+        <template v-if="admin()">
           <v-select
             v-model="formData.role"
             :label="$t('main.role')"
@@ -339,9 +343,7 @@ function file() {
           clearable
         ></v-text-field>
 
-        <po-agreement
-          v-if="!page.props.agreement && user.id === $helper.authUser()!.id"
-        ></po-agreement>
+        <po-agreement v-if="!page.props.agreement && user.id === authUser()!.id"></po-agreement>
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
           <template v-if="isPosting"
@@ -352,7 +354,7 @@ function file() {
       </v-form>
 
       <v-alert
-        v-if="!helper.isEmpty(isPosted)"
+        v-if="!isEmpty(isPosted)"
         type="success"
         variant="tonal"
         class="mb-5 mx-auto"

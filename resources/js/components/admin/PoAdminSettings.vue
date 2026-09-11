@@ -3,8 +3,7 @@ import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import axios from 'axios'
-import { helperKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { useFormValidation } from '@/composables/useFormValidation'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
@@ -12,7 +11,7 @@ defineOptions({
   layout: PoLayoutAdmin
 })
 
-const helper = injectStrict(helperKey)
+const { checkFormValidity } = useFormValidation()
 const page = computed(() => usePage<InertiaPageProps<{ settings: string }>>())
 const settings = ref(page.value.props.settings)
 const isPosting = ref(false)
@@ -22,7 +21,7 @@ const errors = ref<LaravelValidationErrors>({})
 function submitForm() {
   const form = document.querySelector<HTMLFormElement>('#settings-form')
 
-  if (!form || !helper.checkFormValidity(form)) {
+  if (!form || !checkFormValidity(form)) {
     return
   }
 

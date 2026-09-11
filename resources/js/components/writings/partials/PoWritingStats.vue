@@ -2,11 +2,18 @@
 import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
-import { helperKey, loginModalKey, writingKey } from '@/composables/keys'
+import { loginModalKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
+import { useAnimation } from '@/composables/useAnimation'
 
 const page = computed(() => usePage())
-const helper = injectStrict(helperKey)
+const { auth, authUser } = useAuth()
+const { strNullOrEmpty } = useTypeGuards()
+const { readable } = useFormatting()
+const { animate } = useAnimation()
 const writing = injectStrict(writingKey)
 const liked = page.value.props.auth.liked.writings.includes(writing.id)
 const shelved = page.value.props.auth.shelved.includes(writing.id)
@@ -21,7 +28,7 @@ async function like(event: MouseEvent) {
     return
   }
 
-  if (helper.auth() && helper.authUser()!.username !== writing.author.username) {
+  if (auth() && authUser()!.username !== writing.author.username) {
     await axios
       .post<{ count: number; method: 'store' | 'destroy' }>(
         route('likes.store', ['writing', writing.id])
@@ -40,10 +47,10 @@ async function like(event: MouseEvent) {
         const icon = doer.querySelector<HTMLElement>('i')
 
         if (icon) {
-          void helper.animate(icon, 'heartBeat')
+          void animate(icon, 'heartBeat')
         }
       })
-  } else if (!helper.auth()) {
+  } else if (!auth()) {
     loginModal.value = true
   }
 }
@@ -55,7 +62,7 @@ async function shelf(event: MouseEvent) {
     return
   }
 
-  if (helper.auth() && helper.authUser()!.username !== writing.author.username) {
+  if (auth() && authUser()!.username !== writing.author.username) {
     await axios
       .post<{ count: number; method: 'store' | 'destroy' }>(route('shelves.store', writing.slug))
       .then((response) => {
@@ -72,10 +79,10 @@ async function shelf(event: MouseEvent) {
         const icon = doer.querySelector<HTMLElement>('i')
 
         if (icon) {
-          void helper.animate(icon, 'heartBeat')
+          void animate(icon, 'heartBeat')
         }
       })
-  } else if (!helper.auth()) {
+  } else if (!auth()) {
     loginModal.value = true
   }
 }
@@ -84,7 +91,7 @@ async function shelf(event: MouseEvent) {
 <template>
   <div class="d-flex justify-center ga-8 mx-auto text-medium-emphasis text-caption text-center">
     <div
-      v-if="!$helper.strNullOrEmpty(writing.home_posted_at)"
+      v-if="!strNullOrEmpty(writing.home_posted_at)"
       class="d-flex flex-column"
       :title="$t('writings.awarded')"
     >
@@ -99,7 +106,7 @@ async function shelf(event: MouseEvent) {
       @click="like"
     >
       <div><v-icon icon="fas fa-heart"></v-icon></div>
-      <div>{{ $helper.readable(likesCount) }}</div>
+      <div>{{ readable(likesCount) }}</div>
     </div>
 
     <div
@@ -107,12 +114,12 @@ async function shelf(event: MouseEvent) {
       :title="$t('main.count-comments', { count: writing.comments_count })"
     >
       <div><v-icon icon="fas fa-comment"></v-icon></div>
-      <div>{{ $helper.readable(writing.comments_count) }}</div>
+      <div>{{ readable(writing.comments_count) }}</div>
     </div>
 
     <div class="d-flex flex-column" :title="$t('main.count-views', { count: writing.views })">
       <div><v-icon icon="fas fa-book-reader"></v-icon></div>
-      <div>{{ $helper.readable(writing.views) }}</div>
+      <div>{{ readable(writing.views) }}</div>
     </div>
 
     <div
@@ -122,7 +129,7 @@ async function shelf(event: MouseEvent) {
       @click="shelf"
     >
       <div><v-icon icon="fas fa-bookmark"></v-icon></div>
-      <div>{{ $helper.readable(shelfCount) }}</div>
+      <div>{{ readable(shelfCount) }}</div>
     </div>
 
     <div class="d-flex flex-column" :title="$t('main.aura-value', { aura: writing.aura })">

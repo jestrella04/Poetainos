@@ -4,15 +4,20 @@ import { router, usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import { useSwipe } from '@vueuse/core'
 import type { UseSwipeDirection } from '@vueuse/core'
-import { helperKey, unreadCountKey } from '@/composables/keys'
+import { unreadCountKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
+import { useNotificationMessage } from '@/composables/useNotificationMessage'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { AppNotification, Paginated } from '@/types/models'
 
 type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
 
 const page = computed(() => usePage<InertiaPageProps<{ tab: string }>>())
-const helper = injectStrict(helperKey)
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { relativeDate } = useFormatting()
+const { notificationMessage } = useNotificationMessage()
 const notifications = ref<AppNotification[]>([])
 const next = ref('')
 const unreadCount = injectStrict(unreadCountKey)
@@ -34,7 +39,7 @@ useSwipe(target, {
 })
 
 async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
-  if (!helper.strNullOrEmpty(next.value)) {
+  if (!strNullOrEmpty(next.value)) {
     await axios
       .get<Paginated<AppNotification>>(next.value)
       .then((response) => {
@@ -118,7 +123,7 @@ function update(notificationsData: AppNotification[], nextPage: string | null) {
       ></po-loading>
     </template>
 
-    <template v-else-if="!$helper.isEmpty(notifications)">
+    <template v-else-if="!isEmpty(notifications)">
       <template v-if="'unread' === page.props.tab">
         <div class="mb-3 text-right">
           <po-button
@@ -148,11 +153,11 @@ function update(notificationsData: AppNotification[], nextPage: string | null) {
               </div>
               <div class="w-100">
                 <p class="text-caption font-weight-medium">
-                  {{ $helper.relativeDate(notification.created_at) }}
+                  {{ relativeDate(notification.created_at) }}
                 </p>
                 <div class="d-flex w-100 justify-space-between">
                   <div>
-                    <p>{{ $helper.notificationMessage(notification, $t) }}.</p>
+                    <p>{{ notificationMessage(notification, $t) }}.</p>
                     <p
                       v-if="notification.notifier_writing !== null"
                       class="text-caption text-disabled"

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import { useFormatting } from '@/composables/useFormatting'
 import type { InertiaPageProps } from '@/types/inertia'
 
 defineOptions({
@@ -13,6 +14,7 @@ interface Counter {
   count: number
 }
 
+const { readable } = useFormatting()
 const page = computed(() => usePage<InertiaPageProps<{ counters: Record<string, Counter> }>>())
 const counters = page.value.props.counters
 </script>
@@ -31,7 +33,7 @@ const counters = page.value.props.counters
     <div class="d-flex flex-wrap ga-5">
       <template v-for="counter in counters" :key="counter.title">
         <v-card color="primary" class="counter pa-5" rounded>
-          <p class="text-h3">{{ $helper.readable(counter.count) }}</p>
+          <p class="text-h3">{{ readable(counter.count) }}</p>
           <span class="text-caption">{{ counter.title }}</span>
         </v-card>
       </template>

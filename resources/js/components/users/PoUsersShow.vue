@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoUsersEntry from './PoUsersEntry.vue'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { User } from '@/types/models'
 
@@ -23,6 +25,8 @@ interface UsersShowProps {
   }
 }
 
+const { isEmpty } = useTypeGuards()
+const { userDisplayName, relativeDate } = useFormatting()
 const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
 </script>
 
@@ -46,7 +50,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-card v-if="!$helper.isEmpty(page.props.writings.from_author)" class="mb-6">
+          <v-card v-if="!isEmpty(page.props.writings.from_author)" class="mb-6">
             <v-card-text class="mt-3">
               <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-author') }}</p>
 
@@ -61,15 +65,15 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
                   </po-link>
 
                   <p class="text-caption text-disabled">
-                    {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                    {{ $helper.relativeDate(writing.created_at) }}
+                    {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
+                    {{ relativeDate(writing.created_at) }}
                   </p>
                 </div>
               </template>
             </v-card-text>
           </v-card>
 
-          <v-card v-if="!$helper.isEmpty(page.props.writings.from_shelf)" class="mb-6">
+          <v-card v-if="!isEmpty(page.props.writings.from_shelf)" class="mb-6">
             <v-card-text>
               <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-shelf') }}</p>
 
@@ -84,15 +88,15 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
                   </po-link>
 
                   <p class="text-caption text-disabled">
-                    {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                    {{ $helper.relativeDate(writing.created_at) }}
+                    {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
+                    {{ relativeDate(writing.created_at) }}
                   </p>
                 </div>
               </template>
             </v-card-text>
           </v-card>
 
-          <v-card v-if="!$helper.isEmpty(page.props.writings.from_liked)">
+          <v-card v-if="!isEmpty(page.props.writings.from_liked)">
             <v-card-text>
               <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-liked') }}</p>
 
@@ -107,8 +111,8 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
                   </po-link>
 
                   <p class="text-caption text-disabled">
-                    {{ $t('main.by-name', { name: $helper.userDisplayName(writing.author) }) }}
-                    {{ $helper.relativeDate(writing.created_at) }}
+                    {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
+                    {{ relativeDate(writing.created_at) }}
                   </p>
                 </div>
               </template>

@@ -2,15 +2,18 @@
 import { ref, reactive } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
-import { forceSnackBarKey, helperKey, isDeleteKey } from '@/composables/keys'
+import { forceSnackBarKey, isDeleteKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useFormValidation } from '@/composables/useFormValidation'
+import { useSnackbar } from '@/composables/useSnackbar'
 import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
 defineProps<{
   username: string
 }>()
 
-const helper = injectStrict(helperKey)
+const { checkFormValidity } = useFormValidation()
+const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
 const isPosting = ref(false)
 const errors = ref<LaravelValidationErrors>({})
@@ -22,7 +25,7 @@ const formData = reactive({
 async function submit() {
   const form = document.querySelector<HTMLFormElement>('#user-delete-form')
 
-  if (!form || !helper.checkFormValidity(form)) {
+  if (!form || !checkFormValidity(form)) {
     return
   }
 
@@ -41,7 +44,7 @@ async function submit() {
         })
         .then(() => {
           router.visit(route('home'))
-          helper.setSnackBar({
+          setSnackBar({
             message: 'accounts.account-deleted',
             color: 'success',
             active: true

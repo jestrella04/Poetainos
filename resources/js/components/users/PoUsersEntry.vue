@@ -3,11 +3,18 @@ import { computed, provide } from 'vue'
 import PoUsersStats from './partials/PoUsersStats.vue'
 import PoUserDropdown from './partials/PoUserDropdown.vue'
 import { userKey } from '@/composables/keys'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
+import { useSocialLinks } from '@/composables/useSocialLinks'
 import type { User } from '@/types/models'
 
 const props = defineProps<{
   data: User
 }>()
+
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { userDisplayName, relativeDate } = useFormatting()
+const { socialLink } = useSocialLinks()
 
 provide(userKey, props.data)
 
@@ -29,13 +36,13 @@ const socialLinks = computed<Record<string, string>>(() =>
           avatar-color="secondary"
         />
         <po-avatar v-else size="96" color="secondary" :user="data" />
-        <p class="font-weight-bold">{{ $helper.userDisplayName(data) }}</p>
+        <p class="font-weight-bold">{{ userDisplayName(data) }}</p>
         <p class="text-medium-emphasis">@{{ data.username }}</p>
       </div>
 
-      <template v-if="!$helper.strNullOrEmpty(data.website) || !$helper.isEmpty(socialLinks)">
+      <template v-if="!strNullOrEmpty(data.website) || !isEmpty(socialLinks)">
         <div class="d-flex flex-wrap justify-center ga-3 mb-5">
-          <template v-if="!$helper.strNullOrEmpty(data.website)">
+          <template v-if="!strNullOrEmpty(data.website)">
             <div>
               <po-button icon color="primary" size="x-small" :href="data.website" target="_blank">
                 <v-icon icon="fas fa-globe"></v-icon>
@@ -44,12 +51,12 @@ const socialLinks = computed<Record<string, string>>(() =>
           </template>
 
           <template v-for="(user, network) in socialLinks" :key="network">
-            <div v-if="!$helper.strNullOrEmpty(user)">
+            <div v-if="!strNullOrEmpty(user)">
               <po-button
                 icon
                 color="primary"
                 size="x-small"
-                :href="$helper.socialLink(user, network)"
+                :href="socialLink(user, network)"
                 target="_blank"
               >
                 <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`"></v-icon>
@@ -73,17 +80,17 @@ const socialLinks = computed<Record<string, string>>(() =>
 
   <v-card :subtitle="$t('main.more-info').toUpperCase()">
     <v-card-text>
-      <v-row v-if="!$helper.strNullOrEmpty(data.created_at)">
+      <v-row v-if="!strNullOrEmpty(data.created_at)">
         <v-col cols="12" md="4">
           <v-icon icon="fas fa-calendar" class="mr-2"></v-icon>
           {{ $t('main.registered') }}:
         </v-col>
         <v-col cols="12" md="8">
-          {{ $helper.relativeDate(data.created_at ?? '') }}
+          {{ relativeDate(data.created_at ?? '') }}
         </v-col>
       </v-row>
 
-      <v-row v-if="!$helper.strNullOrEmpty(data.location)">
+      <v-row v-if="!strNullOrEmpty(data.location)">
         <v-col cols="12" md="4">
           <v-icon icon="fas fa-map-marker-alt" class="mr-2"></v-icon>
           {{ $t('main.location') }}:
@@ -93,7 +100,7 @@ const socialLinks = computed<Record<string, string>>(() =>
         </v-col>
       </v-row>
 
-      <v-row v-if="!$helper.strNullOrEmpty(data.occupation)">
+      <v-row v-if="!strNullOrEmpty(data.occupation)">
         <v-col cols="12" md="4">
           <v-icon icon="fas fa-toolbox" class="mr-2"></v-icon>
           {{ $t('main.occupation') }}:
@@ -103,7 +110,7 @@ const socialLinks = computed<Record<string, string>>(() =>
         </v-col>
       </v-row>
 
-      <v-row v-if="!$helper.strNullOrEmpty(data.interests)">
+      <v-row v-if="!strNullOrEmpty(data.interests)">
         <v-col cols="12" md="4">
           <v-icon icon="fas fa-masks-theater" class="mr-2"></v-icon>
           {{ $t('main.interests') }}:</v-col

@@ -5,8 +5,7 @@ import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
 import { useSwipe } from '@vueuse/core'
 import type { UseSwipeDirection } from '@vueuse/core'
-import { helperKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { useTypeGuards } from '@/composables/useTypeGuards'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { Writing } from '@/types/models'
 
@@ -18,7 +17,7 @@ interface WritingsPage {
 }
 
 const page = computed(() => usePage<InertiaPageProps<{ sort: string; writings: WritingsPage }>>())
-const helper = injectStrict(helperKey)
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const writings = ref<Writing[]>([])
 const next = ref('')
 const fetched = ref(false)
@@ -39,7 +38,7 @@ useSwipe(target, {
 })
 
 async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
-  if (!helper.strNullOrEmpty(next.value)) {
+  if (!strNullOrEmpty(next.value)) {
     await axios
       .get<WritingsPage>(next.value)
       .then((response) => {
@@ -123,15 +122,12 @@ function update(writingsData: Writing[], nextPage: string | null) {
       <po-loading></po-loading>
     </template>
 
-    <template v-else-if="!$helper.isEmpty(writings)">
+    <template v-else-if="!isEmpty(writings)">
       <template v-for="writing in writings" :key="writing.slug">
         <po-writings-entry :alone="false" :data="writing" />
       </template>
 
-      <po-infinite-scroll
-        v-if="!$helper.strNullOrEmpty(next)"
-        @load="loadMore"
-      ></po-infinite-scroll>
+      <po-infinite-scroll v-if="!strNullOrEmpty(next)" @load="loadMore"></po-infinite-scroll>
     </template>
 
     <template v-else>

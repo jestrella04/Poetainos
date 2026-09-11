@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import PoUsersStats from './PoUsersStats.vue'
+import { useFormatting } from '@/composables/useFormatting'
 import type { User } from '@/types/models'
 
 defineProps<{
   data: User
 }>()
+
+const { userDisplayName } = useFormatting()
 </script>
 
 <template>
@@ -22,7 +25,7 @@ defineProps<{
         <div>
           <p class="font-weight-bold">
             <po-link :href="route('users.show', data.username)" class="stretched" inertia>
-              {{ $helper.userDisplayName(data) }}
+              {{ userDisplayName(data) }}
             </po-link>
           </p>
           <p class="text-medium-emphasis">@{{ data.username }}</p>

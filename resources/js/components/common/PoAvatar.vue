@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { helperKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
 import type { UserLike } from '@/types/models'
 
 const props = defineProps<{
   user: UserLike
 }>()
 
-const helper = injectStrict(helperKey)
+const { strNullOrEmpty } = useTypeGuards()
+const { storage, userDisplayName, userInitials } = useFormatting()
 
 const avatar = computed(() => {
   if (
@@ -31,10 +32,10 @@ const avatar = computed(() => {
 <template>
   <v-avatar>
     <v-img
-      v-if="!helper.strNullOrEmpty(avatar)"
-      :src="$helper.storage(avatar)"
-      :alt="$helper.userDisplayName(user)"
+      v-if="!strNullOrEmpty(avatar)"
+      :src="storage(avatar)"
+      :alt="userDisplayName(user)"
     ></v-img>
-    <span v-else>{{ $helper.userInitials(user) }}</span>
+    <span v-else>{{ userInitials(user) }}</span>
   </v-avatar>
 </template>

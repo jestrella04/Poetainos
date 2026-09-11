@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
-import { helperKey, replyBoxKey, writingKey } from '@/composables/keys'
+import { replyBoxKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useFormValidation } from '@/composables/useFormValidation'
 import type { ValidationError } from '@/types/http'
 
 const props = defineProps<{
@@ -13,7 +14,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   commentPosted: []
 }>()
-const helper = injectStrict(helperKey)
+const { checkFormValidity } = useFormValidation()
 const writing = injectStrict(writingKey)
 const message = ref(props.replyTo)
 const errorMessages = ref<string[]>([])
@@ -22,7 +23,7 @@ const replyBox = injectStrict(replyBoxKey)
 async function submitForm() {
   const form = document.querySelector<HTMLFormElement>(`#${props.formId}`)
 
-  if (!form || !helper.checkFormValidity(form)) {
+  if (!form || !checkFormValidity(form)) {
     return
   }
 

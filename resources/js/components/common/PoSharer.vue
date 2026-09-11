@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { helperKey, sharerKey } from '@/composables/keys'
+import { sharerKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useSocialLinks } from '@/composables/useSocialLinks'
+import { useFormatting } from '@/composables/useFormatting'
 
 const props = defineProps<{
   linkTitle: string
   linkUrl: string
 }>()
 
-const helper = injectStrict(helperKey)
+const { shareLinks } = useSocialLinks()
+const { cropUrl } = useFormatting()
 const sharer = injectStrict(sharerKey)
-const social = helper.shareLinks(props.linkTitle, props.linkUrl)
+const social = shareLinks(props.linkTitle, props.linkUrl)
 
 function copy(event: MouseEvent) {
   const target = event.target as HTMLElement
@@ -30,7 +33,7 @@ function copy(event: MouseEvent) {
       <po-modal-close @click.prevent="sharer = false"></po-modal-close>
       <v-card-text class="text-center">
         <p class="text-bold">{{ linkTitle }}</p>
-        <p class="text-disabled">{{ $helper.cropUrl(linkUrl) }}</p>
+        <p class="text-disabled">{{ cropUrl(linkUrl) }}</p>
       </v-card-text>
 
       <div class="d-flex flex-wrap pa-5 ga-3 w-100 justify-center">

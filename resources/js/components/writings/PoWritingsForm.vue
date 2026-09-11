@@ -3,8 +3,9 @@ import { provide, reactive, computed, ref, watch, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoWritingDelete from './partials/PoWritingDelete.vue'
-import { formDataKey, helperKey, isDeleteKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { formDataKey, isDeleteKey } from '@/composables/keys'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormValidation } from '@/composables/useFormValidation'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
@@ -39,7 +40,8 @@ interface PostedResult {
 }
 
 const page = computed(() => usePage<InertiaPageProps<WritingFormProps>>())
-const helper = injectStrict(helperKey)
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { checkFormValidity } = useFormValidation()
 const writing = page.value.props.writing
 const formData = reactive({
   title: (writing.data.title ??= ''),
@@ -65,7 +67,7 @@ provide(isDeleteKey, isDelete)
 
 onMounted(() => {
   // Is the user updating?
-  isUpdate.value = !helper.strNullOrEmpty(writing.data.title)
+  isUpdate.value = !strNullOrEmpty(writing.data.title)
 
   // If updating, trigger category update
   if (isUpdate.value) {
@@ -111,7 +113,7 @@ async function submitForm() {
 
   clearErrors()
 
-  if (!form || !helper.checkFormValidity(form)) {
+  if (!form || !checkFormValidity(form)) {
     return
   }
 
@@ -301,7 +303,7 @@ function resetForm() {
       </v-form>
 
       <v-alert
-        v-if="!helper.isEmpty(isPosted)"
+        v-if="!isEmpty(isPosted)"
         id="writing-alert"
         type="success"
         variant="tonal"

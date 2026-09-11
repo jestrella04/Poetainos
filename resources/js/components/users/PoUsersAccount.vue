@@ -3,17 +3,20 @@ import { ref, provide, reactive } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
-import { helperKey, isDeleteKey, pushKey } from '@/composables/keys'
+import { isDeleteKey, pushKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
+import { useFormatting } from '@/composables/useFormatting'
 import type { InertiaPageProps } from '@/types/inertia'
 
 const page = usePage<InertiaPageProps<{ notifications?: { email: boolean } }>>()
-const helper = injectStrict(helperKey)
+const { authUser } = useAuth()
+const { userDisplayName } = useFormatting()
 const push = injectStrict(pushKey)
 
 // This page is behind the `verified` auth middleware (routes/web.php), so
 // the authenticated user is always present here.
-const username = helper.authUser()!.username
+const username = authUser()!.username
 const isDelete = ref(false)
 const notifications = reactive({
   email: page.props.notifications?.email ?? true,
@@ -74,20 +77,20 @@ function pusher() {
         <div class="d-flex mb-5 pos-relative">
           <div class="d-flex ga-4 mb-2">
             <div>
-              <po-avatar size="48" color="secondary" :user="$helper.authUser()!" />
+              <po-avatar size="48" color="secondary" :user="authUser()!" />
             </div>
 
             <div>
               <p class="font-weight-bold">
                 <po-link
-                  :href="route('users.show', $helper.authUser()!.username)"
+                  :href="route('users.show', authUser()!.username)"
                   class="stretched"
                   inertia
                 >
-                  {{ $helper.userDisplayName($helper.authUser()!) }}
+                  {{ userDisplayName(authUser()!) }}
                 </po-link>
               </p>
-              <p class="text-medium-emphasis">@{{ $helper.authUser()!.username }}</p>
+              <p class="text-medium-emphasis">@{{ authUser()!.username }}</p>
             </div>
           </div>
         </div>

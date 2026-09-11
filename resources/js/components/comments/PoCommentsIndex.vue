@@ -4,18 +4,19 @@ import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoCommentsForm from './PoCommentsForm.vue'
 import PoCommentsDropdown from './PoCommentsDropdown.vue'
-import {
-  helperKey,
-  loadingCommentsKey,
-  loginModalKey,
-  replyBoxKey,
-  writingKey
-} from '@/composables/keys'
+import { loadingCommentsKey, loginModalKey, replyBoxKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
+import { useAnimation } from '@/composables/useAnimation'
 import type { Comment, Paginated } from '@/types/models'
 
 const page = computed(() => usePage())
-const helper = injectStrict(helperKey)
+const { auth } = useAuth()
+const { isEmpty } = useTypeGuards()
+const { userDisplayName, toLocaleDate, linkify, readable } = useFormatting()
+const { animate } = useAnimation()
 const comments = ref<Partial<Paginated<Comment>>>({})
 const loadingComments = injectStrict(loadingCommentsKey)
 const writing = injectStrict(writingKey)
@@ -42,14 +43,14 @@ async function like(event: MouseEvent, id: number) {
     return
   }
 
-  if (helper.auth()) {
+  if (auth()) {
     await axios
       .post<{ count: number; method: 'store' | 'destroy' }>(route('likes.store', ['comment', id]))
       .then((response) => {
         const countEl = doer.querySelector<HTMLElement>('span.count')
 
         if (countEl) {
-          countEl.textContent = helper.readable(response.data.count)
+          countEl.textContent = readable(response.data.count)
         }
 
         if ('store' === response.data.method) {
@@ -63,7 +64,7 @@ async function like(event: MouseEvent, id: number) {
         const icon = doer.querySelector<HTMLElement>('i')
 
         if (icon) {
-          void helper.animate(icon, 'heartBeat')
+          void animate(icon, 'heartBeat')
         }
       })
   } else {
@@ -72,7 +73,7 @@ async function like(event: MouseEvent, id: number) {
 }
 
 function toggleReply(commentId: number) {
-  if (helper.auth()) {
+  if (auth()) {
     if (replyBox.value === commentId) {
       replyBox.value = 0
     } else {
@@ -98,11 +99,11 @@ function reply(comment: Comment) {
 <template>
   <po-wrapper class="my-5">
     <div class="mb-5">
-      <po-inline-login v-if="!$helper.auth()" :message="$t('accounts.login-before-comment')" />
+      <po-inline-login v-if="!auth()" :message="$t('accounts.login-before-comment')" />
       <po-comments-form v-else form-id="comment-form" @comment-posted="loadComments" />
     </div>
 
-    <template v-if="!$helper.isEmpty(comments.data)">
+    <template v-if="!isEmpty(comments.data)">
       <p class="text-h6 mb-3">{{ $t('comments.comments') }}</p>
 
       <template v-for="comment in comments.data" :key="comment.id">
@@ -113,9 +114,9 @@ function reply(comment: Comment) {
                 <po-avatar size="40" color="secondary" :user="comment.author" />
 
                 <div class="">
-                  <p class="text-caption mb-0">{{ $helper.userDisplayName(comment.author) }}</p>
+                  <p class="text-caption mb-0">{{ userDisplayName(comment.author) }}</p>
                   <p class="text-caption mb-2 text-medium-emphasis">
-                    {{ $helper.toLocaleDate(comment.created_at) }}
+                    {{ toLocaleDate(comment.created_at) }}
                   </p>
                 </div>
               </div>
@@ -125,7 +126,7 @@ function reply(comment: Comment) {
               </div>
             </div>
 
-            <div v-html="$helper.linkify(comment.message)"></div>
+            <div v-html="linkify(comment.message)"></div>
           </v-card-text>
 
           <v-card-actions class="justify-end">
@@ -141,7 +142,7 @@ function reply(comment: Comment) {
               "
             >
               <v-icon class="me-2" icon="fas fa-heart"></v-icon>
-              <span class="count">{{ helper.readable(comment.likes_count) }}</span>
+              <span class="count">{{ readable(comment.likes_count) }}</span>
             </po-button>
 
             <po-button variant="tonal" size="small" @click.prevent="toggleReply(comment.id)">
@@ -150,7 +151,7 @@ function reply(comment: Comment) {
             </po-button>
           </v-card-actions>
 
-          <template v-if="$helper.auth() && replyBox === comment.id">
+          <template v-if="auth() && replyBox === comment.id">
             <div id="" class="reply-box pa-3">
               <po-comments-form
                 :form-id="`reply-${comment.id}-form`"

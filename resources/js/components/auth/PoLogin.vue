@@ -3,15 +3,17 @@ import { ref, reactive, provide, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
-import { formDataKey, helperKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
+import { formDataKey } from '@/composables/keys'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useSnackbar } from '@/composables/useSnackbar'
 import type { ValidationError } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutLogin
 })
 
-const helper = injectStrict(helperKey)
+const { strNullOrEmpty } = useTypeGuards()
+const { setSnackBar } = useSnackbar()
 const isLoading = ref(false)
 const isEmail = ref(false)
 const isReset = ref(false)
@@ -44,7 +46,7 @@ onMounted(() => {
 
     const email = params.get('email')
 
-    if (email !== null && !helper.strNullOrEmpty(email)) {
+    if (email !== null && !strNullOrEmpty(email)) {
       formData.email = email
       shouldLogin.value = true
     }
@@ -133,7 +135,7 @@ async function submitForm() {
         password: formData.password
       })
       .then((response) => {
-        helper.setSnackBar({
+        setSnackBar({
           message: 'accounts.welcome-back',
           color: 'primary',
           active: true

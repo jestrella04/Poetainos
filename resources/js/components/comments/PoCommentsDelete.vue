@@ -2,15 +2,16 @@
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
-import { forceSnackBarKey, helperKey, isDeleteKey, writingKey } from '@/composables/keys'
+import { forceSnackBarKey, isDeleteKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useSnackbar } from '@/composables/useSnackbar'
 import type { Comment } from '@/types/models'
 
 defineProps<{
   comment: Comment
 }>()
 
-const helper = injectStrict(helperKey)
+const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
 const isPosting = ref(false)
 const errors = ref(false)
@@ -33,7 +34,7 @@ async function submit() {
     })
     .then(() => {
       router.visit(route('writings.show', writing.slug))
-      helper.setSnackBar({
+      setSnackBar({
         message: 'comments.comment-deleted',
         color: 'success',
         active: true
