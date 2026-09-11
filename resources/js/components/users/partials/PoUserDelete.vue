@@ -1,31 +1,33 @@
-<script setup>
-import { ref, inject } from 'vue'
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
-import { reactive } from 'vue'
+import { forceSnackBarKey, helperKey, isDeleteKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
-defineProps({
-  username: { type: String, required: true }
-})
+defineProps<{
+  username: string
+}>()
 
-const helper = inject('helper')
-const isDelete = inject('isDelete')
+const helper = injectStrict(helperKey)
+const isDelete = injectStrict(isDeleteKey)
 const isPosting = ref(false)
-const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
+const errors = ref<LaravelValidationErrors>({})
+const forceSnackBar = injectStrict(forceSnackBarKey)
 const formData = reactive({
   password: ''
 })
 
 async function submit() {
-  const form = document.querySelector('#user-delete-form')
+  const form = document.querySelector<HTMLFormElement>('#user-delete-form')
 
-  if (!helper.checkFormValidity(form)) {
+  if (!form || !helper.checkFormValidity(form)) {
     return
   }
 
   isPosting.value = true
-  errors.value = false
+  errors.value = {}
 
   await axios
     .post(route('password.confirmer'), {
@@ -33,7 +35,7 @@ async function submit() {
       password: formData.password
     })
     .then(() => {
-      axios
+      void axios
         .post(form.action, {
           _method: 'DELETE'
         })
@@ -48,11 +50,9 @@ async function submit() {
           forceSnackBar.value = true
           isDelete.value = false
         })
-        .catch()
-        .finally()
     })
-    .catch((error) => {
-      errors.value = error.response.data.errors
+    .catch((error: ValidationError) => {
+      errors.value = error.response?.data.errors ?? {}
     })
     .finally(() => {
       isPosting.value = false

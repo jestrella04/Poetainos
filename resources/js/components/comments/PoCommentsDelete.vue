@@ -1,21 +1,28 @@
-<script setup>
-import { ref, inject } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
+import { forceSnackBarKey, helperKey, isDeleteKey, writingKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { Comment } from '@/types/models'
 
-defineProps({
-  comment: { type: Object, required: true }
-})
+defineProps<{
+  comment: Comment
+}>()
 
-const helper = inject('helper')
-const isDelete = inject('isDelete')
+const helper = injectStrict(helperKey)
+const isDelete = injectStrict(isDeleteKey)
 const isPosting = ref(false)
 const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
-const writing = inject('writing')
+const forceSnackBar = injectStrict(forceSnackBarKey)
+const writing = injectStrict(writingKey)
 
 async function submit() {
-  const form = document.querySelector('#comment-delete-form')
+  const form = document.querySelector<HTMLFormElement>('#comment-delete-form')
+
+  if (!form) {
+    return
+  }
 
   isPosting.value = true
   errors.value = false

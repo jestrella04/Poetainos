@@ -1,7 +1,9 @@
-<script setup>
-defineProps({
-  data: { type: Object, required: true }
-})
+<script setup lang="ts">
+import type { User } from '@/types/models'
+
+defineProps<{
+  data: User
+}>()
 </script>
 
 <template>

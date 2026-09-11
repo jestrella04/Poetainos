@@ -1,30 +1,34 @@
-<script setup>
-import { computed, ref, inject } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import axios from 'axios'
+import { helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const helper = inject('helper')
-const page = computed(() => usePage())
+const helper = injectStrict(helperKey)
+const page = computed(() => usePage<InertiaPageProps<{ settings: string }>>())
 const settings = ref(page.value.props.settings)
 const isPosting = ref(false)
 const isPosted = ref(false)
-const errors = ref([])
+const errors = ref<LaravelValidationErrors>({})
 
 function submitForm() {
-  const form = document.querySelector('#settings-form')
+  const form = document.querySelector<HTMLFormElement>('#settings-form')
 
-  if (!helper.checkFormValidity(form)) {
+  if (!form || !helper.checkFormValidity(form)) {
     return
   }
 
   isPosting.value = true
 
-  axios
+  void axios
     .post(form.action, {
       _method: 'PUT',
       json: settings.value
@@ -32,14 +36,14 @@ function submitForm() {
     .then(() => {
       isPosted.value = true
     })
-    .catch((error) => {
-      errors.value = error.response.data.errors
+    .catch((error: ValidationError) => {
+      errors.value = error.response?.data.errors ?? {}
     })
-    .finally(
+    .finally(() => {
       setTimeout(() => {
         isPosting.value = false
       }, 1000)
-    )
+    })
 }
 </script>
 

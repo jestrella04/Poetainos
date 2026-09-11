@@ -1,19 +1,26 @@
-<script setup>
+<script setup lang="ts">
 import { ref, provide } from 'vue'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
 import PoWritingStats from './partials/PoWritingStats.vue'
 import PoWritingDropdown from './partials/PoWritingDropdown.vue'
+import { loadingCommentsKey, writingKey } from '@/composables/keys'
+import type { UserLike, Writing } from '@/types/models'
 
-const props = defineProps({
-  alone: { type: Boolean, default: true },
-  data: { type: Object, required: true },
-  likers: Object
-})
+const props = withDefaults(
+  defineProps<{
+    alone?: boolean
+    data: Writing
+    likers?: UserLike[]
+  }>(),
+  {
+    alone: true
+  }
+)
 
 const loadingComments = ref(true)
 
-provide('loadingComments', loadingComments)
-provide('writing', props.data)
+provide(loadingCommentsKey, loadingComments)
+provide(writingKey, props.data)
 </script>
 
 <style scoped>
@@ -32,12 +39,12 @@ provide('writing', props.data)
     <v-card :class="{ 'pos-relative': true, 'writing-container': !alone }" elevation="2" rounded>
       <po-writing-dropdown></po-writing-dropdown>
       <template
-        v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)"
+        v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info?.cover)"
       >
         <v-img
           class="align-end text-white"
           height="200"
-          :src="$helper.storage(data.extra_info.cover)"
+          :src="$helper.storage(data.extra_info?.cover ?? '')"
           alt=""
           cover
         >
@@ -104,13 +111,13 @@ provide('writing', props.data)
 
           <template
             v-if="
-              !$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.link)
+              !$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info?.link)
             "
           >
             <div class="d-flex align-center mb-4">
               <v-icon icon="fas fa-link" size="24" class="mr-3"></v-icon>
-              <po-link :href="data.extra_info.link" target="_blank" rel="nofollow noopener">
-                {{ $helper.cropUrl(data.extra_info.link) }}
+              <po-link :href="data.extra_info?.link" target="_blank" rel="nofollow noopener">
+                {{ $helper.cropUrl(data.extra_info?.link ?? '') }}
               </po-link>
             </div>
           </template>
@@ -171,7 +178,7 @@ provide('writing', props.data)
                   <po-avatar size="48" color="secondary" :user="liker" />
                 </po-button>
               </div>
-              <div v-if="likers.length > 5">
+              <div v-if="(likers?.length ?? 0) > 5">
                 <v-avatar size="48" color="secondary" text="+" />
               </div>
             </div>

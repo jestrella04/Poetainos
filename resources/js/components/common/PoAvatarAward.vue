@@ -1,10 +1,12 @@
-<script setup>
-defineProps({
-  user: { type: Object, required: true },
-  avatarSize: { type: String, required: true },
-  avatarColor: { type: String, required: true },
-  avatarClass: { type: String, required: false }
-})
+<script setup lang="ts">
+import type { UserLike } from '@/types/models'
+
+defineProps<{
+  user: UserLike
+  avatarSize: string
+  avatarColor: string
+  avatarClass?: string
+}>()
 </script>
 
 <template>
@@ -12,7 +14,7 @@ defineProps({
     v-if="user.karma && ['A', 'B', 'C'].includes(user.karma)"
     icon="fas fa-award"
     color="transparent"
-    :text-color="$helper.karmaMedal(user.karma)"
+    :text-color="$helper.karmaMedal(user.karma) ?? undefined"
     location="bottom end"
     offset-x="8"
     offset-y="8"

@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { useTheme } from 'vuetify'
 import PoAdminMenu from '../admin/PoAdminMenu.vue'
 
 const theme = useTheme()
-theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+void theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
 </script>
 
 <style>

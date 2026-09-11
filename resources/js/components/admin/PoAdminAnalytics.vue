@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import type { InertiaPageProps } from '@/types/inertia'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const page = computed(() => usePage())
+const page = computed(() => usePage<InertiaPageProps<{ counter: string }>>())
 </script>
 
 <template>

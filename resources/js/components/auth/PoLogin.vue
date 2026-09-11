@@ -1,14 +1,17 @@
-<script setup>
-import { ref, reactive, provide, inject, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, provide, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
+import { formDataKey, helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { ValidationError } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutLogin
 })
 
-const helper = inject('helper')
+const helper = injectStrict(helperKey)
 const isLoading = ref(false)
 const isEmail = ref(false)
 const isReset = ref(false)
@@ -25,13 +28,13 @@ const formData = reactive({
   privacyAgreement: false
 })
 
-const errors = reactive({
+const errors = reactive<{ email: string[]; username: string[]; password: string[] }>({
   email: [],
   username: [],
   password: []
 })
 
-provide('formData', formData)
+provide(formDataKey, formData)
 
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
@@ -39,8 +42,10 @@ onMounted(() => {
   if ('1' === params.get('isEmail')) {
     isEmail.value = true
 
-    if (!helper.strNullOrEmpty(params.get('email'))) {
-      formData.email = params.get('email')
+    const email = params.get('email')
+
+    if (email !== null && !helper.strNullOrEmpty(email)) {
+      formData.email = email
       shouldLogin.value = true
     }
   }
@@ -80,7 +85,11 @@ function resetForm() {
 }
 
 async function submitForm() {
-  const form = document.querySelector('#login-form')
+  const form = document.querySelector<HTMLFormElement>('#login-form')
+
+  if (!form) {
+    return
+  }
 
   if (!form.checkValidity()) {
     form.reportValidity()
@@ -92,7 +101,7 @@ async function submitForm() {
     isLoading.value = true
 
     await axios
-      .post(route('email.check'), { email: formData.email })
+      .post<{ exists: boolean }>(route('email.check'), { email: formData.email })
       .then((response) => {
         if (response.data.exists) {
           shouldLogin.value = true
@@ -102,7 +111,7 @@ async function submitForm() {
           shouldRegister.value = true
         }
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.log(error)
       })
       .finally(() => {
@@ -119,7 +128,10 @@ async function submitForm() {
     clearErrors()
 
     await axios
-      .post(route('login'), { email: formData.email, password: formData.password })
+      .post<{ redirect: string }>(route('login'), {
+        email: formData.email,
+        password: formData.password
+      })
       .then((response) => {
         helper.setSnackBar({
           message: 'accounts.welcome-back',
@@ -129,8 +141,8 @@ async function submitForm() {
 
         router.get(response.data.redirect)
       })
-      .catch((error) => {
-        errors.password = error.response.data.errors.email // Intentional
+      .catch((error: ValidationError) => {
+        errors.password = error.response?.data.errors.email ?? [] // Intentional
       })
       .finally(() => {
         isLoading.value = false
@@ -157,10 +169,10 @@ async function submitForm() {
       .then(() => {
         router.get(route('verification.notice'))
       })
-      .catch((error) => {
-        errors.email = error.response.data.errors.email
-        errors.username = error.response.data.errors.username
-        errors.password = error.response.data.errors.password
+      .catch((error: ValidationError) => {
+        errors.email = error.response?.data.errors.email ?? []
+        errors.username = error.response?.data.errors.username ?? []
+        errors.password = error.response?.data.errors.password ?? []
       })
       .finally(() => {
         isLoading.value = false

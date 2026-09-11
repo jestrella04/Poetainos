@@ -1,14 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { ValidationError } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutLogin
 })
 
-const page = computed(() => usePage())
+const page = computed(() => usePage<InertiaPageProps<{ token: string; email: string }>>())
 const isLoading = ref(false)
 const token = page.value.props.token
 const email = page.value.props.email
@@ -18,7 +20,7 @@ const formData = reactive({
   confirmPassword: ''
 })
 
-const errors = reactive({
+const errors = reactive<{ password: string[] }>({
   password: []
 })
 
@@ -42,7 +44,11 @@ function resetForm() {
 }
 
 async function submitForm() {
-  const form = document.querySelector('#reset-form')
+  const form = document.querySelector<HTMLFormElement>('#reset-form')
+
+  if (!form) {
+    return
+  }
 
   if (!form.checkValidity()) {
     form.reportValidity()
@@ -62,8 +68,8 @@ async function submitForm() {
     .then(() => {
       router.get(route('login', { isReset: 1, isEmail: 1, email: email }))
     })
-    .catch((error) => {
-      errors.password = error.response.data.errors.password
+    .catch((error: ValidationError) => {
+      errors.password = error.response?.data.errors.password ?? []
     })
     .finally(() => {
       isLoading.value = false

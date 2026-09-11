@@ -23,3 +23,5 @@ yarn-error.log
 ./idea
 composer-setup.php
 composer.phar
+.claude
+/resources/js/components.d.ts

@@ -1,18 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { provide, ref } from 'vue'
 import PoCommentsDelete from './PoCommentsDelete.vue'
+import { blockerKey, complainerKey, isDeleteKey } from '@/composables/keys'
+import type { Comment } from '@/types/models'
 
-defineProps({
-  comment: { type: Object, required: true }
-})
+defineProps<{
+  comment: Comment
+}>()
 
 const complainer = ref(false)
 const blocker = ref(false)
 const isDelete = ref(false)
 
-provide('complainer', complainer)
-provide('blocker', blocker)
-provide('isDelete', isDelete)
+provide(complainerKey, complainer)
+provide(blockerKey, blocker)
+provide(isDeleteKey, isDelete)
 </script>
 
 <template>
@@ -45,7 +47,7 @@ provide('isDelete', isDelete)
         <span>{{ $t('complaints.report-comment') }}</span>
       </po-list-item>
 
-      <template v-if="$helper.auth() && $helper.authUser().username !== comment.author.username">
+      <template v-if="$helper.auth() && $helper.authUser()!.username !== comment.author.username">
         <v-divider class="my-0"></v-divider>
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>

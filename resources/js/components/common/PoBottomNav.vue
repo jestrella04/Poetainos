@@ -1,11 +1,13 @@
-<script setup>
-import { computed, inject } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import { mobileSiteMenuKey, mobileUserMenuKey, unreadCountKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
 const page = computed(() => usePage())
-const mobileSiteMenu = inject('mobileSiteMenu')
-const mobileUserMenu = inject('mobileUserMenu')
-const unreadCount = inject('unreadCount')
+const mobileSiteMenu = injectStrict(mobileSiteMenuKey)
+const mobileUserMenu = injectStrict(mobileUserMenuKey)
+const unreadCount = injectStrict(unreadCountKey)
 </script>
 
 <style scoped>
@@ -43,7 +45,7 @@ const unreadCount = inject('unreadCount')
         @click.prevent="mobileUserMenu = !mobileUserMenu"
       >
         <po-badge :count="unreadCount">
-          <po-avatar size="24" color="secondary" :user="$helper.authUser()" />
+          <po-avatar size="24" color="secondary" :user="$helper.authUser()!" />
         </po-badge>
       </po-button>
 

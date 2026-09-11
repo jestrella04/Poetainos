@@ -1,35 +1,41 @@
-<script setup>
-import { ref, inject, watch } from 'vue'
+<script setup lang="ts">
+import { ref, watch } from 'vue'
 import axios from 'axios'
+import { complainerKey, forceSnackBarKey, helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const props = defineProps({
-  compType: { type: String, required: true },
-  compId: { type: Number, required: true }
-})
+const props = defineProps<{
+  compType: string
+  compId: number
+}>()
 
-const helper = inject('helper')
-const complainer = inject('complainer')
-const reasons = ref([])
-const compReasons = ref([])
+const helper = injectStrict(helperKey)
+const complainer = injectStrict(complainerKey)
+const reasons = ref<string[]>([])
+const compReasons = ref<string[]>([])
 const compMessage = ref('')
 const isPosting = ref(false)
 const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
+const forceSnackBar = injectStrict(forceSnackBarKey)
 
 watch(complainer, async () => {
   if (complainer.value) {
     await axios
-      .get(route('complaints.reasons'))
+      .get<{ reasons: string[] }>(route('complaints.reasons'))
       .then((response) => {
         reasons.value = response.data.reasons
       })
-      .catch()
-      .finally()
+      .catch(() => {})
+      .finally(() => {})
   }
 })
 
 async function submit() {
-  const form = document.querySelector('#complaint-form')
+  const form = document.querySelector<HTMLFormElement>('#complaint-form')
+
+  if (!form) {
+    return
+  }
 
   if (helper.isEmpty(compReasons.value)) {
     errors.value = true

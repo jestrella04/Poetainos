@@ -1,12 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
+import type { InertiaPageProps } from '@/types/inertia'
 
-const page = computed(() => usePage())
+const page = computed(() => usePage<InertiaPageProps<{ title?: string }>>())
 const theme = useTheme()
 
-theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+void theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
 </script>
 
 <style>

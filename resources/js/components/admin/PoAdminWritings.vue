@@ -1,15 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import axios from 'axios'
+import type { DataTableHeader } from 'vuetify'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { Paginated } from '@/types/models'
+import type { UserLike } from '@/types/models'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const page = computed(() => usePage())
-const headers = [
+interface WritingAdmin {
+  id: number
+  title: string
+  slug: string
+  aura: string
+  created_at: string
+  author: UserLike
+}
+
+const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
+const headers: DataTableHeader[] = [
   { title: 'Id', align: 'start', sortable: false, key: 'id' },
   { title: 'Title', align: 'start', sortable: false, key: 'title' },
   { title: 'Author', align: 'start', sortable: false, key: 'author' },
@@ -17,23 +30,21 @@ const headers = [
   { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
   { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
 ]
-const items = ref([])
+const items = ref<WritingAdmin[]>([])
 const totalItems = ref(page.value.props.total)
 const isLoading = ref(true)
 
 onMounted(() => {
-  loadItems({ page: 1 })
+  void loadItems({ page: 1 })
 })
 
-async function loadItems(event) {
+async function loadItems(event: { page: number }) {
   await axios
-    .get(route('admin.writings', { page: event.page }))
+    .get<Paginated<WritingAdmin>>(route('admin.writings', { page: event.page }))
     .then((response) => {
       items.value = response.data.data
       isLoading.value = false
     })
-    .catch()
-    .finally()
 }
 </script>
 

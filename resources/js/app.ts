@@ -1,4 +1,5 @@
 import { createApp, h } from 'vue'
+import type { DefineComponent } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { ZiggyVue } from 'ziggy-js'
@@ -18,19 +19,23 @@ library.add(far)
 library.add(fas)
 library.add(fab)
 
-createInertiaApp({
+// Inertia's page components carry an optional `layout` property, a
+// convention layered on top of Vue's DefineComponent, not part of it.
+type InertiaPageComponent = DefineComponent & { layout?: unknown }
+
+void createInertiaApp({
   progress: {
     delay: 0,
     color: '#B39DDB',
     showSpinner: true
   },
   resolve: async (name) => {
-    const page = await resolvePageComponent(
+    const page = await resolvePageComponent<{ default: InertiaPageComponent }>(
       `./components/${name}.vue`,
-      import.meta.glob('./components/**/*.vue')
+      import.meta.glob<{ default: InertiaPageComponent }>('./components/**/*.vue')
     )
     page.default.layout = page.default.layout || PoLayoutMain
-    return page
+    return page.default
   },
   setup({ el, App, props, plugin }) {
     const app = createApp({

@@ -1,19 +1,48 @@
-<script setup>
-import { inject, provide, reactive, ref } from 'vue'
+<script setup lang="ts">
+import { provide, reactive, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
+import { formDataKey, helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
-const page = usePage()
-const helper = inject('helper')
-
-if (!helper) {
-  throw new Error('helper plugin not provided')
+// $user (the raw Eloquent model, not a select()) — a different shape from
+// types/models.ts's `User` (which reflects UsersController::show()'s
+// flattened extra_info->x AS x columns): here extra_info is still a
+// genuine nested object, cast by the model.
+interface EditableUser {
+  id: number
+  username: string
+  name?: string | null
+  email: string
+  role_id?: number | null
+  extra_info?: {
+    bio?: string
+    location?: string
+    occupation?: string
+    interests?: string
+    website?: string
+    social?: Record<string, string>
+  } | null
 }
+
+interface Role {
+  id: number
+  name: string
+}
+
+interface PostedResult {
+  url: string
+}
+
+const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
+const helper = injectStrict(helperKey)
 
 const user = page.props.user
 const formData = reactive({
-  avatar: [],
-  role: '',
+  avatar: [] as File[],
+  role: '' as string | number, // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion -- widens for the later `formData.role = user.role_id` numeric assignment
   name: '',
   username: '',
   email: '',
@@ -27,13 +56,15 @@ const formData = reactive({
   instagram: '',
   facebook: '',
   youtube: '',
-  goodreads: ''
+  goodreads: '',
+  serviceAgreement: false,
+  privacyAgreement: false
 })
-const errors = ref({})
+const errors = ref<LaravelValidationErrors>({})
 const isPosting = ref(false)
-const isPosted = ref({})
+const isPosted = ref<Partial<PostedResult>>({})
 
-provide('formData', formData)
+provide(formDataKey, formData)
 
 // Init form data
 formData.role = user.role_id ?? ''
@@ -63,11 +94,11 @@ function clearErrors() {
 }
 
 async function submitForm() {
-  const form = document.querySelector('#profile-form')
+  const form = document.querySelector<HTMLFormElement>('#profile-form')
 
   clearErrors()
 
-  if (!helper.checkFormValidity(form)) {
+  if (!form || !helper.checkFormValidity(form)) {
     return
   }
 
@@ -75,7 +106,7 @@ async function submitForm() {
   isPosting.value = true
 
   await axios
-    .postForm(form.action, {
+    .postForm<PostedResult>(form.action, {
       _method: 'PUT',
       avatar: formData.avatar,
       role: formData.role,
@@ -99,19 +130,18 @@ async function submitForm() {
       clearErrors()
       isPosted.value = response.data
     })
-    .catch((error) => {
-      errors.value = error.response.data.errors
+    .catch((error: ValidationError) => {
+      errors.value = error.response?.data.errors ?? {}
     })
-    .finally(
+    .finally(() => {
       setTimeout(() => {
         isPosting.value = false
       }, 1000)
-    )
+    })
 }
 
 function file() {
-  const input = document.querySelector('#avatar-input')
-  input.click()
+  document.querySelector<HTMLElement>('#avatar-input')?.click()
 }
 </script>
 
@@ -310,7 +340,7 @@ function file() {
         ></v-text-field>
 
         <po-agreement
-          v-if="!page.props.agreement && user.id === $helper.authUser().id"
+          v-if="!page.props.agreement && user.id === $helper.authUser()!.id"
         ></po-agreement>
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">

@@ -1,19 +1,26 @@
-<script setup>
-import { ref, inject } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import axios from 'axios'
+import { blockerKey, forceSnackBarKey, helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { UserLike } from '@/types/models'
 
-const props = defineProps({
-  user: { type: Object, required: true }
-})
+const props = defineProps<{
+  user: UserLike
+}>()
 
-const helper = inject('helper')
-const blocker = inject('blocker')
+const helper = injectStrict(helperKey)
+const blocker = injectStrict(blockerKey)
 const isPosting = ref(false)
 const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
+const forceSnackBar = injectStrict(forceSnackBarKey)
 
 async function submit() {
-  const form = document.querySelector('#blocking-form')
+  const form = document.querySelector<HTMLFormElement>('#blocking-form')
+
+  if (!form) {
+    return
+  }
 
   isPosting.value = true
   errors.value = false

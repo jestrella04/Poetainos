@@ -1,8 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import type { CategoryLike, TagLike, UserLike } from '@/types/models'
+import type { InertiaPageProps } from '@/types/inertia'
 
-const page = computed(() => usePage())
+interface ExploreProps {
+  categories: {
+    main: CategoryLike[]
+    alt: CategoryLike[]
+  }
+  tags: TagLike[]
+  authors: UserLike[]
+}
+
+const page = computed(() => usePage<InertiaPageProps<ExploreProps>>())
 </script>
 
 <template>

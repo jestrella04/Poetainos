@@ -1,38 +1,46 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import axios from 'axios'
+import type { DataTableHeader } from 'vuetify'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { Paginated } from '@/types/models'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const page = computed(() => usePage())
-const headers = [
+interface ComplaintAdmin {
+  id: number
+  complainable_type: string
+  created_at: string
+  closed_at: string | null
+}
+
+const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
+const headers: DataTableHeader[] = [
   { title: 'Id', align: 'start', sortable: false, key: 'id' },
   { title: 'Type', align: 'start', sortable: false, key: 'type' },
   { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
   { title: 'Closed at', align: 'start', sortable: false, key: 'closed_at' },
   { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
 ]
-const items = ref([])
+const items = ref<ComplaintAdmin[]>([])
 const totalItems = ref(page.value.props.total)
 const isLoading = ref(true)
 
 onMounted(() => {
-  loadItems({ page: 1 })
+  void loadItems({ page: 1 })
 })
 
-async function loadItems(event) {
+async function loadItems(event: { page: number }) {
   await axios
-    .get(route('admin.complaints', { page: event.page }))
+    .get<Paginated<ComplaintAdmin>>(route('admin.complaints', { page: event.page }))
     .then((response) => {
       items.value = response.data.data
       isLoading.value = false
     })
-    .catch()
-    .finally()
 }
 </script>
 
@@ -58,7 +66,7 @@ async function loadItems(event) {
       </template>
 
       <template v-slot:item.closed_at="{ item }">
-        {{ $helper.toLocaleDate(item.closed_at) }}
+        {{ item.closed_at ? $helper.toLocaleDate(item.closed_at) : '' }}
       </template>
 
       <template v-slot:item.actions>

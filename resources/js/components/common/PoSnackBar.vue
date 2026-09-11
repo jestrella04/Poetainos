@@ -1,7 +1,8 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { snackBarKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const snackBar = inject('snackBar')
+const snackBar = injectStrict(snackBarKey)
 </script>
 
 <style scoped>
@@ -21,7 +22,8 @@ const snackBar = inject('snackBar')
     location="top"
     min-height="68"
     rounded
-    timer="blue-grey-lighten-1"
+    timer
+    timer-color="blue-grey-lighten-1"
   >
     <div class="d-flex ga-4">
       <div>

@@ -1,13 +1,25 @@
-<script setup>
-import { computed, ref, inject, onMounted } from 'vue'
+<script setup lang="ts">
+import { computed, ref, onMounted } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import axios from 'axios'
 import { useSwipe } from '@vueuse/core'
+import type { UseSwipeDirection } from '@vueuse/core'
+import { helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { Writing } from '@/types/models'
 
-const page = computed(() => usePage())
-const helper = inject('helper')
-const writings = ref([])
+type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
+
+interface WritingsPage {
+  data: Writing[]
+  next_page_url: string | null
+}
+
+const page = computed(() => usePage<InertiaPageProps<{ sort: string; writings: WritingsPage }>>())
+const helper = injectStrict(helperKey)
+const writings = ref<Writing[]>([])
 const next = ref('')
 const fetched = ref(false)
 const target = document.body
@@ -17,7 +29,7 @@ useSwipe(target, {
   onSwipe() {
     //
   },
-  onSwipeEnd(e, direction) {
+  onSwipeEnd(_e: TouchEvent, direction: UseSwipeDirection) {
     if (direction === 'left') {
       swipeRight()
     } else if (direction === 'right') {
@@ -26,10 +38,10 @@ useSwipe(target, {
   }
 })
 
-async function loadMore({ done }) {
+async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
   if (!helper.strNullOrEmpty(next.value)) {
     await axios
-      .get(next.value)
+      .get<WritingsPage>(next.value)
       .then((response) => {
         update(response.data.data, response.data.next_page_url)
         done('ok')
@@ -44,43 +56,36 @@ async function loadMore({ done }) {
 
 function swipeRight() {
   if ('latest' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="popular"]').click()
+    document.querySelector<HTMLElement>('.v-tab[value="popular"]')?.click()
   } else if ('popular' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="likes"]').click()
+    document.querySelector<HTMLElement>('.v-tab[value="likes"]')?.click()
   }
 }
 
 function swipeLeft() {
   if ('likes' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="popular"]').click()
+    document.querySelector<HTMLElement>('.v-tab[value="popular"]')?.click()
   } else if ('popular' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="latest"]').click()
+    document.querySelector<HTMLElement>('.v-tab[value="latest"]')?.click()
   }
 }
 
-onMounted(async () => {
-  await router.reload({
+onMounted(() => {
+  router.reload({
     only: ['writings'],
-    onSuccess: (page) => {
-      update(page.props.writings.data, page.props.writings.next_page_url)
+    onSuccess: (successPage) => {
+      const successProps = successPage.props as unknown as InertiaPageProps<{
+        writings: WritingsPage
+      }>
+      update(successProps.writings.data, successProps.writings.next_page_url)
     }
   })
 })
 
-function update(writingsData, nextPage) {
+function update(writingsData: Writing[], nextPage: string | null) {
   writings.value.push(...writingsData)
-  next.value = nextPage
+  next.value = nextPage ?? ''
   fetched.value = true
-}
-
-function liked(id, count) {
-  const liked = Object.values(writings.value).filter((writing) => {
-    if (writing.id === id) {
-      return
-    }
-  })
-
-  liked.likes_count.value = count
 }
 </script>
 
@@ -120,7 +125,7 @@ function liked(id, count) {
 
     <template v-else-if="!$helper.isEmpty(writings)">
       <template v-for="writing in writings" :key="writing.slug">
-        <po-writings-entry @liked="liked" :alone="false" :data="writing" />
+        <po-writings-entry :alone="false" :data="writing" />
       </template>
 
       <po-infinite-scroll

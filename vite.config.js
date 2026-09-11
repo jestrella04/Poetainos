@@ -51,7 +51,8 @@ export default defineConfig(({ mode }) => {
     },
   resolve: {
     alias: {
-      'ziggy-js': path.resolve('/vendor/tightenco/ziggy')
+      'ziggy-js': path.resolve('/vendor/tightenco/ziggy'),
+      '@': path.resolve(import.meta.dirname, 'resources/js')
     }
   },
   optimizeDeps: {
@@ -72,7 +73,7 @@ export default defineConfig(({ mode }) => {
   plugins: [
     nodePolyfills(),
     laravel({
-      input: ['resources/js/app.js'],
+      input: ['resources/js/app.ts'],
       ssr: ['resources/js/ssr.js'],
       refresh: true
     }),
@@ -81,14 +82,15 @@ export default defineConfig(({ mode }) => {
     Components({
       dirs: ['resources/js/components/common'],
       resolvers: [VuetifyResolver()],
-      include: [/\.vue$/, /\.vue\?vue/, /\.vue\.[tj]sx?\?vue/, /\.md$/]
+      include: [/\.vue$/, /\.vue\?vue/, /\.vue\.[tj]sx?\?vue/, /\.md$/],
+      dts: 'resources/js/components.d.ts'
     }),
     VitePWA({
       scope: '/',
       base: '/',
       srcDir: 'resources/js',
       outDir: 'public',
-      filename: 'worker.js',
+      filename: 'worker.ts',
       strategies: 'injectManifest',
       injectRegister: false,
       includeManifestIcons: false,

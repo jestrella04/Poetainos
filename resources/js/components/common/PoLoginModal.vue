@@ -1,7 +1,8 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { loginModalKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const loginModal = inject('loginModal')
+const loginModal = injectStrict(loginModalKey)
 </script>
 
 <template>

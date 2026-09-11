@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
 
@@ -11,21 +11,20 @@ async function resendLink() {
     .post(route('verification.send'))
     .then(() => {
       const alert = document.querySelector('.po-success')
-      alert.classList.remove('d-none')
+      alert?.classList.remove('d-none')
 
       setTimeout(() => {
-        alert.classList.add('d-none')
+        alert?.classList.add('d-none')
       }, 6000)
     })
     .catch(() => {
       const alert = document.querySelector('.po-error')
-      alert.classList.remove('d-none')
+      alert?.classList.remove('d-none')
 
       setTimeout(() => {
-        alert.classList.add('d-none')
+        alert?.classList.add('d-none')
       }, 6000)
     })
-    .finally()
 }
 </script>
 

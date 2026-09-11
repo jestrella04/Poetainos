@@ -1,9 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { UserLike, Writing } from '@/types/models'
 
-const page = computed(() => usePage())
+interface WritingsShowProps {
+  isAuthorBlocked: boolean
+  writing: Writing
+  likers: UserLike[]
+  related: {
+    from_author: Writing[]
+    from_category: Writing[]
+  }
+}
+
+const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
 </script>
 
 <template>

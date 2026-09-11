@@ -1,13 +1,19 @@
-<script setup>
-import { provide } from 'vue'
+<script setup lang="ts">
+import { computed, provide } from 'vue'
 import PoUsersStats from './partials/PoUsersStats.vue'
 import PoUserDropdown from './partials/PoUserDropdown.vue'
+import { userKey } from '@/composables/keys'
+import type { User } from '@/types/models'
 
-const props = defineProps({
-  data: { type: Object, required: true }
-})
+const props = defineProps<{
+  data: User
+}>()
 
-provide('user', props.data)
+provide(userKey, props.data)
+
+const socialLinks = computed<Record<string, string>>(() =>
+  props.data.social ? (JSON.parse(props.data.social) as Record<string, string>) : {}
+)
 </script>
 
 <template>
@@ -27,9 +33,7 @@ provide('user', props.data)
         <p class="text-medium-emphasis">@{{ data.username }}</p>
       </div>
 
-      <template
-        v-if="!$helper.strNullOrEmpty(data.website) || !$helper.isEmpty(JSON.parse(data.social))"
-      >
+      <template v-if="!$helper.strNullOrEmpty(data.website) || !$helper.isEmpty(socialLinks)">
         <div class="d-flex flex-wrap justify-center ga-3 mb-5">
           <template v-if="!$helper.strNullOrEmpty(data.website)">
             <div>
@@ -39,7 +43,7 @@ provide('user', props.data)
             </div>
           </template>
 
-          <template v-for="(user, network) in JSON.parse(data.social)" :key="network">
+          <template v-for="(user, network) in socialLinks" :key="network">
             <div v-if="!$helper.strNullOrEmpty(user)">
               <po-button
                 icon
@@ -75,7 +79,7 @@ provide('user', props.data)
           {{ $t('main.registered') }}:
         </v-col>
         <v-col cols="12" md="8">
-          {{ $helper.relativeDate(data.created_at) }}
+          {{ $helper.relativeDate(data.created_at ?? '') }}
         </v-col>
       </v-row>
 

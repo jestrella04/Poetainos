@@ -1,31 +1,67 @@
-<script setup>
-import { inject, provide, reactive, computed, ref, watch, onMounted } from 'vue'
+<script setup lang="ts">
+import { provide, reactive, computed, ref, watch, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoWritingDelete from './partials/PoWritingDelete.vue'
+import { formDataKey, helperKey, isDeleteKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
-const page = computed(() => usePage())
-const helper = inject('helper')
+interface CategoryOption {
+  id: number
+  name: string
+}
+
+interface CategoryWithDescendants extends CategoryOption {
+  descendants: CategoryOption[]
+}
+
+interface WritingFormProps {
+  writing: {
+    data: {
+      title?: string
+      text?: string
+      slug?: string
+      extra_info?: { link?: string; cover?: string } | null
+    }
+    main_category: number | null
+    categories: number[]
+    tags: string[] | null
+  }
+  main_categories: CategoryWithDescendants[]
+  'max-file-size': number
+  agreement: boolean
+}
+
+interface PostedResult {
+  url: string
+}
+
+const page = computed(() => usePage<InertiaPageProps<WritingFormProps>>())
+const helper = injectStrict(helperKey)
 const writing = page.value.props.writing
 const formData = reactive({
   title: (writing.data.title ??= ''),
-  main_category: null, // Properly set onMounted
-  alt_categories: [], // Properly set onMounted
+  main_category: null as number | null, // Properly set onMounted
+  alt_categories: [] as number[], // Properly set onMounted
   tags: (writing.tags ??= []),
   text: (writing.data.text ??= ''),
   link: '',
-  cover: []
+  cover: [] as File[],
+  serviceAgreement: false,
+  privacyAgreement: false
 })
-const errors = ref({})
+const errors = ref<LaravelValidationErrors>({})
 const mainCategories = ref(page.value.props.main_categories)
-const altCategories = ref([])
+const altCategories = ref<CategoryOption[]>([])
 const isPosting = ref(false)
-const isPosted = ref({})
+const isPosted = ref<Partial<PostedResult>>({})
 const isUpdate = ref(false)
 const isDelete = ref(false)
 
-provide('formData', formData)
-provide('isDelete', isDelete)
+provide(formDataKey, formData)
+provide(isDeleteKey, isDelete)
 
 onMounted(() => {
   // Is the user updating?
@@ -37,12 +73,7 @@ onMounted(() => {
     formData.alt_categories = writing.categories
   }
 
-  // Logic needed to assign below values
-  if (
-    'extra_info' in writing.data &&
-    !helper.isNull(writing.data.extra_info) &&
-    'link' in writing.data.extra_info
-  ) {
+  if (writing.data.extra_info?.link !== undefined) {
     formData.link = writing.data.extra_info.link
   }
 })
@@ -51,22 +82,13 @@ watch(
   () => formData.main_category,
   (newValue, oldValue) => {
     // Clear selections (but not on first load)
-    if (!helper.isNull(oldValue) && newValue > 0) {
+    if (oldValue !== null && (newValue ?? 0) > 0) {
       formData.alt_categories = []
     }
 
     // Set new options
-    if (parseInt(formData.main_category) > 0) {
-      altCategories.value = JSON.parse(
-        JSON.stringify(
-          Object.values(mainCategories.value).filter((category) => {
-            return category.id === formData.main_category
-          })
-        )
-      )[0].descendants
-    } else {
-      altCategories.value = []
-    }
+    const selected = mainCategories.value.find((category) => category.id === formData.main_category)
+    altCategories.value = selected ? selected.descendants : []
   }
 )
 
@@ -85,11 +107,11 @@ function clearErrors() {
 }
 
 async function submitForm() {
-  const form = document.querySelector('#writing-form')
+  const form = document.querySelector<HTMLFormElement>('#writing-form')
 
   clearErrors()
 
-  if (!helper.checkFormValidity(form)) {
+  if (!form || !helper.checkFormValidity(form)) {
     return
   }
 
@@ -97,7 +119,7 @@ async function submitForm() {
   isPosting.value = true
 
   await axios
-    .postForm(form.action, {
+    .postForm<PostedResult>(form.action, {
       _method: isUpdate.value ? 'PUT' : 'POST',
       title: formData.title,
       main_category: formData.main_category,
@@ -113,14 +135,14 @@ async function submitForm() {
       resetForm()
       isPosted.value = response.data
     })
-    .catch((error) => {
-      errors.value = error.response.data.errors
+    .catch((error: ValidationError) => {
+      errors.value = error.response?.data.errors ?? {}
     })
-    .finally(
+    .finally(() => {
       setTimeout(() => {
         isPosting.value = false
       }, 1000)
-    )
+    })
 }
 
 function resetForm() {
@@ -194,7 +216,7 @@ function resetForm() {
           clearable
           required
           chips
-          :disabled="!parseInt(formData.main_category) > 0"
+          :disabled="!((formData.main_category ?? 0) > 0)"
         ></v-select>
 
         <v-combobox
@@ -267,7 +289,7 @@ function resetForm() {
         <po-writing-delete
           v-if="isUpdate"
           v-model="isDelete"
-          :slug="writing.data.slug"
+          :slug="writing.data.slug ?? ''"
         ></po-writing-delete>
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">

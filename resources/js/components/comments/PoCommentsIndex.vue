@@ -1,39 +1,56 @@
-<script setup>
-import { ref, onMounted, inject, computed, provide } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, computed, provide } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoCommentsForm from './PoCommentsForm.vue'
 import PoCommentsDropdown from './PoCommentsDropdown.vue'
+import {
+  helperKey,
+  loadingCommentsKey,
+  loginModalKey,
+  replyBoxKey,
+  writingKey
+} from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { Comment, Paginated } from '@/types/models'
 
 const page = computed(() => usePage())
-const helper = inject('helper')
-const comments = ref({})
-const loadingComments = inject('loadingComments', true)
-const writing = inject('writing')
-const loginModal = inject('loginModal', false)
+const helper = injectStrict(helperKey)
+const comments = ref<Partial<Paginated<Comment>>>({})
+const loadingComments = injectStrict(loadingCommentsKey)
+const writing = injectStrict(writingKey)
+const loginModal = injectStrict(loginModalKey)
 const replyBox = ref(0)
 
-provide('replyBox', replyBox)
+provide(replyBoxKey, replyBox)
 
 onMounted(() => {
-  loadComments()
+  void loadComments()
 })
 
 async function loadComments() {
-  await axios.get(route('comments.index', writing.id)).then((response) => {
+  await axios.get<Paginated<Comment>>(route('comments.index', writing.id)).then((response) => {
     comments.value = response.data
     loadingComments.value = false
   })
 }
 
-async function like(event, id) {
-  const doer = event.target.closest('.do-like')
+async function like(event: MouseEvent, id: number) {
+  const doer = (event.target as HTMLElement).closest<HTMLElement>('.do-like')
+
+  if (!doer) {
+    return
+  }
 
   if (helper.auth()) {
     await axios
-      .post(route('likes.store', ['comment', id]))
+      .post<{ count: number; method: 'store' | 'destroy' }>(route('likes.store', ['comment', id]))
       .then((response) => {
-        doer.querySelector('span.count').textContent = helper.readable(response.data.count)
+        const countEl = doer.querySelector<HTMLElement>('span.count')
+
+        if (countEl) {
+          countEl.textContent = helper.readable(response.data.count)
+        }
 
         if ('store' === response.data.method) {
           doer.classList.add('liked')
@@ -41,16 +58,20 @@ async function like(event, id) {
           doer.classList.remove('liked')
         }
       })
-      .catch()
+      .catch(() => undefined)
       .finally(() => {
-        helper.animate(doer.querySelector('i'), 'heartBeat')
+        const icon = doer.querySelector<HTMLElement>('i')
+
+        if (icon) {
+          void helper.animate(icon, 'heartBeat')
+        }
       })
   } else {
     loginModal.value = true
   }
 }
 
-function toggleReply(commentId) {
+function toggleReply(commentId: number) {
   if (helper.auth()) {
     if (replyBox.value === commentId) {
       replyBox.value = 0
@@ -62,8 +83,8 @@ function toggleReply(commentId) {
   }
 }
 
-function reply(comment) {
-  let initialText = ['@' + comment.author.username]
+function reply(comment: Comment) {
+  const initialText = ['@' + comment.author.username]
   const mentions = comment.message.matchAll(/(^|\W)@\b([-a-zA-Z0-9._]{3,25})\b/g)
 
   for (const mention of mentions) {
@@ -114,7 +135,7 @@ function reply(comment) {
               class="do-like"
               :class="{ liked: page.props.auth.liked.comments.includes(comment.id) }"
               @click="
-                (event) => {
+                (event: MouseEvent) => {
                   like(event, comment.id)
                 }
               "

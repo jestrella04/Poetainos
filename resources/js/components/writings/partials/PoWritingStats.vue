@@ -1,23 +1,31 @@
-<script setup>
-import { computed, inject, ref } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
+import { helperKey, loginModalKey, writingKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
 const page = computed(() => usePage())
-const helper = inject('helper')
-const writing = inject('writing')
+const helper = injectStrict(helperKey)
+const writing = injectStrict(writingKey)
 const liked = page.value.props.auth.liked.writings.includes(writing.id)
 const shelved = page.value.props.auth.shelved.includes(writing.id)
 const likesCount = ref(writing.likes_count)
 const shelfCount = ref(writing.shelf_count)
-const loginModal = inject('loginModal', false)
+const loginModal = injectStrict(loginModalKey)
 
-async function like(event) {
-  const doer = event.target.closest('.do-like')
+async function like(event: MouseEvent) {
+  const doer = (event.target as HTMLElement).closest<HTMLElement>('.do-like')
 
-  if (helper.auth() && helper.authUser().username !== writing.author.username) {
+  if (!doer) {
+    return
+  }
+
+  if (helper.auth() && helper.authUser()!.username !== writing.author.username) {
     await axios
-      .post(route('likes.store', ['writing', writing.id]))
+      .post<{ count: number; method: 'store' | 'destroy' }>(
+        route('likes.store', ['writing', writing.id])
+      )
       .then((response) => {
         likesCount.value = response.data.count
 
@@ -27,21 +35,29 @@ async function like(event) {
           doer.classList.remove('liked')
         }
       })
-      .catch()
+      .catch(() => undefined)
       .finally(() => {
-        helper.animate(doer.querySelector('i'), 'heartBeat')
+        const icon = doer.querySelector<HTMLElement>('i')
+
+        if (icon) {
+          void helper.animate(icon, 'heartBeat')
+        }
       })
   } else if (!helper.auth()) {
     loginModal.value = true
   }
 }
 
-async function shelf(event) {
-  const doer = event.target.closest('.do-shelf')
+async function shelf(event: MouseEvent) {
+  const doer = (event.target as HTMLElement).closest<HTMLElement>('.do-shelf')
 
-  if (helper.auth() && helper.authUser().username !== writing.author.username) {
+  if (!doer) {
+    return
+  }
+
+  if (helper.auth() && helper.authUser()!.username !== writing.author.username) {
     await axios
-      .post(route('shelves.store', writing.slug))
+      .post<{ count: number; method: 'store' | 'destroy' }>(route('shelves.store', writing.slug))
       .then((response) => {
         shelfCount.value = response.data.count
 
@@ -51,9 +67,13 @@ async function shelf(event) {
           doer.classList.remove('shelved')
         }
       })
-      .catch()
+      .catch(() => undefined)
       .finally(() => {
-        helper.animate(doer.querySelector('i'), 'heartBeat')
+        const icon = doer.querySelector<HTMLElement>('i')
+
+        if (icon) {
+          void helper.animate(icon, 'heartBeat')
+        }
       })
   } else if (!helper.auth()) {
     loginModal.value = true

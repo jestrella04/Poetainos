@@ -1,12 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import axios from 'axios'
-import { inject, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
+import { helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
-const helper = inject('helper')
+interface Captcha {
+  key: string
+  img: string
+}
+
+const helper = injectStrict(helperKey)
 const isPosting = ref(false)
 const isPosted = ref(false)
-const captcha = ref({})
-const errors = ref({})
+const captcha = ref<Captcha>({ key: '', img: '' })
+const errors = ref<LaravelValidationErrors>({})
 const formData = reactive({
   name: '',
   email: '',
@@ -17,18 +25,14 @@ const formData = reactive({
 })
 
 onMounted(() => {
-  reloadCaptcha()
+  void reloadCaptcha()
 })
 
 async function reloadCaptcha() {
-  await axios
-    .get('/captcha/api/math')
-    .then((response) => {
-      captcha.value = response.data
-      formData.captcha = ''
-    })
-    .catch()
-    .finally()
+  await axios.get<Captcha>('/captcha/api/math').then((response) => {
+    captcha.value = response.data
+    formData.captcha = ''
+  })
 }
 
 function clearErrors() {
@@ -42,7 +46,7 @@ function clearInputs() {
   formData.message = ''
   formData.key = ''
   formData.captcha = ''
-  reloadCaptcha()
+  void reloadCaptcha()
 }
 
 function resetForm() {
@@ -52,9 +56,9 @@ function resetForm() {
 }
 
 async function submitForm() {
-  const form = document.querySelector('#contact-form')
+  const form = document.querySelector<HTMLFormElement>('#contact-form')
 
-  if (!helper.checkFormValidity(form)) {
+  if (!form || !helper.checkFormValidity(form)) {
     return
   }
 
@@ -73,15 +77,15 @@ async function submitForm() {
       resetForm()
       isPosted.value = true
     })
-    .catch((error) => {
-      errors.value = error.response.data.errors
-      reloadCaptcha()
+    .catch((error: ValidationError) => {
+      errors.value = error.response?.data.errors ?? {}
+      void reloadCaptcha()
     })
-    .finally(
+    .finally(() => {
       setTimeout(() => {
         isPosting.value = false
       }, 1000)
-    )
+    })
 }
 </script>
 

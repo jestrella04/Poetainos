@@ -1,19 +1,22 @@
-<script setup>
-import { ref, inject, provide } from 'vue'
+<script setup lang="ts">
+import { ref, provide } from 'vue'
+import { blockerKey, complainerKey, helperKey, sharerKey, userKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const user = inject('user')
+const user = injectStrict(userKey)
+const helper = injectStrict(helperKey)
 const sharer = ref(false)
 const complainer = ref(false)
 const blocker = ref(false)
 
-provide('complainer', complainer)
-provide('blocker', blocker)
-provide('sharer', sharer)
+provide(complainerKey, complainer)
+provide(blockerKey, blocker)
+provide(sharerKey, sharer)
 
 function share() {
   if (navigator.share) {
-    navigator.share({
-      title: user.title,
+    void navigator.share({
+      title: helper.userDisplayName(user),
       url: route('users.show', [user.username])
     })
   } else {
@@ -92,7 +95,7 @@ function share() {
       </po-list-item>
       <v-divider class="my-0"></v-divider>
 
-      <template v-if="$helper.auth() && $helper.authUser().username !== user.username">
+      <template v-if="$helper.auth() && $helper.authUser()!.username !== user.username">
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>
         </po-list-item>

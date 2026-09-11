@@ -1,7 +1,8 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { mobileSiteMenuKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const mobileSiteMenu = inject('mobileSiteMenu', false)
+const mobileSiteMenu = injectStrict(mobileSiteMenuKey)
 </script>
 
 <template>

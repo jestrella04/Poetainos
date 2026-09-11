@@ -1,8 +1,9 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { mobileUserMenuKey, unreadCountKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const unreadCount = inject('unreadCount')
-const mobileUserMenu = inject('mobileUserMenu', false)
+const unreadCount = injectStrict(unreadCountKey)
+const mobileUserMenu = injectStrict(mobileUserMenuKey)
 </script>
 
 <template>

@@ -1,9 +1,14 @@
-<script setup>
-defineProps({
-  msgTitle: { type: String, required: true },
-  msgBody: { type: String, required: true },
-  icon: { type: String, default: '' }
-})
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    msgTitle: string
+    msgBody: string
+    icon?: string
+  }>(),
+  {
+    icon: ''
+  }
+)
 </script>
 
 <template>

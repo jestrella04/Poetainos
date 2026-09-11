@@ -1,15 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { router } from '@inertiajs/vue3'
+import type { Method, RequestPayload, VisitOptions } from '@inertiajs/core'
 
-const props = defineProps({
-  href: String,
-  inertia: Boolean,
-  method: { type: String, default: 'get' },
-  data: Object
-})
+const props = withDefaults(
+  defineProps<{
+    href?: string
+    inertia?: boolean
+    method?: Method
+    data?: RequestPayload
+  }>(),
+  {
+    method: 'get'
+  }
+)
 
 function visit() {
-  const visitOptions = { method: props.method }
+  if (!props.href) {
+    return
+  }
+
+  const visitOptions: VisitOptions = { method: props.method }
   if (props.data) {
     visitOptions.data = props.data
   }

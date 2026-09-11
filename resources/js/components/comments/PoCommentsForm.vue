@@ -1,23 +1,28 @@
-<script setup>
-import { inject, ref } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import axios from 'axios'
+import { helperKey, replyBoxKey, writingKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { ValidationError } from '@/types/http'
 
-const props = defineProps({
-  formId: { type: String, required: true },
-  replyTo: String
-})
+const props = defineProps<{
+  formId: string
+  replyTo?: string
+}>()
 
-const emit = defineEmits('commentPosted')
-const helper = inject('helper')
-const writing = inject('writing')
+const emit = defineEmits<{
+  commentPosted: []
+}>()
+const helper = injectStrict(helperKey)
+const writing = injectStrict(writingKey)
 const message = ref(props.replyTo)
-const errorMessages = ref([])
-const replyBox = inject('replyBox')
+const errorMessages = ref<string[]>([])
+const replyBox = injectStrict(replyBoxKey)
 
 async function submitForm() {
-  const form = document.querySelector(`#${props.formId}`)
+  const form = document.querySelector<HTMLFormElement>(`#${props.formId}`)
 
-  if (!helper.checkFormValidity(form)) {
+  if (!form || !helper.checkFormValidity(form)) {
     return
   }
 
@@ -30,10 +35,9 @@ async function submitForm() {
       emit('commentPosted')
       replyBox.value = 0
     })
-    .catch((error) => {
-      errorMessages.value = error.response.data.errors.comment
+    .catch((error: ValidationError) => {
+      errorMessages.value = error.response?.data.errors.comment ?? []
     })
-    .finally(() => {})
 }
 </script>
 

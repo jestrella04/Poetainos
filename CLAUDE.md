@@ -1,3 +1,111 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**Poetainos** is a community for writers.
+
+## Common Commands
+
+### Development
+
+```bash
+composer dev        # Start all dev servers: artisan serve, queue, pail, vite
+composer dev:ssr    # Dev with SSR support
+composer setup      # Full project setup from scratch
+```
+
+### Building
+
+```bash
+npm run build       # Production frontend build
+npm run build:ssr   # Production build with SSR
+```
+
+### Testing
+
+```bash
+composer test                       # Run all Pest tests
+php artisan test --filter TestName  # Run a single test
+composer ci:check                   # Full CI: lint, format, type check, tests
+npm run test                        # Run all Vitest tests (resources/js/**/__tests__/)
+npm run test:watch                  # Vitest in watch mode
+```
+
+**Never pipe `php artisan test` output** (e.g. `| tail`, `| head`) — not even a narrow `--filter` run, and not even when backgrounded. Pest's browser plugin boots a `playwright run-server` Node child process regardless of which tests actually run, and that child inherits stdout. Once the test process itself exits, the child keeps the pipe open, so `tail`/`head` never see EOF and hang indefinitely with the real output already fully produced but stuck in the pipe buffer. Redirect to a file instead: `php artisan test > out.txt 2>&1`. If a run is already hung this way, find the leftover `node .../playwright/run-server` process for that run and kill it to force EOF. See the `pest-browser-vuetify-gotchas` memory note for the full debugging playbook and more Pest/Playwright gotchas.
+
+### Linting & Formatting
+
+```bash
+composer lint           # Fix PHP with Laravel Pint
+composer lint:check     # Check PHP (no fix)
+npm run lint            # Fix JS/TS/Vue with ESLint
+npm run lint:check      # Check JS/TS/Vue (no fix)
+npm run format          # Format frontend with Prettier
+npm run format:check    # Check formatting
+npm run types:check     # TypeScript type check (vue-tsc)
+```
+
+### Database
+
+```bash
+php artisan migrate:fresh --seed   # Reset DB and seed demo data
+```
+
+## Architecture
+
+### Stack
+
+- **Backend:** Laravel 12, PHP 8.3, MariaDB
+- **Frontend:** Vue 3, TypeScript, Vuetify 4 (Material Design)
+- **Bridge:** Inertia.js v3 (SPA + SSR) + JSON API layer in `routes/api.php`
+- **Auth:** Laravel Fortify + Sanctum, RBAC via roles/permissions
+- **Build:** Vite 7
+
+### Events & Listeners
+
+Listener discovery is **automatic**: Laravel scans `app/Listeners` for any `handle()` method type-hinted to an event class and wires it up on its own — this happens even though `bootstrap/app.php` has no explicit `->withEvents()` call and there is no `EventServiceProvider`. **Never also register a listener manually via `Event::listen()`** (e.g. in `AppServiceProvider::boot()`). Doing so double-registers the listener, so it fires twice per event dispatch — this previously caused every queued mail listener (billing emails, affiliate welcome email) to send duplicate emails silently. After adding a new event/listener pair, run `php artisan event:list` and confirm the event shows exactly **one** listener before considering the work done.
+
+## Key Conventions
+
+### Coding Standards (NON-NEGOTIABLE)
+
+- **DRY:** Extract repeated logic into shared composables, services, or utilities — never duplicate business logic across components or controllers.
+- **Naming:** Use clear, intention-revealing names for variables, methods, and components. Prefer `isAvailableForBooking` over `available()`. Avoid negation in boolean names — use the positive form and negate at the call site: prefer `isEmpty` over `isNotEmpty`, `isFalse` over `isNotTrue`, `hasItems` over `hasNoItems`.
+- **Single responsibility:** Each function, component, and class does one thing. Split when a unit grows beyond that.
+- **Self-documenting code:** Structure and naming should make the intent obvious without comments. Add a comment only when the _why_ is non-obvious (a hidden constraint, a workaround, a subtle invariant).
+- **Consistent patterns:** Follow the conventions already established in sibling files (unless conflicting with defined standards), check them before writing anything new.
+- **No dead code:** Remove unused variables, imports, methods, and components rather than leaving them commented out.
+- **No exports from components:** Never export functions, constants, or types from `.vue` files. When shared logic or constants are needed across components, extract them into a composable under `resources/js/composables/`.
+- **Explicit comparisons, not implicit truthiness:** In `if`/ternary conditions, don't rely on implicit truthy/falsy coercion — Codacy flags this ("Implicit true comparisons prohibited"). Use `=== true`/`=== false` for boolean expressions, and `!== null`/`=== null` for nullable values (objects, query results, etc.) instead of bare `if ($x)` or `$x ?: null`.
+
+### Testing (NON-NEGOTIABLE)
+
+**Never modify production business logic to make a test pass.** This includes adding fields to `$fillable`/`$guarded`, changing global scopes, relaxing validation, or altering service method contracts. Fix tests using `forceFill()->save()`, direct property assignment + `save()`, or `DB::table()`. The production model is the source of truth.
+
+- **Language:** All code must be in English. UI strings belong in i18n locale files.
+- TypeScript strict mode — all types must be explicit
+- `@/*` path alias maps to `resources/js/*`
+- PHP follows Laravel Pint "laravel" preset
+- Tests use Pest (not raw PHPUnit); feature tests extend `TestCase` with `RefreshDatabase`
+- No `app/Http/Requests/` — validation is inline in controllers or via Zod on the frontend
+- Keep controllers thin — delegate business logic to Services
+
+### Vuetify Design System (NON-NEGOTIABLE)
+
+This project uses **Vuetify 4** as its sole UI framework. All UI work MUST follow Vuetify's design system:
+
+- **Always prefer native Vuetify components** (`v-btn`, `v-card`, `v-text-field`, etc.) over raw HTML elements.
+- **No custom CSS when a Vuetify-native alternative exists.** Use Vuetify props (`color`, `variant`, `density`, `elevation`, `rounded`, spacing helpers, etc.).
+- **Theme colors — single source of truth: `resources/js/plugins/theme.ts`.** Never hard-code hex values anywhere. Reference tokens via `color="primary"`, CSS custom properties (`var(--v-theme-primary)`), or Vuetify utility classes.
+- **Component-level customization goes in `resources/js/plugins/vuetify.ts`** (via `defaults`). No deep CSS overrides in component files.
+- Custom CSS is only acceptable for layout concerns Vuetify doesn't address and MUST be documented with a comment.
+
+#### Brand Color Palette
+
+See [DESIGN.md](DESIGN.md) for the full tonal palette reference, contrast ratios, and update process.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -10,6 +118,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 This application is a Laravel application running on PHP 8.3. You are an expert with the Laravel ecosystem. Always use the APIs that match the installed major version of each package — do not assume a version.
 
 Before relying on a package's API, confirm its installed version:
+
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
 - JS packages: check `package.json` for the installed versions.
 
@@ -170,10 +279,10 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Middleware typically lives in `app/Http/Middleware/` and service providers in `app/Providers/`.
 - There is no `bootstrap/app.php` application configuration in a Laravel 10 structure:
-    - Middleware registration happens in `app/Http/Kernel.php`
-    - Exception handling is in `app/Exceptions/Handler.php`
-    - Console commands and schedule register in `app/Console/Kernel.php`
-    - Rate limits likely exist in `RouteServiceProvider` or `app/Http/Kernel.php`
+  - Middleware registration happens in `app/Http/Kernel.php`
+  - Exception handling is in `app/Exceptions/Handler.php`
+  - Console commands and schedule register in `app/Console/Kernel.php`
+  - Rate limits likely exist in `RouteServiceProvider` or `app/Http/Kernel.php`
 
 ## Database
 
@@ -211,6 +320,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 # Inertia + Vue
 
 Vue components must have a single root element.
+
 - IMPORTANT: Activate `inertia-vue-development` when working with Inertia Vue client-side patterns.
 
 </laravel-boost-guidelines>

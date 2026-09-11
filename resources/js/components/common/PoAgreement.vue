@@ -1,7 +1,8 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { formDataKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const formData = inject('formData')
+const formData = injectStrict(formDataKey)
 </script>
 
 <template>

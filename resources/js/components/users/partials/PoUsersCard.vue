@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import PoUsersStats from './PoUsersStats.vue'
+import type { User } from '@/types/models'
 
-defineProps({
-  data: { type: Object, required: true }
-})
+defineProps<{
+  data: User
+}>()
 </script>
 
 <template>

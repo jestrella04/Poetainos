@@ -1,14 +1,21 @@
-<script setup>
-import { computed, inject, ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { computed, ref, onMounted } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import { useSwipe } from '@vueuse/core'
+import type { UseSwipeDirection } from '@vueuse/core'
+import { helperKey, unreadCountKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { AppNotification, Paginated } from '@/types/models'
 
-const page = computed(() => usePage())
-const helper = inject('helper')
-const notifications = ref([])
+type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
+
+const page = computed(() => usePage<InertiaPageProps<{ tab: string }>>())
+const helper = injectStrict(helperKey)
+const notifications = ref<AppNotification[]>([])
 const next = ref('')
-const unreadCount = inject('unreadCount')
+const unreadCount = injectStrict(unreadCountKey)
 const fetched = ref(false)
 const target = document.body
 
@@ -17,7 +24,7 @@ useSwipe(target, {
   onSwipe() {
     //
   },
-  onSwipeEnd(e, direction) {
+  onSwipeEnd(_e: TouchEvent, direction: UseSwipeDirection) {
     if (direction === 'left') {
       swipeRight()
     } else if (direction === 'right') {
@@ -26,13 +33,13 @@ useSwipe(target, {
   }
 })
 
-async function loadMore({ done }) {
+async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
   if (!helper.strNullOrEmpty(next.value)) {
     await axios
-      .get(next.value)
+      .get<Paginated<AppNotification>>(next.value)
       .then((response) => {
         notifications.value.push(...response.data.data)
-        next.value = response.data.next_page_url
+        next.value = response.data.next_page_url ?? ''
         done('ok')
       })
       .catch(() => {
@@ -45,28 +52,31 @@ async function loadMore({ done }) {
 
 function swipeRight() {
   if ('unread' === page.value.props.tab) {
-    document.querySelector('.v-tab[value="all"]').click()
+    document.querySelector<HTMLElement>('.v-tab[value="all"]')?.click()
   }
 }
 
 function swipeLeft() {
   if ('all' === page.value.props.tab) {
-    document.querySelector('.v-tab[value="unread"]').click()
+    document.querySelector<HTMLElement>('.v-tab[value="unread"]')?.click()
   }
 }
 
-onMounted(async () => {
-  await router.reload({
+onMounted(() => {
+  router.reload({
     only: ['notifications'],
-    onSuccess: (page) => {
-      update(page.props.notifications.data, page.props.notifications.next_page_url)
+    onSuccess: (successPage) => {
+      const successProps = successPage.props as unknown as InertiaPageProps<{
+        notifications: Paginated<AppNotification>
+      }>
+      update(successProps.notifications.data, successProps.notifications.next_page_url)
     }
   })
 })
 
-function update(notificationsData, nextPage) {
+function update(notificationsData: AppNotification[], nextPage: string | null) {
   notifications.value.push(...notificationsData)
-  next.value = nextPage
+  next.value = nextPage ?? ''
   fetched.value = true
 }
 </script>
@@ -129,7 +139,7 @@ function update(notificationsData, nextPage) {
           <v-card-text>
             <div class="d-flex ga-5">
               <div>
-                <template v-if="!$helper.isEmpty(notification.notifier_user)">
+                <template v-if="notification.notifier_user !== null">
                   <po-avatar size="48" color="secondary" :user="notification.notifier_user" />
                 </template>
                 <template v-else>
@@ -143,7 +153,10 @@ function update(notificationsData, nextPage) {
                 <div class="d-flex w-100 justify-space-between">
                   <div>
                     <p>{{ $helper.notificationMessage(notification, $t) }}.</p>
-                    <p class="text-caption text-disabled">
+                    <p
+                      v-if="notification.notifier_writing !== null"
+                      class="text-caption text-disabled"
+                    >
                       {{ $t('main.title') }}: {{ notification.notifier_writing.title }}
                     </p>
                   </div>

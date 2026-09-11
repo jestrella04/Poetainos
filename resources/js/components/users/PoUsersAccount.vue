@@ -1,25 +1,26 @@
-<script setup>
-import { inject, ref, provide, reactive } from 'vue'
+<script setup lang="ts">
+import { ref, provide, reactive } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
+import { helperKey, isDeleteKey, pushKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { InertiaPageProps } from '@/types/inertia'
 
-const page = usePage()
-const helper = inject('helper')
-const push = inject('push')
+const page = usePage<InertiaPageProps<{ notifications?: { email: boolean } }>>()
+const helper = injectStrict(helperKey)
+const push = injectStrict(pushKey)
 
-if (!helper) {
-  throw new Error('helper plugin not provided')
-}
-
-const username = helper.authUser().username
+// This page is behind the `verified` auth middleware (routes/web.php), so
+// the authenticated user is always present here.
+const username = helper.authUser()!.username
 const isDelete = ref(false)
 const notifications = reactive({
   email: page.props.notifications?.email ?? true,
   push: false
 })
 
-provide('isDelete', isDelete)
+provide(isDeleteKey, isDelete)
 
 if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
   navigator.serviceWorker.ready
@@ -38,11 +39,11 @@ if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
             notifications.push = false
           }
         })
-        .catch((e) => {
+        .catch((e: unknown) => {
           console.log('Error thrown checking subscription status.', e)
         })
     })
-    .catch((e) => {
+    .catch((e: unknown) => {
       console.log('Service worker not available:', e)
     })
 }
@@ -50,11 +51,7 @@ if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
 function email() {
   notifications.email = !notifications.email
 
-  axios
-    .post(route('notifications.email', [notifications.email]))
-    .then()
-    .catch()
-    .finally()
+  void axios.post(route('notifications.email', [String(notifications.email)]))
 }
 
 function pusher() {
@@ -77,20 +74,20 @@ function pusher() {
         <div class="d-flex mb-5 pos-relative">
           <div class="d-flex ga-4 mb-2">
             <div>
-              <po-avatar size="48" color="secondary" :user="$helper.authUser()" />
+              <po-avatar size="48" color="secondary" :user="$helper.authUser()!" />
             </div>
 
             <div>
               <p class="font-weight-bold">
                 <po-link
-                  :href="route('users.show', $helper.authUser().username)"
+                  :href="route('users.show', $helper.authUser()!.username)"
                   class="stretched"
                   inertia
                 >
-                  {{ $helper.userDisplayName($helper.authUser()) }}
+                  {{ $helper.userDisplayName($helper.authUser()!) }}
                 </po-link>
               </p>
-              <p class="text-medium-emphasis">@{{ $helper.authUser().username }}</p>
+              <p class="text-medium-emphasis">@{{ $helper.authUser()!.username }}</p>
             </div>
           </div>
         </div>

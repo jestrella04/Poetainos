@@ -1,19 +1,23 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { helperKey, sharerKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const props = defineProps({
-  linkTitle: { type: String, required: true },
-  linkUrl: { type: String, required: true }
-})
+const props = defineProps<{
+  linkTitle: string
+  linkUrl: string
+}>()
 
-const helper = inject('helper')
-const sharer = inject('sharer')
+const helper = injectStrict(helperKey)
+const sharer = injectStrict(sharerKey)
 const social = helper.shareLinks(props.linkTitle, props.linkUrl)
 
-function copy(event) {
-  if ('copy' === event.target.closest('.social').id) {
+function copy(event: MouseEvent) {
+  const target = event.target as HTMLElement
+  const socialEl = target.closest('.social')
+
+  if (socialEl && 'copy' === socialEl.id) {
     event.preventDefault()
-    navigator.clipboard.writeText(props.linkUrl)
+    void navigator.clipboard.writeText(props.linkUrl)
   }
 
   sharer.value = false

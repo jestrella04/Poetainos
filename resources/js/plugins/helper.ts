@@ -1,65 +1,71 @@
-// plugins/helper.js
-
 import * as _ from 'lodash-es'
-import millifyModule from 'millify'
-
-const millify = typeof millifyModule === 'function' ? millifyModule : millifyModule.default
+import { millify } from 'millify'
 import { computed } from 'vue'
+import type { App } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import crop from 'crop-url'
 import linkifyHtml from 'linkify-html'
 import 'linkify-plugin-mention'
 import MarkdownIt from 'markdown-it'
 import { intlFormatDistance } from 'date-fns'
+import type { ComposerTranslation } from 'vue-i18n'
+import { helperKey, type SnackBarState } from '../composables/keys'
+import type { UserLike } from '../types/models'
 
 const page = computed(() => usePage())
 
-const Helper = class {
-  constructor() {}
+interface NotificationLike {
+  type: string
+  // The user this notification is about is resolved server-side by id and
+  // can come back null (e.g. the referenced user was since deleted).
+  notifier_user: UserLike | null
+}
 
-  auth() {
+export class Helper {
+  auth(): boolean {
     const auth = page.value.props.auth
-    return !this.isNull(auth.user) && !this.strNullOrEmpty(auth.user.username)
+    return auth.user !== null && !this.strNullOrEmpty(auth.user.username)
   }
 
   authUser() {
     return page.value.props.auth.user
   }
 
-  admin() {
-    const auth = page.value.props.auth
-    return auth.admin
+  admin(): boolean {
+    return page.value.props.auth.admin === true
   }
 
-  canEdit(author) {
-    if (this.auth()) {
-      return this.authUser().username === author.username || this.admin()
+  canEdit(author: { username: string }): boolean {
+    const user = this.authUser()
+
+    if (user === null || this.strNullOrEmpty(user.username)) {
+      return false
     }
 
-    return false
+    return user.username === author.username || this.admin()
   }
 
-  storage(path) {
+  storage(path: string): string {
     return `/storage/${path}`
   }
 
-  isNil(obj) {
+  isNil(obj: unknown): obj is null | undefined {
     return _.isNil(obj)
   }
 
-  isNull(obj) {
+  isNull(obj: unknown): obj is null {
     return _.isNull(obj)
   }
 
-  isEmpty(obj) {
+  isEmpty(obj: unknown): boolean {
     return _.isEmpty(obj)
   }
 
-  strNullOrEmpty(str) {
+  strNullOrEmpty(str: string | null | undefined): boolean {
     return _.isNil(str) || '' === str.trim()
   }
 
-  userDisplayName(user) {
+  userDisplayName(user: UserLike): string {
     if (!_.isNil(user.name) && '' !== user.name) {
       return user.name
     }
@@ -67,7 +73,7 @@ const Helper = class {
     return user.username
   }
 
-  userInitials(user) {
+  userInitials(user: UserLike): string {
     if (!_.isNil(user.name) && !_.isNil(user.last_name)) {
       return _.toUpper(`${user.name.substring(0, 1)}${user.last_name.substring(0, 1)}`)
     }
@@ -75,11 +81,11 @@ const Helper = class {
     return _.toUpper(user.username.substring(0, 1))
   }
 
-  readable(str) {
-    return millify(str)
+  readable(value: number): string {
+    return millify(value)
   }
 
-  toLocaleDate(date) {
+  toLocaleDate(date: string | number | Date): string {
     return new Date(date).toLocaleDateString('es-DO', {
       year: 'numeric',
       month: 'short',
@@ -87,11 +93,11 @@ const Helper = class {
     })
   }
 
-  relativeDate(date) {
+  relativeDate(date: string | number | Date): string {
     return intlFormatDistance(new Date(date), new Date(), { locale: 'es' })
   }
 
-  excerpt(text) {
+  excerpt(text: string): string {
     const len = text.length
 
     if (len < 400) {
@@ -101,21 +107,21 @@ const Helper = class {
     return `${text.substring(0, 400)}...`
   }
 
-  cropUrl(url, max = 40) {
+  cropUrl(url: string, max = 40): string {
     return crop(url, max)
   }
 
-  linkify(text) {
+  linkify(text: string): string {
     const options = {
       formatHref: {
-        mention: (href) => `${route('users.index')}${href}`
+        mention: (href: string) => `${route('users.index')}${href}`
       }
     }
 
     return linkifyHtml(text, options)
   }
 
-  socialLink(user, network) {
+  socialLink(user: string, network: string): string {
     let url = ''
 
     switch (network) {
@@ -151,25 +157,27 @@ const Helper = class {
     return url
   }
 
-  markdown(md) {
+  markdown(md: string): string {
     return MarkdownIt().render(md)
   }
 
-  notificationMessage(notification, t) {
-    let message = null
+  notificationMessage(notification: NotificationLike, t: ComposerTranslation): string | null {
+    let message: string | null = null
+    // Falls back when the notifying user has since been deleted — the
+    // server resolves notifier_user by id and can return null.
+    const name =
+      notification.notifier_user !== null
+        ? this.userDisplayName(notification.notifier_user)
+        : 'Usuario'
 
     switch (notification.type) {
       case 'App\\Notifications\\WritingCommented':
-        message = t('comments.user-added', {
-          name: this.userDisplayName(notification.notifier_user)
-        })
+        message = t('comments.user-added', { name })
         break
 
       case 'App\\Notifications\\WritingCommentMentioned':
       case 'App\\Notifications\\WritingReplyMentioned':
-        message = t('comments.user-mentioned', {
-          name: this.userDisplayName(notification.notifier_user)
-        })
+        message = t('comments.user-mentioned', { name })
         break
 
       case 'App\\Notifications\\WritingFeatured':
@@ -177,44 +185,36 @@ const Helper = class {
         break
 
       case 'App\\Notifications\\WritingLiked':
-        message = t('writings.user-liked', {
-          name: this.userDisplayName(notification.notifier_user)
-        })
+        message = t('writings.user-liked', { name })
         break
 
       case 'App\\Notifications\\WritingReplied':
-        message = t('comments.user-replied', {
-          name: this.userDisplayName(notification.notifier_user)
-        })
+        message = t('comments.user-replied', { name })
         break
 
       case 'App\\Notifications\\WritingShelved':
-        message = t('writings.user-shelved', {
-          name: this.userDisplayName(notification.notifier_user)
-        })
+        message = t('writings.user-shelved', { name })
         break
 
       case 'App\\Notifications\\CommentLiked':
-        message = t('comments.user-liked', {
-          name: this.userDisplayName(notification.notifier_user)
-        })
+        message = t('comments.user-liked', { name })
         break
     }
 
     return message
   }
 
-  setSnackBar(snack = {}) {
+  setSnackBar(snack: Partial<SnackBarState> = {}): void {
     sessionStorage.setItem('snack', JSON.stringify(snack))
   }
 
-  getSnackBar() {
-    const snack = JSON.parse(sessionStorage.getItem('snack'))
+  getSnackBar(): Partial<SnackBarState> | null {
+    const stored = sessionStorage.getItem('snack')
     sessionStorage.removeItem('snack')
-    return snack
+    return stored === null ? null : (JSON.parse(stored) as Partial<SnackBarState>)
   }
 
-  checkFormValidity(form) {
+  checkFormValidity(form: HTMLFormElement): boolean {
     if (!form.checkValidity()) {
       form.reportValidity()
       return false
@@ -223,15 +223,15 @@ const Helper = class {
     return true
   }
 
-  animate = (node, animation, prefix = 'animate__') =>
+  animate(node: HTMLElement, animation: string, prefix = 'animate__'): Promise<string> {
     // We create a Promise and return it
-    new Promise((resolve) => {
+    return new Promise((resolve) => {
       const animationName = `${prefix}${animation}`
 
       node.classList.add(`${prefix}animated`, animationName)
 
       // When the animation ends, we clean the classes and resolve the Promise
-      function handleAnimationEnd(event) {
+      function handleAnimationEnd(event: Event) {
         event.stopPropagation()
         node.classList.remove(`${prefix}animated`, animationName)
         resolve('Animation ended')
@@ -239,8 +239,9 @@ const Helper = class {
 
       node.addEventListener('animationend', handleAnimationEnd, { once: true })
     })
+  }
 
-  shareLinks(title, url) {
+  shareLinks(title: string, url: string): Array<{ name: string; url: string; icon: string }> {
     const facebookBaseUrl = `https://facebook.com/sharer/sharer.php?u=${url}`
     const twitterBaseUrl = `https://twitter.com/intent/tweet/?text=${title}&url=${url}`
     const whatsappBaseUrl = `whatsapp://send?text=${title}%20${url}`
@@ -275,7 +276,7 @@ const Helper = class {
     ]
   }
 
-  socialIcon() {
+  socialIcon(): Record<string, string | undefined> {
     return {
       twitter: 'fab fa-x-twitter',
       threads: 'fab fa-threads',
@@ -286,12 +287,12 @@ const Helper = class {
     }
   }
 
-  asset(url) {
+  asset(url: string): string {
     return new URL(url, route('home')).toString()
   }
 
-  karmaMedal(grade) {
-    let medal = null
+  karmaMedal(grade: string): string | null {
+    let medal: string | null = null
 
     if ('C' == grade) {
       medal = 'deep-orange-accent-1'
@@ -305,10 +306,16 @@ const Helper = class {
   }
 }
 
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $helper: Helper
+  }
+}
+
 export const helper = {
-  install: (app) => {
-    const helper = new Helper()
-    app.config.globalProperties.$helper = helper
-    app.provide('helper', helper)
+  install: (app: App) => {
+    const instance = new Helper()
+    app.config.globalProperties.$helper = instance
+    app.provide(helperKey, instance)
   }
 }

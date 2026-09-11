@@ -1,8 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import type { InertiaPageProps } from '@/types/inertia'
 
-const page = computed(() => usePage())
+interface StaticPage {
+  title: string
+  text: string
+}
+
+const page = computed(() => usePage<InertiaPageProps<{ page: StaticPage }>>())
 const data = page.value.props.page
 </script>
 

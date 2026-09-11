@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 
 defineOptions({

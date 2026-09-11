@@ -1,14 +1,24 @@
-<script setup>
-import { computed, ref, reactive, provide, inject, onMounted, onUpdated, watch } from 'vue'
+<script setup lang="ts">
+import { computed, ref, reactive, onMounted, onUpdated, watch, provide } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 import '@khmyznikov/pwa-install'
+import {
+  forceSnackBarKey,
+  helperKey,
+  loginModalKey,
+  mobileSiteMenuKey,
+  mobileUserMenuKey,
+  snackBarKey,
+  unreadCountKey
+} from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
 const page = computed(() => usePage())
-const helper = inject('helper')
+const helper = injectStrict(helperKey)
 const theme = useTheme()
 const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
@@ -28,60 +38,69 @@ const echo = new Echo({
   broadcaster: 'pusher',
   key: import.meta.env.VITE_PUSHER_APP_KEY,
   wsHost: import.meta.env.VITE_PUSHER_HOST,
-  wsPort: import.meta.env.VITE_PUSHER_PORT,
-  wssPort: import.meta.env.VITE_PUSHER_PORT,
+  wsPort: import.meta.env.VITE_PUSHER_PORT ? Number(import.meta.env.VITE_PUSHER_PORT) : undefined,
+  wssPort: import.meta.env.VITE_PUSHER_PORT ? Number(import.meta.env.VITE_PUSHER_PORT) : undefined,
   cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
   forceTLS: import.meta.env.VITE_PUSHER_APP_FORCETLS === 'true',
-  disableStats: true
+  disableStats: true,
+  // PusherConnector connects synchronously during Echo's constructor, so
+  // Pusher must be supplied here rather than assigned on the instance
+  // afterwards (the connection attempt would already have failed).
+  Pusher
 })
 const reloadSW = '__RELOAD_SW__'
 const intervalMS = 60 * 60 * 1000
 
-echo.Pusher = Pusher
 document.body.appendChild(installComponent)
-window.matchMedia('(prefers-color-scheme: dark)').matches
+void (window.matchMedia('(prefers-color-scheme: dark)').matches
   ? theme.change('dark')
-  : theme.change('light')
+  : theme.change('light'))
 
 useRegisterSW({
   onRegisteredSW(swUrl, r) {
     console.log(`Service Worker at: ${swUrl}`)
 
-    if (reloadSW === 'true') {
+    if ((reloadSW as string) === 'true') {
       r &&
-        setInterval(async () => {
+        setInterval(() => {
           console.log('Checking for sw update')
-          await r.update()
+          void r.update()
         }, intervalMS)
     } else {
-      console.log(`SW Registered: ${r}`)
+      console.log('SW Registered:', r)
     }
   }
 })
 
-provide('snackBar', snackBar)
-provide('forceSnackBar', forceSnackBar)
-provide('mobileSiteMenu', mobileSiteMenu)
-provide('mobileUserMenu', mobileUserMenu)
-provide('unreadCount', unreadCount)
-provide('loginModal', loginModal)
+provide(snackBarKey, snackBar)
+provide(forceSnackBarKey, forceSnackBar)
+provide(mobileSiteMenuKey, mobileSiteMenu)
+provide(mobileUserMenuKey, mobileUserMenu)
+provide(unreadCountKey, unreadCount)
+provide(loginModalKey, loginModal)
 
 onMounted(() => {
   getFlashMessages()
 
   if (helper.auth() && 'setAppBadge' in navigator) {
-    navigator.setAppBadge(unreadCount.value)
+    void navigator.setAppBadge(unreadCount.value)
   }
 
   // Listen for new user notification events coming from the server
   if (helper.auth()) {
-    echo.private(`notifications.${helper.authUser().id}`).listen('NotificationEvent', (payload) => {
-      unreadCount.value = payload.notifications.unread
+    const authUser = helper.authUser()
 
-      if ('setAppBadge' in navigator) {
-        navigator.setAppBadge(payload.notifications.unread)
-      }
-    })
+    if (authUser) {
+      echo
+        .private(`notifications.${authUser.id}`)
+        .listen('NotificationEvent', (payload: { notifications: { unread: number } }) => {
+          unreadCount.value = payload.notifications.unread
+
+          if ('setAppBadge' in navigator) {
+            void navigator.setAppBadge(payload.notifications.unread)
+          }
+        })
+    }
   }
 })
 
@@ -101,14 +120,14 @@ function getFlashMessages() {
   const flash = page.value.props.flash.message
 
   // Check for client side flash messages
-  if (!helper.isEmpty(snack)) {
-    snackBar.message = snack.message
-    snackBar.active = snack.active
-    snackBar.color = snack.color
+  if (snack !== null && !helper.isEmpty(snack)) {
+    snackBar.message = snack.message ?? snackBar.message
+    snackBar.active = snack.active ?? snackBar.active
+    snackBar.color = snack.color ?? snackBar.color
   }
 
   // Check for server side flash messages
-  if (!helper.strNullOrEmpty(flash)) {
+  if (flash !== null && !helper.strNullOrEmpty(flash)) {
     snackBar.message = flash
     snackBar.active = true
     snackBar.color = 'primary'
@@ -349,7 +368,7 @@ code {
             <template v-slot:activator="{ props }">
               <po-button icon v-bind="props" style="font-size: 0.7rem">
                 <po-badge :count="unreadCount">
-                  <po-avatar size="32" color="secondary" :user="$helper.authUser()" />
+                  <po-avatar size="32" color="secondary" :user="$helper.authUser()!" />
                 </po-badge>
               </po-button>
             </template>

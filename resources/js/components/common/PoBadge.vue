@@ -1,7 +1,12 @@
-<script setup>
-defineProps({
-  count: { type: Number, default: 0 }
-})
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    count?: number
+  }>(),
+  {
+    count: 0
+  }
+)
 </script>
 
 <template>

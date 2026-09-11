@@ -1,20 +1,27 @@
-<script setup>
-import { inject, computed } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { helperKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import type { UserLike } from '@/types/models'
 
-const props = defineProps({
-  user: { type: Object, required: true }
-})
+const props = defineProps<{
+  user: UserLike
+}>()
 
-const helper = inject('helper')
-
-if (!helper) {
-  throw new Error('helper plugin not provided')
-}
+const helper = injectStrict(helperKey)
 
 const avatar = computed(() => {
-  if (!helper.strNullOrEmpty(props.user?.avatar)) {
+  if (
+    props.user.avatar !== null &&
+    props.user.avatar !== undefined &&
+    props.user.avatar.trim() !== ''
+  ) {
     return props.user.avatar
-  } else if (props.user?.extra_info?.avatar) {
+  } else if (
+    props.user.extra_info?.avatar !== null &&
+    props.user.extra_info?.avatar !== undefined &&
+    props.user.extra_info.avatar !== ''
+  ) {
     return props.user.extra_info.avatar
   }
   return ''

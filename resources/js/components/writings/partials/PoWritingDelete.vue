@@ -1,20 +1,26 @@
-<script setup>
-import { ref, inject } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import axios from 'axios'
 import { router } from '@inertiajs/vue3'
+import { forceSnackBarKey, helperKey, isDeleteKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-defineProps({
-  slug: { type: String, required: true }
-})
+defineProps<{
+  slug: string
+}>()
 
-const helper = inject('helper')
-const isDelete = inject('isDelete')
+const helper = injectStrict(helperKey)
+const isDelete = injectStrict(isDeleteKey)
 const isPosting = ref(false)
 const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
+const forceSnackBar = injectStrict(forceSnackBarKey)
 
 async function submit() {
-  const form = document.querySelector('#writing-delete-form')
+  const form = document.querySelector<HTMLFormElement>('#writing-delete-form')
+
+  if (!form) {
+    return
+  }
 
   isPosting.value = true
   errors.value = false

@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 
 const page = computed(() => usePage())
-const relatedApps = ref([])
+const relatedApps = ref<RelatedApplication[]>([])
 
-if ('getInstalledRelatedApps' in navigator) {
-  navigator.getInstalledRelatedApps().then((related) => {
+if (navigator.getInstalledRelatedApps !== undefined) {
+  void navigator.getInstalledRelatedApps().then((related) => {
     relatedApps.value = related
   })
 }
@@ -32,7 +32,7 @@ footer {
     <div class="d-inline-flex ga-3">&copy; 2020 {{ page.props.site.name }}</div>
 
     <div v-if="$helper.isEmpty(relatedApps)" class="d-inline-flex ga-3">
-      <template v-for="(app, store) in page.props.site.stores" :key="app">
+      <template v-for="(app, store) in page.props.site.stores" :key="store">
         <po-button
           v-if="'' !== app.value"
           :href="app.value"

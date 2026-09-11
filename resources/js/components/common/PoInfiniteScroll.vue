@@ -1,4 +1,4 @@
-<script setup></script>
+<script setup lang="ts"></script>
 
 <template>
   <v-infinite-scroll color="primary" class="mt-10" mode="manual">

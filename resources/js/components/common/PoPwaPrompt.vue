@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 // replaced dynamically
@@ -9,14 +9,14 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
   onRegisteredSW(swUrl, r) {
     console.log(`Service Worker at: ${swUrl}`)
 
-    if (reloadSW === 'true') {
+    if ((reloadSW as string) === 'true') {
       r &&
-        setInterval(async () => {
+        setInterval(() => {
           console.log('Checking for sw update')
-          await r.update()
+          void r.update()
         }, intervalMS)
     } else {
-      console.log(`SW Registered: ${r}`)
+      console.log('SW Registered:', r)
     }
   }
 })
