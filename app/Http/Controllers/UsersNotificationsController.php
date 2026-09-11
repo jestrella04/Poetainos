@@ -86,7 +86,7 @@ class UsersNotificationsController extends Controller
 
     public function email($enable)
     {
-        User::find(auth()->user()->id)->emailNotifications($enable);
+        auth()->user()->emailNotifications($enable);
 
         return response()->json(null, 204);
     }

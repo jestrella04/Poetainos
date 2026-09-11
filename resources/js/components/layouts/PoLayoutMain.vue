@@ -2,7 +2,6 @@
 import { computed, ref, reactive, onMounted, onUpdated, watch, provide } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTheme } from 'vuetify'
-import { useRegisterSW } from 'virtual:pwa-register/vue'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 import '@khmyznikov/pwa-install'
@@ -48,29 +47,10 @@ const echo = new Echo({
   // afterwards (the connection attempt would already have failed).
   Pusher
 })
-const reloadSW = '__RELOAD_SW__'
-const intervalMS = 60 * 60 * 1000
-
 document.body.appendChild(installComponent)
 void (window.matchMedia('(prefers-color-scheme: dark)').matches
   ? theme.change('dark')
   : theme.change('light'))
-
-useRegisterSW({
-  onRegisteredSW(swUrl, r) {
-    console.log(`Service Worker at: ${swUrl}`)
-
-    if ((reloadSW as string) === 'true') {
-      r &&
-        setInterval(() => {
-          console.log('Checking for sw update')
-          void r.update()
-        }, intervalMS)
-    } else {
-      console.log('SW Registered:', r)
-    }
-  }
-})
 
 provide(snackBarKey, snackBar)
 provide(forceSnackBarKey, forceSnackBar)
@@ -216,12 +196,12 @@ code {
 
 .liked i,
 .do-like:hover i {
-  color: #d32f2f;
+  color: rgb(var(--v-theme-error));
 }
 
 .shelved i,
 .do-shelf:hover i {
-  color: #2196f3;
+  color: rgb(var(--v-theme-info));
 }
 
 .do-shelf,
@@ -269,6 +249,7 @@ code {
     <po-head />
     <po-snack-bar></po-snack-bar>
     <po-login-modal v-model="loginModal"></po-login-modal>
+    <po-pwa-prompt></po-pwa-prompt>
 
     <v-toolbar color="primary" :elevation="4" class="po-navbar px-3 d-none d-lg-flex">
       <v-container class="d-inline-flex justify-space-between">

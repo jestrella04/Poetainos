@@ -2,18 +2,13 @@
 
 namespace App\Notifications;
 
-use App\Events\NotificationEvent;
 use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\DatabaseMessage;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushChannel;
-use NotificationChannels\WebPush\WebPushMessage;
 
-class WritingCommented extends Notification implements ShouldQueue
+class WritingCommented extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
@@ -59,59 +54,6 @@ class WritingCommented extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return ['mail', 'database', 'broadcast', WebPushChannel::class];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return MailMessage
-     */
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->subject($this->notification['title'])
-            ->greeting($this->notification['greeting'])
-            ->line($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->line($this->notification['footer']);
-    }
-
-    /**
-     * Get the web push representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
-     * @return DatabaseMessage
-     */
-    public function toWebPush($notifiable, $notification)
-    {
-        return (new WebPushMessage)
-            ->title($this->notification['title'])
-            ->icon($this->notification['icon'])
-            ->body($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->options(['TTL' => 1000])
-            ->renotify()
-            ->requireInteraction()
-            ->tag($this->notification['tag']);
-        // ->data(['id' => $notification->id])
-        // ->badge()
-        // ->dir()
-        // ->image()
-        // ->lang()
-        // ->vibrate()
-    }
-
-    /**
-     * Get the broadcastable representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return BroadcastMessage
-     */
-    public function toBroadcast($notifiable)
-    {
-        return event(new NotificationEvent($notifiable));
     }
 
     /**

@@ -164,7 +164,7 @@ async function submitForm() {
 
       <v-text-field
         v-model="formData.captcha"
-        label="Captcha"
+        :label="$t('main.captcha')"
         :placeholder="$t('main.validate-not-robot')"
         hide-details="auto"
         :error-messages="errors.captcha"

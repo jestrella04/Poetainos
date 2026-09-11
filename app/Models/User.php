@@ -178,8 +178,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $shelf = $count['shelf'] ?? 0;
         $awards = $count['awards'] ?? 0;
         $views = $count['views'] ?? 0;
-        // $hood = $this->hood->count();
-        // $extendedHood = $this->fellowHood($count = true);
 
         // Get points from settings
         $pointsWritings = getSiteConfig('aura.points.user.writing');
@@ -188,9 +186,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $pointsShelf = getSiteConfig('aura.points.user.shelf');
         $pointsViews = getSiteConfig('aura.points.user.views');
         $pointsAwards = getSiteConfig('aura.points.user.award');
-        // $pointsHood = getSiteConfig('aura.points.user.hood');
-        // $pointsExtendedHood = getSiteConfig('aura.points.user.extended_hood');
-        $basePoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
+        $basePoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards;
 
         // Calculate points as per settings
         $pointsWritings = $pointsWritings * $writings;
@@ -199,9 +195,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $pointsShelf = $pointsShelf * $shelf;
         $pointsViews = $pointsViews * $views;
         $pointsAwards = $pointsAwards * $awards;
-        // $pointsHood = $pointsHood * $hood;
-        // $pointsExtendedHood = $pointsExtendedHood * $extendedHood;
-        $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards /* + $pointsHood + $pointsExtendedHood */ ;
+        $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards;
 
         return [
             'base' => (int) $basePoints,
@@ -220,18 +214,15 @@ class User extends Authenticatable implements MustVerifyEmail
             'shelf' => $user->shelf_count,
             'awards' => $user->awards_count,
             'views' => $this->profile_views,
-            // 'hood' => $this->hood->count(),
-            // 'extendedHood' => $this->fellowHood($count = true),
         ];
 
         $points = $this->calcPoints($count);
 
         // Do the math
-        if ($points['total'] > 0) {
-            $aura = (($points['total'] / $points['base']) * ($points['base'] / 6)) / $points['base']; // 6 is the count of countables (writings, likes, etc)
-
-            // Format numbers
-            $aura = number_format($aura, 2);
+        if ($points['total'] > 0 && $points['base'] > 0) {
+            // Reduces algebraically to total / (6 * base); 6 is the count of
+            // countables (writings, likes, comments, shelf, views, awards).
+            $aura = number_format($points['total'] / (6 * $points['base']), 2);
 
             // Persist to the database
             DB::table('users')->whereId($this->id)->update([

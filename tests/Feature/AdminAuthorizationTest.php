@@ -19,6 +19,17 @@ test('admins can access the admin area', function (): void {
     $this->actingAs($admin)->get('/admin')->assertOk();
 });
 
+test('the tools page exposes structured server info and a log tail', function (): void {
+    $admin = actingAsAdmin();
+
+    $this->actingAs($admin)->get(route('admin.tools'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('info')
+            ->where('info.PHP version', PHP_VERSION)
+            ->has('log'));
+});
+
 test('isAllowed reflects the role\'s admin permission', function (): void {
     $noRole = User::factory()->create();
     expect($noRole->isAllowed('admin'))->toBeFalse();

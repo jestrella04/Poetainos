@@ -33,22 +33,10 @@ class WritingsController extends Controller
         $awards = request()->route()->getName() === 'writings.awards';
         $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
         $filterAwards = $awards ? 'home_posted_at' : 'id';
-        $writings = Writing::whereNotIn('user_id', $this->getBlockedUsers())
+        $writings = Writing::visibleTo($this->getBlockedUsers())
             ->whereNotNull($filterAwards)
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with([
-                'author' => function ($query): void {
-                    $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
-                },
-            ]);
-
-        if ($sort === 'latest') {
-            $writings = $writings->latest();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc')->orderBy('aura', 'desc');
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc')->orderBy('aura', 'desc');
-        }
+            ->withListingRelations()
+            ->sorted($sort);
 
         if (request()->expectsJson()) {
             return $writings->simplePaginate($this->pagination)->withQueryString();
@@ -98,7 +86,7 @@ class WritingsController extends Controller
         $writing->updateAura();
         // $writing->author->updateAura();
 
-        $user = auth()->check() ? User::find(auth()->user()->id) : null;
+        $user = auth()->user();
 
         return Inertia::render('writings/PoWritingsShow', [
             'meta' => [
@@ -196,7 +184,7 @@ class WritingsController extends Controller
             ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
-            'agreement' => User::find(auth()->user()->id)->isInAgreement(),
+            'agreement' => auth()->user()->isInAgreement(),
         ]);
     }
 
@@ -300,7 +288,7 @@ class WritingsController extends Controller
         // $writing->author->updateKarma();
 
         // Persist user agreements to avoid asking again
-        if (! empty(request('service_agreement') && ! empty(request('privacy_agreement')))) {
+        if (request('service_agreement') && request('privacy_agreement')) {
             $writing->author->acceptAgreements();
         }
 
@@ -338,7 +326,7 @@ class WritingsController extends Controller
 
         // Delete related likes
         Like::where([
-            ['likeable_type', 'App\Models\Writing'],
+            ['likeable_type', Writing::class],
             ['likeable_id', $writing->id],
         ])->delete();
 

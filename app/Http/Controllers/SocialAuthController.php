@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -63,10 +64,13 @@ class SocialAuthController extends Controller
             $user->extra_info = ['avatar' => $path];
         }
 
-        // Set email as verified
-        if (empty($social->email_verfied_at)) {
+        // Social login implies a trusted email address (the provider already
+        // authenticated it) — verify it once on first login. Socialite's User
+        // object has no portable "email verified" flag across our providers
+        // (Google/Facebook/Twitter), so check our own record instead.
+        if (empty($user->email_verified_at)) {
             $updated = true;
-            $user->email_verified_at = now();
+            $user->email_verified_at = Carbon::now();
         }
 
         // Save changes, if any

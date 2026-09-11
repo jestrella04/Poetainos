@@ -23,7 +23,7 @@ class CommentsController extends Controller
         $filter = [0];
 
         if (auth()->check()) {
-            $filter = User::find(auth()->user()->id)->blockedAuthors()->pluck('blocked_user_id');
+            $filter = auth()->user()->blockedAuthors()->pluck('blocked_user_id');
         }
 
         $comments = Comment::where('writing_id', $writing)
@@ -142,7 +142,7 @@ class CommentsController extends Controller
 
         // Delete related likes
         Like::where([
-            ['likeable_type', 'App\Models\Comment'],
+            ['likeable_type', Comment::class],
             ['likeable_id', $comment->id],
         ])->delete();
 

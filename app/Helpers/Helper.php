@@ -135,3 +135,25 @@ function inRange($value, $min, $max)
 {
     return $value >= $min && $value < $max;
 }
+
+function tailFile(string $path, int $lines = 100): string
+{
+    if (! is_readable($path)) {
+        return '';
+    }
+
+    $file = new SplFileObject($path, 'r');
+    $file->seek(PHP_INT_MAX);
+    $lastLine = $file->key();
+
+    $file->seek(max(0, $lastLine - $lines));
+
+    $tail = [];
+
+    while (! $file->eof()) {
+        $tail[] = $file->fgets();
+        $file->next();
+    }
+
+    return implode('', $tail);
+}

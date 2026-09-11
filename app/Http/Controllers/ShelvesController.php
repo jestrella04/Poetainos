@@ -60,7 +60,7 @@ class ShelvesController extends Controller
      */
     public function destroy(Writing $writing)
     {
-        User::find(auth()->user()->id)->shelf()->detach($writing->id);
+        auth()->user()->shelf()->detach($writing->id);
         $count = Shelf::where('writing_id', $writing->id)->count();
 
         return [

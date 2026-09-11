@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\WritingFeatured;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -160,8 +161,13 @@ class Writing extends Model
         $totalPoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
 
         // Do the math
-        $auraNew = (($totalPoints / $basePoints) * ($basePoints / 4)) / $basePoints; // 4 is the count of countables (comments, likes, etc)
-        $auraNew = number_format($auraNew, 2);
+        if ($basePoints <= 0) {
+            return;
+        }
+
+        // Reduces algebraically to totalPoints / (4 * basePoints); 4 is the
+        // count of countables (likes, comments, shelf, views).
+        $auraNew = number_format($totalPoints / (4 * $basePoints), 2);
 
         // Check when writing was posted (in days)
         $postedAt = Carbon::parse($this->created_at)->diffInDays();
@@ -207,5 +213,41 @@ class Writing extends Model
     public function complaints()
     {
         return $this->morphMany(Complaint::class, 'complainable');
+    }
+
+    /**
+     * Exclude writings authored by any of the given blocked user ids.
+     *
+     * @param  array<int>  $blockedUserIds
+     */
+    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
+    {
+        return $query->whereNotIn('user_id', $blockedUserIds);
+    }
+
+    /**
+     * Shared sort used by every writings listing. 'popular' and 'likes'
+     * break ties by aura (desc) so that, among writings with an identical
+     * views/likes count, the higher-quality (higher-aura) one surfaces
+     * first.
+     */
+    public function scopeSorted(Builder $query, string $sort): Builder
+    {
+        return match ($sort) {
+            'popular' => $query->orderBy('views', 'desc')->orderBy('aura', 'desc'),
+            'likes' => $query->orderBy('likes_count', 'desc')->orderBy('aura', 'desc'),
+            default => $query->latest(),
+        };
+    }
+
+    /**
+     * Counts and author summary eager-loaded by every writings listing.
+     */
+    public function scopeWithListingRelations(Builder $query): Builder
+    {
+        return $query->withCount(['likes', 'comments', 'shelf'])
+            ->with(['author' => function ($query): void {
+                $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
+            }]);
     }
 }

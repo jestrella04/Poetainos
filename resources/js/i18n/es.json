@@ -78,6 +78,9 @@
   "admin": {
     "admin-panel": "Administración",
     "analytics": "Analíticas",
+    "closed-at": "Cerrado el",
+    "download-full-copy": "Descargar copia completa",
+    "full-name": "Nombre completo",
     "log-viewer": "Registros del Sistema",
     "manage-complaints": "Administrar Denuncias",
     "php-info": "Info de PHP",
@@ -140,6 +143,7 @@
     "karma-contrib-missing": "Te animamos a interactuar con al menos {count} textos de otros autores antes de continuar.",
     "karma-contrib-actions": "Se vale un me gusta, un comentario, un marcador... (o todo a la vez 😉).",
     "karma-points": "Tienes un karma nivel \"{karma}\".",
+    "karma": "Karma",
     "about-us": "Sobre Nosotros",
     "action-irreversible": "Esta acción es irreversible.",
     "actions": "Acciones",
@@ -168,6 +172,7 @@
     "by-name": "por {name}",
     "cant-show": "No podemos mostrarte esto",
     "cant-show-more-content": "Es una pena, en este momento no podemos mostrate más contenido.",
+    "captcha": "Captcha",
     "choose-image": "Escoger imagen",
     "click-to-reload.": "Presiona para recargar.",
     "click-to-select": "Presiona para seleccionar",
@@ -325,7 +330,8 @@
     "page-created": "Página creada con éxito",
     "page-deleted": "Página eliminada con éxito",
     "page-updated": "Página actualizada con éxito",
-    "pages": "Páginas"
+    "pages": "Páginas",
+    "pages-list": "Listado de páginas"
   },
   "tags": {
     "create-tag": "Crear etiqueta",

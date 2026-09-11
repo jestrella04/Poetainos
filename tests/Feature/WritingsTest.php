@@ -26,6 +26,21 @@ test('show increments views and calculates a finite aura', function (): void {
     expect(is_numeric($fresh->aura))->toBeTrue();
 });
 
+test('updateAura does not throw when all writing aura points are zeroed', function (): void {
+    config(['writerhood.aura.points.writing' => [
+        'like' => 0,
+        'comment' => 0,
+        'shelf' => 0,
+        'views' => 0,
+    ]]);
+
+    $writing = Writing::factory()->create(['aura' => '1.23']);
+
+    $writing->updateAura();
+
+    expect((float) $writing->fresh()->aura)->toBe(1.23);
+});
+
 test('random redirects to an existing writing', function (): void {
     $writing = Writing::factory()->create();
 

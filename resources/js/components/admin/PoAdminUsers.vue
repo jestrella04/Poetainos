@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
+import { useServerTable } from '@/composables/useServerTable'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { Paginated } from '@/types/models'
 
 defineOptions({
   layout: PoLayoutAdmin
@@ -21,33 +21,22 @@ interface UserAdmin {
   karma: string | null
 }
 
+const { t } = useI18n()
 const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
 const headers: DataTableHeader[] = [
-  { title: 'Id', align: 'start', sortable: false, key: 'id' },
-  { title: 'Username', align: 'start', sortable: false, key: 'username' },
-  { title: 'Full Name', align: 'start', sortable: false, key: 'name' },
-  { title: 'Email', align: 'start', sortable: false, key: 'email' },
-  { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
-  { title: 'Aura', align: 'start', sortable: false, key: 'aura' },
-  { title: 'Karma', align: 'start', sortable: false, key: 'karma' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
+  { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
+  { title: t('users.username'), align: 'start', sortable: false, key: 'username' },
+  { title: t('admin.full-name'), align: 'start', sortable: false, key: 'name' },
+  { title: t('main.email'), align: 'start', sortable: false, key: 'email' },
+  { title: t('main.created-at'), align: 'start', sortable: false, key: 'created_at' },
+  { title: t('main.aura'), align: 'start', sortable: false, key: 'aura' },
+  { title: t('main.karma'), align: 'start', sortable: false, key: 'karma' },
+  { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
 ]
-const items = ref<UserAdmin[]>([])
-const totalItems = ref(page.value.props.total)
-const isLoading = ref(true)
-
-onMounted(() => {
-  void loadItems({ page: 1 })
-})
-
-async function loadItems(event: { page: number }) {
-  await axios
-    .get<Paginated<UserAdmin>>(route('admin.users', { page: event.page }))
-    .then((response) => {
-      items.value = response.data.data
-      isLoading.value = false
-    })
-}
+const { items, totalItems, isLoading, loadItems } = useServerTable<UserAdmin>(
+  'admin.users',
+  page.value.props.total
+)
 </script>
 
 <template>

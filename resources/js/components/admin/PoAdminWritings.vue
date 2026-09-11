@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
+import { useServerTable } from '@/composables/useServerTable'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { Paginated } from '@/types/models'
 import type { UserLike } from '@/types/models'
 
 defineOptions({
@@ -21,31 +21,20 @@ interface WritingAdmin {
   author: UserLike
 }
 
+const { t } = useI18n()
 const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
 const headers: DataTableHeader[] = [
-  { title: 'Id', align: 'start', sortable: false, key: 'id' },
-  { title: 'Title', align: 'start', sortable: false, key: 'title' },
-  { title: 'Author', align: 'start', sortable: false, key: 'author' },
-  { title: 'Aura', align: 'start', sortable: false, key: 'aura' },
-  { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
+  { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
+  { title: t('main.title'), align: 'start', sortable: false, key: 'title' },
+  { title: t('users.author'), align: 'start', sortable: false, key: 'author' },
+  { title: t('main.aura'), align: 'start', sortable: false, key: 'aura' },
+  { title: t('main.created-at'), align: 'start', sortable: false, key: 'created_at' },
+  { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
 ]
-const items = ref<WritingAdmin[]>([])
-const totalItems = ref(page.value.props.total)
-const isLoading = ref(true)
-
-onMounted(() => {
-  void loadItems({ page: 1 })
-})
-
-async function loadItems(event: { page: number }) {
-  await axios
-    .get<Paginated<WritingAdmin>>(route('admin.writings', { page: event.page }))
-    .then((response) => {
-      items.value = response.data.data
-      isLoading.value = false
-    })
-}
+const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>(
+  'admin.writings',
+  page.value.props.total
+)
 </script>
 
 <template>

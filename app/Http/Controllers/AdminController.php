@@ -173,11 +173,6 @@ class AdminController extends Controller
 
     public function tools()
     {
-        ob_start();
-        phpinfo();
-        $pinfo = ob_get_contents();
-        ob_end_clean();
-
         return Inertia::render('admin/PoAdminTools', [
             'meta' => [
                 'title' => getPageTitle([
@@ -185,8 +180,17 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'log' => shell_exec('tail -n 100 '.$this->log),
-            'info' => $pinfo,
+            'log' => tailFile($this->log, 100),
+            'info' => [
+                __('PHP version') => PHP_VERSION,
+                __('Laravel version') => app()->version(),
+                __('Memory limit') => ini_get('memory_limit'),
+                __('Upload max filesize') => ini_get('upload_max_filesize'),
+                __('Post max size') => ini_get('post_max_size'),
+                __('Max execution time') => ini_get('max_execution_time').'s',
+                __('OPcache enabled') => function_exists('opcache_get_status') && opcache_get_status() !== false ? __('Yes') : __('No'),
+                __('Loaded extensions') => implode(', ', get_loaded_extensions()),
+            ],
         ]);
     }
 

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
+import { useServerTable } from '@/composables/useServerTable'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { Paginated } from '@/types/models'
 
 defineOptions({
   layout: PoLayoutAdmin
@@ -18,30 +18,19 @@ interface ComplaintAdmin {
   closed_at: string | null
 }
 
+const { t } = useI18n()
 const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
 const headers: DataTableHeader[] = [
-  { title: 'Id', align: 'start', sortable: false, key: 'id' },
-  { title: 'Type', align: 'start', sortable: false, key: 'type' },
-  { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
-  { title: 'Closed at', align: 'start', sortable: false, key: 'closed_at' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
+  { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
+  { title: t('main.type'), align: 'start', sortable: false, key: 'type' },
+  { title: t('main.created-at'), align: 'start', sortable: false, key: 'created_at' },
+  { title: t('admin.closed-at'), align: 'start', sortable: false, key: 'closed_at' },
+  { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
 ]
-const items = ref<ComplaintAdmin[]>([])
-const totalItems = ref(page.value.props.total)
-const isLoading = ref(true)
-
-onMounted(() => {
-  void loadItems({ page: 1 })
-})
-
-async function loadItems(event: { page: number }) {
-  await axios
-    .get<Paginated<ComplaintAdmin>>(route('admin.complaints', { page: event.page }))
-    .then((response) => {
-      items.value = response.data.data
-      isLoading.value = false
-    })
-}
+const { items, totalItems, isLoading, loadItems } = useServerTable<ComplaintAdmin>(
+  'admin.complaints',
+  page.value.props.total
+)
 </script>
 
 <template>

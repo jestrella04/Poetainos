@@ -124,7 +124,7 @@ class UsersController extends Controller
         $user->updateAura();
         // $user->updateKarma();
 
-        $authUser = auth()->check() ? User::find(auth()->user()->id) : null;
+        $authUser = auth()->user();
 
         return Inertia::render('users/PoUsersShow', [
             'meta' => [
@@ -290,7 +290,7 @@ class UsersController extends Controller
         $user->save();
 
         // Persist user agreements to avoid asking again
-        if (! empty(request('service_agreement') && ! empty(request('privacy_agreement')))) {
+        if (request('service_agreement') && request('privacy_agreement')) {
             $user->acceptAgreements();
         }
 
@@ -335,8 +335,7 @@ class UsersController extends Controller
      */
     public function blockUser(User $user)
     {
-        $blockingUser = User::find(auth()->user()->id);
-        $blockingUser->block($user);
+        auth()->user()->block($user);
 
         return [];
     }
@@ -349,7 +348,7 @@ class UsersController extends Controller
      */
     public function account()
     {
-        $user = User::find(auth()->user()->id);
+        $user = auth()->user();
         $this->authorize('delete', $user);
 
         $params = [];

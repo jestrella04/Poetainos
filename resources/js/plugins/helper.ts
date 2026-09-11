@@ -1,308 +1,146 @@
-import * as _ from 'lodash-es'
-import { millify } from 'millify'
-import { computed } from 'vue'
 import type { App } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import crop from 'crop-url'
-import linkifyHtml from 'linkify-html'
-import 'linkify-plugin-mention'
-import MarkdownIt from 'markdown-it'
-import { intlFormatDistance } from 'date-fns'
 import type { ComposerTranslation } from 'vue-i18n'
 import { helperKey, type SnackBarState } from '../composables/keys'
+import { useTypeGuards } from '../composables/useTypeGuards'
+import { useAuth } from '../composables/useAuth'
+import { useFormatting } from '../composables/useFormatting'
+import { useSocialLinks } from '../composables/useSocialLinks'
+import { useSnackbar } from '../composables/useSnackbar'
+import {
+  useNotificationMessage,
+  type NotificationLike
+} from '../composables/useNotificationMessage'
+import { useFormValidation } from '../composables/useFormValidation'
+import { useAnimation } from '../composables/useAnimation'
 import type { UserLike } from '../types/models'
 
-const page = computed(() => usePage())
-
-interface NotificationLike {
-  type: string
-  // The user this notification is about is resolved server-side by id and
-  // can come back null (e.g. the referenced user was since deleted).
-  notifier_user: UserLike | null
-}
-
+/**
+ * Thin facade preserving the existing `$helper`/`helper.xyz()` call-site
+ * surface used across the app's components, while the actual logic lives
+ * in focused composables under resources/js/composables/. New code should
+ * prefer importing those composables directly; this facade exists so
+ * existing templates and scripts keep working unchanged.
+ */
 export class Helper {
+  private typeGuards = useTypeGuards()
+  private authApi = useAuth()
+  private formatting = useFormatting()
+  private socialLinks = useSocialLinks()
+  private snackbar = useSnackbar()
+  private notificationMsg = useNotificationMessage()
+  private formValidation = useFormValidation()
+  private animation = useAnimation()
+
   auth(): boolean {
-    const auth = page.value.props.auth
-    return auth.user !== null && !this.strNullOrEmpty(auth.user.username)
+    return this.authApi.auth()
   }
 
   authUser() {
-    return page.value.props.auth.user
+    return this.authApi.authUser()
   }
 
   admin(): boolean {
-    return page.value.props.auth.admin === true
+    return this.authApi.admin()
   }
 
   canEdit(author: { username: string }): boolean {
-    const user = this.authUser()
-
-    if (user === null || this.strNullOrEmpty(user.username)) {
-      return false
-    }
-
-    return user.username === author.username || this.admin()
-  }
-
-  storage(path: string): string {
-    return `/storage/${path}`
+    return this.authApi.canEdit(author)
   }
 
   isNil(obj: unknown): obj is null | undefined {
-    return _.isNil(obj)
+    return this.typeGuards.isNil(obj)
   }
 
   isNull(obj: unknown): obj is null {
-    return _.isNull(obj)
+    return this.typeGuards.isNull(obj)
   }
 
   isEmpty(obj: unknown): boolean {
-    return _.isEmpty(obj)
+    return this.typeGuards.isEmpty(obj)
   }
 
   strNullOrEmpty(str: string | null | undefined): boolean {
-    return _.isNil(str) || '' === str.trim()
+    return this.typeGuards.strNullOrEmpty(str)
+  }
+
+  storage(path: string): string {
+    return this.formatting.storage(path)
   }
 
   userDisplayName(user: UserLike): string {
-    if (!_.isNil(user.name) && '' !== user.name) {
-      return user.name
-    }
-
-    return user.username
+    return this.formatting.userDisplayName(user)
   }
 
   userInitials(user: UserLike): string {
-    if (!_.isNil(user.name) && !_.isNil(user.last_name)) {
-      return _.toUpper(`${user.name.substring(0, 1)}${user.last_name.substring(0, 1)}`)
-    }
-
-    return _.toUpper(user.username.substring(0, 1))
+    return this.formatting.userInitials(user)
   }
 
   readable(value: number): string {
-    return millify(value)
+    return this.formatting.readable(value)
   }
 
   toLocaleDate(date: string | number | Date): string {
-    return new Date(date).toLocaleDateString('es-DO', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+    return this.formatting.toLocaleDate(date)
   }
 
   relativeDate(date: string | number | Date): string {
-    return intlFormatDistance(new Date(date), new Date(), { locale: 'es' })
+    return this.formatting.relativeDate(date)
   }
 
   excerpt(text: string): string {
-    const len = text.length
-
-    if (len < 400) {
-      return text
-    }
-
-    return `${text.substring(0, 400)}...`
+    return this.formatting.excerpt(text)
   }
 
   cropUrl(url: string, max = 40): string {
-    return crop(url, max)
+    return this.formatting.cropUrl(url, max)
   }
 
   linkify(text: string): string {
-    const options = {
-      formatHref: {
-        mention: (href: string) => `${route('users.index')}${href}`
-      }
-    }
-
-    return linkifyHtml(text, options)
-  }
-
-  socialLink(user: string, network: string): string {
-    let url = ''
-
-    switch (network) {
-      case 'twitter':
-        url = `https://twitter.com/${user}`
-        break
-
-      case 'threads':
-        url = `https://threads.net/@${user}`
-        break
-
-      case 'instagram':
-        url = `https://instagram.com/${user}`
-        break
-
-      case 'facebook':
-        url = `https://facebook.com/${user}`
-        break
-
-      case 'youtube':
-        url = `https://youtube.com/user/${user}`
-        break
-
-      case 'goodreads':
-        url = `https://www.goodreads.com/${user}`
-        break
-
-      case 'telegram':
-        url = `https://t.me/${user}`
-        break
-    }
-
-    return url
+    return this.formatting.linkify(text)
   }
 
   markdown(md: string): string {
-    return MarkdownIt().render(md)
-  }
-
-  notificationMessage(notification: NotificationLike, t: ComposerTranslation): string | null {
-    let message: string | null = null
-    // Falls back when the notifying user has since been deleted — the
-    // server resolves notifier_user by id and can return null.
-    const name =
-      notification.notifier_user !== null
-        ? this.userDisplayName(notification.notifier_user)
-        : 'Usuario'
-
-    switch (notification.type) {
-      case 'App\\Notifications\\WritingCommented':
-        message = t('comments.user-added', { name })
-        break
-
-      case 'App\\Notifications\\WritingCommentMentioned':
-      case 'App\\Notifications\\WritingReplyMentioned':
-        message = t('comments.user-mentioned', { name })
-        break
-
-      case 'App\\Notifications\\WritingFeatured':
-        message = t('writings.writing-awarded')
-        break
-
-      case 'App\\Notifications\\WritingLiked':
-        message = t('writings.user-liked', { name })
-        break
-
-      case 'App\\Notifications\\WritingReplied':
-        message = t('comments.user-replied', { name })
-        break
-
-      case 'App\\Notifications\\WritingShelved':
-        message = t('writings.user-shelved', { name })
-        break
-
-      case 'App\\Notifications\\CommentLiked':
-        message = t('comments.user-liked', { name })
-        break
-    }
-
-    return message
-  }
-
-  setSnackBar(snack: Partial<SnackBarState> = {}): void {
-    sessionStorage.setItem('snack', JSON.stringify(snack))
-  }
-
-  getSnackBar(): Partial<SnackBarState> | null {
-    const stored = sessionStorage.getItem('snack')
-    sessionStorage.removeItem('snack')
-    return stored === null ? null : (JSON.parse(stored) as Partial<SnackBarState>)
-  }
-
-  checkFormValidity(form: HTMLFormElement): boolean {
-    if (!form.checkValidity()) {
-      form.reportValidity()
-      return false
-    }
-
-    return true
-  }
-
-  animate(node: HTMLElement, animation: string, prefix = 'animate__'): Promise<string> {
-    // We create a Promise and return it
-    return new Promise((resolve) => {
-      const animationName = `${prefix}${animation}`
-
-      node.classList.add(`${prefix}animated`, animationName)
-
-      // When the animation ends, we clean the classes and resolve the Promise
-      function handleAnimationEnd(event: Event) {
-        event.stopPropagation()
-        node.classList.remove(`${prefix}animated`, animationName)
-        resolve('Animation ended')
-      }
-
-      node.addEventListener('animationend', handleAnimationEnd, { once: true })
-    })
-  }
-
-  shareLinks(title: string, url: string): Array<{ name: string; url: string; icon: string }> {
-    const facebookBaseUrl = `https://facebook.com/sharer/sharer.php?u=${url}`
-    const twitterBaseUrl = `https://twitter.com/intent/tweet/?text=${title}&url=${url}`
-    const whatsappBaseUrl = `whatsapp://send?text=${title}%20${url}`
-    const telegramBaseUrl = `https://t.me/share/url?url=${url}&text=${title}`
-
-    return [
-      {
-        name: 'Facebook',
-        url: facebookBaseUrl,
-        icon: 'fab fa-facebook-f'
-      },
-      {
-        name: 'Twitter',
-        url: twitterBaseUrl,
-        icon: 'fab fa-x-twitter'
-      },
-      {
-        name: 'Whatsapp',
-        url: whatsappBaseUrl,
-        icon: 'fab fa-whatsapp'
-      },
-      {
-        name: 'Telegram',
-        url: telegramBaseUrl,
-        icon: 'fab fa-telegram'
-      },
-      {
-        name: 'copy',
-        url: '#',
-        icon: 'far fa-clone'
-      }
-    ]
-  }
-
-  socialIcon(): Record<string, string | undefined> {
-    return {
-      twitter: 'fab fa-x-twitter',
-      threads: 'fab fa-threads',
-      instagram: 'fab fa-instagram',
-      facebook: 'fab fa-facebook-f',
-      youtube: 'fab fa-youtube',
-      telegram: 'fab fa-telegram'
-    }
+    return this.formatting.markdown(md)
   }
 
   asset(url: string): string {
-    return new URL(url, route('home')).toString()
+    return this.formatting.asset(url)
   }
 
   karmaMedal(grade: string): string | null {
-    let medal: string | null = null
+    return this.formatting.karmaMedal(grade)
+  }
 
-    if ('C' == grade) {
-      medal = 'deep-orange-accent-1'
-    } else if ('B' == grade) {
-      medal = 'blue-grey-lighten-3'
-    } else if ('A' == grade) {
-      medal = 'amber-accent-4'
-    }
+  socialLink(user: string, network: string): string {
+    return this.socialLinks.socialLink(user, network)
+  }
 
-    return medal
+  shareLinks(title: string, url: string): Array<{ name: string; url: string; icon: string }> {
+    return this.socialLinks.shareLinks(title, url)
+  }
+
+  socialIcon(): Record<string, string | undefined> {
+    return this.socialLinks.socialIcon()
+  }
+
+  notificationMessage(notification: NotificationLike, t: ComposerTranslation): string | null {
+    return this.notificationMsg.notificationMessage(notification, t)
+  }
+
+  setSnackBar(snack: Partial<SnackBarState> = {}): void {
+    this.snackbar.setSnackBar(snack)
+  }
+
+  getSnackBar(): Partial<SnackBarState> | null {
+    return this.snackbar.getSnackBar()
+  }
+
+  checkFormValidity(form: HTMLFormElement): boolean {
+    return this.formValidation.checkFormValidity(form)
+  }
+
+  animate(node: HTMLElement, animation: string, prefix = 'animate__'): Promise<string> {
+    return this.animation.animate(node, animation, prefix)
   }
 }
 

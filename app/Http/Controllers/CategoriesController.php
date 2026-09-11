@@ -53,19 +53,11 @@ class CategoriesController extends Controller
         ];
 
         $writings = $category->writingsRecursive()
-            ->whereNotIn('user_id', $this->getBlockedUsers())
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query): void {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }]);
-
-        if ($sort === 'latest') {
-            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        }
+            ->visibleTo($this->getBlockedUsers())
+            ->withListingRelations()
+            ->sorted($sort)
+            ->simplePaginate($this->pagination)
+            ->withQueryString();
 
         if (request()->expectsJson()) {
             return $writings;

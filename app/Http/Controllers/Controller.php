@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -29,7 +28,7 @@ class Controller extends BaseController
     public function getBlockedUsers()
     {
         $blockedUsers = auth()->check()
-            ? User::find(auth()->user()->id)->blockedAuthors()->pluck('blocked_user_id')->toArray()
+            ? auth()->user()->blockedAuthors()->pluck('blocked_user_id')->toArray()
             : [0];
 
         return $blockedUsers;

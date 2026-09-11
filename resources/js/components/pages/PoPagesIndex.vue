@@ -12,7 +12,7 @@ const page = computed(() => usePage<InertiaPageProps<{ pages: PageSummary[] }>>(
 </script>
 
 <template>
-  <v-card title="Pages List">
+  <v-card :title="$t('pages.pages-list')">
     <v-card-text>
       <v-list>
         <template v-for="data in page.props.pages" :key="data.slug">

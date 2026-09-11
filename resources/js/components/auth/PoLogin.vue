@@ -142,7 +142,12 @@ async function submitForm() {
         router.get(response.data.redirect)
       })
       .catch((error: ValidationError) => {
-        errors.password = error.response?.data.errors.email ?? [] // Intentional
+        // Laravel's LoginRequest::authenticate() always keys a failed-login
+        // error "email" (deliberately ambiguous about whether the email or
+        // the password was wrong). By this point the email is already
+        // confirmed to exist (see the email.check step above) and only the
+        // password field is visible, so we surface the message there.
+        errors.password = error.response?.data.errors.email ?? []
       })
       .finally(() => {
         isLoading.value = false

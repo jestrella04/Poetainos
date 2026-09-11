@@ -44,9 +44,9 @@ class LikesController extends Controller
         $like->user_id = auth()->user()->id;
         $like->vote = 1;
 
-        if ($likeable == 'writing') {
+        if ($likeable === 'writing') {
             $like->likeable()->associate(Writing::find($likeable_id));
-        } elseif ($likeable == 'comment') {
+        } elseif ($likeable === 'comment') {
             $like->likeable()->associate(Comment::find($likeable_id));
         }
 
@@ -67,7 +67,7 @@ class LikesController extends Controller
         $like->user->updateAura();
         // $like->user->updateKarma();
 
-        if ($likeable == 'writing') {
+        if ($likeable === 'writing') {
             $like->likeable->updateAura();
 
             // Notify writing author
@@ -78,7 +78,7 @@ class LikesController extends Controller
             }
         }
 
-        if ($likeable == 'comment') {
+        if ($likeable === 'comment') {
             // Notify comment author
             if ($like->likeable->author->isNot(auth()->user())) {
                 $like->likeable->author->notify(
@@ -131,16 +131,16 @@ class LikesController extends Controller
      */
     public function destroy($likeable, $likeable_id)
     {
-        if ($likeable == 'writing') {
+        if ($likeable === 'writing') {
             Like::where([
-                ['likeable_type', 'App\Models\Writing'],
+                ['likeable_type', Writing::class],
                 ['likeable_id', $likeable_id],
                 ['user_id', auth()->user()->id],
             ])->delete();
             $count = Writing::find($likeable_id)->likes()->count();
-        } elseif ($likeable == 'comment') {
+        } elseif ($likeable === 'comment') {
             Like::where([
-                ['likeable_type', 'App\Models\Comment'],
+                ['likeable_type', Comment::class],
                 ['likeable_id', $likeable_id],
                 ['user_id', auth()->user()->id],
             ])->delete();

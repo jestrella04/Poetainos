@@ -5,17 +5,13 @@ namespace App\Notifications;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\DatabaseMessage;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use NotificationChannels\FacebookPoster\FacebookPosterChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterPost;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\WebPush\WebPushChannel;
-use NotificationChannels\WebPush\WebPushMessage;
 
-class WritingFeatured extends Notification implements ShouldQueue
+class WritingFeatured extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
@@ -64,22 +60,6 @@ class WritingFeatured extends Notification implements ShouldQueue
         return ['mail', 'database', TwitterChannel::class, FacebookPosterChannel::class, WebPushChannel::class];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return MailMessage
-     */
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->subject($this->notification['title'])
-            ->greeting($this->notification['greeting'])
-            ->line($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->line($this->notification['footer']);
-    }
-
     public function toTwitter($notifiable)
     {
         $msg = implode(' ', $this->notification['body_social']);
@@ -95,32 +75,6 @@ class WritingFeatured extends Notification implements ShouldQueue
         $msg = str_replace(':author', $this->writing->author->getName(), $msg);
 
         return (new FacebookPosterPost($msg))->withLink($this->notification['url']);
-    }
-
-    /**
-     * Get the web push representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
-     * @return DatabaseMessage
-     */
-    public function toWebPush($notifiable, $notification)
-    {
-        return (new WebPushMessage)
-            ->title($this->notification['title'])
-            ->icon($this->notification['icon'])
-            ->body($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->options(['TTL' => 1000])
-            ->renotify()
-            ->requireInteraction()
-            ->tag($this->notification['tag']);
-        // ->data(['id' => $notification->id])
-        // ->badge()
-        // ->dir()
-        // ->image()
-        // ->lang()
-        // ->vibrate()
     }
 
     /**

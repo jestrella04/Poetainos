@@ -8,7 +8,9 @@ defineOptions({
   layout: PoLayoutAdmin
 })
 
-const page = computed(() => usePage<InertiaPageProps<{ info: string; log: string }>>())
+const page = computed(() =>
+  usePage<InertiaPageProps<{ info: Record<string, string>; log: string }>>()
+)
 const tab = ref<string | null>(null)
 </script>
 
@@ -23,11 +25,14 @@ const tab = ref<string | null>(null)
 
     <v-window v-model="tab" class="h-100">
       <v-window-item value="info" class="h-100">
-        <iframe
-          :srcdoc="page.props.info"
-          frameborder="0"
-          style="height: 100%; width: 100%"
-        ></iframe>
+        <v-table>
+          <tbody>
+            <tr v-for="(value, key) in page.props.info" :key="key">
+              <td class="font-weight-bold">{{ key }}</td>
+              <td>{{ value }}</td>
+            </tr>
+          </tbody>
+        </v-table>
       </v-window-item>
 
       <v-window-item value="log" class="h-100">
@@ -36,7 +41,7 @@ const tab = ref<string | null>(null)
           size="x-small"
           :href="route('admin.log')"
           icon
-          title="Download full copy"
+          :title="$t('admin.download-full-copy')"
           class="mb-2"
         >
           <v-icon icon="fas fa-download"></v-icon>
