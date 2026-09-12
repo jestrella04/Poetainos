@@ -54,6 +54,8 @@ describe('site initialization', function (): void {
         expect($admin->email)->toBe('admin@example.com');
         expect(Hash::check('Str0ngPassw0rd', $admin->password))->toBeTrue();
         expect(Hash::check('', $admin->password))->toBeFalse();
+        expect($admin->role?->name)->toBe('master');
+        expect($admin->isAllowed('admin'))->toBeTrue();
     });
 
     it('rejects bootstrapping without admin credentials', function (): void {

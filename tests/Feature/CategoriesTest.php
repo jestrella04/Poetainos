@@ -78,7 +78,7 @@ describe('admin category management', function (): void {
 });
 
 describe('authorization for admin category routes', function (): void {
-    it('redirects non-admins to login', function (): void {
+    it('forbids non-admins', function (): void {
         // Given
         $user = createUser();
         $category = Category::factory()->create();
@@ -87,6 +87,6 @@ describe('authorization for admin category routes', function (): void {
         $response = actingAs($user)->delete('/admin/categories/delete/'.$category->slug);
 
         // Then
-        $response->assertRedirect(route('login'));
+        $response->assertForbidden();
     });
 });

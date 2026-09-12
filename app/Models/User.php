@@ -38,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'aura',
         'karma',
         'aura_updated_at',
+        'role_id',
     ];
 
     /**

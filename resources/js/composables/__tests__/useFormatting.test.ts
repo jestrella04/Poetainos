@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { useFormatting } from '../useFormatting'
 
-const { userDisplayName, userInitials, excerpt, karmaMedal } = useFormatting()
+const { userDisplayName, userInitials, excerpt, karmaMedal, linkify } = useFormatting()
 
 describe('userDisplayName', () => {
   it('prefers the name when present', () => {
@@ -38,6 +38,42 @@ describe('excerpt', () => {
 
     // Then
     expect(result).toBe(`${'a'.repeat(400)}...`)
+  })
+})
+
+describe('linkify', () => {
+  it('escapes raw HTML instead of letting it through to the DOM', () => {
+    // Given
+    const comment = '<img src=x onerror=alert(1)>'
+
+    // When
+    const result = linkify(comment)
+
+    // Then
+    expect(result).not.toContain('<img')
+    expect(result).toContain('&lt;img')
+  })
+
+  it('still turns plain URLs into links', () => {
+    // Given
+    const comment = 'Check https://example.com out'
+
+    // When
+    const result = linkify(comment)
+
+    // Then
+    expect(result).toContain('<a href="https://example.com"')
+  })
+
+  it('escapes stray angle brackets in plain text so they cannot form a tag', () => {
+    // Given
+    const comment = '5 < 10 and 10 > 5'
+
+    // When
+    const result = linkify(comment)
+
+    // Then
+    expect(result).toBe('5 &lt; 10 and 10 &gt; 5')
   })
 })
 

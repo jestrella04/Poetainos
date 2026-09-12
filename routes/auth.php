@@ -16,6 +16,10 @@ Route::middleware('guest')->group(function (): void {
     Route::get('/login/{service}', [SocialAuthController::class, 'redirectToProvider'])->name('social.login');
     Route::get('/login/{service}/callback', [SocialAuthController::class, 'handleProviderCallback']);
 
+    Route::get('/login/{service}/confirm/{user:id}', [SocialAuthController::class, 'confirmProviderLink'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('social.confirm');
+
     /* Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register'); */
 

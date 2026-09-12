@@ -14,7 +14,7 @@ describe('the admin area', function (): void {
         $response->assertRedirect(route('login'));
     });
 
-    it('redirects authenticated non-admins to login', function (): void {
+    it('forbids authenticated non-admins', function (): void {
         // Given
         $user = createUser();
 
@@ -22,7 +22,7 @@ describe('the admin area', function (): void {
         $response = actingAs($user)->get('/admin');
 
         // Then
-        $response->assertRedirect(route('login'));
+        $response->assertForbidden();
     });
 
     it('is accessible to admins', function (): void {

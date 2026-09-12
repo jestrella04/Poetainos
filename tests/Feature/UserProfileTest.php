@@ -26,6 +26,36 @@ describe('viewing and updating a profile', function (): void {
         expect($user->extra_info['bio'] ?? null)->toBe('A short bio.');
     });
 
+    it('requires re-verification when a user changes their email address', function (): void {
+        // Given
+        $user = createUser(['email_verified_at' => now()]);
+
+        // When
+        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => 'Updated Name',
+            'email' => 'new-address@example.com',
+        ]);
+
+        // Then
+        $response->assertOk();
+        expect($user->refresh()->email_verified_at)->toBeNull();
+    });
+
+    it('keeps the account verified when the email is left unchanged', function (): void {
+        // Given
+        $user = createUser(['email_verified_at' => now()]);
+
+        // When
+        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => 'Updated Name',
+            'email' => $user->email,
+        ]);
+
+        // Then
+        $response->assertOk();
+        expect($user->refresh()->email_verified_at)->not->toBeNull();
+    });
+
     it('forbids a different verified user from viewing or updating someone else\'s profile', function (): void {
         // Given
         $user = createUser();

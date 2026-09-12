@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\ConfirmSocialLogin;
 use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
@@ -19,7 +22,7 @@ class SocialAuthController extends Controller
      */
     public function redirectToProvider(string $service): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        if (! empty(request('redirect'))) {
+        if (isSafeRedirectPath(request('redirect'))) {
             Redirect::setIntendedUrl(request('redirect'));
         }
 
@@ -48,6 +51,26 @@ class SocialAuthController extends Controller
             'role_id' => Role::where('name', 'user')->firstOrFail()->id,
         ]);
 
+        $linkedProviders = $user->extra_info['linked_providers'] ?? [];
+
+        // An existing account meeting this provider for the first time must
+        // confirm ownership by email before we trust the provider's claim
+        // and log in — otherwise anyone who can get a provider to report a
+        // victim's email address could sign straight into their account.
+        if ($exists && ! in_array($service, $linkedProviders, true)) {
+            $confirmUrl = URL::temporarySignedRoute(
+                'social.confirm',
+                Carbon::now()->addMinutes(30),
+                ['user' => $user->id, 'service' => $service]
+            );
+
+            $user->notify(new ConfirmSocialLogin($service, $confirmUrl));
+
+            request()->session()->flash('message', 'accounts.confirm-social-link-sent');
+
+            return redirect(route('login'));
+        }
+
         // Grab avatar
         if (empty($user->extra_info['avatar']) && $social->getAvatar() !== null) {
             $avatar = @file_get_contents($social->getAvatar());
@@ -72,13 +95,15 @@ class SocialAuthController extends Controller
             $user->email_verified_at = Carbon::now();
         }
 
+        $updated = $this->linkProvider($user, $service, $linkedProviders) || ($updated ?? false);
+
         // Save changes, if any
-        if ($updated ?? false) {
+        if ($updated) {
             $user->save();
         }
 
         // Authenticate user
-        auth()->login($user);
+        Auth::login($user);
 
         // Set flash message content
         if ($exists) {
@@ -91,5 +116,44 @@ class SocialAuthController extends Controller
         request()->session()->flash('message', $message);
 
         return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
+    }
+
+    /**
+     * Complete a social login for an existing account that just confirmed,
+     * via the signed emailed link, that it owns this provider's email.
+     */
+    public function confirmProviderLink(string $service, User $user): RedirectResponse
+    {
+        $linkedProviders = $user->extra_info['linked_providers'] ?? [];
+
+        if ($this->linkProvider($user, $service, $linkedProviders)) {
+            $user->save();
+        }
+
+        Auth::login($user);
+
+        request()->session()->flash('message', 'accounts.welcome-back');
+
+        return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
+    }
+
+    /**
+     * Record that a provider is now trusted for this account, so future
+     * logins through it skip the email confirmation step.
+     *
+     * @param  array<int, string>  $linkedProviders
+     */
+    private function linkProvider(User $user, string $service, array $linkedProviders): bool
+    {
+        if (in_array($service, $linkedProviders, true)) {
+            return false;
+        }
+
+        $linkedProviders[] = $service;
+        $extraInfo = $user->extra_info ?? [];
+        $extraInfo['linked_providers'] = $linkedProviders;
+        $user->extra_info = $extraInfo;
+
+        return true;
     }
 }

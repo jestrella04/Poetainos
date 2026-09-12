@@ -74,12 +74,12 @@ Route::middleware(['verified'])->group(function (): void {
     Route::get('/account', [UsersController::class, 'account'])->name('users.account');
 
     // Comments
-    Route::post('/comments/create', [CommentsController::class, 'store'])->name('comments.store');
+    Route::post('/comments/create', [CommentsController::class, 'store'])->middleware('throttle:20,1')->name('comments.store');
     Route::delete('/comments/delete/{comment}', [CommentsController::class, 'destroy'])->name('comments.destroy');
 
     // Likes
-    Route::post('/likes/{type}/{id}/store', [LikesController::class, 'store'])->name('likes.store');
-    Route::delete('/likes/{type}/{id}/delete', [LikesController::class, 'destroy'])->name('likes.destroy');
+    Route::post('/likes/{type}/{id}/store', [LikesController::class, 'store'])->middleware('throttle:60,1')->name('likes.store');
+    Route::delete('/likes/{type}/{id}/delete', [LikesController::class, 'destroy'])->middleware('throttle:60,1')->name('likes.destroy');
 
     // Other user tasks
     Route::post('/shelves/{writing}/store', [ShelvesController::class, 'store'])->name('shelves.store');
@@ -141,7 +141,7 @@ Route::get('/reload-captcha', [ContactsController::class, 'reloadCaptcha'])->nam
 
 // Complaints
 Route::get('/complaints/reasons', [ComplaintsController::class, 'reasons'])->name('complaints.reasons');
-Route::post('/complaints/store', [ComplaintsController::class, 'store'])->name('complaints.store');
+Route::post('/complaints/store', [ComplaintsController::class, 'store'])->middleware('throttle:10,1')->name('complaints.store');
 
 // Redirects, keep on the bottom
 Route::redirect('/socialite', '/login', 301);

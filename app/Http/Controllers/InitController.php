@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class InitController extends Controller
@@ -65,7 +66,7 @@ class InitController extends Controller
         ]);
 
         // Authenticate admin user
-        auth()->login($user);
+        Auth::login($user);
 
         // Redirect to the init success page
         return redirect(route(('home')));

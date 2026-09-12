@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -51,7 +52,7 @@ class RegisteredUserController extends Controller
             'role_id' => Role::where('name', 'user')->firstOrFail()->id,
         ]);
 
-        auth()->login($user);
+        Auth::login($user);
         $user->sendEmailVerificationNotification();
 
         return Inertia::render('auth/PoVerify');

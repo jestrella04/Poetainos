@@ -37,6 +37,36 @@ describe('authenticating', function (): void {
         $response->assertJson(['redirect' => url(RouteServiceProvider::HOME)]);
     });
 
+    it('honors a safe, same-site redirect target after login', function (): void {
+        // Given
+        $user = createUser();
+        get('/login?redirect=/writings/create');
+
+        // When
+        $response = post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        // Then
+        $response->assertJson(['redirect' => url('/writings/create')]);
+    });
+
+    it('ignores an external redirect target to prevent an open redirect', function (): void {
+        // Given
+        $user = createUser();
+        get('/login?redirect=https://evil.example/phish');
+
+        // When
+        $response = post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        // Then
+        $response->assertJson(['redirect' => url(RouteServiceProvider::HOME)]);
+    });
+
     it('does not authenticate with an invalid password', function (): void {
         // Given
         $user = createUser();

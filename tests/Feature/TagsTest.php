@@ -49,7 +49,7 @@ describe('admin tag management', function (): void {
         expect(Tag::find($tag->id))->toBeNull();
     });
 
-    it('redirects non-admins to login', function (): void {
+    it('forbids non-admins', function (): void {
         // Given
         $user = createUser();
         $tag = Tag::factory()->create();
@@ -58,6 +58,6 @@ describe('admin tag management', function (): void {
         $response = actingAs($user)->delete('/admin/tags/delete/'.$tag->slug);
 
         // Then
-        $response->assertRedirect(route('login'));
+        $response->assertForbidden();
     });
 });

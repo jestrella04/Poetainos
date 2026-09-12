@@ -40,13 +40,36 @@ describe('recalculating karma', function (): void {
         $response->assertUnauthorized();
     });
 
-    it('lets an authenticated user trigger a karma recalculation', function (): void {
+    it('forbids an unrelated authenticated user from triggering another user\'s karma recalculation', function (): void {
         // Given
         $user = createUser();
         $requester = createUser();
 
         // When
         $response = actingAs($requester)->putJson("/api/karma/{$user->username}");
+
+        // Then
+        $response->assertForbidden();
+    });
+
+    it('lets a user trigger their own karma recalculation', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->putJson("/api/karma/{$user->username}");
+
+        // Then
+        $response->assertOk();
+    });
+
+    it('lets an admin trigger any user\'s karma recalculation', function (): void {
+        // Given
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->putJson("/api/karma/{$user->username}");
 
         // Then
         $response->assertOk();

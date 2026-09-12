@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\post;
 
@@ -26,5 +28,6 @@ describe('registration', function (): void {
         // RegisteredUserController::store() renders the verify-email prompt directly
         // rather than redirecting.
         $response->assertOk();
+        expect(User::where('username', 'testuser')->firstOrFail()->role?->name)->toBe('user');
     });
 });

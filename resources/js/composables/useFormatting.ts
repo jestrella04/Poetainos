@@ -61,6 +61,15 @@ export function useFormatting() {
     return crop(url, max)
   }
 
+  function escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+  }
+
   function linkify(text: string): string {
     const options = {
       formatHref: {
@@ -68,7 +77,10 @@ export function useFormatting() {
       }
     }
 
-    return linkifyHtml(text, options)
+    // linkify-html parses its input as HTML and re-emits any existing tags
+    // verbatim, so raw user text must be entity-escaped first or a comment
+    // like `<img src=x onerror=...>` renders live through the `v-html` sink.
+    return linkifyHtml(escapeHtml(text), options)
   }
 
   function markdown(md: string): string {

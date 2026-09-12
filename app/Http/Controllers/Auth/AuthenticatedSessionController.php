@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,7 +21,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        if (! empty(request('redirect'))) {
+        if (isSafeRedirectPath(request('redirect'))) {
             Redirect::setIntendedUrl(request('redirect'));
         }
 
@@ -66,7 +67,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        auth('web')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         $request->session()->flash('message', 'accounts.logged-out-goodbye');

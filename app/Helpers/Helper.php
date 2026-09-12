@@ -96,6 +96,24 @@ function inRange(int|float $value, int|float $min, int|float $max): bool
 }
 
 /**
+ * Whether a post-login "redirect" target is a same-site relative path,
+ * safe to hand to Redirect::setIntendedUrl(). Rejects absolute and
+ * protocol-relative URLs so the value can't be used for an open redirect.
+ */
+function isSafeRedirectPath(?string $url): bool
+{
+    if (empty($url)) {
+        return false;
+    }
+
+    if (str_starts_with($url, '//') || str_contains($url, '://')) {
+        return false;
+    }
+
+    return str_starts_with($url, '/');
+}
+
+/**
  * Weighted average "aura" score for a set of countable metrics (e.g. likes,
  * comments, shelf adds). Each countable's contribution is its raw count
  * multiplied by its per-unit weight; the base is the sum of the weights

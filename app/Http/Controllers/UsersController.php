@@ -234,11 +234,23 @@ class UsersController extends Controller
             $user->role_id = request('role');
         }
 
+        // A changed email is unverified until the user proves they own it again
+        $emailChanged = $user->email !== request('email');
+
         // Persist to database
         $user->name = request('name');
         $user->email = request('email');
         $user->extra_info = $extraInfo;
+
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
         $user->save();
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+        }
 
         // Persist user agreements to avoid asking again
         if (request('service_agreement') && request('privacy_agreement')) {
@@ -298,6 +310,8 @@ class UsersController extends Controller
      */
     public function karma(User $user): \Illuminate\Http\Response
     {
+        $this->authorize('update', $user);
+
         $user->updateKarma();
 
         return response($user->karma);
