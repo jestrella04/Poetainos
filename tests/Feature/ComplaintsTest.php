@@ -46,3 +46,11 @@ test('submitting a complaint requires at least one reason', function (): void {
         'reasons' => [],
     ])->assertJsonValidationErrors('reasons');
 });
+
+test('submitting a complaint about a nonexistent subject 404s instead of crashing', function (): void {
+    $this->postJson('/complaints/store', [
+        'complainable_type' => 'writings',
+        'complainable_id' => 999999,
+        'reasons' => ['spam'],
+    ])->assertNotFound();
+});

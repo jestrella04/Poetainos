@@ -54,14 +54,17 @@ class SocialAuthController extends Controller
 
         // Grab avatar
         if (empty($user->extra_info['avatar'])) {
-            $updated = true;
-            $avatar = file_get_contents($social->getAvatar());
-            $size = getimagesize($social->getAvatar());
-            $extension = image_type_to_extension($size[2]);
-            $base = bin2hex(random_bytes(20));
-            $path = 'avatars/'.$base.$extension;
-            Storage::disk('local')->put($path, $avatar);
-            $user->extra_info = ['avatar' => $path];
+            $avatar = @file_get_contents($social->getAvatar());
+            $size = $avatar !== false ? getimagesizefromstring($avatar) : false;
+
+            if ($size !== false) {
+                $updated = true;
+                $extension = image_type_to_extension($size[2]);
+                $base = bin2hex(random_bytes(20));
+                $path = 'avatars/'.$base.$extension;
+                Storage::disk('local')->put($path, $avatar);
+                $user->extra_info = ['avatar' => $path];
+            }
         }
 
         // Social login implies a trusted email address (the provider already

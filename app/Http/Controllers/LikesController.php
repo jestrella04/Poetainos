@@ -40,15 +40,12 @@ class LikesController extends Controller
      */
     public function store($likeable, $likeable_id)
     {
+        $likeableModel = $this->resolveLikeable($likeable, $likeable_id);
+
         $like = new Like;
         $like->user_id = auth()->user()->id;
         $like->vote = 1;
-
-        if ($likeable === 'writing') {
-            $like->likeable()->associate(Writing::find($likeable_id));
-        } elseif ($likeable === 'comment') {
-            $like->likeable()->associate(Comment::find($likeable_id));
-        }
+        $like->likeable()->associate($likeableModel);
 
         // Check existence
         $exist = Like::where([
@@ -65,7 +62,6 @@ class LikesController extends Controller
 
         // Update aura / karma
         $like->user->updateAura();
-        // $like->user->updateKarma();
 
         if ($likeable === 'writing') {
             $like->likeable->updateAura();
@@ -131,25 +127,35 @@ class LikesController extends Controller
      */
     public function destroy($likeable, $likeable_id)
     {
-        if ($likeable === 'writing') {
-            Like::where([
-                ['likeable_type', Writing::class],
-                ['likeable_id', $likeable_id],
-                ['user_id', auth()->user()->id],
-            ])->delete();
-            $count = Writing::find($likeable_id)->likes()->count();
-        } elseif ($likeable === 'comment') {
-            Like::where([
-                ['likeable_type', Comment::class],
-                ['likeable_id', $likeable_id],
-                ['user_id', auth()->user()->id],
-            ])->delete();
-            $count = Comment::find($likeable_id)->likes()->count();
-        }
+        $likeableModel = $this->resolveLikeable($likeable, $likeable_id);
+
+        Like::where([
+            ['likeable_type', $likeableModel::class],
+            ['likeable_id', $likeableModel->id],
+            ['user_id', auth()->user()->id],
+        ])->delete();
 
         return [
             'method' => 'destroy',
-            'count' => $count,
+            'count' => $likeableModel->likes()->count(),
         ];
+    }
+
+    /**
+     * Resolve the polymorphic target of a like from its route type and id.
+     *
+     * @return Writing|Comment
+     */
+    private function resolveLikeable($likeable, $likeableId)
+    {
+        if (! is_numeric($likeableId)) {
+            abort(404);
+        }
+
+        return match ($likeable) {
+            'writing' => Writing::findOrFail((int) $likeableId),
+            'comment' => Comment::findOrFail((int) $likeableId),
+            default => abort(404),
+        };
     }
 }

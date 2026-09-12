@@ -84,7 +84,6 @@ class WritingsController extends Controller
 
         // Update Aura
         $writing->updateAura();
-        // $writing->author->updateAura();
 
         $user = auth()->user();
 
@@ -220,12 +219,10 @@ class WritingsController extends Controller
             'text' => 'required|string|min:10|max:2000',
             'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
-            'cover' => 'nullable|file|image|max:'.getSiteConfig('uploads_max_file_size'),
+            'cover' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
             'service_agreement' => 'sometimes|required|accepted',
             'privacy_agreement' => 'sometimes|required|accepted',
         ]);
-
-        // dd($request);
 
         // Process the uploaded cover, if any
         if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
@@ -285,7 +282,6 @@ class WritingsController extends Controller
 
         // Update user aura / karma
         $writing->author->updateAura();
-        // $writing->author->updateKarma();
 
         // Persist user agreements to avoid asking again
         if (request('service_agreement') && request('privacy_agreement')) {
@@ -296,13 +292,6 @@ class WritingsController extends Controller
         if ($action === 'create') {
             // Share on social media
             $writing->author->notify(new WritingPublished($writing));
-
-            // Add a like automatically from the poster
-            /* $like = new Like;
-            $like->user_id = auth()->user()->id;
-            $like->vote = 1;
-            $like->likeable()->associate(Writing::find($writing->id));
-            $like->save(); */
         }
 
         // Set response data

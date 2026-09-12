@@ -12,6 +12,12 @@ class InitController extends Controller
 {
     public function init()
     {
+        $token = config('services.installer.token');
+
+        if (empty($token) || ! hash_equals($token, (string) request('token'))) {
+            abort(403);
+        }
+
         if (Setting::where('name', 'site')->first() !== null) {
             abort(403, 'App already initialized');
         }

@@ -6,19 +6,15 @@ use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ComplaintsController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\GenericController;
-use App\Http\Controllers\HoodsController;
 use App\Http\Controllers\InitController;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PushNotificationsController;
-use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShelvesController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersNotificationsController;
-// use App\Http\Controllers\UsersHoodsController;
-// use App\Http\Controllers\UsersHoodsWritingsController;
 use App\Http\Controllers\WritingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,7 +84,6 @@ Route::middleware(['verified'])->group(function (): void {
     // Other user tasks
     Route::post('/shelves/{writing}/store', [ShelvesController::class, 'store'])->name('shelves.store');
     Route::delete('/shelves/{writing}/delete', [ShelvesController::class, 'destroy'])->name('shelves.destroy');
-    Route::post('/hoods/store', [HoodsController::class, 'store'])->name('hoods.store');
 
     // Notifications
     Route::get('/notifications', [UsersNotificationsController::class, 'index'])->name('notifications.index');
@@ -110,7 +105,6 @@ Route::get('/init', [InitController::class, 'init'])->name('init.show');
 // Generic
 Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.manifest');
 Route::get('/offline', [GenericController::class, 'offline'])->name('offline');
-Route::get('/search', [SearchController::class, 'show'])->name('search');
 Route::get('/explore', [GenericController::class, 'explore'])->name('explore');
 
 // Writings
@@ -125,19 +119,15 @@ Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show'
 Route::get('/users/{user}/writings', [GenericController::class, 'writings'])->name('users.writings.index');
 Route::get('/users/{user}/shelf', [GenericController::class, 'shelf'])->name('users.shelf.index');
 Route::get('/users/{user}/likes', [GenericController::class, 'likes'])->name('users.likes.index');
-// Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('users.hood.index');
-// Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
 
 // Pages
 Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
 Route::get('/pages/{page}', [PagesController::class, 'show'])->name('pages.show');
 
 // Categories
-// Route::get('/categories', [CategoriesController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoriesController::class, 'show'])->name('categories.show');
 
 // Tags
-// Route::get('/tags', [TagsController::class, 'index'])->name('tags.index');
 Route::get('/tags/query', [TagsController::class, 'query'])->name('tags.query');
 Route::get('/tags/{tag}', [TagsController::class, 'show'])->name('tags.show');
 

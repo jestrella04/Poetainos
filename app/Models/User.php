@@ -136,7 +136,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hood()
     {
-        return $this->belongsToMany(User::class, 'hoods');
+        return $this->belongsToMany(User::class, 'hoods', 'user_id', 'fellow_user_id');
     }
 
     public function fellowHood($count = false)

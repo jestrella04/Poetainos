@@ -231,7 +231,7 @@ class UsersController extends Controller
             'facebook' => 'nullable|string|min:3|max:40',
             'youtube' => 'nullable|string|min:3|max:40',
             'goodreads' => 'nullable|string|min:3|max:40',
-            'avatar' => 'nullable|file|image|max:'.getSiteConfig('uploads_max_file_size'),
+            'avatar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
             'avatar-remove' => 'nullable|boolean',
             'service_agreement' => 'sometimes|required|accepted',
             'privacy_agreement' => 'sometimes|required|accepted',
@@ -278,8 +278,8 @@ class UsersController extends Controller
             $extraInfo['agreement']['privacy_policy'] = 'on';
         }
 
-        // Check if a user role is set
-        if (! empty(request('role'))) {
+        // Only an admin may change a user's role
+        if (! empty(request('role')) && auth()->user()->isAllowed('admin')) {
             $user->role_id = request('role');
         }
 
@@ -326,6 +326,28 @@ class UsersController extends Controller
         }
 
         return [];
+    }
+
+    /**
+     * Get the currently authenticated user.
+     *
+     * @return User
+     */
+    public function me(Request $request)
+    {
+        return $request->user();
+    }
+
+    /**
+     * Recalculate the given user's karma.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function karma(User $user)
+    {
+        $user->updateKarma();
+
+        return response($user->karma);
     }
 
     /**

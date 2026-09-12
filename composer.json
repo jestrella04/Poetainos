@@ -94,7 +94,7 @@
       "npm run test"
     ],
     "analyse": [
-      "phpstan analyse --memory-limit=1G"
+      "phpstan analyse -v . --memory-limit=1G"
     ],
     "ci:format": [
       "rector process",

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shelf;
-use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
 use Illuminate\Http\Request;
@@ -19,10 +18,10 @@ class ShelvesController extends Controller
      */
     public function store(Writing $writing)
     {
-        $userId = auth()->user()->id;
+        $user = auth()->user();
 
         // Check existence
-        $exist = Shelf::where('user_id', $userId)->where('writing_id', $writing->id)->count();
+        $exist = Shelf::where('user_id', $user->id)->where('writing_id', $writing->id)->count();
 
         if ($exist > 0) {
             return $this->destroy($writing);
@@ -30,19 +29,16 @@ class ShelvesController extends Controller
 
         Shelf::create([
             'writing_id' => $writing->id,
-            'user_id' => $userId,
+            'user_id' => $user->id,
         ]);
 
         // Update aura / karma
-        User::find($userId)->updateAura();
-        // User::find($userId)->updateKarma();
-        Writing::find($writing->id)->updateAura();
+        $user->updateAura();
+        $writing->updateAura();
 
         // Notify author
-        if (! Writing::find($writing->id)->author->is(auth()->user())) {
-            Writing::find($writing->id)->author->notify(
-                new WritingShelved(Writing::find($writing->id), auth()->user())
-            );
+        if (! $writing->author->is($user)) {
+            $writing->author->notify(new WritingShelved($writing, $user));
         }
 
         $count = Shelf::where('writing_id', $writing->id)->count();

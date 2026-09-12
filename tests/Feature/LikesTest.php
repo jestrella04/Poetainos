@@ -61,3 +61,16 @@ test('deleting a like only removes the acting user\'s own like', function (): vo
     $this->actingAs($liker)->delete("/likes/writing/{$writing->id}/delete")
         ->assertJson(['method' => 'destroy', 'count' => 1]);
 });
+
+test('liking a nonexistent writing 404s instead of crashing', function (): void {
+    $liker = User::factory()->create();
+
+    $this->actingAs($liker)->post('/likes/writing/999999/store')->assertNotFound();
+});
+
+test('liking an unknown likeable type 404s instead of crashing', function (): void {
+    $writing = Writing::factory()->create();
+    $liker = User::factory()->create();
+
+    $this->actingAs($liker)->post("/likes/bogus/{$writing->id}/store")->assertNotFound();
+});

@@ -37,3 +37,16 @@ test('social login verifies a not-yet-verified email on first login', function (
 
     expect($user->fresh()->email_verified_at)->not->toBeNull();
 });
+
+test('social login does not crash when the provider avatar cannot be fetched', function (): void {
+    $socialUser = SocialiteUser::fake([
+        'email' => 'new-writer@example.com',
+        'avatar' => 'https://avatars.example.invalid/does-not-exist.png',
+    ]);
+    Socialite::fake('google', $socialUser);
+
+    $this->get('/login/google/callback')->assertRedirect();
+
+    $user = User::where('email', 'new-writer@example.com')->firstOrFail();
+    expect($user->extra_info['avatar'] ?? null)->toBeNull();
+});

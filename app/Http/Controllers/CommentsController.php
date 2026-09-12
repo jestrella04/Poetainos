@@ -71,7 +71,6 @@ class CommentsController extends Controller
 
         // Update aura / karma
         $comment->author->updateAura();
-        // $comment->author->updateKarma();
         $comment->writing->updateAura();
 
         // Notify author

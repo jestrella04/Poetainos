@@ -29,31 +29,31 @@ class AdminController extends Controller
             'counters' => [
                 'users' => [
                     'title' => __('Users'),
-                    'count' => User::all()->count(),
+                    'count' => User::count(),
                 ],
                 'writings' => [
                     'title' => __('Writings'),
-                    'count' => Writing::all()->count(),
+                    'count' => Writing::count(),
                 ],
                 'comments' => [
                     'title' => __('Comments'),
-                    'count' => Comment::all()->count(),
+                    'count' => Comment::count(),
                 ],
                 'categories' => [
                     'title' => __('Categories'),
-                    'count' => Category::all()->count(),
+                    'count' => Category::count(),
                 ],
                 'tags' => [
                     'title' => __('Tags'),
-                    'count' => Tag::all()->count(),
+                    'count' => Tag::count(),
                 ],
                 'likes' => [
                     'title' => __('Likes'),
-                    'count' => Like::all()->count(),
+                    'count' => Like::count(),
                 ],
                 'shelves' => [
                     'title' => __('Bookmarks'),
-                    'count' => Shelf::all()->count(),
+                    'count' => Shelf::count(),
                 ],
             ],
             'meta' => [
@@ -90,7 +90,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'total' => Category::all()->count(),
+            'total' => Category::count(),
         ]);
     }
 
@@ -107,7 +107,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'total' => Tag::all()->count(),
+            'total' => Tag::count(),
         ]);
     }
 
@@ -126,7 +126,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'total' => User::all()->count(),
+            'total' => User::count(),
         ]);
     }
 
@@ -150,7 +150,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'total' => Writing::all()->count(),
+            'total' => Writing::count(),
         ]);
     }
 
@@ -167,7 +167,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'total' => Page::all()->count(),
+            'total' => Page::count(),
         ]);
     }
 
@@ -220,7 +220,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'total' => Complaint::all()->count(),
+            'total' => Complaint::count(),
         ]);
     }
 
@@ -248,7 +248,10 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'counter' => "https://counter.dev/dashboard.html?user=$user&token=$token%3D",
+            'counter' => 'https://counter.dev/dashboard.html?'.http_build_query([
+                'user' => $user,
+                'token' => $token,
+            ]),
         ]);
     }
 }

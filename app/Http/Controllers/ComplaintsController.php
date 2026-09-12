@@ -53,14 +53,18 @@ class ComplaintsController extends Controller
 
         $id = request('complainable_id');
 
-        // Update accordingly
-        if (request('complainable_type') == 'writings') {
-            $complaint->complainable()->associate(Writing::find($id));
-        } elseif (request('complainable_type') == 'comments') {
-            $complaint->complainable()->associate(Comment::find($id));
-        } elseif (request('complainable_type') == 'users') {
-            $complaint->complainable()->associate(User::find($id));
+        // Resolve the reported resource
+        $complainable = match (request('complainable_type')) {
+            'writings' => Writing::find($id),
+            'comments' => Comment::find($id),
+            'users' => User::find($id),
+        };
+
+        if ($complainable === null) {
+            abort(404);
         }
+
+        $complaint->complainable()->associate($complainable);
 
         $complaint->reasons = request('reasons');
         $complaint->comment = request('comment');

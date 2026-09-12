@@ -185,7 +185,7 @@ class GenericController extends Controller
 
     public function offline()
     {
-        Inertia::render('generic/PoOffline', [
+        return Inertia::render('generic/PoOffline', [
             'meta' => [],
         ]);
     }

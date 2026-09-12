@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Role;
 use App\Models\User;
 
 test('a user can view and update their own profile', function (): void {
@@ -40,6 +41,33 @@ test('an admin can view and update any profile', function (): void {
     ])->assertOk();
 
     expect($user->fresh()->name)->toBe('Admin Edited');
+});
+
+test('a non-admin cannot change their own role', function (): void {
+    $adminRole = Role::factory()->admin()->create();
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->put('/users/edit/'.$user->username, [
+        'name' => 'Just a user',
+        'email' => $user->email,
+        'role' => $adminRole->id,
+    ])->assertOk();
+
+    expect($user->fresh()->role_id)->not->toBe($adminRole->id);
+});
+
+test('an admin can change a user\'s role', function (): void {
+    $adminRole = Role::factory()->admin()->create();
+    $user = User::factory()->create();
+    $admin = actingAsAdmin();
+
+    $this->actingAs($admin)->put('/users/edit/'.$user->username, [
+        'name' => 'Just a user',
+        'email' => $user->email,
+        'role' => $adminRole->id,
+    ])->assertOk();
+
+    expect($user->fresh()->role_id)->toBe($adminRole->id);
 });
 
 test('a user can delete their own account after confirming their password', function (): void {
