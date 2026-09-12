@@ -133,60 +133,31 @@ class GenericController extends Controller
         $json->short_name = getSiteConfig('name');
         $json->description = getSiteConfig('slogan');
 
+        $shortcuts = [
+            'account' => [__('My account'), route('users.account')],
+            'publish' => [__('Publish'), route('writings.create')],
+            'featured' => [__('Golden Flowers'), route('writings.awards')],
+            'random' => [__('Random'), route('writings.random')],
+            'authors' => [__('Writers'), route('users.index')],
+        ];
+
         foreach ($json->shortcuts as $shortcut) {
-            if ($shortcut->name === 'account') {
-                $shortcut->name = __('My account');
-                $shortcut->short_name = __('My account');
-                $shortcut->url = route('users.account');
-
+            if (! isset($shortcuts[$shortcut->name])) {
                 continue;
             }
 
-            if ($shortcut->name === 'publish') {
-                $shortcut->name = __('Publish');
-                $shortcut->short_name = __('Publish');
-                $shortcut->url = route('writings.create');
-
-                continue;
-            }
-
-            if ($shortcut->name === 'featured') {
-                $shortcut->name = __('Golden Flowers');
-                $shortcut->short_name = __('Golden Flowers');
-                $shortcut->url = route('writings.awards');
-
-                continue;
-            }
-
-            if ($shortcut->name === 'random') {
-                $shortcut->name = __('Random');
-                $shortcut->short_name = __('Random');
-                $shortcut->url = route('writings.random');
-
-                continue;
-            }
-
-            if ($shortcut->name === 'authors') {
-                $shortcut->name = __('Writers');
-                $shortcut->short_name = __('Writers');
-                $shortcut->url = route('users.index');
-
-                continue;
-            }
+            [$label, $url] = $shortcuts[$shortcut->name];
+            $shortcut->name = $label;
+            $shortcut->short_name = $label;
+            $shortcut->url = $url;
         }
 
         foreach ($json->related_applications as $app) {
             if ($app->platform === 'webapp') {
                 $app->url = route('pwa.manifest');
-
-                continue;
-            }
-
-            if ($app->platform === 'play') {
+            } elseif ($app->platform === 'play') {
                 $app->url = config('services.google.play_store.url');
                 $app->id = config('services.google.play_store.id');
-
-                continue;
             }
         }
 

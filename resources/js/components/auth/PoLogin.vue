@@ -88,9 +88,7 @@ async function checkEmail(): Promise<void> {
     .then((response) => {
       step.value = response.data.exists === true ? 'login' : 'register'
     })
-    .catch((error: unknown) => {
-      console.log(error)
-    })
+    .catch(() => undefined)
     .finally(() => {
       isLoading.value = false
     })

@@ -21,11 +21,7 @@ class LikesController extends Controller
     public function store(string $likeable, string $likeableId): array
     {
         $likeableModel = $this->resolveLikeable($likeable, $likeableId);
-        $user = auth()->user();
-
-        if ($user === null) {
-            abort(401);
-        }
+        $user = $this->requireAuthUser();
 
         $like = new Like;
         $like->user()->associate($user);
@@ -33,13 +29,13 @@ class LikesController extends Controller
         $like->likeable()->associate($likeableModel);
 
         // Check existence
-        $exist = Like::where([
+        $exists = Like::where([
             ['user_id', $like->user_id],
             ['likeable_type', $like->likeable_type],
             ['likeable_id', $like->likeable_id],
-        ])->count();
+        ])->exists();
 
-        if ($exist > 0) {
+        if ($exists) {
             return $this->destroy($likeable, $likeableId);
         }
 
@@ -82,11 +78,7 @@ class LikesController extends Controller
     public function destroy(string $likeable, string $likeableId): array
     {
         $likeableModel = $this->resolveLikeable($likeable, $likeableId);
-        $user = auth()->user();
-
-        if ($user === null) {
-            abort(401);
-        }
+        $user = $this->requireAuthUser();
 
         Like::where([
             ['likeable_type', $likeableModel::class],

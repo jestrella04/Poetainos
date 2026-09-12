@@ -21,16 +21,6 @@ class GenerateAssetLinks extends Command
     protected $description = 'Generate assetlinks.json file (a digital file that proves ownership of a PWA)';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      */
     public function handle(): int

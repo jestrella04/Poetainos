@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -28,5 +29,20 @@ class Controller extends BaseController
         return $user !== null
             ? $user->blockedAuthors()->pluck('blocked_user_id')->toArray()
             : [0];
+    }
+
+    /**
+     * The currently authenticated user, aborting with a 401 if there is none.
+     * Shared by every action that requires a logged-in user to proceed.
+     */
+    public function requireAuthUser(): User
+    {
+        $user = auth()->user();
+
+        if ($user === null) {
+            abort(401);
+        }
+
+        return $user;
     }
 }

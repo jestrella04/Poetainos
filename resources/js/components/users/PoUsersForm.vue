@@ -296,7 +296,7 @@ function openAvatarPicker(): void {
           hide-details="auto"
           :error-messages="errors.website"
           minlength="3"
-          maxlength="100"
+          maxlength="250"
           clearable
         ></v-text-field>
 

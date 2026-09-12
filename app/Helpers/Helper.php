@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -131,6 +134,26 @@ function calculateWeightedAuraScore(array $countables, array $weights): array
 function resolveSort(array $allowed, string $default = 'latest'): string
 {
     return in_array(request('sort'), $allowed, true) ? request('sort') : $default;
+}
+
+/**
+ * Random writings for a "related content" widget, with each one's author
+ * summary eager-loaded (the shape every such widget needs).
+ *
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @param  Builder<TModel>|Relation<TModel, *, *>  $query  A query builder, or a relation (e.g. $user->writings()) — both proxy with()/inRandomOrder()/take()/get() to the underlying builder.
+ * @return EloquentCollection<int, TModel>
+ */
+function randomWritingsWithAuthor(Builder|Relation $query, int $take = 5): EloquentCollection
+{
+    return $query
+        ->with(['author' => function ($authorQuery): void {
+            $authorQuery->forAuthorSummary();
+        }])
+        ->inRandomOrder()
+        ->take($take)
+        ->get();
 }
 
 function tailFile(string $path, int $lines = 100): string

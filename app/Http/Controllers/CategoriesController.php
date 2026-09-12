@@ -20,9 +20,6 @@ class CategoriesController extends Controller
     public function show(Category $category): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
-        $params = [
-            'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]).' '.$category->description,
-        ];
 
         $writings = $category->writingsRecursive()
             ->visibleTo($this->getBlockedUsers())

@@ -7,7 +7,6 @@ use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 
 class RedirectIfAuthenticated
 {
@@ -23,7 +22,7 @@ class RedirectIfAuthenticated
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
+            if (auth($guard)->check()) {
                 return redirect(RouteServiceProvider::HOME);
             }
         }

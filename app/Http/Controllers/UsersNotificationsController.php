@@ -83,7 +83,7 @@ class UsersNotificationsController extends Controller
 
     public function show(string $notificationId): RedirectResponse
     {
-        $notification = auth()->user()?->notifications->find($notificationId);
+        $notification = auth()->user()?->notifications()->find($notificationId);
 
         if ($notification !== null) {
             $notification->markAsRead();

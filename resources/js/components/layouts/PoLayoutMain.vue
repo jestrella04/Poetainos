@@ -16,11 +16,13 @@ import {
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useStaticPages } from '@/composables/useStaticPages'
 
 const page = computed(() => usePage())
 const { auth, authUser, admin } = useAuth()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { getSnackBar } = useSnackbar()
+const { faqPath, aboutPath, termsPath, privacyPath } = useStaticPages()
 const theme = useTheme()
 const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
@@ -295,35 +297,23 @@ code {
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item
-                  :href="route('pages.show', 'preguntas-frecuentes')"
-                  prepend-icon="fas fa-circle-question"
-                  inertia
-                >
+                <po-list-item :href="faqPath()" prepend-icon="fas fa-circle-question" inertia>
                   <span>{{ $t('main.faq') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item
-                  :href="route('pages.show', 'sobre-nosotros')"
-                  prepend-icon="fas fa-address-card"
-                  inertia
-                >
+                <po-list-item :href="aboutPath()" prepend-icon="fas fa-address-card" inertia>
                   <span>{{ $t('main.about-us') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
-                <po-list-item
-                  :href="route('pages.show', 'condiciones-de-uso')"
-                  prepend-icon="fas fa-pen-ruler"
-                  inertia
-                >
+                <po-list-item :href="termsPath()" prepend-icon="fas fa-pen-ruler" inertia>
                   <span>{{ $t('main.terms-of-use') }}</span>
                 </po-list-item>
                 <v-divider class="my-0"></v-divider>
 
                 <po-list-item
-                  :href="route('pages.show', 'politicas-de-privacidad')"
+                  :href="privacyPath()"
                   variant="text"
                   prepend-icon="fas fa-shield-halved"
                   inertia

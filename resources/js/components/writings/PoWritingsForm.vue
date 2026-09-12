@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { provide, reactive, computed, ref, watch, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 import PoWritingDelete from './partials/PoWritingDelete.vue'
 import { formDataKey, isDeleteKey } from '@/composables/keys'
@@ -40,8 +41,13 @@ interface PostedResult {
 }
 
 const page = computed(() => usePage<InertiaPageProps<WritingFormProps>>())
+const { t } = useI18n()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { checkFormValidity } = useFormValidation()
+
+function requiredLabel(key: string): string {
+  return `${t(key)} *`
+}
 const writing = page.value.props.writing
 const formData = reactive({
   title: (writing.data.title ??= ''),
@@ -180,7 +186,7 @@ function resetForm() {
 
         <v-text-field
           v-model="formData.title"
-          :label="$t('main.title') + ' *'"
+          :label="requiredLabel('main.title')"
           hide-details="auto"
           :error-messages="errors.title"
           :placeholder="$t('main.enter-title')"
@@ -193,7 +199,7 @@ function resetForm() {
 
         <v-select
           v-model="formData.main_category"
-          :label="$t('categories.main-category') + ' *'"
+          :label="requiredLabel('categories.main-category')"
           hide-details="auto"
           :error-messages="errors.main_category"
           :placeholder="$t('categories.select-main')"
@@ -208,7 +214,7 @@ function resetForm() {
 
         <v-select
           v-model="formData.alt_categories"
-          :label="$t('categories.alt-categories') + ' *'"
+          :label="requiredLabel('categories.alt-categories')"
           hide-details="auto"
           :error-messages="errors.categories"
           :placeholder="$t('categories.select-alt')"
@@ -240,7 +246,7 @@ function resetForm() {
 
         <v-textarea
           v-model="formData.text"
-          :label="$t('main.text') + ' *'"
+          :label="requiredLabel('main.text')"
           hide-details="auto"
           :error-messages="errors.text"
           :placeholder="$t('main.enter-text')"

@@ -6,7 +6,6 @@ use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class InitController extends Controller
@@ -22,6 +21,13 @@ class InitController extends Controller
         if (Setting::where('name', 'site')->first() !== null) {
             abort(403, 'App already initialized');
         }
+
+        // Validate the admin credentials being bootstrapped
+        request()->validate([
+            'username' => ['required', 'string', 'min:3', 'max:45', 'regex:/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/'],
+            'email' => ['required', 'string', 'email', 'max:250'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
 
         // Create default JSON settings
         $site = (string) file_get_contents(base_path('resources/json/settings.default.json'));
@@ -52,14 +58,14 @@ class InitController extends Controller
         ]);
 
         $user = User::create([
-            'username' => '',
+            'username' => request('username'),
             'role_id' => $role->id,
-            'email' => '',
-            'password' => Hash::make(''),
+            'email' => request('email'),
+            'password' => Hash::make((string) request('password')),
         ]);
 
         // Authenticate admin user
-        Auth::login($user);
+        auth()->login($user);
 
         // Redirect to the init success page
         return redirect(route(('home')));

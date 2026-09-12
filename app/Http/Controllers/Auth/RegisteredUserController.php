@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -33,7 +31,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'username' => ['required', 'string', 'min:3', 'max:45', 'unique:users', 'regex:/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/'],
-            'email' => ['required', 'string', 'email', 'max:45', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:250', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'],
             'service_agreement' => ['required', 'accepted'],
             'privacy_agreement' => ['required', 'accepted'],
@@ -53,9 +51,7 @@ class RegisteredUserController extends Controller
             'role_id' => Role::where('name', 'user')->firstOrFail()->id,
         ]);
 
-        // event(new Registered($user));
-
-        Auth::login($user);
+        auth()->login($user);
         $user->sendEmailVerificationNotification();
 
         return Inertia::render('auth/PoVerify');

@@ -113,17 +113,14 @@ class WritingsController extends Controller
                 'from_author' => Writing::whereNot('id', $writing->id)
                     ->where('user_id', $writing->user_id)
                     ->inRandomOrder()->take(5)->get(),
-                'from_category' => Writing::whereIn(
-                    'id',
-                    DB::table('category_writing')
-                        ->select('writing_id')
-                        ->whereIn('category_id', $writing->categories()->pluck('id'))
-                )->with([
-                    'author' => function ($query): void {
-                        $query->forAuthorSummary();
-                    },
-                ])->inRandomOrder()->take(5)->get(),
-
+                'from_category' => randomWritingsWithAuthor(
+                    Writing::whereIn(
+                        'id',
+                        DB::table('category_writing')
+                            ->select('writing_id')
+                            ->whereIn('category_id', $writing->categories()->pluck('id'))
+                    )
+                ),
             ],
             'isAuthorBlocked' => $user !== null && $writing->author !== null ? $user->isAuthorBlocked($writing->author) : false,
         ]);
@@ -193,11 +190,7 @@ class WritingsController extends Controller
             $action = 'update';
         }
 
-        $user = auth()->user();
-
-        if ($user === null) {
-            abort(401);
-        }
+        $user = $this->requireAuthUser();
 
         // Check number of posts by user
         $posts = $user->writings()->whereDate('created_at', '=', Carbon::today())->count();
@@ -214,7 +207,7 @@ class WritingsController extends Controller
             'title' => 'required|string|min:3|max:100',
             'main_category' => 'required|integer|exists:categories,id',
             'categories' => 'required|array|exists:categories,id|max:2',
-            'text' => 'required|string|min:10|max:2000',
+            'text' => 'required|string|min:10|max:4000',
             'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
             'cover' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),

@@ -40,10 +40,6 @@ class TagsController extends Controller
     public function show(Tag $tag): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
-        $params = [
-            'head_msg' => __('You are browsing the library of writings tagged with ":tag".', ['tag' => $tag->name]),
-
-        ];
         $writings = $tag->writings()
             ->visibleTo($this->getBlockedUsers())
             ->withListingRelations()

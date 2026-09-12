@@ -61,15 +61,6 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        // Debugging SQL queries
-        /* if (env('APP_DEBUG')) {
-            DB::listen(function($sql) {
-                Log::info($sql->sql);
-                Log::info($sql->bindings);
-                Log::info($sql->time);
-            });
-        } */
-
         // Use Bootstrap for pagination
         Paginator::useBootstrap();
     }

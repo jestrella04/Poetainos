@@ -365,19 +365,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $likes = $this->likes()
             ->where('likeable_type', 'App\Models\Writing')
-            ->whereDate('created_at', now()->today())
+            ->whereDate('created_at', Carbon::today())
             ->pluck('likeable_id')
             ->all();
 
         $comments = $this->comments()
             ->distinct('writing_id')
-            ->whereDate('created_at', now()->today())
+            ->whereDate('created_at', Carbon::today())
             ->pluck('writing_id')
             ->all();
 
         $shelves = Shelf::where('user_id', $this->id)
             ->distinct('writing_id')
-            ->whereDate('created_at', now()->today())
+            ->whereDate('created_at', Carbon::today())
             ->pluck('writing_id')
             ->all();
 

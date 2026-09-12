@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { formDataKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
+import { useStaticPages } from '@/composables/useStaticPages'
 
 const formData = injectStrict(formDataKey)
+const { termsPath, privacyPath } = useStaticPages()
 </script>
 
 <template>
@@ -19,7 +21,7 @@ const formData = injectStrict(formDataKey)
     </div>
 
     <div class="pt-4 ps-4">
-      <po-link :href="route('pages.show', 'condiciones-de-uso')" target="_blank" inertia>
+      <po-link :href="termsPath()" target="_blank" inertia>
         <v-icon icon="fas fa-arrow-up-right-from-square"></v-icon>
       </po-link>
     </div>
@@ -37,7 +39,7 @@ const formData = injectStrict(formDataKey)
     </div>
 
     <div class="pt-4 ps-4">
-      <po-link :href="route('pages.show', 'politicas-de-privacidad')" inertia>
+      <po-link :href="privacyPath()" inertia>
         <v-icon icon="fas fa-arrow-up-right-from-square"></v-icon>
       </po-link>
     </div>

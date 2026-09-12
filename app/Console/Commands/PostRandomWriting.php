@@ -23,16 +23,6 @@ class PostRandomWriting extends Command
     protected $description = 'Post a random writing to Twitter';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      */
     public function handle(): int

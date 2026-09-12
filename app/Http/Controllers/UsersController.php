@@ -126,38 +126,14 @@ class UsersController extends Controller
                 ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
                 ->firstOrFail(),
             'writings' => [
-                'from_author' => $user
-                    ->writings()
-                    ->with([
-                        'author' => function ($query): void {
-                            $query->forAuthorSummary();
-                        },
-                    ])
-                    ->inRandomOrder()
-                    ->take(5)
-                    ->get(),
-                'from_shelf' => $user
-                    ->shelf()
-                    ->with([
-                        'author' => function ($query): void {
-                            $query->forAuthorSummary();
-                        },
-                    ])
-                    ->inRandomOrder()
-                    ->take(5)
-                    ->get(),
-                'from_liked' => Writing::whereIn(
-                    'id',
-                    $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'),
-                )
-                    ->with([
-                        'author' => function ($query): void {
-                            $query->forAuthorSummary();
-                        },
-                    ])
-                    ->inRandomOrder()
-                    ->take(5)
-                    ->get(),
+                'from_author' => randomWritingsWithAuthor($user->writings()),
+                'from_shelf' => randomWritingsWithAuthor($user->shelf()),
+                'from_liked' => randomWritingsWithAuthor(
+                    Writing::whereIn(
+                        'id',
+                        $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'),
+                    )
+                ),
             ],
             'isAuthorBlocked' => $authUser !== null ? $authUser->isAuthorBlocked($user) : false,
         ]);
@@ -192,19 +168,19 @@ class UsersController extends Controller
         // Validate user input
         request()->validate([
             'role' => 'nullable|integer|exists:roles,id',
-            'name' => 'required|string|min:3|max:60',
-            'email' => 'required|email|min:3|max:40',
+            'name' => 'required|string|min:3|max:250',
+            'email' => 'required|email|min:3|max:250',
             'bio' => 'nullable|string|min:3|max:300',
-            'location' => 'nullable|string|min:3|max:40',
-            'occupation' => 'nullable|string|min:3|max:40',
-            'interests' => 'nullable|string|min:3|max:100',
+            'location' => 'nullable|string|min:3|max:250',
+            'occupation' => 'nullable|string|min:3|max:100',
+            'interests' => 'nullable|string|min:3|max:250',
             'website' => 'nullable|url|max:250',
-            'twitter' => 'nullable|string|min:3|max:40',
-            'threads' => 'nullable|string|min:3|max:40',
-            'instagram' => 'nullable|string|min:3|max:40',
-            'facebook' => 'nullable|string|min:3|max:40',
-            'youtube' => 'nullable|string|min:3|max:40',
-            'goodreads' => 'nullable|string|min:3|max:40',
+            'twitter' => 'nullable|string|min:3|max:250',
+            'threads' => 'nullable|string|min:3|max:250',
+            'instagram' => 'nullable|string|min:3|max:100',
+            'facebook' => 'nullable|string|min:3|max:250',
+            'youtube' => 'nullable|string|min:3|max:100',
+            'goodreads' => 'nullable|string|min:3|max:250',
             'avatar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
             'avatar-remove' => 'nullable|boolean',
             'service_agreement' => 'sometimes|required|accepted',
@@ -349,8 +325,6 @@ class UsersController extends Controller
         if ($user === null) {
             abort(401);
         }
-
-        $params = [];
 
         return Inertia::render('users/PoUsersAccount', [
             'meta' => [

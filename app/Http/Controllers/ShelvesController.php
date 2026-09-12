@@ -15,16 +15,12 @@ class ShelvesController extends Controller
      */
     public function store(Writing $writing): array
     {
-        $user = auth()->user();
-
-        if ($user === null) {
-            abort(401);
-        }
+        $user = $this->requireAuthUser();
 
         // Check existence
-        $exist = Shelf::where('user_id', $user->id)->where('writing_id', $writing->id)->count();
+        $exists = Shelf::where('user_id', $user->id)->where('writing_id', $writing->id)->exists();
 
-        if ($exist > 0) {
+        if ($exists) {
             return $this->destroy($writing);
         }
 
@@ -57,11 +53,7 @@ class ShelvesController extends Controller
      */
     public function destroy(Writing $writing): array
     {
-        $user = auth()->user();
-
-        if ($user === null) {
-            abort(401);
-        }
+        $user = $this->requireAuthUser();
 
         $user->shelf()->detach($writing->id);
         $count = Shelf::where('writing_id', $writing->id)->count();
