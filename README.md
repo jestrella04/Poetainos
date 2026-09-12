@@ -114,6 +114,32 @@ Or, assuming you prefer Laradock, we got you covered. There are a couple of hand
 npm run up
 ```
 
+## Graphify (Knowledge Graph)
+
+The project uses [graphify](https://github.com/Ruzicka/graphify) to maintain a persistent knowledge graph for codebase exploration. Install it with:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv tool install graphifyy
+```
+
+Once installed, register the skill with your AI assistant:
+
+```bash
+graphify install --project
+```
+
+Then, the graph can be queried or updated:
+
+```bash
+graphify query "how does multi-tenancy work"   # Scoped subgraph for a question
+graphify explain "SubscriptionService"          # Focused concept explanation
+graphify path "AppointmentController" "Service" # Relationship between two nodes
+graphify update .                               # Rebuild graph after code changes
+```
+
+The pre-built graph lives in `graphify-out/`. Run `graphify update .` after significant code changes to keep it current.
+
 <!-- USAGE EXAMPLES -->
 
 ## Usage
