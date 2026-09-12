@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import type { Method, RequestPayload } from '@inertiajs/core'
+import { useInertiaVisit } from '@/composables/useInertiaVisit'
 
-const props = defineProps<{
-  href?: string
-  inertia?: boolean
-}>()
-
-function visit() {
-  if (!props.href) {
-    return
+const props = withDefaults(
+  defineProps<{
+    href?: string
+    inertia?: boolean
+    method?: Method
+    data?: RequestPayload
+  }>(),
+  {
+    method: 'get'
   }
+)
 
-  router.get(props.href)
-}
+const { visit } = useInertiaVisit(props)
 </script>
 
 <template>

@@ -89,13 +89,7 @@ const page = computed(() => usePage<InertiaPageProps<ExploreProps>>())
                 :title="userDisplayName(author)"
                 inertia
               >
-                <po-avatar-award
-                  v-if="author.karma && ['A', 'B', 'C'].includes(author.karma)"
-                  :user="author"
-                  avatar-size="64"
-                  avatar-color="secondary"
-                />
-                <po-avatar v-else size="64" color="secondary" :user="author" />
+                <po-avatar-award :user="author" avatar-size="64" avatar-color="secondary" />
               </po-link>
             </template>
           </div>

@@ -94,7 +94,7 @@ class Writing extends Model
     {
         $likes = $this->likes()->pluck('user_id');
 
-        return User::select('id', 'username', 'name', 'extra_info->avatar AS avatar')->whereIn('id', $likes)->get();
+        return User::forAuthorSummary()->whereIn('id', $likes)->get();
     }
 
     public function tags()
@@ -141,33 +141,29 @@ class Writing extends Model
 
         // Count user content
         $writing = Writing::whereId($this->id)->withCount(['likes', 'comments', 'shelf'])->firstOrFail();
-        $likes = $writing->likes_count;
-        $comments = $writing->comments_count;
-        $shelf = $writing->shelf_count;
-        $views = $this->views;
+        $countables = [
+            'likes' => $writing->likes_count,
+            'comments' => $writing->comments_count,
+            'shelf' => $writing->shelf_count,
+            'views' => $this->views,
+        ];
 
         // Get points from settings
-        $pointsLikes = getSiteConfig('aura.points.writing.like');
-        $pointsComments = getSiteConfig('aura.points.writing.comment');
-        $pointsShelf = getSiteConfig('aura.points.writing.shelf');
-        $pointsViews = getSiteConfig('aura.points.writing.views');
-        $basePoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
+        $weights = [
+            'likes' => getSiteConfig('aura.points.writing.like'),
+            'comments' => getSiteConfig('aura.points.writing.comment'),
+            'shelf' => getSiteConfig('aura.points.writing.shelf'),
+            'views' => getSiteConfig('aura.points.writing.views'),
+        ];
 
-        // Calculate points as per settings
-        $pointsLikes = $pointsLikes * $likes;
-        $pointsComments = $pointsComments * $comments;
-        $pointsShelf = $pointsShelf * $shelf;
-        $pointsViews = $pointsViews * $views;
-        $totalPoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
+        $points = calculateWeightedAuraScore($countables, $weights);
 
         // Do the math
-        if ($basePoints <= 0) {
+        if ($points['base'] <= 0) {
             return;
         }
 
-        // Reduces algebraically to totalPoints / (4 * basePoints); 4 is the
-        // count of countables (likes, comments, shelf, views).
-        $auraNew = number_format($totalPoints / (4 * $basePoints), 2);
+        $auraNew = $points['score'];
 
         // Check when writing was posted (in days)
         $postedAt = Carbon::parse($this->created_at)->diffInDays();
@@ -247,7 +243,7 @@ class Writing extends Model
     {
         return $query->withCount(['likes', 'comments', 'shelf'])
             ->with(['author' => function ($query): void {
-                $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
+                $query->forAuthorSummary(withKarma: true);
             }]);
     }
 }

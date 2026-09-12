@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
@@ -124,6 +124,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Role::class);
     }
 
+    /**
+     * Minimal author summary columns reused across every listing/eager-load
+     * that only needs to display "who wrote this" (id, username, name,
+     * avatar), optionally including karma.
+     */
+    public function scopeForAuthorSummary(Builder $query, bool $withKarma = false): Builder
+    {
+        $columns = ['id', 'username', 'name', 'extra_info->avatar AS avatar'];
+
+        if ($withKarma) {
+            $columns[] = 'karma';
+        }
+
+        return $query->select($columns);
+    }
+
     public function writings()
     {
         return $this->hasMany(Writing::class);
@@ -132,22 +148,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function shelf()
     {
         return $this->belongsToMany(Writing::class, 'shelves');
-    }
-
-    public function hood()
-    {
-        return $this->belongsToMany(User::class, 'hoods', 'user_id', 'fellow_user_id');
-    }
-
-    public function fellowHood($count = false)
-    {
-        if ($count) {
-            $count = DB::select('SELECT count(`user_id`) AS user_count FROM `hoods` WHERE `fellow_user_id` = ?', [$this->id]);
-
-            return $count[0]->user_count;
-        }
-
-        return DB::select('SELECT `user_id` FROM `hoods` WHERE `fellow_user_id` = ?', [$this->id]);
     }
 
     public function comments()
@@ -170,37 +170,28 @@ class User extends Authenticatable implements MustVerifyEmail
         DB::table($this->getTable())->whereId($this->id)->increment('profile_views');
     }
 
-    private function calcPoints(array $count)
+    private function calcPoints(array $count): array
     {
-        $writings = $count['writings'] ?? 0;
-        $likes = $count['likes'] ?? 0;
-        $comments = $count['comments'] ?? 0;
-        $shelf = $count['shelf'] ?? 0;
-        $awards = $count['awards'] ?? 0;
-        $views = $count['views'] ?? 0;
+        $countables = [
+            'writings' => $count['writings'] ?? 0,
+            'likes' => $count['likes'] ?? 0,
+            'comments' => $count['comments'] ?? 0,
+            'shelf' => $count['shelf'] ?? 0,
+            'views' => $count['views'] ?? 0,
+            'awards' => $count['awards'] ?? 0,
+        ];
 
         // Get points from settings
-        $pointsWritings = getSiteConfig('aura.points.user.writing');
-        $pointsLikes = getSiteConfig('aura.points.user.like');
-        $pointsComments = getSiteConfig('aura.points.user.comment');
-        $pointsShelf = getSiteConfig('aura.points.user.shelf');
-        $pointsViews = getSiteConfig('aura.points.user.views');
-        $pointsAwards = getSiteConfig('aura.points.user.award');
-        $basePoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards;
-
-        // Calculate points as per settings
-        $pointsWritings = $pointsWritings * $writings;
-        $pointsLikes = $pointsLikes * $likes;
-        $pointsComments = $pointsComments * $comments;
-        $pointsShelf = $pointsShelf * $shelf;
-        $pointsViews = $pointsViews * $views;
-        $pointsAwards = $pointsAwards * $awards;
-        $totalPoints = $pointsWritings + $pointsLikes + $pointsComments + $pointsShelf + $pointsViews + $pointsAwards;
-
-        return [
-            'base' => (int) $basePoints,
-            'total' => (int) $totalPoints,
+        $weights = [
+            'writings' => getSiteConfig('aura.points.user.writing'),
+            'likes' => getSiteConfig('aura.points.user.like'),
+            'comments' => getSiteConfig('aura.points.user.comment'),
+            'shelf' => getSiteConfig('aura.points.user.shelf'),
+            'views' => getSiteConfig('aura.points.user.views'),
+            'awards' => getSiteConfig('aura.points.user.award'),
         ];
+
+        return calculateWeightedAuraScore($countables, $weights);
     }
 
     public function updateAura()
@@ -220,13 +211,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         // Do the math
         if ($points['total'] > 0 && $points['base'] > 0) {
-            // Reduces algebraically to total / (6 * base); 6 is the count of
-            // countables (writings, likes, comments, shelf, views, awards).
-            $aura = number_format($points['total'] / (6 * $points['base']), 2);
-
             // Persist to the database
             DB::table('users')->whereId($this->id)->update([
-                'aura' => $aura,
+                'aura' => $points['score'],
                 'aura_updated_at' => Carbon::now(),
             ]);
         }
@@ -267,24 +254,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this;
     }
 
-    public function isAllowed($task)
+    public function isAllowed(string $task): bool
     {
-        if (null !== ($this->role)) {
-            $this->task = $task;
-            $permissions = $this->role->permissions();
-
-            if (count($permissions) > 0) {
-                $allowed = Arr::first($this->role->permissions(), function ($value, $key) {
-                    return $this->task === $value['name'];
-                });
-
-                if ($allowed['enabled']) {
-                    return true;
-                }
-            }
+        if ($this->role === null) {
+            return false;
         }
 
-        return false;
+        $permission = collect($this->role->permissions())->firstWhere('name', $task);
+
+        return $permission['enabled'] ?? false;
     }
 
     public function isInAgreement()

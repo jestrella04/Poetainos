@@ -57,7 +57,7 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<ComplaintAdmi
       </template>
 
       <template v-slot:item.closed_at="{ item }">
-        {{ item.closed_at ? toLocaleDate(item.closed_at) : '' }}
+        {{ item.closed_at !== null ? toLocaleDate(item.closed_at) : '' }}
       </template>
 
       <template v-slot:item.actions>

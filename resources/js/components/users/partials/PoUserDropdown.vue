@@ -4,10 +4,12 @@ import { blockerKey, complainerKey, sharerKey, userKey } from '@/composables/key
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useFormatting } from '@/composables/useFormatting'
+import { useNativeShare } from '@/composables/useNativeShare'
 
 const user = injectStrict(userKey)
 const { auth, authUser } = useAuth()
 const { userDisplayName } = useFormatting()
+const { share: nativeShare } = useNativeShare()
 const sharer = ref(false)
 const complainer = ref(false)
 const blocker = ref(false)
@@ -16,15 +18,10 @@ provide(complainerKey, complainer)
 provide(blockerKey, blocker)
 provide(sharerKey, sharer)
 
-function share() {
-  if (navigator.share) {
-    void navigator.share({
-      title: userDisplayName(user),
-      url: route('users.show', [user.username])
-    })
-  } else {
+function share(): void {
+  nativeShare(userDisplayName(user), route('users.show', [user.username]), () => {
     sharer.value = true
-  }
+  })
 }
 </script>
 

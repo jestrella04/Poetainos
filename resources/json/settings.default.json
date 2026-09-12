@@ -119,5 +119,11 @@
       "icon": "fas fa-shopping-bag",
       "description": "URL to get the application on Samsung Finder."
     }
+  },
+  "writings": {
+    "daily_post_limit": {
+      "value": 3,
+      "description": "The maximum number of writings a user can publish per day."
+    }
   }
 }

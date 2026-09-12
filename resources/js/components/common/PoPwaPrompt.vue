@@ -10,11 +10,12 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
     console.log(`Service Worker at: ${swUrl}`)
 
     if ((reloadSW as string) === 'true') {
-      r &&
+      if (r !== undefined) {
         setInterval(() => {
           console.log('Checking for sw update')
           void r.update()
         }, intervalMS)
+      }
     } else {
       console.log('SW Registered:', r)
     }

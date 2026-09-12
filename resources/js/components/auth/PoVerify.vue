@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
 
@@ -6,24 +7,33 @@ defineOptions({
   layout: PoLayoutLogin
 })
 
-async function resendLink() {
+const showSuccess = ref(false)
+const showError = ref(false)
+
+function flashMessage(message: 'success' | 'error'): void {
+  if (message === 'success') {
+    showSuccess.value = true
+  } else {
+    showError.value = true
+  }
+
+  setTimeout(() => {
+    if (message === 'success') {
+      showSuccess.value = false
+    } else {
+      showError.value = false
+    }
+  }, 6000)
+}
+
+async function resendLink(): Promise<void> {
   await axios
     .post(route('verification.send'))
     .then(() => {
-      const alert = document.querySelector('.po-success')
-      alert?.classList.remove('d-none')
-
-      setTimeout(() => {
-        alert?.classList.add('d-none')
-      }, 6000)
+      flashMessage('success')
     })
     .catch(() => {
-      const alert = document.querySelector('.po-error')
-      alert?.classList.remove('d-none')
-
-      setTimeout(() => {
-        alert?.classList.add('d-none')
-      }, 6000)
+      flashMessage('error')
     })
 }
 </script>
@@ -31,16 +41,18 @@ async function resendLink() {
 <template>
   <div class="px-10">
     <v-alert
+      v-if="showSuccess"
       :text="$t('accounts.verification-link-sent')"
-      class="text-caption po-success text-center mb-10 d-none"
+      class="text-caption po-success text-center mb-10"
       color="success"
       variant="tonal"
       rounded
     ></v-alert>
 
     <v-alert
+      v-if="showError"
       :text="$t('main.error-try-again')"
-      class="text-caption po-error text-center mb-10 d-none"
+      class="text-caption po-error text-center mb-10"
       color="error"
       variant="tonal"
       rounded

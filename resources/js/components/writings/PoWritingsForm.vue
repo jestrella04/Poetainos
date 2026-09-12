@@ -94,6 +94,8 @@ watch(
   }
 )
 
+const isAltCategoriesDisabled = computed(() => (formData.main_category ?? 0) <= 0)
+
 function clearInputs() {
   formData.title = ''
   formData.main_category = null
@@ -218,7 +220,7 @@ function resetForm() {
           clearable
           required
           chips
-          :disabled="!((formData.main_category ?? 0) > 0)"
+          :disabled="isAltCategoriesDisabled"
         ></v-select>
 
         <v-combobox

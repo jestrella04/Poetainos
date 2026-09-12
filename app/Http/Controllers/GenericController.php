@@ -12,7 +12,7 @@ class GenericController extends Controller
 {
     public function writings(User $user)
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $sort = resolveSort(['latest', 'popular', 'likes']);
         $writings = $user->writings()
             ->visibleTo($this->getBlockedUsers())
             ->withListingRelations()
@@ -34,7 +34,7 @@ class GenericController extends Controller
 
     public function shelf(User $user)
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $sort = resolveSort(['latest', 'popular', 'likes']);
         $writings = Writing::whereIn('id', $user->shelf()->pluck('id'))
             ->visibleTo($this->getBlockedUsers())
             ->withListingRelations()
@@ -56,7 +56,7 @@ class GenericController extends Controller
 
     public function likes(User $user)
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $sort = resolveSort(['latest', 'popular', 'likes']);
         $writings = Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
             ->visibleTo($this->getBlockedUsers())
             ->whereNot('user_id', $user->id)

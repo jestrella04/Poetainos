@@ -12,14 +12,14 @@ defineOptions({
   layout: PoLayoutLogin
 })
 
+type LoginStep = 'guest' | 'checking' | 'login' | 'register'
+
 const { strNullOrEmpty } = useTypeGuards()
 const { setSnackBar } = useSnackbar()
 const isLoading = ref(false)
-const isEmail = ref(false)
-const isReset = ref(false)
-const shouldLogin = ref(false)
-const shouldRegister = ref(false)
-const shouldReset = ref(false)
+const step = ref<LoginStep>('guest')
+const arrivedFromPasswordReset = ref(false)
+const resetEmailSent = ref(false)
 
 const formData = reactive({
   email: '',
@@ -42,22 +42,22 @@ onMounted(() => {
   const params = new URLSearchParams(window.location.search)
 
   if ('1' === params.get('isEmail')) {
-    isEmail.value = true
+    step.value = 'checking'
 
     const email = params.get('email')
 
     if (email !== null && !strNullOrEmpty(email)) {
       formData.email = email
-      shouldLogin.value = true
+      step.value = 'login'
     }
   }
 
   if ('1' === params.get('isReset')) {
-    isReset.value = true
+    arrivedFromPasswordReset.value = true
   }
 })
 
-function clearInputs() {
+function clearInputs(): void {
   formData.email = ''
   formData.username = ''
   formData.password = ''
@@ -66,138 +66,128 @@ function clearInputs() {
   formData.privacyAgreement = false
 }
 
-function clearErrors() {
+function clearErrors(): void {
   errors.email = []
   errors.username = []
   errors.password = []
 }
 
-function resetForm() {
+function resetForm(): void {
   setTimeout(() => {
-    isEmail.value = false
-    shouldLogin.value = false
-    shouldRegister.value = false
-
-    // Clear inputs
+    step.value = 'guest'
     clearInputs()
-
-    // Clear errors
     clearErrors()
   }, 500)
 }
 
-async function submitForm() {
+async function checkEmail(): Promise<void> {
+  isLoading.value = true
+
+  await axios
+    .post<{ exists: boolean }>(route('email.check'), { email: formData.email })
+    .then((response) => {
+      step.value = response.data.exists === true ? 'login' : 'register'
+    })
+    .catch((error: unknown) => {
+      console.log(error)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+
+async function login(): Promise<void> {
+  isLoading.value = true
+  clearErrors()
+
+  await axios
+    .post<{ redirect: string }>(route('login'), {
+      email: formData.email,
+      password: formData.password
+    })
+    .then((response) => {
+      setSnackBar({
+        message: 'accounts.welcome-back',
+        color: 'primary',
+        active: true
+      })
+
+      router.get(response.data.redirect)
+    })
+    .catch((error: ValidationError) => {
+      // Laravel's LoginRequest::authenticate() always keys a failed-login
+      // error "email" (deliberately ambiguous about whether the email or
+      // the password was wrong). By this point the email is already
+      // confirmed to exist (see the checkEmail() step above) and only the
+      // password field is visible, so we surface the message there.
+      errors.password = error.response?.data.errors.email ?? []
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+
+async function register(): Promise<void> {
+  isLoading.value = true
+  clearErrors()
+
+  await axios
+    .post(route('register'), {
+      email: formData.email,
+      username: formData.username,
+      password: formData.password,
+      password_confirmation: formData.confirmPassword,
+      service_agreement: formData.serviceAgreement,
+      privacy_agreement: formData.privacyAgreement
+    })
+    .then(() => {
+      router.get(route('verification.notice'))
+    })
+    .catch((error: ValidationError) => {
+      errors.email = error.response?.data.errors.email ?? []
+      errors.username = error.response?.data.errors.username ?? []
+      errors.password = error.response?.data.errors.password ?? []
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+
+async function submitForm(): Promise<void> {
   const form = document.querySelector<HTMLFormElement>('#login-form')
 
-  if (!form) {
+  if (form === null) {
     return
   }
 
-  if (!form.checkValidity()) {
+  if (form.checkValidity() === false) {
     form.reportValidity()
     return
   }
 
-  // Check if email exists
-  if (!shouldLogin.value && !shouldRegister.value) {
-    isLoading.value = true
+  switch (step.value) {
+    case 'checking':
+      await checkEmail()
+      break
 
-    await axios
-      .post<{ exists: boolean }>(route('email.check'), { email: formData.email })
-      .then((response) => {
-        if (response.data.exists) {
-          shouldLogin.value = true
-          shouldRegister.value = false
-        } else {
-          shouldLogin.value = false
-          shouldRegister.value = true
-        }
-      })
-      .catch((error: unknown) => {
-        console.log(error)
-      })
-      .finally(() => {
-        isLoading.value = false
-      })
+    case 'login':
+      await login()
+      break
 
-    // Prevent entering following if statement
-    return
-  }
-
-  // Attempt to login
-  else if (shouldLogin.value) {
-    isLoading.value = true
-    clearErrors()
-
-    await axios
-      .post<{ redirect: string }>(route('login'), {
-        email: formData.email,
-        password: formData.password
-      })
-      .then((response) => {
-        setSnackBar({
-          message: 'accounts.welcome-back',
-          color: 'primary',
-          active: true
-        })
-
-        router.get(response.data.redirect)
-      })
-      .catch((error: ValidationError) => {
-        // Laravel's LoginRequest::authenticate() always keys a failed-login
-        // error "email" (deliberately ambiguous about whether the email or
-        // the password was wrong). By this point the email is already
-        // confirmed to exist (see the email.check step above) and only the
-        // password field is visible, so we surface the message there.
-        errors.password = error.response?.data.errors.email ?? []
-      })
-      .finally(() => {
-        isLoading.value = false
-      })
-
-    // Prevent entering following if statement
-    return
-  }
-
-  // Attempt to register
-  else if (shouldRegister.value) {
-    isLoading.value = true
-    clearErrors()
-
-    await axios
-      .post(route('register'), {
-        email: formData.email,
-        username: formData.username,
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
-        service_agreement: formData.serviceAgreement,
-        privacy_agreement: formData.privacyAgreement
-      })
-      .then(() => {
-        router.get(route('verification.notice'))
-      })
-      .catch((error: ValidationError) => {
-        errors.email = error.response?.data.errors.email ?? []
-        errors.username = error.response?.data.errors.username ?? []
-        errors.password = error.response?.data.errors.password ?? []
-      })
-      .finally(() => {
-        isLoading.value = false
-      })
-
-    // Prevent entering following if statement
-    return
+    case 'register':
+      await register()
+      break
   }
 }
 
-async function resetPassword() {
+async function resetPassword(): Promise<void> {
   await axios
     .post(route('password.email'), { email: formData.email })
     .then(() => {
-      shouldReset.value = true
+      resetEmailSent.value = true
     })
-    .catch(() => {
-      //errors.email = error.response.data.errors.email
+    .catch((error: ValidationError) => {
+      errors.email = error.response?.data.errors.email ?? []
     })
 }
 </script>
@@ -217,7 +207,7 @@ async function resetPassword() {
       {{ $t('accounts.welcome-to-hood') }}
     </p>
 
-    <template v-if="isEmail">
+    <template v-if="step !== 'guest'">
       <v-form
         id="login-form"
         class="po-login"
@@ -230,15 +220,15 @@ async function resetPassword() {
           :label="$t('main.email')"
           :placeholder="$t('main.enter-your-email')"
           :error-messages="errors.email"
-          :readonly="shouldLogin || shouldRegister"
+          :readonly="step === 'login' || step === 'register'"
           persistent-placeholder
-          :clearable="!shouldLogin && !shouldRegister"
+          :clearable="step === 'checking'"
           required
           hide-details="auto"
         >
         </v-text-field>
 
-        <template v-if="shouldRegister">
+        <template v-if="step === 'register'">
           <v-text-field
             v-model="formData.username"
             type="text"
@@ -283,7 +273,7 @@ async function resetPassword() {
           <po-agreement></po-agreement>
         </template>
 
-        <template v-if="shouldLogin">
+        <template v-if="step === 'login'">
           <v-text-field
             v-model="formData.password"
             type="password"
@@ -304,7 +294,7 @@ async function resetPassword() {
         </po-button>
 
         <po-button
-          v-if="shouldLogin"
+          v-if="step === 'login'"
           size="x-small"
           variant="plain"
           class="mt-5"
@@ -320,13 +310,13 @@ async function resetPassword() {
       </v-form>
 
       <v-alert
-        v-if="shouldReset || isReset"
+        v-if="resetEmailSent || arrivedFromPasswordReset"
         type="success"
         variant="tonal"
         class="mt-5 mx-auto text-caption"
         style="width: 85%; max-width: 600px"
       >
-        <span v-if="shouldReset">{{ $t('accounts.reset-password-link-sent') }}</span>
+        <span v-if="resetEmailSent">{{ $t('accounts.reset-password-link-sent') }}</span>
         <span v-else>{{ $t('accounts.new-password-set') }}</span>
       </v-alert>
     </template>
@@ -367,7 +357,12 @@ async function resetPassword() {
         </div>
 
         <div>
-          <po-button block color="primary" prepend-icon="fas fa-at" @click.prevent="isEmail = true">
+          <po-button
+            block
+            color="primary"
+            prepend-icon="fas fa-at"
+            @click.prevent="step = 'checking'"
+          >
             {{ $t('accounts.continue-with-email') }}
           </po-button>
         </div>

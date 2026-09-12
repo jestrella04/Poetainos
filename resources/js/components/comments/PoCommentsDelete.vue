@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import axios from 'axios'
 import { forceSnackBarKey, isDeleteKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { Comment } from '@/types/models'
 
 defineProps<{
@@ -13,26 +12,15 @@ defineProps<{
 
 const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
-const isPosting = ref(false)
-const errors = ref(false)
 const forceSnackBar = injectStrict(forceSnackBarKey)
 const writing = injectStrict(writingKey)
+const { isPosting, submitForm } = useFormSubmit(false)
 
-async function submit() {
-  const form = document.querySelector<HTMLFormElement>('#comment-delete-form')
-
-  if (!form) {
-    return
-  }
-
-  isPosting.value = true
-  errors.value = false
-
-  await axios
-    .post(form.action, {
-      _method: 'DELETE'
-    })
-    .then(() => {
+async function submit(): Promise<void> {
+  await submitForm({
+    formSelector: '#comment-delete-form',
+    payload: { _method: 'DELETE' },
+    onSuccess: () => {
       router.visit(route('writings.show', writing.slug))
       setSnackBar({
         message: 'comments.comment-deleted',
@@ -42,13 +30,9 @@ async function submit() {
 
       forceSnackBar.value = true
       isDelete.value = false
-    })
-    .catch(() => {
-      errors.value = true
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+    },
+    onError: () => true
+  })
 }
 </script>
 

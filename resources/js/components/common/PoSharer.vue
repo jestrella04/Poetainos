@@ -14,11 +14,11 @@ const { cropUrl } = useFormatting()
 const sharer = injectStrict(sharerKey)
 const social = shareLinks(props.linkTitle, props.linkUrl)
 
-function copy(event: MouseEvent) {
+function copy(event: MouseEvent): void {
   const target = event.target as HTMLElement
   const socialEl = target.closest('.social')
 
-  if (socialEl && 'copy' === socialEl.id) {
+  if (socialEl !== null && 'copy' === socialEl.id) {
     event.preventDefault()
     void navigator.clipboard.writeText(props.linkUrl)
   }

@@ -41,8 +41,10 @@ class ComplaintsController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store(Complaint $complaint)
+    public function store()
     {
+        $complaint = new Complaint;
+
         // Validate user input
         request()->validate([
             'complainable_type' => 'required|string|in:writings,comments,users',

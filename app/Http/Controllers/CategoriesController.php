@@ -47,7 +47,7 @@ class CategoriesController extends Controller
      */
     public function show(Category $category)
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $sort = resolveSort(['latest', 'popular', 'likes']);
         $params = [
             'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]).' '.$category->description,
         ];
@@ -92,7 +92,7 @@ class CategoriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request)
     {
         // Get category model
         $category = Category::where('id', request('id'))->firstOrNew();
@@ -105,27 +105,26 @@ class CategoriesController extends Controller
             'description' => 'required|string|min:3|max:255',
         ]);
 
+        $action = $category->exists ? 'update' : 'create';
+
         // Update accordingly
         $category->name = request('name');
         $category->parent_id = request('parent');
         $category->description = request('description');
 
-        if (! $category->exists) {
-            $action = 'create';
+        if ($action === 'create') {
             $category->slug = slugify($category->getTable(), request('name'));
         }
 
         $category->save();
 
-        if (isset($action) && $action === 'create') {
-            $message = __('Category created successfully');
-        } else {
-            $message = __('Category updated successfully');
-        }
+        $message = $action === 'create'
+            ? __('Category created successfully')
+            : __('Category updated successfully');
 
         return [
             'message' => $message,
-            'action' => $action ?? 'update',
+            'action' => $action,
             'id' => $category->id,
         ];
     }

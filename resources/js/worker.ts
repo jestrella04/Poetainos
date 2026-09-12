@@ -89,7 +89,7 @@ self.addEventListener('push', (event: PushEvent) => {
   // https://developer.mozilla.org/en-US/docs/Web/API/PushMessageData
   // The payload shape is a server-side contract, not something the client
   // can verify at compile time.
-  if (event.data) {
+  if (event.data !== null) {
     event.waitUntil(sendNotification(event.data.json() as PushNotificationData))
   }
 })
@@ -111,7 +111,7 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
     .then((windowClients) => {
       const matchingClient = windowClients.find((windowClient) => windowClient.url === url)
 
-      if (matchingClient) {
+      if (matchingClient !== undefined) {
         return matchingClient.focus()
       } else {
         return self.clients.openWindow(url)

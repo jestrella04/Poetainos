@@ -82,13 +82,7 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>
             <v-icon icon="fas fa-edit"></v-icon>
           </po-button>
 
-          <po-button
-            :href="route('writings.edit', item.slug)"
-            size="x-small"
-            color="secondary"
-            icon
-            inertia
-          >
+          <po-button href="#" size="x-small" color="secondary" icon inertia>
             <v-icon icon="fas fa-trash"></v-icon>
           </po-button>
         </div>

@@ -41,6 +41,17 @@ test('updateAura does not throw when all writing aura points are zeroed', functi
     expect((float) $writing->fresh()->aura)->toBe(1.23);
 });
 
+test('the daily post limit is configurable via site settings', function (): void {
+    config(['writerhood.writings' => ['daily_post_limit' => 1]]);
+
+    $user = User::factory()->create();
+    Writing::factory()->for($user, 'author')->create();
+
+    $this->actingAs($user)
+        ->post(route('writings.store'), ['title' => 'One too many'])
+        ->assertSessionHasErrors('title');
+});
+
 test('random redirects to an existing writing', function (): void {
     $writing = Writing::factory()->create();
 

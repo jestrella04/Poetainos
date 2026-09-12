@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
-import type { Method, RequestPayload, VisitOptions } from '@inertiajs/core'
+import type { Method, RequestPayload } from '@inertiajs/core'
+import { useInertiaVisit } from '@/composables/useInertiaVisit'
 
 const props = withDefaults(
   defineProps<{
@@ -14,18 +14,7 @@ const props = withDefaults(
   }
 )
 
-function visit() {
-  // use the programmatic router.visit provided by Inertia
-  if (!props.href) {
-    return
-  }
-
-  const visitOptions: VisitOptions = { method: props.method }
-  if (props.data) {
-    visitOptions.data = props.data
-  }
-  router.visit(props.href, visitOptions)
-}
+const { visit } = useInertiaVisit(props)
 </script>
 
 <template>

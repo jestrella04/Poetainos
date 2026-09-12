@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use Illuminate\Database\QueryException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -39,10 +41,15 @@ class AppServiceProvider extends ServiceProvider
                         'writerhood' => $settings[0],
                     ]);
                 }
-            } catch (\Throwable $th) {
+            } catch (QueryException|\Error $th) {
+                // Expected before /init runs: the `settings` table may not exist
+                // yet, or exist with no `site` row (Setting::first() returns null,
+                // and calling ->pluck() on it throws an \Error).
+                Log::warning($th);
+
                 $route = $this->app->request->getRequestUri();
 
-                if (substr($route, 0, 5) !== '/init') {
+                if (! str_starts_with($route, '/init')) {
                     abort(503, 'App not configured');
                 }
             }

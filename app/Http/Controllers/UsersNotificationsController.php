@@ -26,24 +26,28 @@ class UsersNotificationsController extends Controller
             $notifications = User::find($user->id)->notifications()->paginate($this->pagination)->withQueryString();
         }
 
-        $notifications->map(function ($notification): void {
+        $notifierUserIds = $notifications->pluck('data.user_id')->filter()->unique();
+        $notifierWritingIds = $notifications->pluck('data.writing_id')->filter()->unique();
+
+        $notifierUsers = User::forAuthorSummary()
+            ->whereIn('id', $notifierUserIds)
+            ->get()
+            ->keyBy('id');
+
+        $notifierWritings = Writing::select('id', 'title', 'slug')
+            ->whereIn('id', $notifierWritingIds)
+            ->get()
+            ->keyBy('id');
+
+        $notifications->each(function ($notification) use ($notifierUsers, $notifierWritings): void {
             $notification['notifier_user'] =
                 isset($notification->data['user_id'])
-                ? User::select(
-                    'id',
-                    'name',
-                    'username',
-                    'extra_info->avatar AS avatar'
-                )->whereId($notification->data['user_id'])->first()
+                ? $notifierUsers->get($notification->data['user_id'])
                 : null;
 
             $notification['notifier_writing'] =
                 isset($notification->data['writing_id'])
-                ? Writing::select(
-                    'id',
-                    'title',
-                    'slug',
-                )->whereId($notification->data['writing_id'])->first()
+                ? $notifierWritings->get($notification->data['writing_id'])
                 : null;
         });
 

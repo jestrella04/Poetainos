@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import axios from 'axios'
 import { blockerKey, forceSnackBarKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useFormatting } from '@/composables/useFormatting'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { UserLike } from '@/types/models'
 
 const props = defineProps<{
@@ -14,25 +13,14 @@ const props = defineProps<{
 const { userDisplayName } = useFormatting()
 const { setSnackBar } = useSnackbar()
 const blocker = injectStrict(blockerKey)
-const isPosting = ref(false)
-const errors = ref(false)
 const forceSnackBar = injectStrict(forceSnackBarKey)
+const { isPosting, submitForm } = useFormSubmit(false)
 
-async function submit() {
-  const form = document.querySelector<HTMLFormElement>('#blocking-form')
-
-  if (!form) {
-    return
-  }
-
-  isPosting.value = true
-  errors.value = false
-
-  await axios
-    .post(form.action, {
-      user: props.user.username
-    })
-    .then(() => {
+async function submit(): Promise<void> {
+  await submitForm({
+    formSelector: '#blocking-form',
+    payload: { user: props.user.username },
+    onSuccess: () => {
       setSnackBar({
         message: 'users.user-blocked',
         color: 'success',
@@ -41,13 +29,9 @@ async function submit() {
 
       forceSnackBar.value = true
       blocker.value = false
-    })
-    .catch(() => {
-      errors.value = true
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+    },
+    onError: () => true
+  })
 }
 </script>
 

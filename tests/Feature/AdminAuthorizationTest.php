@@ -47,3 +47,12 @@ test('isAllowed reflects the role\'s admin permission', function (): void {
     $admin = actingAsAdmin();
     expect($admin->isAllowed('admin'))->toBeTrue();
 });
+
+test('isAllowed returns false when the role has permissions but none match the requested task', function (): void {
+    $role = Role::factory()->create([
+        'extra_info' => ['permissions' => [['name' => 'moderate', 'enabled' => true]]],
+    ]);
+    $user = User::factory()->create(['role_id' => $role->id]);
+
+    expect($user->isAllowed('admin'))->toBeFalse();
+});

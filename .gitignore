@@ -10,6 +10,7 @@
 /public/.well-known/*
 /bootstrap/ssr/*
 /storage/*.key
+/storage/phpstan
 /vendor
 .env
 .env.backup

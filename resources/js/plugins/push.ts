@@ -18,7 +18,7 @@ export class Push {
       const options: PushSubscriptionOptionsInit = { userVisibleOnly: true }
       const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
 
-      if (vapidPublicKey) {
+      if (vapidPublicKey !== undefined && vapidPublicKey !== '') {
         options.applicationServerKey = this.urlBase64ToUint8Array(vapidPublicKey)
       }
 
@@ -38,6 +38,24 @@ export class Push {
   }
 
   /**
+   * Whether the browser currently holds a push subscription.
+   */
+  async isSubscribed(): Promise<boolean> {
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
+      return false
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.getSubscription()
+      return subscription !== null
+    } catch (e: unknown) {
+      console.log('Error thrown checking subscription status.', e)
+      return false
+    }
+  }
+
+  /**
    * Unsubscribe from push notifications.
    */
   unsubscribe(): void {
@@ -45,7 +63,7 @@ export class Push {
       registration.pushManager
         .getSubscription()
         .then((subscription) => {
-          if (!subscription) {
+          if (subscription === null) {
             return
           }
 
@@ -73,8 +91,8 @@ export class Push {
     const contentEncoding = (PushManager.supportedContentEncodings ?? ['aesgcm'])[0] ?? 'aesgcm'
     const data: SubscriptionPayload = {
       endpoint: subscription.endpoint,
-      publicKey: key ? btoa(String.fromCharCode(...new Uint8Array(key))) : null,
-      authToken: token ? btoa(String.fromCharCode(...new Uint8Array(token))) : null,
+      publicKey: key !== null ? btoa(String.fromCharCode(...new Uint8Array(key))) : null,
+      authToken: token !== null ? btoa(String.fromCharCode(...new Uint8Array(token))) : null,
       contentEncoding
     }
 

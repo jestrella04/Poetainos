@@ -38,14 +38,14 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $ziggy = new Ziggy($group = null, $request->url());
-        $user = auth()->check() ? User::find(auth()->user()->id) : null;
+        $user = auth()->check()
+            ? User::forAuthorSummary()->find(auth()->id())
+            : null;
 
         return array_merge(parent::share($request), [
             'ziggy' => $ziggy->toArray(),
             'auth' => [
-                'user' => auth()->check()
-                    ? User::select('id', 'username', 'name', 'extra_info->avatar AS avatar')->where('id', $user->id)->firstOrFail()
-                    : null,
+                'user' => $user,
                 'admin' => auth()->check() ? $user->isAllowed('admin') : null,
                 'notifications' => auth()->check() ? $user->unreadNotifications->count() : 0,
                 'liked' => [

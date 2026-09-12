@@ -30,7 +30,7 @@ class CommentsController extends Controller
             ->whereNotIn('user_id', $filter)
             ->with([
                 'author' => function ($query): void {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    $query->forAuthorSummary();
                 },
             ])
             ->withCount(['likes'])

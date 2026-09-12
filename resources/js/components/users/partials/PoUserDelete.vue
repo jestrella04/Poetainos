@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 import { forceSnackBarKey, isDeleteKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useFormValidation } from '@/composables/useFormValidation'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { LaravelValidationErrors, ValidationError } from '@/types/http'
 
 defineProps<{
@@ -15,51 +16,38 @@ defineProps<{
 const { checkFormValidity } = useFormValidation()
 const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
-const isPosting = ref(false)
-const errors = ref<LaravelValidationErrors>({})
 const forceSnackBar = injectStrict(forceSnackBarKey)
 const formData = reactive({
   password: ''
 })
+const { isPosting, errors, submitForm } = useFormSubmit<LaravelValidationErrors>({})
 
-async function submit() {
+async function submit(): Promise<void> {
   const form = document.querySelector<HTMLFormElement>('#user-delete-form')
 
-  if (!form || !checkFormValidity(form)) {
+  if (form === null || !checkFormValidity(form)) {
     return
   }
 
-  isPosting.value = true
-  errors.value = {}
+  await submitForm({
+    formSelector: '#user-delete-form',
+    payload: { _method: 'DELETE' },
+    preSubmit: async () => {
+      await axios.post(route('password.confirmer'), { password: formData.password })
+    },
+    onSuccess: () => {
+      router.visit(route('home'))
+      setSnackBar({
+        message: 'accounts.account-deleted',
+        color: 'success',
+        active: true
+      })
 
-  await axios
-    .post(route('password.confirmer'), {
-      //'_method': 'DELETE',
-      password: formData.password
-    })
-    .then(() => {
-      void axios
-        .post(form.action, {
-          _method: 'DELETE'
-        })
-        .then(() => {
-          router.visit(route('home'))
-          setSnackBar({
-            message: 'accounts.account-deleted',
-            color: 'success',
-            active: true
-          })
-
-          forceSnackBar.value = true
-          isDelete.value = false
-        })
-    })
-    .catch((error: ValidationError) => {
-      errors.value = error.response?.data.errors ?? {}
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+      forceSnackBar.value = true
+      isDelete.value = false
+    },
+    onError: (error) => (error as ValidationError).response?.data.errors ?? {}
+  })
 }
 </script>
 

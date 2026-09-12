@@ -29,13 +29,7 @@ const socialLinks = computed<Record<string, string>>(() =>
 
     <v-card-text>
       <div class="text-center mb-5">
-        <po-avatar-award
-          v-if="data.karma && ['A', 'B', 'C'].includes(data.karma)"
-          :user="data"
-          avatar-size="96"
-          avatar-color="secondary"
-        />
-        <po-avatar v-else size="96" color="secondary" :user="data" />
+        <po-avatar-award :user="data" avatar-size="96" avatar-color="secondary" />
         <p class="font-weight-bold">{{ userDisplayName(data) }}</p>
         <p class="text-medium-emphasis">@{{ data.username }}</p>
       </div>

@@ -25,9 +25,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'featured'])
-          ? request('sort')
-          : 'featured';
+        $sort = resolveSort(['latest', 'popular', 'featured'], 'featured');
         $users = User::select(
             'id',
             'username',
@@ -154,7 +152,7 @@ class UsersController extends Controller
                     ->writings()
                     ->with([
                         'author' => function ($query): void {
-                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                            $query->forAuthorSummary();
                         },
                     ])
                     ->inRandomOrder()
@@ -164,7 +162,7 @@ class UsersController extends Controller
                     ->shelf()
                     ->with([
                         'author' => function ($query): void {
-                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                            $query->forAuthorSummary();
                         },
                     ])
                     ->inRandomOrder()
@@ -176,7 +174,7 @@ class UsersController extends Controller
                 )
                     ->with([
                         'author' => function ($query): void {
-                            $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                            $query->forAuthorSummary();
                         },
                     ])
                     ->inRandomOrder()

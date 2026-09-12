@@ -1,89 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
-import axios from 'axios'
-import { useSwipe } from '@vueuse/core'
-import type { UseSwipeDirection } from '@vueuse/core'
 import { useTypeGuards } from '@/composables/useTypeGuards'
+import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { User } from '@/types/models'
 
-type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
+const page = computed(() => usePage<InertiaPageProps<{ sort: string }>>())
+const { isEmpty } = useTypeGuards()
 
-interface UsersPage {
-  data: User[]
-  next_page_url: string | null
-}
-
-const page = computed(() => usePage<InertiaPageProps<{ sort: string; users: UsersPage }>>())
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const users = ref<User[]>([])
-const next = ref('')
-const fetched = ref(false)
-const target = document.body
-
-useSwipe(target, {
-  passive: true,
-  onSwipe() {
-    //
-  },
-  onSwipeEnd(_e: TouchEvent, direction: UseSwipeDirection) {
-    if (direction === 'left') {
-      swipeRight()
-    } else if (direction === 'right') {
-      swipeLeft()
-    }
-  }
+const { items: users, fetched, loadMore } = usePaginatedTabList<User>({
+  tabOrder: ['featured', 'latest', 'popular'],
+  currentTab: () => page.value.props.sort,
+  reloadPropKey: 'users'
 })
-
-async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
-  if (!strNullOrEmpty(next.value)) {
-    await axios
-      .get<UsersPage>(next.value)
-      .then((response) => {
-        update(response.data.data, response.data.next_page_url)
-        done('ok')
-      })
-      .catch(() => {
-        done('error')
-      })
-  } else {
-    done('empty')
-  }
-}
-
-function swipeRight() {
-  if ('featured' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="latest"]')?.click()
-  } else if ('latest' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="popular"]')?.click()
-  }
-}
-
-function swipeLeft() {
-  if ('popular' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="latest"]')?.click()
-  } else if ('latest' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="featured"]')?.click()
-  }
-}
-
-onMounted(() => {
-  router.reload({
-    only: ['users'],
-    onSuccess: (successPage) => {
-      const successProps = successPage.props as unknown as InertiaPageProps<{ users: UsersPage }>
-      update(successProps.users.data, successProps.users.next_page_url)
-    }
-  })
-})
-
-function update(usersData: User[], nextPage: string | null) {
-  users.value.push(...usersData)
-  next.value = nextPage ?? ''
-  fetched.value = true
-}
 </script>
 
 <template>

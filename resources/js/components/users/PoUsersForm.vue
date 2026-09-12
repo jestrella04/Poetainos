@@ -38,6 +38,29 @@ interface PostedResult {
   url: string
 }
 
+type SocialNetworkKey =
+  | 'twitter'
+  | 'threads'
+  | 'instagram'
+  | 'facebook'
+  | 'youtube'
+  | 'goodreads'
+
+interface SocialLinkField {
+  key: SocialNetworkKey
+  label: string
+  maxlength: number
+}
+
+const socialLinkFields: SocialLinkField[] = [
+  { key: 'twitter', label: 'X (Twitter)', maxlength: 250 },
+  { key: 'threads', label: 'Threads', maxlength: 250 },
+  { key: 'instagram', label: 'Instagram', maxlength: 100 },
+  { key: 'facebook', label: 'Facebook', maxlength: 250 },
+  { key: 'youtube', label: 'Youtube', maxlength: 100 },
+  { key: 'goodreads', label: 'Goodreads', maxlength: 250 }
+]
+
 const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
 const { authUser, admin } = useAuth()
 const { isEmpty } = useTypeGuards()
@@ -144,7 +167,7 @@ async function submitForm() {
     })
 }
 
-function file() {
+function openAvatarPicker(): void {
   document.querySelector<HTMLElement>('#avatar-input')?.click()
 }
 </script>
@@ -161,7 +184,7 @@ function file() {
       >
         <div class="d-flex ga-3 mb-3 align-center">
           <po-avatar :user="user" size="72" color="secondary"></po-avatar>
-          <po-button color="primary" variant="tonal" @click="file">{{
+          <po-button color="primary" variant="tonal" @click="openAvatarPicker">{{
             $t('main.choose-image')
           }}</po-button>
 
@@ -278,68 +301,15 @@ function file() {
         ></v-text-field>
 
         <v-text-field
-          v-model="formData.twitter"
+          v-for="field in socialLinkFields"
+          :key="field.key"
+          v-model="formData[field.key]"
           type="text"
-          label="X (Twitter)"
+          :label="field.label"
           hide-details="auto"
-          :error-messages="errors.twitter"
+          :error-messages="errors[field.key]"
           minlength="3"
-          maxlength="250"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.threads"
-          type="text"
-          label="Threads"
-          hide-details="auto"
-          :error-messages="errors.threads"
-          minlength="3"
-          maxlength="250"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.instagram"
-          type="text"
-          label="Instagram"
-          hide-details="auto"
-          :error-messages="errors.instagram"
-          minlength="3"
-          maxlength="100"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.facebook"
-          type="text"
-          label="Facebook"
-          hide-details="auto"
-          :error-messages="errors.facebook"
-          minlength="3"
-          maxlength="250"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.youtube"
-          type="text"
-          label="Youtube"
-          hide-details="auto"
-          :error-messages="errors.youtube"
-          minlength="3"
-          maxlength="100"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.goodreads"
-          type="text"
-          label="Goodreads"
-          hide-details="auto"
-          :error-messages="errors.goodreads"
-          minlength="3"
-          maxlength="250"
+          :maxlength="field.maxlength"
           clearable
         ></v-text-field>
 

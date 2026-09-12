@@ -9,14 +9,14 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
-import { useAnimation } from '@/composables/useAnimation'
+import { useToggleReaction } from '@/composables/useToggleReaction'
 import type { Comment, Paginated } from '@/types/models'
 
 const page = computed(() => usePage())
 const { auth } = useAuth()
 const { isEmpty } = useTypeGuards()
 const { userDisplayName, toLocaleDate, linkify, readable } = useFormatting()
-const { animate } = useAnimation()
+const { toggleReaction } = useToggleReaction()
 const comments = ref<Partial<Paginated<Comment>>>({})
 const loadingComments = injectStrict(loadingCommentsKey)
 const writing = injectStrict(writingKey)
@@ -36,40 +36,29 @@ async function loadComments() {
   })
 }
 
-async function like(event: MouseEvent, id: number) {
-  const doer = (event.target as HTMLElement).closest<HTMLElement>('.do-like')
+async function like(event: MouseEvent, id: number): Promise<void> {
+  const isAuthenticated = auth()
 
-  if (!doer) {
-    return
-  }
+  await toggleReaction({
+    event,
+    doerSelector: '.do-like',
+    canReact: isAuthenticated,
+    isAuthenticated,
+    onUnauthenticated: () => {
+      loginModal.value = true
+    },
+    postUrl: route('likes.store', ['comment', id]),
+    activeClass: 'liked',
+    onCount: (count) => {
+      const countEl = (event.target as HTMLElement)
+        .closest<HTMLElement>('.do-like')
+        ?.querySelector<HTMLElement>('span.count')
 
-  if (auth()) {
-    await axios
-      .post<{ count: number; method: 'store' | 'destroy' }>(route('likes.store', ['comment', id]))
-      .then((response) => {
-        const countEl = doer.querySelector<HTMLElement>('span.count')
-
-        if (countEl) {
-          countEl.textContent = readable(response.data.count)
-        }
-
-        if ('store' === response.data.method) {
-          doer.classList.add('liked')
-        } else {
-          doer.classList.remove('liked')
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        const icon = doer.querySelector<HTMLElement>('i')
-
-        if (icon) {
-          void animate(icon, 'heartBeat')
-        }
-      })
-  } else {
-    loginModal.value = true
-  }
+      if (countEl !== null && countEl !== undefined) {
+        countEl.textContent = readable(count)
+      }
+    }
+  })
 }
 
 function toggleReply(commentId: number) {

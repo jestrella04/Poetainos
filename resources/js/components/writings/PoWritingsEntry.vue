@@ -53,18 +53,10 @@ provide(writingKey, props.data)
           <div class="text-center py-3">
             <po-link :href="route('users.show', data.author.username)" inertia>
               <po-avatar-award
-                v-if="data.author.karma && ['A', 'B', 'C'].includes(data.author.karma)"
                 :user="data.author"
                 avatar-size="64"
                 avatar-color="secondary"
                 avatar-class="avatar-shadow"
-              />
-              <po-avatar
-                v-else
-                size="64"
-                color="secondary"
-                :user="data.author"
-                class="avatar-shadow"
               />
             </po-link>
           </div>
@@ -73,13 +65,7 @@ provide(writingKey, props.data)
 
       <div v-else class="text-center pt-6">
         <po-link :href="route('users.show', data.author.username)" inertia>
-          <po-avatar-award
-            v-if="data.author.karma && ['A', 'B', 'C'].includes(data.author.karma)"
-            :user="data.author"
-            avatar-size="64"
-            avatar-color="secondary"
-          />
-          <po-avatar v-else size="64" color="secondary" :user="data.author" />
+          <po-avatar-award :user="data.author" avatar-size="64" avatar-color="secondary" />
         </po-link>
       </div>
 

@@ -66,7 +66,7 @@ class TagsController extends Controller
      */
     public function show(Tag $tag)
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $sort = resolveSort(['latest', 'popular', 'likes']);
         $params = [
             'head_msg' => __('You are browsing the library of writings tagged with ":tag".', ['tag' => $tag->name]),
 

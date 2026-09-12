@@ -1,34 +1,21 @@
 <?php
 
-use App\Models\Reply;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 
 class MoveRepliesToComments extends Migration
 {
     /**
      * Run the migrations.
      *
+     * This one-time data migration (moving legacy Reply records into the
+     * comments table) has already been completed against production data.
+     * The Reply model no longer exists, so this is intentionally a no-op.
+     *
      * @return void
      */
     public function up()
     {
-        try {
-            Reply::all()->each(function ($reply) {
-                DB::table('comments')->insert([
-                    'user_id' => $reply->author->id,
-                    'writing_id' => $reply->comment->writing->id,
-                    'message' => '@'.$reply->comment->author->username.' '.$reply->message,
-                    'created_at' => $reply->created_at,
-                    'updated_at' => $reply->updated_at,
-                ]);
-
-                $reply->delete();
-            });
-        } catch (Throwable $th) {
-            // throw $th;
-        }
-
+        //
     }
 
     /**

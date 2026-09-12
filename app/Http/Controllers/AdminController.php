@@ -67,7 +67,7 @@ class AdminController extends Controller
     public function settings()
     {
         return Inertia::render('admin/PoAdminSettings', [
-            'settings' => json_encode(Setting::where('name', 'site')->first()->pluck('data')[0], JSON_PRETTY_PRINT),
+            'settings' => json_encode(Setting::where('name', 'site')->value('data'), JSON_PRETTY_PRINT),
             'meta' => [
                 'title' => getPageTitle([
                     __('Settings'),
@@ -196,15 +196,7 @@ class AdminController extends Controller
 
     public function log()
     {
-        header('Content-Description: Log download');
-        header('Content-Type: text/plain');
-        header('Content-Disposition: attachment; filename="'.basename($this->log).'"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: '.filesize($this->log));
-        readfile($this->log);
-        exit;
+        return response()->download($this->log);
     }
 
     public function complaints()

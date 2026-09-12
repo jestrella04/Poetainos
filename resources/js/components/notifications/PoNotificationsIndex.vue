@@ -1,89 +1,30 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
-import axios from 'axios'
-import { useSwipe } from '@vueuse/core'
-import type { UseSwipeDirection } from '@vueuse/core'
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import { unreadCountKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
 import { useNotificationMessage } from '@/composables/useNotificationMessage'
+import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { AppNotification, Paginated } from '@/types/models'
-
-type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
+import type { AppNotification } from '@/types/models'
 
 const page = computed(() => usePage<InertiaPageProps<{ tab: string }>>())
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { isEmpty } = useTypeGuards()
 const { relativeDate } = useFormatting()
 const { notificationMessage } = useNotificationMessage()
-const notifications = ref<AppNotification[]>([])
-const next = ref('')
 const unreadCount = injectStrict(unreadCountKey)
-const fetched = ref(false)
-const target = document.body
 
-useSwipe(target, {
-  passive: true,
-  onSwipe() {
-    //
-  },
-  onSwipeEnd(_e: TouchEvent, direction: UseSwipeDirection) {
-    if (direction === 'left') {
-      swipeRight()
-    } else if (direction === 'right') {
-      swipeLeft()
-    }
-  }
+const {
+  items: notifications,
+  fetched,
+  loadMore
+} = usePaginatedTabList<AppNotification>({
+  tabOrder: ['unread', 'all'],
+  currentTab: () => page.value.props.tab,
+  reloadPropKey: 'notifications'
 })
-
-async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
-  if (!strNullOrEmpty(next.value)) {
-    await axios
-      .get<Paginated<AppNotification>>(next.value)
-      .then((response) => {
-        notifications.value.push(...response.data.data)
-        next.value = response.data.next_page_url ?? ''
-        done('ok')
-      })
-      .catch(() => {
-        done('error')
-      })
-  } else {
-    done('empty')
-  }
-}
-
-function swipeRight() {
-  if ('unread' === page.value.props.tab) {
-    document.querySelector<HTMLElement>('.v-tab[value="all"]')?.click()
-  }
-}
-
-function swipeLeft() {
-  if ('all' === page.value.props.tab) {
-    document.querySelector<HTMLElement>('.v-tab[value="unread"]')?.click()
-  }
-}
-
-onMounted(() => {
-  router.reload({
-    only: ['notifications'],
-    onSuccess: (successPage) => {
-      const successProps = successPage.props as unknown as InertiaPageProps<{
-        notifications: Paginated<AppNotification>
-      }>
-      update(successProps.notifications.data, successProps.notifications.next_page_url)
-    }
-  })
-})
-
-function update(notificationsData: AppNotification[], nextPage: string | null) {
-  notifications.value.push(...notificationsData)
-  next.value = nextPage ?? ''
-  fetched.value = true
-}
 </script>
 
 <style scoped>

@@ -25,42 +25,26 @@ const notifications = reactive({
 
 provide(isDeleteKey, isDelete)
 
-if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.ready
-    .then((registration) => {
-      registration.pushManager
-        .getSubscription()
-        .then((subscription) => {
-          // Keep subscription in sync with server
-          if (subscription) {
-            push.subscribe()
-            notifications.push = true
-          }
+void push.isSubscribed().then((isSubscribed) => {
+  if (isSubscribed === true) {
+    // Keep subscription in sync with server
+    push.subscribe()
+    notifications.push = true
+  } else {
+    notifications.push = false
+  }
+})
 
-          // Uncheck the push switcher
-          if (!subscription) {
-            notifications.push = false
-          }
-        })
-        .catch((e: unknown) => {
-          console.log('Error thrown checking subscription status.', e)
-        })
-    })
-    .catch((e: unknown) => {
-      console.log('Service worker not available:', e)
-    })
-}
-
-function email() {
-  notifications.email = !notifications.email
+function toggleEmailNotifications(value: boolean | null): void {
+  notifications.email = value === true
 
   void axios.post(route('notifications.email', [String(notifications.email)]))
 }
 
-function pusher() {
-  notifications.push = !notifications.push
+function togglePushNotifications(value: boolean | null): void {
+  notifications.push = value === true
 
-  if (notifications.push) {
+  if (notifications.push === true) {
     push.subscribe()
   } else {
     push.unsubscribe()
@@ -127,21 +111,21 @@ function pusher() {
           </p>
 
           <v-switch
-            v-model="notifications.email"
+            :model-value="notifications.email"
             :label="$t('main.email')"
             class="mb-0"
             hide-details="auto"
             color="primary"
-            @click.prevent="email"
+            @update:model-value="toggleEmailNotifications"
           ></v-switch>
 
           <v-switch
-            v-model="notifications.push"
+            :model-value="notifications.push"
             :label="$t('main.push')"
             class="mb-0"
             hide-details="auto"
             color="primary"
-            @click.prevent="pusher"
+            @update:model-value="togglePushNotifications"
           ></v-switch>
         </div>
         <div class="mb-5">

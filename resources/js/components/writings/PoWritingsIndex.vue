@@ -1,91 +1,25 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
-import axios from 'axios'
-import { useSwipe } from '@vueuse/core'
-import type { UseSwipeDirection } from '@vueuse/core'
 import { useTypeGuards } from '@/composables/useTypeGuards'
+import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { Writing } from '@/types/models'
 
-type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
-
-interface WritingsPage {
-  data: Writing[]
-  next_page_url: string | null
-}
-
-const page = computed(() => usePage<InertiaPageProps<{ sort: string; writings: WritingsPage }>>())
+const page = computed(() => usePage<InertiaPageProps<{ sort: string }>>())
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const writings = ref<Writing[]>([])
-const next = ref('')
-const fetched = ref(false)
-const target = document.body
 
-useSwipe(target, {
-  passive: true,
-  onSwipe() {
-    //
-  },
-  onSwipeEnd(_e: TouchEvent, direction: UseSwipeDirection) {
-    if (direction === 'left') {
-      swipeRight()
-    } else if (direction === 'right') {
-      swipeLeft()
-    }
-  }
+const {
+  items: writings,
+  next,
+  fetched,
+  loadMore
+} = usePaginatedTabList<Writing>({
+  tabOrder: ['latest', 'popular', 'likes'],
+  currentTab: () => page.value.props.sort,
+  reloadPropKey: 'writings'
 })
-
-async function loadMore({ done }: { done: (status: InfiniteScrollStatus) => void }) {
-  if (!strNullOrEmpty(next.value)) {
-    await axios
-      .get<WritingsPage>(next.value)
-      .then((response) => {
-        update(response.data.data, response.data.next_page_url)
-        done('ok')
-      })
-      .catch(() => {
-        done('error')
-      })
-  } else {
-    done('empty')
-  }
-}
-
-function swipeRight() {
-  if ('latest' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="popular"]')?.click()
-  } else if ('popular' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="likes"]')?.click()
-  }
-}
-
-function swipeLeft() {
-  if ('likes' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="popular"]')?.click()
-  } else if ('popular' === page.value.props.sort) {
-    document.querySelector<HTMLElement>('.v-tab[value="latest"]')?.click()
-  }
-}
-
-onMounted(() => {
-  router.reload({
-    only: ['writings'],
-    onSuccess: (successPage) => {
-      const successProps = successPage.props as unknown as InertiaPageProps<{
-        writings: WritingsPage
-      }>
-      update(successProps.writings.data, successProps.writings.next_page_url)
-    }
-  })
-})
-
-function update(writingsData: Writing[], nextPage: string | null) {
-  writings.value.push(...writingsData)
-  next.value = nextPage ?? ''
-  fetched.value = true
-}
 </script>
 
 <template>

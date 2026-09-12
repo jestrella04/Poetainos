@@ -88,26 +88,25 @@ class PagesController extends Controller
             'text' => 'required|string|min:100',
         ]);
 
+        $action = $page->exists ? 'update' : 'create';
+
         // Update accordingly
         $page->title = request('title');
         $page->text = request('text');
 
-        if (! $page->exists) {
-            $action = 'create';
+        if ($action === 'create') {
             $page->slug = slugify($page->getTable(), request('title'));
         }
 
         $page->save();
 
-        if (isset($action) && $action === 'create') {
-            $message = __('Page created successfully');
-        } else {
-            $message = __('Page updated successfully');
-        }
+        $message = $action === 'create'
+            ? __('Page created successfully')
+            : __('Page updated successfully');
 
         return [
             'message' => $message,
-            'action' => $action ?? 'update',
+            'action' => $action,
             'id' => $page->id,
         ];
     }

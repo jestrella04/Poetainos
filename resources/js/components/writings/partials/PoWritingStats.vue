@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import axios from 'axios'
 import { loginModalKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
-import { useAnimation } from '@/composables/useAnimation'
+import { useToggleReaction } from '@/composables/useToggleReaction'
 
 const page = computed(() => usePage())
 const { auth, authUser } = useAuth()
 const { strNullOrEmpty } = useTypeGuards()
 const { readable } = useFormatting()
-const { animate } = useAnimation()
+const { toggleReaction } = useToggleReaction()
 const writing = injectStrict(writingKey)
 const liked = page.value.props.auth.liked.writings.includes(writing.id)
 const shelved = page.value.props.auth.shelved.includes(writing.id)
@@ -21,70 +20,42 @@ const likesCount = ref(writing.likes_count)
 const shelfCount = ref(writing.shelf_count)
 const loginModal = injectStrict(loginModalKey)
 
-async function like(event: MouseEvent) {
-  const doer = (event.target as HTMLElement).closest<HTMLElement>('.do-like')
+const canReactToWriting = computed(
+  () => auth() === true && authUser()!.username !== writing.author.username
+)
 
-  if (!doer) {
-    return
-  }
-
-  if (auth() && authUser()!.username !== writing.author.username) {
-    await axios
-      .post<{ count: number; method: 'store' | 'destroy' }>(
-        route('likes.store', ['writing', writing.id])
-      )
-      .then((response) => {
-        likesCount.value = response.data.count
-
-        if ('store' === response.data.method) {
-          doer.classList.add('liked')
-        } else if ('destroy' === response.data.method) {
-          doer.classList.remove('liked')
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        const icon = doer.querySelector<HTMLElement>('i')
-
-        if (icon) {
-          void animate(icon, 'heartBeat')
-        }
-      })
-  } else if (!auth()) {
-    loginModal.value = true
-  }
+async function like(event: MouseEvent): Promise<void> {
+  await toggleReaction({
+    event,
+    doerSelector: '.do-like',
+    canReact: canReactToWriting.value,
+    isAuthenticated: auth(),
+    onUnauthenticated: () => {
+      loginModal.value = true
+    },
+    postUrl: route('likes.store', ['writing', writing.id]),
+    activeClass: 'liked',
+    onCount: (count) => {
+      likesCount.value = count
+    }
+  })
 }
 
-async function shelf(event: MouseEvent) {
-  const doer = (event.target as HTMLElement).closest<HTMLElement>('.do-shelf')
-
-  if (!doer) {
-    return
-  }
-
-  if (auth() && authUser()!.username !== writing.author.username) {
-    await axios
-      .post<{ count: number; method: 'store' | 'destroy' }>(route('shelves.store', writing.slug))
-      .then((response) => {
-        shelfCount.value = response.data.count
-
-        if ('store' === response.data.method) {
-          doer.classList.add('shelved')
-        } else if ('destroy' === response.data.method) {
-          doer.classList.remove('shelved')
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        const icon = doer.querySelector<HTMLElement>('i')
-
-        if (icon) {
-          void animate(icon, 'heartBeat')
-        }
-      })
-  } else if (!auth()) {
-    loginModal.value = true
-  }
+async function shelf(event: MouseEvent): Promise<void> {
+  await toggleReaction({
+    event,
+    doerSelector: '.do-shelf',
+    canReact: canReactToWriting.value,
+    isAuthenticated: auth(),
+    onUnauthenticated: () => {
+      loginModal.value = true
+    },
+    postUrl: route('shelves.store', writing.slug),
+    activeClass: 'shelved',
+    onCount: (count) => {
+      shelfCount.value = count
+    }
+  })
 }
 </script>
 

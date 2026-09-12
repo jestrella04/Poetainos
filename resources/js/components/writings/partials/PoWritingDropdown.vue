@@ -3,8 +3,10 @@ import { provide, ref } from 'vue'
 import { blockerKey, complainerKey, sharerKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
+import { useNativeShare } from '@/composables/useNativeShare'
 
 const { auth, authUser, canEdit } = useAuth()
+const { share: nativeShare } = useNativeShare()
 const writing = injectStrict(writingKey)
 const sharer = ref(false)
 const complainer = ref(false)
@@ -14,15 +16,10 @@ provide(complainerKey, complainer)
 provide(blockerKey, blocker)
 provide(sharerKey, sharer)
 
-function share() {
-  if (navigator.share) {
-    void navigator.share({
-      title: writing.title,
-      url: route('writings.show', [writing.slug])
-    })
-  } else {
+function share(): void {
+  nativeShare(writing.title, route('writings.show', [writing.slug]), () => {
     sharer.value = true
-  }
+  })
 }
 </script>
 

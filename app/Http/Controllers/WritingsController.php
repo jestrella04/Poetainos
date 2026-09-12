@@ -31,7 +31,7 @@ class WritingsController extends Controller
     public function index()
     {
         $awards = request()->route()->getName() === 'writings.awards';
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
+        $sort = resolveSort(['latest', 'popular', 'likes']);
         $filterAwards = $awards ? 'home_posted_at' : 'id';
         $writings = Writing::visibleTo($this->getBlockedUsers())
             ->whereNotNull($filterAwards)
@@ -99,7 +99,7 @@ class WritingsController extends Controller
                 ->withCount(['likes', 'comments', 'shelf'])
                 ->with([
                     'author' => function ($query): void {
-                        $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
+                        $query->forAuthorSummary(withKarma: true);
                     },
                 ])
                 ->with([
@@ -125,7 +125,7 @@ class WritingsController extends Controller
                         ->whereIn('category_id', $writing->categories()->pluck('id'))
                 )->with([
                     'author' => function ($query): void {
-                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                        $query->forAuthorSummary();
                     },
                 ])->inRandomOrder()->take(5)->get(),
 
@@ -204,8 +204,9 @@ class WritingsController extends Controller
 
         // Check number of posts by user
         $posts = auth()->user()->writings()->whereDate('created_at', '=', Carbon::today())->count();
+        $dailyPostLimit = getSiteConfig('writings.daily_post_limit') ?? 3;
 
-        if ($posts >= 3) {
+        if ($posts >= $dailyPostLimit) {
             throw ValidationException::withMessages([
                 'title' => __('You have reached your maximum number of posts for today. Please try again tomorrow.'),
             ]);

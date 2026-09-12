@@ -35,12 +35,15 @@ class LikesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * Toggles the like: creates it if the user hasn't liked this resource
+     * yet, or removes it (delegating to destroy()) if they already have.
+     *
      * @param  Request  $request
      * @return array
      */
-    public function store($likeable, $likeable_id)
+    public function store($likeable, $likeableId)
     {
-        $likeableModel = $this->resolveLikeable($likeable, $likeable_id);
+        $likeableModel = $this->resolveLikeable($likeable, $likeableId);
 
         $like = new Like;
         $like->user_id = auth()->user()->id;
@@ -55,7 +58,7 @@ class LikesController extends Controller
         ])->count();
 
         if ($exist > 0) {
-            return $this->destroy($likeable, $likeable_id);
+            return $this->destroy($likeable, $likeableId);
         }
 
         $like->save();
@@ -125,9 +128,9 @@ class LikesController extends Controller
      * @param  Like  $like
      * @return array
      */
-    public function destroy($likeable, $likeable_id)
+    public function destroy($likeable, $likeableId)
     {
-        $likeableModel = $this->resolveLikeable($likeable, $likeable_id);
+        $likeableModel = $this->resolveLikeable($likeable, $likeableId);
 
         Like::where([
             ['likeable_type', $likeableModel::class],

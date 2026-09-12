@@ -1,0 +1,18 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    parseModelCastsMethod: true
+    level: 8
+
+    paths:
+        - app
+        - config
+        - database
+        - routes
+        - tests
+
+    tmpDir: storage/phpstan
+
+    checkOctaneCompatibility: false
+    checkModelProperties: true

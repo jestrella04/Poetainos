@@ -5,6 +5,7 @@ import { complainerKey, forceSnackBarKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 
 const props = defineProps<{
   compType: string
@@ -17,45 +18,40 @@ const complainer = injectStrict(complainerKey)
 const reasons = ref<string[]>([])
 const compReasons = ref<string[]>([])
 const compMessage = ref('')
-const isPosting = ref(false)
-const errors = ref(false)
+const hasReasonsLoadError = ref(false)
 const forceSnackBar = injectStrict(forceSnackBarKey)
+const { isPosting, errors, submitForm } = useFormSubmit(false)
 
 watch(complainer, async () => {
-  if (complainer.value) {
+  if (complainer.value === true) {
+    hasReasonsLoadError.value = false
+
     await axios
       .get<{ reasons: string[] }>(route('complaints.reasons'))
       .then((response) => {
         reasons.value = response.data.reasons
       })
-      .catch(() => {})
-      .finally(() => {})
+      .catch(() => {
+        hasReasonsLoadError.value = true
+      })
   }
 })
 
-async function submit() {
-  const form = document.querySelector<HTMLFormElement>('#complaint-form')
-
-  if (!form) {
-    return
-  }
-
+async function submit(): Promise<void> {
   if (isEmpty(compReasons.value)) {
     errors.value = true
     return
   }
 
-  isPosting.value = true
-  errors.value = false
-
-  await axios
-    .post(form.action, {
+  await submitForm({
+    formSelector: '#complaint-form',
+    payload: {
       complainable_type: props.compType,
       complainable_id: props.compId,
       reasons: compReasons.value,
       message: compMessage.value
-    })
-    .then(() => {
+    },
+    onSuccess: () => {
       setSnackBar({
         message: 'complaints.complaint-received',
         color: 'success',
@@ -67,13 +63,9 @@ async function submit() {
       complainer.value = false
       compReasons.value = []
       compMessage.value = ''
-    })
-    .catch(() => {
-      errors.value = true
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+    },
+    onError: () => true
+  })
 }
 </script>
 
@@ -90,6 +82,10 @@ async function submit() {
         <v-form id="complaint-form" :action="route('complaints.store')" @submit.prevent="submit">
           <p v-if="errors" class="text-caption text-error mt-3" style="margin-bottom: -10px">
             {{ $t('main.select-least-one') }}
+          </p>
+
+          <p v-if="hasReasonsLoadError" class="text-caption text-error mt-3">
+            {{ $t('main.error-try-again') }}
           </p>
 
           <template v-for="reason in reasons" :key="reason">
