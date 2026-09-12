@@ -8,43 +8,60 @@ use function Pest\Laravel\assertGuest;
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 
-test('login screen can be rendered', function (): void {
-    $response = get('/login');
+describe('the login screen', function (): void {
+    it('can be rendered', function (): void {
+        // When
+        $response = get('/login');
 
-    $response->assertStatus(200);
+        // Then
+        $response->assertStatus(200);
+    });
 });
 
-test('users can authenticate using the login screen', function (): void {
-    $user = createUser();
+describe('authenticating', function (): void {
+    it('allows users to authenticate using the login screen', function (): void {
+        // Given
+        $user = createUser();
 
-    $response = post('/login', [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
+        // When
+        $response = post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
 
-    // AuthenticatedSessionController::store() returns the redirect target as JSON
-    // for the frontend to navigate to, rather than an HTTP redirect response.
-    assertAuthenticated();
-    $response->assertOk();
-    $response->assertJson(['redirect' => url(RouteServiceProvider::HOME)]);
+        // Then
+        // AuthenticatedSessionController::store() returns the redirect target as JSON
+        // for the frontend to navigate to, rather than an HTTP redirect response.
+        assertAuthenticated();
+        $response->assertOk();
+        $response->assertJson(['redirect' => url(RouteServiceProvider::HOME)]);
+    });
+
+    it('does not authenticate with an invalid password', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        post('/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        // Then
+        assertGuest();
+    });
 });
 
-test('users can not authenticate with invalid password', function (): void {
-    $user = createUser();
+describe('logging out', function (): void {
+    it('allows users to logout', function (): void {
+        // Given
+        $user = createUser();
 
-    post('/login', [
-        'email' => $user->email,
-        'password' => 'wrong-password',
-    ]);
+        // When
+        $response = actingAs($user)->post('/logout');
 
-    assertGuest();
-});
-
-test('users can logout', function (): void {
-    $user = createUser();
-
-    $response = actingAs($user)->post('/logout');
-
-    assertGuest();
-    $response->assertRedirect('/');
+        // Then
+        assertGuest();
+        $response->assertRedirect('/');
+    });
 });

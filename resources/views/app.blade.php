@@ -26,7 +26,7 @@
     @routes
 
     <!-- Vite -->
-    @vite('resources/js/app.js')
+    @vite('resources/js/app.ts')
 
     @if (!empty(config('services.counter.tracking_id')))
         <!-- Counter Stats -->

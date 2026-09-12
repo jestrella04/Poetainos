@@ -2,6 +2,12 @@
 
 use function Pest\Laravel\get;
 
-test('the offline page renders', function (): void {
-    get('/offline')->assertOk();
+describe('the offline page', function (): void {
+    it('renders', function (): void {
+        // When
+        $response = get('/offline');
+
+        // Then
+        $response->assertOk();
+    });
 });

@@ -6,51 +6,59 @@ use Illuminate\Support\Facades\Notification;
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 
-// The GET /forgot-password "screen" route is commented out in routes/auth.php —
-// only POST /forgot-password (password.email) exists in this app.
-test('reset password link can be requested', function (): void {
-    Notification::fake();
+describe('resetting a password', function (): void {
+    // The GET /forgot-password "screen" route is commented out in routes/auth.php —
+    // only POST /forgot-password (password.email) exists in this app.
+    it('can request a reset password link', function (): void {
+        // Given
+        Notification::fake();
+        $user = createUser();
 
-    $user = createUser();
+        // When
+        post('/forgot-password', ['email' => $user->email]);
 
-    post('/forgot-password', ['email' => $user->email]);
-
-    Notification::assertSentTo($user, ResetPassword::class);
-});
-
-test('reset password screen can be rendered', function (): void {
-    Notification::fake();
-
-    $user = createUser();
-
-    post('/forgot-password', ['email' => $user->email]);
-
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = get('/reset-password/'.$notification->token);
-
-        $response->assertStatus(200);
-
-        return true;
+        // Then
+        Notification::assertSentTo($user, ResetPassword::class);
     });
-});
 
-test('password can be reset with valid token', function (): void {
-    Notification::fake();
+    it('can render the reset password screen', function (): void {
+        // Given
+        Notification::fake();
+        $user = createUser();
+        post('/forgot-password', ['email' => $user->email]);
 
-    $user = createUser();
+        // Then
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+            // When
+            $response = get('/reset-password/'.$notification->token);
 
-    post('/forgot-password', ['email' => $user->email]);
+            // Then
+            $response->assertStatus(200);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = post('/reset-password', [
-            'token' => $notification->token,
-            'email' => $user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
+            return true;
+        });
+    });
 
-        $response->assertSessionHasNoErrors();
+    it('can be reset with a valid token', function (): void {
+        // Given
+        Notification::fake();
+        $user = createUser();
+        post('/forgot-password', ['email' => $user->email]);
 
-        return true;
+        // Then
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+            // When
+            $response = post('/reset-password', [
+                'token' => $notification->token,
+                'email' => $user->email,
+                'password' => 'password',
+                'password_confirmation' => 'password',
+            ]);
+
+            // Then
+            $response->assertSessionHasNoErrors();
+
+            return true;
+        });
     });
 });

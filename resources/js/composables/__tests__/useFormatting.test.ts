@@ -30,8 +30,13 @@ describe('excerpt', () => {
   })
 
   it('truncates text over 400 characters with an ellipsis', () => {
+    // Given
     const text = 'a'.repeat(500)
+
+    // When
     const result = excerpt(text)
+
+    // Then
     expect(result).toBe(`${'a'.repeat(400)}...`)
   })
 })

@@ -5,98 +5,140 @@ use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 
-test('a user can view and update their own profile', function (): void {
-    $user = createUser();
+describe('viewing and updating a profile', function (): void {
+    it('allows a user to view and update their own profile', function (): void {
+        // Given
+        $user = createUser();
 
-    actingAs($user)->get('/users/edit/'.$user->username)->assertOk();
+        // When
+        $viewResponse = actingAs($user)->get('/users/edit/'.$user->username);
+        $updateResponse = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+            'bio' => 'A short bio.',
+        ]);
 
-    actingAs($user)->put('/users/edit/'.$user->username, [
-        'name' => 'Updated Name',
-        'email' => 'updated@example.com',
-        'bio' => 'A short bio.',
-    ])->assertOk();
+        // Then
+        $viewResponse->assertOk();
+        $updateResponse->assertOk();
+        $user->refresh();
+        expect($user->name)->toBe('Updated Name');
+        expect($user->extra_info['bio'] ?? null)->toBe('A short bio.');
+    });
 
-    $user->refresh();
-    expect($user->name)->toBe('Updated Name');
-    expect($user->extra_info['bio'] ?? null)->toBe('A short bio.');
+    it('forbids a different verified user from viewing or updating someone else\'s profile', function (): void {
+        // Given
+        $user = createUser();
+        $other = createUser();
+
+        // When
+        $viewResponse = actingAs($other)->get('/users/edit/'.$user->username);
+        $updateResponse = actingAs($other)->put('/users/edit/'.$user->username, [
+            'name' => 'Someone else',
+            'email' => 'someone-else@example.com',
+        ]);
+
+        // Then
+        $viewResponse->assertForbidden();
+        $updateResponse->assertForbidden();
+    });
+
+    it('allows an admin to view and update any profile', function (): void {
+        // Given
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        $viewResponse = actingAs($admin)->get('/users/edit/'.$user->username);
+        $updateResponse = actingAs($admin)->put('/users/edit/'.$user->username, [
+            'name' => 'Admin Edited',
+            'email' => $user->email,
+        ]);
+
+        // Then
+        $viewResponse->assertOk();
+        $updateResponse->assertOk();
+        expect($user->refresh()->name)->toBe('Admin Edited');
+    });
 });
 
-test('a different verified user cannot view or update someone else\'s profile', function (): void {
-    $user = createUser();
-    $other = createUser();
+describe('changing a user\'s role', function (): void {
+    it('prevents a non-admin from changing their own role', function (): void {
+        // Given
+        $adminRole = Role::factory()->admin()->create();
+        $user = createUser();
 
-    actingAs($other)->get('/users/edit/'.$user->username)->assertForbidden();
-    actingAs($other)->put('/users/edit/'.$user->username, [
-        'name' => 'Someone else',
-        'email' => 'someone-else@example.com',
-    ])->assertForbidden();
+        // When
+        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => 'Just a user',
+            'email' => $user->email,
+            'role' => $adminRole->id,
+        ]);
+
+        // Then
+        $response->assertOk();
+        expect($user->refresh()->role_id)->not->toBe($adminRole->id);
+    });
+
+    it('allows an admin to change a user\'s role', function (): void {
+        // Given
+        $adminRole = Role::factory()->admin()->create();
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->put('/users/edit/'.$user->username, [
+            'name' => 'Just a user',
+            'email' => $user->email,
+            'role' => $adminRole->id,
+        ]);
+
+        // Then
+        $response->assertOk();
+        expect($user->refresh()->role_id)->toBe($adminRole->id);
+    });
 });
 
-test('an admin can view and update any profile', function (): void {
-    $user = createUser();
-    $admin = actingAsAdmin();
+describe('deleting an account', function (): void {
+    it('allows a user to delete their own account after confirming their password', function (): void {
+        // Given
+        $user = createUser();
 
-    actingAs($admin)->get('/users/edit/'.$user->username)->assertOk();
-    actingAs($admin)->put('/users/edit/'.$user->username, [
-        'name' => 'Admin Edited',
-        'email' => $user->email,
-    ])->assertOk();
+        // When
+        $response = actingAs($user)
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->delete('/users/delete/'.$user->username);
 
-    expect($user->refresh()->name)->toBe('Admin Edited');
+        // Then
+        $response->assertRedirect(route('home'));
+        expect(User::find($user->id))->toBeNull();
+    });
+
+    it('allows an admin to delete a different user without confirming a password', function (): void {
+        // Given
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->delete('/admin/users/delete/'.$user->username);
+
+        // Then
+        $response->assertOk();
+        expect(User::find($user->id))->toBeNull();
+    });
 });
 
-test('a non-admin cannot change their own role', function (): void {
-    $adminRole = Role::factory()->admin()->create();
-    $user = createUser();
+describe('blocking a user', function (): void {
+    it('allows a user to block another user', function (): void {
+        // Given
+        $user = createUser();
+        $author = createUser();
 
-    actingAs($user)->put('/users/edit/'.$user->username, [
-        'name' => 'Just a user',
-        'email' => $user->email,
-        'role' => $adminRole->id,
-    ])->assertOk();
+        // When
+        $response = actingAs($user)->post('/users/block/'.$author->username);
 
-    expect($user->refresh()->role_id)->not->toBe($adminRole->id);
-});
-
-test('an admin can change a user\'s role', function (): void {
-    $adminRole = Role::factory()->admin()->create();
-    $user = createUser();
-    $admin = actingAsAdmin();
-
-    actingAs($admin)->put('/users/edit/'.$user->username, [
-        'name' => 'Just a user',
-        'email' => $user->email,
-        'role' => $adminRole->id,
-    ])->assertOk();
-
-    expect($user->refresh()->role_id)->toBe($adminRole->id);
-});
-
-test('a user can delete their own account after confirming their password', function (): void {
-    $user = createUser();
-
-    actingAs($user)
-        ->withSession(['auth.password_confirmed_at' => time()])
-        ->delete('/users/delete/'.$user->username)
-        ->assertRedirect(route('home'));
-
-    expect(User::find($user->id))->toBeNull();
-});
-
-test('an admin can delete a different user without confirming a password', function (): void {
-    $user = createUser();
-    $admin = actingAsAdmin();
-
-    actingAs($admin)->delete('/admin/users/delete/'.$user->username)->assertOk();
-
-    expect(User::find($user->id))->toBeNull();
-});
-
-test('a user can block another user', function (): void {
-    $user = createUser();
-    $author = createUser();
-
-    actingAs($user)->post('/users/block/'.$author->username)->assertOk();
-
-    expect($user->refresh()->isAuthorBlocked($author))->toBeTrue();
+        // Then
+        $response->assertOk();
+        expect($user->refresh()->isAuthorBlocked($author))->toBeTrue();
+    });
 });

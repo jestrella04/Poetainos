@@ -9,9 +9,11 @@ beforeEach(() => {
 
 describe('useFormSubmit', () => {
   it('does nothing when the form is not found', async () => {
+    // Given
     const post = vi.spyOn(axios, 'post')
     const { submitForm } = useFormSubmit(false)
 
+    // When
     await submitForm({
       formSelector: '#missing-form',
       payload: {},
@@ -19,14 +21,17 @@ describe('useFormSubmit', () => {
       onError: () => true
     })
 
+    // Then
     expect(post).not.toHaveBeenCalled()
   })
 
   it('posts the payload to the form action and calls onSuccess', async () => {
+    // Given
     const post = vi.spyOn(axios, 'post').mockResolvedValueOnce({})
     const onSuccess = vi.fn()
     const { isPosting, errors, submitForm } = useFormSubmit(false)
 
+    // When
     const promise = submitForm({
       formSelector: '#test-form',
       payload: { _method: 'DELETE' },
@@ -34,6 +39,7 @@ describe('useFormSubmit', () => {
       onError: () => true
     })
 
+    // Then
     expect(isPosting.value).toBe(true)
 
     await promise
@@ -45,10 +51,12 @@ describe('useFormSubmit', () => {
   })
 
   it('sets errors from onError and skips onSuccess when the post fails', async () => {
+    // Given
     vi.spyOn(axios, 'post').mockRejectedValueOnce(new Error('network error'))
     const onSuccess = vi.fn()
     const { isPosting, errors, submitForm } = useFormSubmit(false)
 
+    // When
     await submitForm({
       formSelector: '#test-form',
       payload: {},
@@ -56,17 +64,20 @@ describe('useFormSubmit', () => {
       onError: () => true
     })
 
+    // Then
     expect(onSuccess).not.toHaveBeenCalled()
     expect(errors.value).toBe(true)
     expect(isPosting.value).toBe(false)
   })
 
   it('runs preSubmit before the main post and stops on preSubmit failure', async () => {
+    // Given
     const post = vi.spyOn(axios, 'post').mockResolvedValue({})
     const preSubmit = vi.fn().mockRejectedValueOnce(new Error('bad password'))
     const onSuccess = vi.fn()
     const { errors, submitForm } = useFormSubmit(false)
 
+    // When
     await submitForm({
       formSelector: '#test-form',
       payload: { _method: 'DELETE' },
@@ -75,6 +86,7 @@ describe('useFormSubmit', () => {
       onError: () => true
     })
 
+    // Then
     expect(preSubmit).toHaveBeenCalledOnce()
     expect(post).not.toHaveBeenCalled()
     expect(onSuccess).not.toHaveBeenCalled()
@@ -82,11 +94,13 @@ describe('useFormSubmit', () => {
   })
 
   it('calls the main post after preSubmit resolves', async () => {
+    // Given
     const post = vi.spyOn(axios, 'post').mockResolvedValue({})
     const preSubmit = vi.fn().mockResolvedValueOnce(undefined)
     const onSuccess = vi.fn()
     const { submitForm } = useFormSubmit(false)
 
+    // When
     await submitForm({
       formSelector: '#test-form',
       payload: { _method: 'DELETE' },
@@ -95,6 +109,7 @@ describe('useFormSubmit', () => {
       onError: () => true
     })
 
+    // Then
     expect(preSubmit).toHaveBeenCalledOnce()
     expect(post).toHaveBeenCalledWith('http://localhost:3000/things/1', { _method: 'DELETE' })
     expect(onSuccess).toHaveBeenCalledOnce()

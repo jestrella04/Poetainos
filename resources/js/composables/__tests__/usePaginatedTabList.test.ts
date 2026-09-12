@@ -16,122 +16,135 @@ beforeEach(() => {
 })
 
 describe('usePaginatedTabList', () => {
-  it('reports empty when there is no next page to load', async () => {
-    const { loadMore } = usePaginatedTabList<{ id: number }>({
-      tabOrder: ['latest', 'popular'],
-      currentTab: () => 'latest',
-      reloadPropKey: 'writings'
+  describe('loadMore', () => {
+    it('reports empty when there is no next page to load', async () => {
+      // Given
+      const { loadMore } = usePaginatedTabList<{ id: number }>({
+        tabOrder: ['latest', 'popular'],
+        currentTab: () => 'latest',
+        reloadPropKey: 'writings'
+      })
+      const done = vi.fn()
+
+      // When
+      await loadMore({ done })
+
+      // Then
+      expect(done).toHaveBeenCalledWith('empty')
     })
 
-    const done = vi.fn()
-    await loadMore({ done })
+    it('appends the next page of items and reports ok on success', async () => {
+      // Given
+      const get = vi
+        .spyOn(axios, 'get')
+        .mockResolvedValueOnce({ data: { data: [{ id: 2 }], next_page_url: null } })
+      const { items, next, loadMore } = usePaginatedTabList<{ id: number }>({
+        tabOrder: ['latest', 'popular'],
+        currentTab: () => 'latest',
+        reloadPropKey: 'writings'
+      })
+      next.value = '/writings?page=2'
+      const done = vi.fn()
 
-    expect(done).toHaveBeenCalledWith('empty')
+      // When
+      await loadMore({ done })
+
+      // Then
+      expect(items.value).toEqual([{ id: 2 }])
+      expect(next.value).toBe('')
+      expect(done).toHaveBeenCalledWith('ok')
+
+      get.mockRestore()
+    })
+
+    it('reports error when the pagination request fails', async () => {
+      // Given
+      const get = vi.spyOn(axios, 'get').mockRejectedValueOnce(new Error('network error'))
+      const { next, loadMore } = usePaginatedTabList<{ id: number }>({
+        tabOrder: ['latest', 'popular'],
+        currentTab: () => 'latest',
+        reloadPropKey: 'writings'
+      })
+      next.value = '/writings?page=2'
+      const done = vi.fn()
+
+      // When
+      await loadMore({ done })
+
+      // Then
+      expect(done).toHaveBeenCalledWith('error')
+
+      get.mockRestore()
+    })
   })
 
-  it('appends the next page of items and reports ok on success', async () => {
-    const get = vi
-      .spyOn(axios, 'get')
-      .mockResolvedValueOnce({ data: { data: [{ id: 2 }], next_page_url: null } })
+  describe('swipe navigation', () => {
+    it('clicks the next tab in tabOrder on a left swipe', () => {
+      // Given
+      let swipeOptions: SwipeOptions = {}
+      vi.mocked(useSwipe).mockImplementation((_target, options) => {
+        swipeOptions = options as SwipeOptions
+        return {} as ReturnType<typeof useSwipe>
+      })
+      document.body.innerHTML = '<button class="v-tab" value="popular"></button>'
+      const popularTab = document.querySelector<HTMLElement>('.v-tab[value="popular"]')
+      expect(popularTab).not.toBeNull()
+      const click = vi.fn()
+      popularTab!.click = click
+      usePaginatedTabList<{ id: number }>({
+        tabOrder: ['latest', 'popular'],
+        currentTab: () => 'latest',
+        reloadPropKey: 'writings'
+      })
 
-    const { items, next, loadMore } = usePaginatedTabList<{ id: number }>({
-      tabOrder: ['latest', 'popular'],
-      currentTab: () => 'latest',
-      reloadPropKey: 'writings'
-    })
-    next.value = '/writings?page=2'
+      // When
+      swipeOptions.onSwipeEnd?.({} as TouchEvent, 'left')
 
-    const done = vi.fn()
-    await loadMore({ done })
-
-    expect(items.value).toEqual([{ id: 2 }])
-    expect(next.value).toBe('')
-    expect(done).toHaveBeenCalledWith('ok')
-
-    get.mockRestore()
-  })
-
-  it('reports error when the pagination request fails', async () => {
-    const get = vi.spyOn(axios, 'get').mockRejectedValueOnce(new Error('network error'))
-
-    const { next, loadMore } = usePaginatedTabList<{ id: number }>({
-      tabOrder: ['latest', 'popular'],
-      currentTab: () => 'latest',
-      reloadPropKey: 'writings'
-    })
-    next.value = '/writings?page=2'
-
-    const done = vi.fn()
-    await loadMore({ done })
-
-    expect(done).toHaveBeenCalledWith('error')
-
-    get.mockRestore()
-  })
-
-  it('clicks the next tab in tabOrder on a left swipe', () => {
-    let swipeOptions: SwipeOptions = {}
-    vi.mocked(useSwipe).mockImplementation((_target, options) => {
-      swipeOptions = options as SwipeOptions
-      return {} as ReturnType<typeof useSwipe>
+      // Then
+      expect(click).toHaveBeenCalledOnce()
     })
 
-    document.body.innerHTML = '<button class="v-tab" value="popular"></button>'
-    const popularTab = document.querySelector<HTMLElement>('.v-tab[value="popular"]')
-    expect(popularTab).not.toBeNull()
-    const click = vi.fn()
-    popularTab!.click = click
+    it('clicks the previous tab in tabOrder on a right swipe', () => {
+      // Given
+      let swipeOptions: SwipeOptions = {}
+      vi.mocked(useSwipe).mockImplementation((_target, options) => {
+        swipeOptions = options as SwipeOptions
+        return {} as ReturnType<typeof useSwipe>
+      })
+      document.body.innerHTML = '<button class="v-tab" value="latest"></button>'
+      const latestTab = document.querySelector<HTMLElement>('.v-tab[value="latest"]')
+      expect(latestTab).not.toBeNull()
+      const click = vi.fn()
+      latestTab!.click = click
+      usePaginatedTabList<{ id: number }>({
+        tabOrder: ['latest', 'popular'],
+        currentTab: () => 'popular',
+        reloadPropKey: 'writings'
+      })
 
-    usePaginatedTabList<{ id: number }>({
-      tabOrder: ['latest', 'popular'],
-      currentTab: () => 'latest',
-      reloadPropKey: 'writings'
+      // When
+      swipeOptions.onSwipeEnd?.({} as TouchEvent, 'right')
+
+      // Then
+      expect(click).toHaveBeenCalledOnce()
     })
 
-    swipeOptions.onSwipeEnd?.({} as TouchEvent, 'left')
+    it('does nothing when swiping past the last tab', () => {
+      // Given
+      let swipeOptions: SwipeOptions = {}
+      vi.mocked(useSwipe).mockImplementation((_target, options) => {
+        swipeOptions = options as SwipeOptions
+        return {} as ReturnType<typeof useSwipe>
+      })
+      document.body.innerHTML = ''
+      usePaginatedTabList<{ id: number }>({
+        tabOrder: ['latest', 'popular'],
+        currentTab: () => 'popular',
+        reloadPropKey: 'writings'
+      })
 
-    expect(click).toHaveBeenCalledOnce()
-  })
-
-  it('clicks the previous tab in tabOrder on a right swipe', () => {
-    let swipeOptions: SwipeOptions = {}
-    vi.mocked(useSwipe).mockImplementation((_target, options) => {
-      swipeOptions = options as SwipeOptions
-      return {} as ReturnType<typeof useSwipe>
+      // Then
+      expect(() => swipeOptions.onSwipeEnd?.({} as TouchEvent, 'left')).not.toThrow()
     })
-
-    document.body.innerHTML = '<button class="v-tab" value="latest"></button>'
-    const latestTab = document.querySelector<HTMLElement>('.v-tab[value="latest"]')
-    expect(latestTab).not.toBeNull()
-    const click = vi.fn()
-    latestTab!.click = click
-
-    usePaginatedTabList<{ id: number }>({
-      tabOrder: ['latest', 'popular'],
-      currentTab: () => 'popular',
-      reloadPropKey: 'writings'
-    })
-
-    swipeOptions.onSwipeEnd?.({} as TouchEvent, 'right')
-
-    expect(click).toHaveBeenCalledOnce()
-  })
-
-  it('does nothing when swiping past the last tab', () => {
-    let swipeOptions: SwipeOptions = {}
-    vi.mocked(useSwipe).mockImplementation((_target, options) => {
-      swipeOptions = options as SwipeOptions
-      return {} as ReturnType<typeof useSwipe>
-    })
-
-    document.body.innerHTML = ''
-
-    usePaginatedTabList<{ id: number }>({
-      tabOrder: ['latest', 'popular'],
-      currentTab: () => 'popular',
-      reloadPropKey: 'writings'
-    })
-
-    expect(() => swipeOptions.onSwipeEnd?.({} as TouchEvent, 'left')).not.toThrow()
   })
 })

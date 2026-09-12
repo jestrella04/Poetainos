@@ -6,57 +6,87 @@ use App\Models\Writing;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
-it('show renders for each sort option', function (string $sort): void {
-    $category = Category::factory()->create();
+describe('the show page', function (): void {
+    it('renders for each sort option', function (string $sort): void {
+        // Given
+        $category = Category::factory()->create();
 
-    get($category->path().'?sort='.$sort)->assertOk();
-})->with(['latest', 'popular', 'likes']);
+        // When
+        $response = get($category->path().'?sort='.$sort);
 
-test('writingsRecursive includes writings attached to descendant categories', function (): void {
-    $parent = Category::factory()->create(['parent_id' => null]);
-    $child = Category::factory()->create(['parent_id' => $parent->id]);
-    $writing = Writing::factory()->create();
-    $writing->categories()->attach($child->id);
-
-    $writings = $parent->writingsRecursive()->pluck('id');
-
-    expect($writings->all())->toContain($writing->id);
+        // Then
+        $response->assertOk();
+    })->with(['latest', 'popular', 'likes']);
 });
 
-test('admin can create and update a category', function (): void {
-    $admin = actingAsAdmin();
+describe('writingsRecursive', function (): void {
+    it('includes writings attached to descendant categories', function (): void {
+        // Given
+        $parent = Category::factory()->create(['parent_id' => null]);
+        $child = Category::factory()->create(['parent_id' => $parent->id]);
+        $writing = Writing::factory()->create();
+        $writing->categories()->attach($child->id);
 
-    actingAs($admin)->put('/admin/categories/edit', [
-        'id' => 0,
-        'name' => 'New Category',
-        'description' => 'A description long enough.',
-    ])->assertOk();
+        // When
+        $writings = $parent->writingsRecursive()->pluck('id');
 
-    $category = Category::where('name', 'New Category')->firstOrFail();
-
-    actingAs($admin)->put('/admin/categories/edit', [
-        'id' => $category->id,
-        'name' => 'New Category',
-        'description' => 'An updated description.',
-    ])->assertOk();
-
-    expect($category->refresh()->description)->toBe('An updated description.');
+        // Then
+        expect($writings->all())->toContain($writing->id);
+    });
 });
 
-test('admin can delete a category', function (): void {
-    $admin = actingAsAdmin();
-    $category = Category::factory()->create();
+describe('admin category management', function (): void {
+    it('creates and updates a category', function (): void {
+        // Given
+        $admin = actingAsAdmin();
 
-    actingAs($admin)->delete('/admin/categories/delete/'.$category->slug)->assertOk();
+        // When
+        $createResponse = actingAs($admin)->put('/admin/categories/edit', [
+            'id' => 0,
+            'name' => 'New Category',
+            'description' => 'A description long enough.',
+        ]);
 
-    expect(Category::find($category->id))->toBeNull();
+        // Then
+        $createResponse->assertOk();
+        $category = Category::where('name', 'New Category')->firstOrFail();
+
+        // When
+        $updateResponse = actingAs($admin)->put('/admin/categories/edit', [
+            'id' => $category->id,
+            'name' => 'New Category',
+            'description' => 'An updated description.',
+        ]);
+
+        // Then
+        $updateResponse->assertOk();
+        expect($category->refresh()->description)->toBe('An updated description.');
+    });
+
+    it('deletes a category', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+        $category = Category::factory()->create();
+
+        // When
+        $response = actingAs($admin)->delete('/admin/categories/delete/'.$category->slug);
+
+        // Then
+        $response->assertOk();
+        expect(Category::find($category->id))->toBeNull();
+    });
 });
 
-test('non-admins are redirected to login for admin category routes', function (): void {
-    $user = createUser();
-    $category = Category::factory()->create();
+describe('authorization for admin category routes', function (): void {
+    it('redirects non-admins to login', function (): void {
+        // Given
+        $user = createUser();
+        $category = Category::factory()->create();
 
-    actingAs($user)
-        ->delete('/admin/categories/delete/'.$category->slug)
-        ->assertRedirect(route('login'));
+        // When
+        $response = actingAs($user)->delete('/admin/categories/delete/'.$category->slug);
+
+        // Then
+        $response->assertRedirect(route('login'));
+    });
 });

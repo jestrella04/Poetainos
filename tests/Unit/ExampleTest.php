@@ -1,5 +1,7 @@
 <?php
 
-test('true is true', function (): void {
-    expect(true)->toBeTrue();
+describe('truthiness', function (): void {
+    it('is true', function (): void {
+        expect(true)->toBeTrue();
+    });
 });

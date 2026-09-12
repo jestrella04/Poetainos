@@ -4,28 +4,51 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\putJson;
 
-test('guests cannot access the authenticated user endpoint', function (): void {
-    getJson('/api/user')->assertUnauthorized();
+describe('the authenticated user endpoint', function (): void {
+    it('is inaccessible to guests', function (): void {
+        // When
+        $response = getJson('/api/user');
+
+        // Then
+        $response->assertUnauthorized();
+    });
+
+    it('lets an authenticated user fetch themselves', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->getJson('/api/user');
+
+        // Then
+        $response->assertOk()->assertJson([
+            'id' => $user->id,
+            'username' => $user->username,
+        ]);
+    });
 });
 
-test('an authenticated user can fetch themselves', function (): void {
-    $user = createUser();
+describe('recalculating karma', function (): void {
+    it('is inaccessible to guests', function (): void {
+        // Given
+        $user = createUser();
 
-    actingAs($user)->getJson('/api/user')->assertOk()->assertJson([
-        'id' => $user->id,
-        'username' => $user->username,
-    ]);
-});
+        // When
+        $response = putJson("/api/karma/{$user->username}");
 
-test('guests cannot recalculate a user\'s karma', function (): void {
-    $user = createUser();
+        // Then
+        $response->assertUnauthorized();
+    });
 
-    putJson("/api/karma/{$user->username}")->assertUnauthorized();
-});
+    it('lets an authenticated user trigger a karma recalculation', function (): void {
+        // Given
+        $user = createUser();
+        $requester = createUser();
 
-test('an authenticated user can trigger a karma recalculation', function (): void {
-    $user = createUser();
-    $requester = createUser();
+        // When
+        $response = actingAs($requester)->putJson("/api/karma/{$user->username}");
 
-    actingAs($requester)->putJson("/api/karma/{$user->username}")->assertOk();
+        // Then
+        $response->assertOk();
+    });
 });

@@ -2,8 +2,12 @@
 
 use function Pest\Laravel\get;
 
-test('the application returns a successful response', function (): void {
-    $response = get('/');
+describe('the application', function (): void {
+    it('returns a successful response', function (): void {
+        // When
+        $response = get('/');
 
-    $response->assertStatus(200);
+        // Then
+        $response->assertStatus(200);
+    });
 });

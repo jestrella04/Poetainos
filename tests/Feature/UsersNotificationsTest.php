@@ -27,45 +27,53 @@ function createDatabaseNotification(User $recipient, array $data, ?Carbon $creat
     ]);
 }
 
-test('index attaches the notifier user and writing without querying per notification', function (): void {
-    $recipient = createUser();
-    $notifier1 = createUser();
-    $notifier2 = createUser();
-    $writing1 = Writing::factory()->create();
-    $writing2 = Writing::factory()->create();
+describe('the notifications index', function (): void {
+    it('attaches the notifier user and writing without querying per notification', function (): void {
+        // Given
+        $recipient = createUser();
+        $notifier1 = createUser();
+        $notifier2 = createUser();
+        $writing1 = Writing::factory()->create();
+        $writing2 = Writing::factory()->create();
 
-    createDatabaseNotification($recipient, ['user_id' => $notifier1->id, 'writing_id' => $writing1->id], now()->subMinute());
-    createDatabaseNotification($recipient, ['user_id' => $notifier2->id, 'writing_id' => $writing2->id], now());
+        createDatabaseNotification($recipient, ['user_id' => $notifier1->id, 'writing_id' => $writing1->id], now()->subMinute());
+        createDatabaseNotification($recipient, ['user_id' => $notifier2->id, 'writing_id' => $writing2->id], now());
 
-    $response = actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']));
+        // When
+        $response = actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']));
 
-    $response->assertOk();
-    $response->assertJsonPath('data.0.notifier_user.id', $notifier2->id);
-    $response->assertJsonPath('data.0.notifier_writing.id', $writing2->id);
-    $response->assertJsonPath('data.1.notifier_user.id', $notifier1->id);
-    $response->assertJsonPath('data.1.notifier_writing.id', $writing1->id);
-});
+        // Then
+        $response->assertOk();
+        $response->assertJsonPath('data.0.notifier_user.id', $notifier2->id);
+        $response->assertJsonPath('data.0.notifier_writing.id', $writing2->id);
+        $response->assertJsonPath('data.1.notifier_user.id', $notifier1->id);
+        $response->assertJsonPath('data.1.notifier_writing.id', $writing1->id);
+    });
 
-test('index query count does not scale with the number of notifications', function (): void {
-    $recipient = createUser();
-    $notifier = createUser();
-    $writing = Writing::factory()->create();
+    it('keeps the query count from scaling with the number of notifications', function (): void {
+        // Given
+        $recipient = createUser();
+        $notifier = createUser();
+        $writing = Writing::factory()->create();
 
-    createDatabaseNotification($recipient, ['user_id' => $notifier->id, 'writing_id' => $writing->id]);
-
-    DB::enableQueryLog();
-    actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
-    $queryCountForOneNotification = count(DB::getQueryLog());
-    DB::flushQueryLog();
-
-    for ($i = 0; $i < 9; $i++) {
         createDatabaseNotification($recipient, ['user_id' => $notifier->id, 'writing_id' => $writing->id]);
-    }
 
-    DB::flushQueryLog();
-    actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
-    $queryCountForTenNotifications = count(DB::getQueryLog());
-    DB::disableQueryLog();
+        // When
+        DB::enableQueryLog();
+        actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
+        $queryCountForOneNotification = count(DB::getQueryLog());
+        DB::flushQueryLog();
 
-    expect($queryCountForTenNotifications)->toBe($queryCountForOneNotification);
+        for ($i = 0; $i < 9; $i++) {
+            createDatabaseNotification($recipient, ['user_id' => $notifier->id, 'writing_id' => $writing->id]);
+        }
+
+        DB::flushQueryLog();
+        actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
+        $queryCountForTenNotifications = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        // Then
+        expect($queryCountForTenNotifications)->toBe($queryCountForOneNotification);
+    });
 });

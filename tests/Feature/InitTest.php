@@ -4,32 +4,53 @@ use App\Models\Setting;
 
 use function Pest\Laravel\get;
 
-test('init is forbidden without a valid installer token', function (): void {
-    config(['services.installer.token' => 'secret-token']);
+describe('site initialization', function (): void {
+    it('is forbidden without a valid installer token', function (): void {
+        // Given
+        config(['services.installer.token' => 'secret-token']);
 
-    get('/init')->assertForbidden();
-    get('/init?token=wrong-token')->assertForbidden();
+        // When
+        $withoutToken = get('/init');
+        $withWrongToken = get('/init?token=wrong-token');
 
-    expect(Setting::where('name', 'site')->exists())->toBeFalse();
-});
+        // Then
+        $withoutToken->assertForbidden();
+        $withWrongToken->assertForbidden();
+        expect(Setting::where('name', 'site')->exists())->toBeFalse();
+    });
 
-test('init is forbidden when no installer token is configured', function (): void {
-    config(['services.installer.token' => null]);
+    it('is forbidden when no installer token is configured', function (): void {
+        // Given
+        config(['services.installer.token' => null]);
 
-    get('/init?token=anything')->assertForbidden();
-});
+        // When
+        $response = get('/init?token=anything');
 
-test('init bootstraps the site when the correct token is provided', function (): void {
-    config(['services.installer.token' => 'secret-token']);
+        // Then
+        $response->assertForbidden();
+    });
 
-    get('/init?token=secret-token')->assertRedirect(route('home'));
+    it('bootstraps the site when the correct token is provided', function (): void {
+        // Given
+        config(['services.installer.token' => 'secret-token']);
 
-    expect(Setting::where('name', 'site')->exists())->toBeTrue();
-});
+        // When
+        $response = get('/init?token=secret-token');
 
-test('init is forbidden once the site is already initialized', function (): void {
-    config(['services.installer.token' => 'secret-token']);
-    Setting::create(['name' => 'site', 'data' => []]);
+        // Then
+        $response->assertRedirect(route('home'));
+        expect(Setting::where('name', 'site')->exists())->toBeTrue();
+    });
 
-    get('/init?token=secret-token')->assertForbidden();
+    it('is forbidden once the site is already initialized', function (): void {
+        // Given
+        config(['services.installer.token' => 'secret-token']);
+        Setting::create(['name' => 'site', 'data' => []]);
+
+        // When
+        $response = get('/init?token=secret-token');
+
+        // Then
+        $response->assertForbidden();
+    });
 });

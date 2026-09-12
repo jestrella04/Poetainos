@@ -5,56 +5,94 @@ use App\Models\Role;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
-test('guests are redirected away from the admin area', function (): void {
-    get('/admin')->assertRedirect(route('login'));
+describe('the admin area', function (): void {
+    it('redirects guests away', function (): void {
+        // When
+        $response = get('/admin');
+
+        // Then
+        $response->assertRedirect(route('login'));
+    });
+
+    it('redirects authenticated non-admins to login', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->get('/admin');
+
+        // Then
+        $response->assertRedirect(route('login'));
+    });
+
+    it('is accessible to admins', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->get('/admin');
+
+        // Then
+        $response->assertOk();
+    });
 });
 
-test('authenticated non-admins are redirected to login from the admin area', function (): void {
-    $user = createUser();
+describe('the tools page', function (): void {
+    it('exposes structured server info and a log tail', function (): void {
+        // Given
+        $admin = actingAsAdmin();
 
-    actingAs($user)->get('/admin')->assertRedirect(route('login'));
+        // When
+        $response = actingAs($admin)->get(route('admin.tools'));
+
+        // Then
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->has('info')
+                ->where('info.PHP version', PHP_VERSION)
+                ->has('log'));
+    });
 });
 
-test('admins can access the admin area', function (): void {
-    $admin = actingAsAdmin();
+describe('isAllowed', function (): void {
+    it('reflects the role\'s admin permission', function (): void {
+        // Given
+        $noRole = createUser();
 
-    actingAs($admin)->get('/admin')->assertOk();
-});
+        // Then
+        expect($noRole->isAllowed('admin'))->toBeFalse();
 
-test('the tools page exposes structured server info and a log tail', function (): void {
-    $admin = actingAsAdmin();
+        // Given
+        $plainRole = Role::factory()->create();
+        $plainRoleUser = createUser(['role_id' => $plainRole->id]);
 
-    actingAs($admin)->get(route('admin.tools'))
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->has('info')
-            ->where('info.PHP version', PHP_VERSION)
-            ->has('log'));
-});
+        // Then
+        expect($plainRoleUser->isAllowed('admin'))->toBeFalse();
 
-test('isAllowed reflects the role\'s admin permission', function (): void {
-    $noRole = createUser();
-    expect($noRole->isAllowed('admin'))->toBeFalse();
+        // Given
+        $disabledAdminRole = Role::factory()->create([
+            'extra_info' => ['permissions' => [['name' => 'admin', 'enabled' => false]]],
+        ]);
+        $disabledAdminUser = createUser(['role_id' => $disabledAdminRole->id]);
 
-    $plainRole = Role::factory()->create();
-    $plainRoleUser = createUser(['role_id' => $plainRole->id]);
-    expect($plainRoleUser->isAllowed('admin'))->toBeFalse();
+        // Then
+        expect($disabledAdminUser->isAllowed('admin'))->toBeFalse();
 
-    $disabledAdminRole = Role::factory()->create([
-        'extra_info' => ['permissions' => [['name' => 'admin', 'enabled' => false]]],
-    ]);
-    $disabledAdminUser = createUser(['role_id' => $disabledAdminRole->id]);
-    expect($disabledAdminUser->isAllowed('admin'))->toBeFalse();
+        // Given
+        $admin = actingAsAdmin();
 
-    $admin = actingAsAdmin();
-    expect($admin->isAllowed('admin'))->toBeTrue();
-});
+        // Then
+        expect($admin->isAllowed('admin'))->toBeTrue();
+    });
 
-test('isAllowed returns false when the role has permissions but none match the requested task', function (): void {
-    $role = Role::factory()->create([
-        'extra_info' => ['permissions' => [['name' => 'moderate', 'enabled' => true]]],
-    ]);
-    $user = createUser(['role_id' => $role->id]);
+    it('returns false when the role has permissions but none match the requested task', function (): void {
+        // Given
+        $role = Role::factory()->create([
+            'extra_info' => ['permissions' => [['name' => 'moderate', 'enabled' => true]]],
+        ]);
+        $user = createUser(['role_id' => $role->id]);
 
-    expect($user->isAllowed('admin'))->toBeFalse();
+        // Then
+        expect($user->isAllowed('admin'))->toBeFalse();
+    });
 });

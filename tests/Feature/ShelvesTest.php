@@ -6,41 +6,53 @@ use Illuminate\Support\Facades\Notification;
 
 use function Pest\Laravel\actingAs;
 
-test('a user can shelve and unshelve a writing', function (): void {
-    Notification::fake();
+describe('shelving a writing', function (): void {
+    it('allows a user to shelve and unshelve a writing', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+        $reader = createUser();
 
-    $author = createUser();
-    $writing = Writing::factory()->for($author, 'author')->create();
-    $reader = createUser();
+        // When
+        $shelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/store");
 
-    actingAs($reader)->post("/shelves/{$writing->slug}/store")
-        ->assertJson(['method' => 'store', 'count' => 1]);
+        // Then
+        $shelveResponse->assertJson(['method' => 'store', 'count' => 1]);
+        Notification::assertSentTo($author, WritingShelved::class);
 
-    Notification::assertSentTo($author, WritingShelved::class);
+        // When
+        $unshelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/store");
 
-    actingAs($reader)->post("/shelves/{$writing->slug}/store")
-        ->assertJson(['method' => 'destroy', 'count' => 0]);
-});
+        // Then
+        $unshelveResponse->assertJson(['method' => 'destroy', 'count' => 0]);
+    });
 
-test('shelving your own writing does not notify you', function (): void {
-    Notification::fake();
+    it('does not notify the author when they shelve their own writing', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
 
-    $author = createUser();
-    $writing = Writing::factory()->for($author, 'author')->create();
+        // When
+        actingAs($author)->post("/shelves/{$writing->slug}/store");
 
-    actingAs($author)->post("/shelves/{$writing->slug}/store");
+        // Then
+        Notification::assertNothingSent();
+    });
 
-    Notification::assertNothingSent();
-});
+    it('only detaches the acting user when deleting a shelf entry', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        $reader = createUser();
+        $otherReader = createUser();
+        actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        actingAs($otherReader)->post("/shelves/{$writing->slug}/store");
 
-test('deleting a shelf entry only detaches the acting user', function (): void {
-    $writing = Writing::factory()->create();
-    $reader = createUser();
-    $otherReader = createUser();
+        // When
+        $response = actingAs($reader)->delete("/shelves/{$writing->slug}/delete");
 
-    actingAs($reader)->post("/shelves/{$writing->slug}/store");
-    actingAs($otherReader)->post("/shelves/{$writing->slug}/store");
-
-    actingAs($reader)->delete("/shelves/{$writing->slug}/delete")
-        ->assertJson(['method' => 'destroy', 'count' => 1]);
+        // Then
+        $response->assertJson(['method' => 'destroy', 'count' => 1]);
+    });
 });

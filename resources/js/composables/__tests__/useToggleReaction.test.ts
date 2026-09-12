@@ -15,11 +15,13 @@ beforeEach(() => {
 
 describe('useToggleReaction', () => {
   it('does nothing when the doer ancestor is not found', async () => {
+    // Given
     document.body.innerHTML = '<span class="target"></span>'
     const event = { target: document.querySelector('.target') } as unknown as MouseEvent
     const post = vi.spyOn(axios, 'post')
     const { toggleReaction } = useToggleReaction()
 
+    // When
     await toggleReaction({
       event,
       doerSelector: '.do-like',
@@ -31,15 +33,18 @@ describe('useToggleReaction', () => {
       onCount: vi.fn()
     })
 
+    // Then
     expect(post).not.toHaveBeenCalled()
   })
 
   it('posts the toggle, adds the active class, and reports the count on store', async () => {
+    // Given
     const event = buildClickEvent()
     vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { count: 5, method: 'store' } })
     const onCount = vi.fn()
     const { toggleReaction } = useToggleReaction()
 
+    // When
     await toggleReaction({
       event,
       doerSelector: '.do-like',
@@ -51,16 +56,19 @@ describe('useToggleReaction', () => {
       onCount
     })
 
+    // Then
     expect(onCount).toHaveBeenCalledWith(5)
     expect(document.querySelector('.do-like')?.classList.contains('liked')).toBe(true)
   })
 
   it('removes the active class when the toggle destroys the reaction', async () => {
+    // Given
     const event = buildClickEvent()
     document.querySelector('.do-like')?.classList.add('liked')
     vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { count: 0, method: 'destroy' } })
     const { toggleReaction } = useToggleReaction()
 
+    // When
     await toggleReaction({
       event,
       doerSelector: '.do-like',
@@ -72,15 +80,18 @@ describe('useToggleReaction', () => {
       onCount: vi.fn()
     })
 
+    // Then
     expect(document.querySelector('.do-like')?.classList.contains('liked')).toBe(false)
   })
 
   it('prompts login instead of posting when the viewer is not authenticated', async () => {
+    // Given
     const event = buildClickEvent()
     const post = vi.spyOn(axios, 'post')
     const onUnauthenticated = vi.fn()
     const { toggleReaction } = useToggleReaction()
 
+    // When
     await toggleReaction({
       event,
       doerSelector: '.do-like',
@@ -92,16 +103,19 @@ describe('useToggleReaction', () => {
       onCount: vi.fn()
     })
 
+    // Then
     expect(post).not.toHaveBeenCalled()
     expect(onUnauthenticated).toHaveBeenCalledOnce()
   })
 
   it('silently does nothing for an authenticated viewer who cannot react (e.g. own content)', async () => {
+    // Given
     const event = buildClickEvent()
     const post = vi.spyOn(axios, 'post')
     const onUnauthenticated = vi.fn()
     const { toggleReaction } = useToggleReaction()
 
+    // When
     await toggleReaction({
       event,
       doerSelector: '.do-like',
@@ -113,6 +127,7 @@ describe('useToggleReaction', () => {
       onCount: vi.fn()
     })
 
+    // Then
     expect(post).not.toHaveBeenCalled()
     expect(onUnauthenticated).not.toHaveBeenCalled()
   })
