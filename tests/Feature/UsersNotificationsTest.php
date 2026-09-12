@@ -61,7 +61,7 @@ describe('the notifications index', function (): void {
         // When
         DB::enableQueryLog();
         actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
-        $queryCountForOneNotification = count(DB::getQueryLog());
+        $queryCountForOneNotification = count((array) DB::getQueryLog());
         DB::flushQueryLog();
 
         for ($i = 0; $i < 9; $i++) {
@@ -70,7 +70,7 @@ describe('the notifications index', function (): void {
 
         DB::flushQueryLog();
         actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
-        $queryCountForTenNotifications = count(DB::getQueryLog());
+        $queryCountForTenNotifications = count((array) DB::getQueryLog());
         DB::disableQueryLog();
 
         // Then
