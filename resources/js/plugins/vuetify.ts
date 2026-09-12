@@ -15,10 +15,5 @@ export const vuetify = createVuetify({
     sets: {
       fa
     }
-  },
-  defaults: {
-    VBtn: {
-      class: 'text-uppercase'
-    }
   }
 })

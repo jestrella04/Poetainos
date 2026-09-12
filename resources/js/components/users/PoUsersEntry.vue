@@ -24,7 +24,7 @@ const socialLinks = computed<Record<string, string>>(() =>
 </script>
 
 <template>
-  <v-card class="mb-5 pos-relative" elevation="2" rounded>
+  <v-card class="mb-5 position-relative" elevation="2" rounded>
     <po-user-dropdown></po-user-dropdown>
 
     <v-card-text>

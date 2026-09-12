@@ -12,7 +12,7 @@ const { userDisplayName } = useFormatting()
 
 <template>
   <v-card rounded elevation="2" class="user-container">
-    <v-card-text class="pos-relative">
+    <v-card-text class="position-relative">
       <div class="d-flex ga-4 mb-2">
         <po-avatar-award :user="data" avatar-size="48" avatar-color="secondary" />
 

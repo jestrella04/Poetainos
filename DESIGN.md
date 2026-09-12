@@ -1,5 +1,7 @@
 # Theme & Color System
 
+> **Superseded:** `resources/js/plugins/theme.ts` was reset to Vuetify's stock default palette ahead of the upcoming UI redesign. The brand palette documented below is no longer live — kept here as historical rationale until the redesign defines a new palette.
+
 ## Overview
 
 Encolame uses **Vuetify 4** with a fully custom MD3-aligned color system. The single source of truth is `resources/js/plugins/theme.ts`. All color decisions must trace back to the designer-provided brand anchors or a documented rationale.

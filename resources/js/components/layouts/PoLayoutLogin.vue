@@ -11,31 +11,15 @@ void theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'd
 </script>
 
 <style>
+/* Vuetify's height:100% isn't applied to html/body by default; needed for the full-height split login layout. */
 html,
 body {
   height: 100%;
 }
-
-.logo-shadow {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
-}
-
-.logo-shadow:focus,
-.logo-shadow:active,
-.logo-shadow:hover {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-}
-
-.bg-gradient {
-  background: linear-gradient(
-    180deg,
-    rgb(var(--v-theme-primary)) 0%,
-    rgb(var(--v-theme-surface)) 100%
-  ) !important;
-}
 </style>
 
 <style scoped>
+/* Split login layout (image column + form column), each filling the viewport height. No Vuetify layout primitive for this. */
 .login-col {
   width: 100%;
   height: 100%;
@@ -50,20 +34,6 @@ body {
   height: 72px;
   max-width: 72px;
   max-height: 72px;
-}
-
-@media screen and (max-width: 960px) {
-  .login-col .v-sheet {
-    background: linear-gradient(
-      180deg,
-      rgb(var(--v-theme-primary)) 0%,
-      rgb(var(--v-theme-surface)) 100%
-    ) !important;
-  }
-
-  login-btns {
-    background-color: transparent !important;
-  }
 }
 
 @media screen and (min-width: 960px) {
@@ -88,8 +58,8 @@ body {
       <v-row class="flex-column flex-md-row" style="height: 100%; gap: 0">
         <po-head :title="page.props.title" />
         <v-col class="login-col d-none d-md-block">
-          <v-sheet class="d-flex align-center justify-center bg-gradient">
-            <v-img src="/images/logo.svg" class="logo logo-shadow"></v-img>
+          <v-sheet class="d-flex align-center justify-center">
+            <v-img src="/images/logo.svg" class="logo"></v-img>
           </v-sheet>
         </v-col>
 
@@ -97,7 +67,7 @@ body {
           <v-sheet class="d-flex align-center justify-center">
             <div style="width: 100%; max-width: 100%">
               <div class="d-flex align-center justify-center pb-10 d-md-none">
-                <v-img src="/images/logo.svg" class="logo logo-shadow"></v-img>
+                <v-img src="/images/logo.svg" class="logo"></v-img>
               </div>
               <slot />
             </div>

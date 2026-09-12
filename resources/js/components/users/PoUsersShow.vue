@@ -55,7 +55,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
               <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-author') }}</p>
 
               <template v-for="writing in page.props.writings.from_author" :key="writing.id">
-                <div class="mb-2 pos-relative">
+                <div class="mb-2 position-relative">
                   <po-link
                     :href="route('writings.show', writing.slug)"
                     class="text-bold stretched"
@@ -78,7 +78,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
               <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-shelf') }}</p>
 
               <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
-                <div class="mb-2 pos-relative">
+                <div class="mb-2 position-relative">
                   <po-link
                     :href="route('writings.show', writing.slug)"
                     class="text-bold stretched"
@@ -101,7 +101,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
               <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-liked') }}</p>
 
               <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
-                <div class="mb-2 pos-relative">
+                <div class="mb-2 position-relative">
                   <po-link
                     :href="route('writings.show', writing.slug)"
                     class="text-bold stretched"

@@ -25,7 +25,6 @@ type InertiaPageComponent = DefineComponent & { layout?: unknown }
 void createInertiaApp({
   progress: {
     delay: 0,
-    color: '#B39DDB',
     showSpinner: true
   },
   resolve: async (name) => {

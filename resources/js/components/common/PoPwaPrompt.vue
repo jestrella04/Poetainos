@@ -23,12 +23,6 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
 })
 </script>
 
-<style scoped>
-.v-snackbar {
-  margin: 0 auto;
-}
-</style>
-
 <template>
   <div v-if="needRefresh" class="d-flex w-100 justify-center">
     <v-snackbar

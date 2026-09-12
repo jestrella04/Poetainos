@@ -15,6 +15,7 @@ const data = page.value.props.page
 </script>
 
 <style scoped>
+/* Typography for CMS/prose content rendered as raw HTML; Vuetify has no built-in prose styling. */
 *:deep(h1),
 *:deep(h2),
 *:deep(h3),

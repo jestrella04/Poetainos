@@ -7,6 +7,7 @@ void theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'd
 </script>
 
 <style>
+/* Clears space for the fixed-width side nav (PoAdminMenu), which isn't part of Vuetify's layout system. */
 .admin-wrapper {
   margin-left: 60px;
 }

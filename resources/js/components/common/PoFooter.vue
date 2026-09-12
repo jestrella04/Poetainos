@@ -17,13 +17,7 @@ if (navigator.getInstalledRelatedApps !== undefined) {
 </script>
 
 <style scoped>
-footer {
-  max-height: 96px !important;
-  font-size: 0.7rem !important;
-  padding: 1rem !important;
-  text-align: center;
-}
-
+/* Keeps the footer clear of the fixed mobile bottom navigation, which doesn't reserve layout space on its own. */
 @media screen and (max-width: 1280px) {
   footer {
     margin-bottom: 56px !important;
@@ -32,7 +26,10 @@ footer {
 </style>
 
 <template>
-  <v-footer :elevation="2" class="d-flex flex-wrap align-center justify-space-around ga-2">
+  <v-footer
+    :elevation="2"
+    class="d-flex flex-wrap align-center justify-space-around ga-2 pa-4 text-caption text-center"
+  >
     <div class="d-inline-flex ga-3">&copy; 2020 {{ page.props.site.name }}</div>
 
     <div v-if="isEmpty(relatedApps)" class="d-inline-flex ga-3">

@@ -28,6 +28,7 @@ provide(writingKey, props.data)
 </script>
 
 <style scoped>
+/* Tighter line-height for the title and preserved whitespace in user-authored body text; content-specific, not a Vuetify concern. */
 .writing-title {
   line-height: 1.6rem !important;
   margin-bottom: 0.3rem;
@@ -40,7 +41,11 @@ provide(writingKey, props.data)
 
 <template>
   <po-wrapper>
-    <v-card :class="{ 'pos-relative': true, 'writing-container': !alone }" elevation="2" rounded>
+    <v-card
+      :class="{ 'position-relative': true, 'writing-container': !alone }"
+      elevation="2"
+      rounded
+    >
       <po-writing-dropdown></po-writing-dropdown>
       <template v-if="!isEmpty(data.extra_info) && !strNullOrEmpty(data.extra_info?.cover)">
         <v-img
@@ -52,12 +57,7 @@ provide(writingKey, props.data)
         >
           <div class="text-center py-3">
             <po-link :href="route('users.show', data.author.username)" inertia>
-              <po-avatar-award
-                :user="data.author"
-                avatar-size="64"
-                avatar-color="secondary"
-                avatar-class="avatar-shadow"
-              />
+              <po-avatar-award :user="data.author" avatar-size="64" avatar-color="secondary" />
             </po-link>
           </div>
         </v-img>
@@ -69,7 +69,7 @@ provide(writingKey, props.data)
         </po-link>
       </div>
 
-      <v-card-text class="pos-relative pt-1">
+      <v-card-text class="position-relative pt-1">
         <div class="text-center mb-3">
           <p class="text-h6 text-uppercase writing-title">
             <po-link

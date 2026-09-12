@@ -6,6 +6,7 @@ const page = computed(() => usePage())
 </script>
 
 <style scoped>
+/* Fixed-width responsive side nav; not built on Vuetify's navigation drawer, so positioning is manual. */
 nav {
   position: fixed;
   top: 0;
@@ -19,10 +20,6 @@ nav {
   nav {
     width: 250px;
   }
-}
-
-.v-list {
-  overflow-x: hidden !important;
 }
 </style>
 

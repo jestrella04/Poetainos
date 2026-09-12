@@ -28,6 +28,7 @@ const {
 </script>
 
 <style scoped>
+/* Caps the list to a comfortable reading width; Vuetify's v-container has no such preset. */
 .column-full {
   width: 100%;
   max-width: 620px;

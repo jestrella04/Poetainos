@@ -12,14 +12,6 @@ const mobileUserMenu = injectStrict(mobileUserMenuKey)
 const unreadCount = injectStrict(unreadCountKey)
 </script>
 
-<style scoped>
-@media screen and (max-width: 600px) {
-  .v-btn {
-    min-width: 60px !important;
-  }
-}
-</style>
-
 <template>
   <v-bottom-navigation v-model="page.props.route.name" bg-color="primary" class="hidden-lg-and-up">
     <po-button value="home" :href="route('home')" :title="$t('main.home')" inertia>

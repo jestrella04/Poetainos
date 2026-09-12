@@ -96,7 +96,7 @@ function reply(comment: Comment) {
       <p class="text-h6 mb-3">{{ $t('comments.comments') }}</p>
 
       <template v-for="comment in comments.data" :key="comment.id">
-        <v-card class="mb-2 pos-relative smaller">
+        <v-card class="mb-2 position-relative">
           <v-card-text class="pb-1">
             <div class="d-flex ga-3">
               <div class="flex-grow-1 d-inline-flex ga-3">

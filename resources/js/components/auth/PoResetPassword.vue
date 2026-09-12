@@ -78,11 +78,11 @@ async function submitForm() {
 </script>
 
 <style scoped>
+/* Caps the form to a comfortable width and centers it; Vuetify's v-form has no width preset. */
 .po-login {
   width: 100%;
   max-width: 400px;
   margin-inline: auto;
-  background-color: transparent;
 }
 </style>
 

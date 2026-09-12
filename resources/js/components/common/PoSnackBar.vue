@@ -5,14 +5,6 @@ import { injectStrict } from '@/composables/injectStrict'
 const snackBar = injectStrict(snackBarKey)
 </script>
 
-<style scoped>
-.v-snackbar {
-  width: 100%;
-  max-width: 400px;
-  margin: 1rem auto;
-}
-</style>
-
 <template>
   <v-snackbar
     v-model="snackBar.active"
@@ -21,6 +13,8 @@ const snackBar = injectStrict(snackBarKey)
     elevation="5"
     location="top"
     min-height="68"
+    width="100%"
+    max-width="400"
     rounded
     timer
     timer-color="blue-grey-lighten-1"

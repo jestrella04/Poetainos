@@ -121,36 +121,14 @@ function getFlashMessages() {
 </script>
 
 <style>
-html {
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    'Noto Sans',
-    'Liberation Sans',
-    Arial,
-    sans-serif,
-    'Apple Color Emoji',
-    'Segoe UI Emoji',
-    'Segoe UI Symbol',
-    'Noto Color Emoji' !important;
-  font-size: clamp(1.13rem, 1.08rem + 0.24vw, 1.25rem) !important;
-}
-
+/* Vuetify's height:100% isn't applied to html/body/root container by default; needed for full-height layouts. */
 html,
 body,
 .po-container {
   height: 100% !important;
 }
 
-pre,
-code {
-  font-family:
-    SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
-}
-
+/* po-navbar uses v-toolbar (not v-app-bar), which isn't part of Vuetify's layout system, so it needs manual fixed positioning. */
 @media screen and (min-width: 1280px) {
   .po-navbar {
     position: fixed !important;
@@ -159,24 +137,7 @@ code {
   }
 }
 
-.logo-shadow {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
-}
-
-.avatar-shadow {
-  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.9));
-}
-
-.logo-shadow:focus,
-.logo-shadow:active,
-.logo-shadow:hover {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-}
-
-.pos-relative {
-  position: relative !important;
-}
-
+/* Stretched-link pattern: makes an ancestor card fully clickable via a positioned pseudo-element. No Vuetify equivalent. */
 .stretched::after {
   position: absolute !important;
   top: 0 !important;
@@ -187,18 +148,7 @@ code {
   content: '' !important;
 }
 
-.v-card-text {
-  font-size: 1rem !important;
-}
-
-.v-input {
-  margin-bottom: 1rem;
-}
-
-.v-tab {
-  font-size: 0.7rem !important;
-}
-
+/* Like/shelve icon state coloring; no Vuetify prop drives this from a plain CSS class. */
 .liked i,
 .do-like:hover i {
   color: rgb(var(--v-theme-error));
@@ -214,6 +164,7 @@ code {
   cursor: pointer;
 }
 
+/* Positions the "more actions" trigger button over the top-right corner of a card. */
 .po-btn-more {
   position: absolute;
   top: 1rem;
@@ -221,11 +172,7 @@ code {
   z-index: 999;
 }
 
-.smaller,
-.smaller .v-card-text {
-  font-size: 0.85rem !important;
-}
-
+/* Sticks the tab bar below the fixed navbar; offset changes once the navbar stops being fixed. */
 .sticky-tabs {
   position: sticky !important;
   top: 64px !important;
@@ -240,6 +187,7 @@ code {
   }
 }
 
+/* Caps content to a comfortable reading width; Vuetify's v-container has no such preset. */
 .user-container,
 .writing-container {
   width: 100% !important;
@@ -266,7 +214,7 @@ code {
             class="font-weight-bold"
             inertia
           >
-            <v-img height="42" width="42" src="/images/logo.svg" class="logo-shadow"></v-img>
+            <v-img height="42" width="42" src="/images/logo.svg"></v-img>
           </po-link>
         </div>
 

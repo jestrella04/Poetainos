@@ -20,6 +20,7 @@ const counters = page.value.props.counters
 </script>
 
 <style scoped>
+/* Keeps stat figures from reflowing at odd widths; no Vuetify sizing utility fits this exact width. */
 .counter {
   min-width: 155px;
   text-align: center;

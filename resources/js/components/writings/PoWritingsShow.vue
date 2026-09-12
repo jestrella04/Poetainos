@@ -48,7 +48,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
                 <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-author') }}</p>
 
                 <template v-for="writing in page.props.related.from_author" :key="writing.id">
-                  <div class="mb-2 pos-relative">
+                  <div class="mb-2 position-relative">
                     <po-link
                       :href="route('writings.show', writing.slug)"
                       class="text-bold stretched"
@@ -76,7 +76,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
               <div v-if="!isEmpty(page.props.related.from_category)">
                 <p class="text-uppercase text-caption mb-5">{{ $t('main.related-writings') }}</p>
                 <template v-for="writing in page.props.related.from_category" :key="writing.id">
-                  <div class="mb-2 pos-relative">
+                  <div class="mb-2 position-relative">
                     <po-link
                       :href="route('writings.show', writing.slug)"
                       class="text-bold stretched"

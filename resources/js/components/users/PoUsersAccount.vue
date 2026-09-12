@@ -58,7 +58,7 @@ function togglePushNotifications(value: boolean | null): void {
 
     <v-card>
       <v-card-text style="max-width: 400px">
-        <div class="d-flex mb-5 pos-relative">
+        <div class="d-flex mb-5 position-relative">
           <div class="d-flex ga-4 mb-2">
             <div>
               <po-avatar size="48" color="secondary" :user="authUser()!" />
