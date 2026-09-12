@@ -5,20 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Shelf;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class ShelvesController extends Controller
 {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
-     * @return Response
+     * @return array<string, mixed>
      */
-    public function store(Writing $writing)
+    public function store(Writing $writing): array
     {
         $user = auth()->user();
+
+        if ($user === null) {
+            abort(401);
+        }
 
         // Check existence
         $exist = Shelf::where('user_id', $user->id)->where('writing_id', $writing->id)->count();
@@ -37,7 +38,7 @@ class ShelvesController extends Controller
         $writing->updateAura();
 
         // Notify author
-        if (! $writing->author->is($user)) {
+        if ($writing->author !== null && ! $writing->author->is($user)) {
             $writing->author->notify(new WritingShelved($writing, $user));
         }
 
@@ -52,11 +53,17 @@ class ShelvesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return array<string, mixed>
      */
-    public function destroy(Writing $writing)
+    public function destroy(Writing $writing): array
     {
-        auth()->user()->shelf()->detach($writing->id);
+        $user = auth()->user();
+
+        if ($user === null) {
+            abort(401);
+        }
+
+        $user->shelf()->detach($writing->id);
         $count = Shelf::where('writing_id', $writing->id)->count();
 
         return [

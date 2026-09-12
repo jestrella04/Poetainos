@@ -80,9 +80,14 @@ pest()->extend(TestCase::class)
 |
 */
 
+/**
+ * @param  array<string, mixed>  $attributes
+ */
 function actingAsAdmin(array $attributes = []): User
 {
     $role = Role::factory()->admin()->create();
 
-    return User::factory()->create(array_merge(['role_id' => $role->id], $attributes));
+    return User::factory()->create(
+        fn (array $factoryAttributes): array => array_merge($factoryAttributes, ['role_id' => $role->id], $attributes)
+    );
 }

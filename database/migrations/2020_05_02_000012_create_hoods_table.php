@@ -18,8 +18,8 @@ class CreateHoodsTable extends Migration
             $table->unsignedBigInteger('fellow_user_id');
             $table->primary(['user_id', 'fellow_user_id']);
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
-            $table->foreign('fellow_user_id')->references('id')->on('users')->onDelete('CASCADE');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('fellow_user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

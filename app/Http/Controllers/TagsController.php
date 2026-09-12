@@ -3,33 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tag;
-use Illuminate\Http\Request;
+use App\Models\Writing;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class TagsController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Query list of matching resources.
      *
-     * @return \Illuminate\Http\Response
+     * @return Collection<int, array{value: mixed, label: mixed}>
      */
-    public function query()
+    public function query(): Collection
     {
         $wildcard = '%'.request('query').'%';
 
         return Tag::where('name', 'like', $wildcard)
-            ->take($this->pagination)
+            ->take($this->pagination ?? 15)
             ->get()
             ->map(function ($tag, $key) {
                 return [
@@ -40,31 +33,11 @@ class TagsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return Response|Paginator<int, Writing&object{pivot: Pivot}>
      */
-    public function show(Tag $tag)
+    public function show(Tag $tag): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
         $params = [
@@ -96,21 +69,9 @@ class TagsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Tag $tag)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Tag $tag)
+    public function update(Tag $tag): void
     {
         //
     }
@@ -118,9 +79,9 @@ class TagsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return array<string, string>
      */
-    public function destroy(Tag $tag)
+    public function destroy(Tag $tag): array
     {
         $tag->delete();
 

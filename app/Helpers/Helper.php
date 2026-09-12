@@ -1,17 +1,11 @@
 <?php
 
-use App\Models\User;
-use App\Notifications\CommentLiked;
-use App\Notifications\WritingCommented;
-use App\Notifications\WritingCommentMentioned;
-use App\Notifications\WritingFeatured;
-use App\Notifications\WritingLiked;
-use App\Notifications\WritingShelved;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-function getSiteConfig($path = '')
+function getSiteConfig(string $path = ''): mixed
 {
     if (! empty($path)) {
         $path = config('writerhood.'.$path);
@@ -26,7 +20,7 @@ function getSiteConfig($path = '')
     }
 }
 
-function slugify($table, $title, $column = 'slug', $separator = '-')
+function slugify(string $table, string $title, string $column = 'slug', string $separator = '-'): string
 {
     // Normalize the title
     $slug = Str::of($title)->slug($separator);
@@ -52,7 +46,10 @@ function slugify($table, $title, $column = 'slug', $separator = '-')
     throw new Exception('Can not create a unique slug');
 }
 
-function getRelatedIdentifiers($table, $slug, $column)
+/**
+ * @return Collection<int, stdClass>
+ */
+function getRelatedIdentifiers(string $table, string $slug, string $column): Collection
 {
     return DB::table($table)
         ->select($column)
@@ -60,77 +57,37 @@ function getRelatedIdentifiers($table, $slug, $column)
         ->get();
 }
 
-function getNotificationMessage($notification)
+/**
+ * @param  array<int, string>  $titleParts
+ */
+function getPageTitle(array $titleParts, string $separator = '–'): string
 {
-    switch ($notification->type) {
-        case WritingCommented::class:
-            $message = __(':name has added a comment on your writing', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case WritingCommentMentioned::class:
-            $message = __(':name has mentioned you in a comment', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case WritingFeatured::class:
-            $message = __('Your writing has been awarded with a Golden Flower');
-            break;
-
-        case WritingLiked::class:
-            $message = __(':name has liked your writing', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case WritingShelved::class:
-            $message = __(':name has added your writing to his shelf', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case CommentLiked::class:
-            $message = __(':name has liked your comment', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-        default:
-            $message = false;
-    }
-
-    return $message;
-}
-
-function getPageTitle(array $titleParts, $separator = '–')
-{
-    $titleParts[] = getSiteConfig(('name'));
+    $titleParts[] = getSiteConfig('name');
 
     return implode(" {$separator} ", $titleParts);
 }
 
-function isTruthy($string)
+function isTruthy(mixed $value): bool
 {
-    $string = strtolower($string);
+    $value = strtolower((string) $value);
 
-    if (! empty($string) && in_array($string, [1, '1', true, 'true', 'on', 'yes'], true)) {
+    if (! empty($value) && in_array($value, [1, '1', true, 'true', 'on', 'yes'], true)) {
         return true;
     }
 
     return false;
 }
 
-function hydrateSettings($text)
+function hydrateSettings(string $text): string
 {
-    return preg_replace_callback(
+    return (string) preg_replace_callback(
         '/{{([^}]+)}}/',
         fn ($matches) => getSiteConfig($matches[1]),
         $text
     );
 }
 
-function inRange($value, $min, $max)
+function inRange(int|float $value, int|float $min, int|float $max): bool
 {
     return $value >= $min && $value < $max;
 }

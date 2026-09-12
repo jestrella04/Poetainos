@@ -6,24 +6,27 @@ use App\Models\Writing;
 use App\Notifications\WritingPublished;
 use Illuminate\Support\Facades\Notification;
 
-test('index renders for each sort option', function (string $sort): void {
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
+
+it('renders the index for each sort option', function (string $sort): void {
     Writing::factory()->count(3)->create();
 
-    $this->get('/?sort='.$sort)->assertOk();
+    get('/?sort='.$sort)->assertOk();
 })->with(['latest', 'popular', 'likes']);
 
 test('awards page can be rendered', function (): void {
-    $this->get(route('writings.awards'))->assertOk();
+    get(route('writings.awards'))->assertOk();
 });
 
 test('show increments views and calculates a finite aura', function (): void {
     $writing = Writing::factory()->create();
 
-    $this->get($writing->path())->assertOk();
+    get($writing->path())->assertOk();
 
-    $fresh = $writing->fresh();
-    expect($fresh->views)->toBe(1);
-    expect(is_numeric($fresh->aura))->toBeTrue();
+    $writing->refresh();
+    expect($writing->views)->toBe(1);
+    expect(is_finite($writing->aura))->toBeTrue();
 });
 
 test('updateAura does not throw when all writing aura points are zeroed', function (): void {
@@ -38,7 +41,7 @@ test('updateAura does not throw when all writing aura points are zeroed', functi
 
     $writing->updateAura();
 
-    expect((float) $writing->fresh()->aura)->toBe(1.23);
+    expect((float) $writing->refresh()->aura)->toBe(1.23);
 });
 
 test('the daily post limit is configurable via site settings', function (): void {
@@ -47,7 +50,7 @@ test('the daily post limit is configurable via site settings', function (): void
     $user = User::factory()->create();
     Writing::factory()->for($user, 'author')->create();
 
-    $this->actingAs($user)
+    actingAs($user)
         ->post(route('writings.store'), ['title' => 'One too many'])
         ->assertSessionHasErrors('title');
 });
@@ -55,15 +58,15 @@ test('the daily post limit is configurable via site settings', function (): void
 test('random redirects to an existing writing', function (): void {
     $writing = Writing::factory()->create();
 
-    $this->get('/writings/random')->assertRedirect($writing->path());
+    get('/writings/random')->assertRedirect($writing->path());
 });
 
 test('random 404s when there are no writings', function (): void {
-    $this->get('/writings/random')->assertNotFound();
+    get('/writings/random')->assertNotFound();
 });
 
 test('guests are redirected away from writings create', function (): void {
-    $this->get('/writings/create')->assertRedirect(route('verification.notice'));
+    get('/writings/create')->assertRedirect(route('verification.notice'));
 });
 
 test('verified users can publish a writing', function (): void {
@@ -73,7 +76,7 @@ test('verified users can publish a writing', function (): void {
     $mainCategory = Category::factory()->create(['parent_id' => null]);
     $subCategory = Category::factory()->create(['parent_id' => $mainCategory->id]);
 
-    $this->actingAs($user)->post('/writings/create', [
+    actingAs($user)->post('/writings/create', [
         'title' => 'My new poem',
         'main_category' => $mainCategory->id,
         'categories' => [$subCategory->id],
@@ -93,7 +96,7 @@ test('users cannot publish more than 3 writings a day', function (): void {
 
     Writing::factory()->for($user, 'author')->count(3)->create(['created_at' => now()]);
 
-    $this->actingAs($user)->post('/writings/create', [
+    actingAs($user)->post('/writings/create', [
         'title' => 'One too many',
         'main_category' => $mainCategory->id,
         'categories' => [$mainCategory->id],
@@ -105,8 +108,8 @@ test('the author can edit and delete their own writing', function (): void {
     $author = User::factory()->create();
     $writing = Writing::factory()->for($author, 'author')->create();
 
-    $this->actingAs($author)->get('/writings/edit/'.$writing->slug)->assertOk();
-    $this->actingAs($author)->delete('/writings/delete/'.$writing->slug)->assertOk();
+    actingAs($author)->get('/writings/edit/'.$writing->slug)->assertOk();
+    actingAs($author)->delete('/writings/delete/'.$writing->slug)->assertOk();
 
     expect(Writing::find($writing->id))->toBeNull();
 });
@@ -115,16 +118,16 @@ test('a different verified user cannot edit or delete someone else\'s writing', 
     $writing = Writing::factory()->create();
     $other = User::factory()->create();
 
-    $this->actingAs($other)->get('/writings/edit/'.$writing->slug)->assertForbidden();
-    $this->actingAs($other)->delete('/writings/delete/'.$writing->slug)->assertForbidden();
+    actingAs($other)->get('/writings/edit/'.$writing->slug)->assertForbidden();
+    actingAs($other)->delete('/writings/delete/'.$writing->slug)->assertForbidden();
 });
 
 test('an admin can edit and delete any writing', function (): void {
     $writing = Writing::factory()->create();
     $admin = actingAsAdmin();
 
-    $this->actingAs($admin)->get('/writings/edit/'.$writing->slug)->assertOk();
-    $this->actingAs($admin)->delete('/writings/delete/'.$writing->slug)->assertOk();
+    actingAs($admin)->get('/writings/edit/'.$writing->slug)->assertOk();
+    actingAs($admin)->delete('/writings/delete/'.$writing->slug)->assertOk();
 
     expect(Writing::find($writing->id))->toBeNull();
 });

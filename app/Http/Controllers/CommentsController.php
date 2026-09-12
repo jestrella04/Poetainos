@@ -8,22 +8,24 @@ use App\Models\User;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 class CommentsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return Paginator<int, Comment>
      */
-    public function index($writing)
+    public function index(string $writing): Paginator
     {
         $filter = [0];
 
-        if (auth()->check()) {
-            $filter = auth()->user()->blockedAuthors()->pluck('blocked_user_id');
+        $user = auth()->user();
+
+        if ($user !== null) {
+            $filter = $user->blockedAuthors()->pluck('blocked_user_id');
         }
 
         $comments = Comment::where('writing_id', $writing)
@@ -41,41 +43,37 @@ class CommentsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
-     *
-     * @return Response
      */
-    public function store(Request $request)
+    public function store(Request $request): void
     {
         request()->validate([
             'comment' => 'required|min:1|max:300',
             'writing_id' => 'required|exists:writings,id',
         ]);
 
+        $user = auth()->user();
+
+        if ($user === null) {
+            return;
+        }
+
         $message = request('comment');
         $comment = Comment::create([
-            'user_id' => auth()->user()->id,
+            'user_id' => $user->id,
             'writing_id' => request('writing_id'),
             'message' => $message,
         ]);
 
+        $writing = $comment->writing;
+
         // Update aura / karma
-        $comment->author->updateAura();
-        $comment->writing->updateAura();
+        $comment->author?->updateAura();
+        $writing?->updateAura();
 
         // Notify author
-        if (! $comment->writing->author->is(auth()->user())) {
-            $comment->writing->author->notify(new WritingCommented($comment->writing, auth()->user()));
+        if ($writing !== null && $writing->author !== null && ! $writing->author->is($user)) {
+            $writing->author->notify(new WritingCommented($writing, $user));
         }
 
         // Notify @mentions
@@ -88,56 +86,28 @@ class CommentsController extends Controller
 
             if (
                 $mention !== null
-                && ! $mention->is($comment->writing->author)
-                && ! $mention->is(auth()->user())
+                && $writing !== null
+                && $writing->author !== null
+                && ! $mention->is($writing->author)
+                && ! $mention->is($user)
             ) {
-                $mention->notify(new WritingCommentMentioned($comment, auth()->user()));
+                $mention->notify(new WritingCommentMentioned($comment, $user));
             }
         }
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @return Response
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return Response
-     */
-    public function edit(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @return Response
-     */
-    public function update(Request $request, Comment $comment)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
-     * @return array
+     * @return array<int, mixed>
      */
-    public function destroy(Comment $comment)
+    public function destroy(Comment $comment): array
     {
         $this->authorize('delete', $comment);
         $comment->deleteOrFail();
 
         // Delete related notifications
-        DatabaseNotification::where('data->comment_id', $comment->id)->delete();
+        DB::table('notifications')->where('data->comment_id', $comment->id)->delete();
 
         // Delete related likes
         Like::where([

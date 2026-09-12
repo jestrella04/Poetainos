@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Writing;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -12,18 +16,26 @@ class UsersNotificationsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return Response|LengthAwarePaginator<int, DatabaseNotification>
      */
-    public function index()
+    public function index(): Response|LengthAwarePaginator
     {
         $user = auth()->user();
+
+        if ($user === null) {
+            abort(401);
+        }
+
         $tab = in_array(request('tab'), ['unread', 'all']) ? request('tab') : 'unread';
-        $notifications = [];
 
         if ($tab === 'unread') {
-            $notifications = User::find($user->id)->unreadNotifications()->paginate($this->pagination)->withQueryString();
+            $notifications = User::find($user->id)?->unreadNotifications()->paginate($this->pagination)->withQueryString();
         } else {
-            $notifications = User::find($user->id)->notifications()->paginate($this->pagination)->withQueryString();
+            $notifications = User::find($user->id)?->notifications()->paginate($this->pagination)->withQueryString();
+        }
+
+        if ($notifications === null) {
+            abort(404);
         }
 
         $notifierUserIds = $notifications->pluck('data.user_id')->filter()->unique();
@@ -39,7 +51,7 @@ class UsersNotificationsController extends Controller
             ->get()
             ->keyBy('id');
 
-        $notifications->each(function ($notification) use ($notifierUsers, $notifierWritings): void {
+        $notifications->each(function (DatabaseNotification $notification) use ($notifierUsers, $notifierWritings): void {
             $notification['notifier_user'] =
                 isset($notification->data['user_id'])
                 ? $notifierUsers->get($notification->data['user_id'])
@@ -62,18 +74,18 @@ class UsersNotificationsController extends Controller
         ]);
     }
 
-    public function clear()
+    public function clear(): RedirectResponse
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        auth()->user()?->unreadNotifications->markAsRead();
 
         return redirect(route('notifications.index'));
     }
 
-    public function show($notificationId)
+    public function show(string $notificationId): RedirectResponse
     {
-        $notification = auth()->user()->notifications->find($notificationId);
+        $notification = auth()->user()?->notifications->find($notificationId);
 
-        if ($notification) {
+        if ($notification !== null) {
             $notification->markAsRead();
 
             if (isset($notification->data['url'])) {
@@ -85,19 +97,22 @@ class UsersNotificationsController extends Controller
             return $redirectUrl;
         }
 
-        return abort(401);
+        abort(401);
     }
 
-    public function email($enable)
+    public function email(string $enable): JsonResponse
     {
-        auth()->user()->emailNotifications($enable);
+        auth()->user()?->emailNotifications($enable);
 
         return response()->json(null, 204);
     }
 
-    public function status()
+    /**
+     * @return array<string, mixed>
+     */
+    public function status(): array
     {
-        $info = auth()->user()->extra_info;
+        $info = auth()->user()->extra_info ?? [];
         $status = [];
 
         if (array_key_exists('notifications', $info)) {

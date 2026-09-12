@@ -26,7 +26,7 @@ class CreateWritingsTable extends Migration
             $table->timestamp('aura_updated_at')->nullable();
             $table->timestamp('home_posted_at')->nullable();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

@@ -12,7 +12,6 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -26,11 +25,11 @@ class WritingsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response|Paginator
+     * @return Response|Paginator<int, Writing>
      */
-    public function index()
+    public function index(): Response|Paginator
     {
-        $awards = request()->route()->getName() === 'writings.awards';
+        $awards = request()->route()?->getName() === 'writings.awards';
         $sort = resolveSort(['latest', 'popular', 'likes']);
         $filterAwards = $awards ? 'home_posted_at' : 'id';
         $writings = Writing::visibleTo($this->getBlockedUsers())
@@ -54,10 +53,8 @@ class WritingsController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return Response
      */
-    public function create()
+    public function create(): Response
     {
         return $this->edit(new Writing);
     }
@@ -65,19 +62,17 @@ class WritingsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function store(Request $request)
+    public function store(Request $request): array
     {
         return $this->update($request, new Writing);
     }
 
     /**
      * Display the specified resource.
-     *
-     * @return Response
      */
-    public function show(Writing $writing)
+    public function show(Writing $writing): Response
     {
         // Increment writing views
         $writing->incrementViews();
@@ -91,11 +86,11 @@ class WritingsController extends Controller
             'meta' => [
                 'title' => getPageTitle([
                     $writing->title,
-                    $writing->author->getName(),
+                    $writing->author?->getName() ?? '',
                 ]),
                 'canonical' => $writing->path(),
             ],
-            'writing' => Writing::whereId($writing->id)
+            'writing' => Writing::where('id', $writing->id)
                 ->withCount(['likes', 'comments', 'shelf'])
                 ->with([
                     'author' => function ($query): void {
@@ -130,16 +125,14 @@ class WritingsController extends Controller
                 ])->inRandomOrder()->take(5)->get(),
 
             ],
-            'isAuthorBlocked' => auth()->check() ? $user->isAuthorBlocked($writing->author) : false,
+            'isAuthorBlocked' => $user !== null && $writing->author !== null ? $user->isAuthorBlocked($writing->author) : false,
         ]);
     }
 
     /**
      * Display a random resource.
-     *
-     * @return RedirectResponse|Redirector
      */
-    public function random()
+    public function random(): RedirectResponse|Redirector
     {
         $writing = User::has('writings', '>', 0)
             ->inRandomOrder()
@@ -153,10 +146,8 @@ class WritingsController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @return Response
      */
-    public function edit(Writing $writing)
+    public function edit(Writing $writing): Response
     {
         // Ensure user has the proper permission
         if ($writing->exists) {
@@ -170,29 +161,29 @@ class WritingsController extends Controller
 
         return Inertia::render('writings/PoWritingsForm', [
             'meta' => [
-                'title' => request()->route()->getName() === 'writings.edit'
+                'title' => request()->route()?->getName() === 'writings.edit'
                     ? getPageTitle([__('Update writing')])
                     : getPageTitle([__('Publish a writing')]),
             ],
             'writing' => [
                 'data' => $writing,
-                'main_category' => $writing->exists ? $writing->mainCategory()->pluck('id')->first() : null,
+                'main_category' => $writing->exists ? $writing->mainCategory()->value('id') : null,
                 'categories' => $writing->exists ? $writing->altCategories()->pluck('id') : [],
                 'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
 
             ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
-            'agreement' => auth()->user()->isInAgreement(),
+            'agreement' => auth()->user()?->isInAgreement() ?? false,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function update(Request $request, Writing $writing)
+    public function update(Request $request, Writing $writing): array
     {
         $action = 'create';
 
@@ -202,8 +193,14 @@ class WritingsController extends Controller
             $action = 'update';
         }
 
+        $user = auth()->user();
+
+        if ($user === null) {
+            abort(401);
+        }
+
         // Check number of posts by user
-        $posts = auth()->user()->writings()->whereDate('created_at', '=', Carbon::today())->count();
+        $posts = $user->writings()->whereDate('created_at', '=', Carbon::today())->count();
         $dailyPostLimit = getSiteConfig('writings.daily_post_limit') ?? 3;
 
         if ($posts >= $dailyPostLimit) {
@@ -248,7 +245,7 @@ class WritingsController extends Controller
         $writing->title = request('title');
 
         if (! $writing->exists) {
-            $writing->user_id = auth()->user()->id;
+            $writing->author()->associate($user);
             $writing->slug = slugify($writing->getTable(), $writing->title);
         }
 
@@ -256,15 +253,15 @@ class WritingsController extends Controller
         $writing->extra_info = $extraInfo;
         $writing->save();
 
-        $categories = request('categories');
+        $categories = (array) request('categories');
         array_unshift($categories, request('main_category'));
 
         $tagsToSync = [];
 
         // Let's grab the entered tags
         if (! empty(request('tags'))) {
-            foreach (request('tags') as $tag) {
-                $tag = preg_replace('/\s+/', ' ', $tag);
+            foreach ((array) request('tags') as $tag) {
+                $tag = (string) preg_replace('/\s+/', ' ', (string) $tag);
                 $tag = trim($tag);
                 $tag = Tag::firstOrCreate(
                     ['name' => $tag],
@@ -282,17 +279,17 @@ class WritingsController extends Controller
         $writing->tags()->sync($tagsToSync);
 
         // Update user aura / karma
-        $writing->author->updateAura();
+        $writing->author?->updateAura();
 
         // Persist user agreements to avoid asking again
         if (request('service_agreement') && request('privacy_agreement')) {
-            $writing->author->acceptAgreements();
+            $writing->author?->acceptAgreements();
         }
 
         // Set response message and trigger notification
         if ($action === 'create') {
             // Share on social media
-            $writing->author->notify(new WritingPublished($writing));
+            $writing->author?->notify(new WritingPublished($writing));
         }
 
         // Set response data
@@ -304,15 +301,15 @@ class WritingsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return array
+     * @return array<int, mixed>
      */
-    public function destroy(Writing $writing)
+    public function destroy(Writing $writing): array
     {
         $this->authorize('delete', $writing);
         $writing->deleteOrFail();
 
         // Delete related notifications
-        DatabaseNotification::where('data->writing_id', $writing->id)->delete();
+        DB::table('notifications')->where('data->writing_id', $writing->id)->delete();
 
         // Delete related likes
         Like::where([

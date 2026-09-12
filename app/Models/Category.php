@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\CategoryFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Category extends Model
 {
+    /** @use HasFactory<CategoryFactory> */
     use HasFactory, HasRecursiveRelationships;
 
     public function getRouteKeyName()
@@ -15,34 +20,46 @@ class Category extends Model
         return 'slug';
     }
 
-    public function path()
+    public function path(): string
     {
         return route('categories.show', $this->slug);
     }
 
-    public function writings()
+    /**
+     * @return BelongsToMany<Writing, $this>
+     */
+    public function writings(): BelongsToMany
     {
         return $this->belongsToMany(Writing::class);
     }
 
-    public function writingsRecursive()
+    /**
+     * @return Builder<Writing>
+     */
+    public function writingsRecursive(): Builder
     {
         return Writing::with('categories')->whereHas('categories', function ($q): void {
             $q->whereIn('category_id', $this->descendantsAndSelf()->pluck('id'));
         });
     }
 
-    public function writingsCount()
+    public function writingsCount(): int
     {
         return $this->writings->unique()->count();
     }
 
-    public function categories()
+    /**
+     * @return HasMany<Category, $this>
+     */
+    public function categories(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function childrenCategories()
+    /**
+     * @return HasMany<Category, $this>
+     */
+    public function childrenCategories(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id')
             ->with('categories');

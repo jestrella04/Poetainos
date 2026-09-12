@@ -15,20 +15,12 @@ class WritingPublished extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $writing;
+    protected string $msg;
 
-    protected $msg;
+    protected string $url;
 
-    protected $url;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct(Writing $writing)
+    public function __construct(protected Writing $writing)
     {
-        $this->writing = $writing;
         $this->msg = __('":title" by :author has just been published on our site.', [
             'title' => $this->writing->title,
         ]);
@@ -40,23 +32,23 @@ class WritingPublished extends Notification implements ShouldQueue
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<int, string>
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return [TwitterChannel::class, FacebookPosterChannel::class];
     }
 
-    public function toTwitter($notifiable)
+    public function toTwitter(mixed $notifiable): TwitterStatusUpdate
     {
-        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $this->msg).' '.$this->url;
+        $msg = str_replace(':author', $this->writing->author?->getTwitterUsername() ?? '', $this->msg).' '.$this->url;
 
         return new TwitterStatusUpdate($msg);
     }
 
-    public function toFacebookPoster($notifiable)
+    public function toFacebookPoster(mixed $notifiable): FacebookPosterPost
     {
-        $msg = str_replace(':author', $this->writing->author->getName(), $this->msg);
+        $msg = str_replace(':author', $this->writing->author?->getName() ?? '', $this->msg);
 
         return (new FacebookPosterPost($msg))->withLink($this->url);
     }
@@ -65,9 +57,9 @@ class WritingPublished extends Notification implements ShouldQueue
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //

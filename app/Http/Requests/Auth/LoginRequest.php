@@ -23,7 +23,7 @@ class LoginRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, Rule|array|string>
+     * @return array<string, Rule|array<int, string>|string>
      */
     public function rules(): array
     {

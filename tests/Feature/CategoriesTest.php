@@ -4,10 +4,13 @@ use App\Models\Category;
 use App\Models\User;
 use App\Models\Writing;
 
-test('show renders for each sort option', function (string $sort): void {
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
+
+it('show renders for each sort option', function (string $sort): void {
     $category = Category::factory()->create();
 
-    $this->get($category->path().'?sort='.$sort)->assertOk();
+    get($category->path().'?sort='.$sort)->assertOk();
 })->with(['latest', 'popular', 'likes']);
 
 test('writingsRecursive includes writings attached to descendant categories', function (): void {
@@ -24,7 +27,7 @@ test('writingsRecursive includes writings attached to descendant categories', fu
 test('admin can create and update a category', function (): void {
     $admin = actingAsAdmin();
 
-    $this->actingAs($admin)->put('/admin/categories/edit', [
+    actingAs($admin)->put('/admin/categories/edit', [
         'id' => 0,
         'name' => 'New Category',
         'description' => 'A description long enough.',
@@ -32,20 +35,20 @@ test('admin can create and update a category', function (): void {
 
     $category = Category::where('name', 'New Category')->firstOrFail();
 
-    $this->actingAs($admin)->put('/admin/categories/edit', [
+    actingAs($admin)->put('/admin/categories/edit', [
         'id' => $category->id,
         'name' => 'New Category',
         'description' => 'An updated description.',
     ])->assertOk();
 
-    expect($category->fresh()->description)->toBe('An updated description.');
+    expect($category->refresh()->description)->toBe('An updated description.');
 });
 
 test('admin can delete a category', function (): void {
     $admin = actingAsAdmin();
     $category = Category::factory()->create();
 
-    $this->actingAs($admin)->delete('/admin/categories/delete/'.$category->slug)->assertOk();
+    actingAs($admin)->delete('/admin/categories/delete/'.$category->slug)->assertOk();
 
     expect(Category::find($category->id))->toBeNull();
 });
@@ -54,7 +57,7 @@ test('non-admins are redirected to login for admin category routes', function ()
     $user = User::factory()->create();
     $category = Category::factory()->create();
 
-    $this->actingAs($user)
+    actingAs($user)
         ->delete('/admin/categories/delete/'.$category->slug)
         ->assertRedirect(route('login'));
 });

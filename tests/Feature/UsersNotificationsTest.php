@@ -6,6 +6,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use function Pest\Laravel\actingAs;
+
+/**
+ * @param  array<string, mixed>  $data
+ */
 function createDatabaseNotification(User $recipient, array $data, ?Carbon $createdAt = null): void
 {
     $createdAt ??= now();
@@ -24,19 +29,21 @@ function createDatabaseNotification(User $recipient, array $data, ?Carbon $creat
 
 test('index attaches the notifier user and writing without querying per notification', function (): void {
     $recipient = User::factory()->create();
-    $notifiers = User::factory()->count(2)->create();
-    $writings = Writing::factory()->count(2)->create();
+    $notifier1 = User::factory()->create();
+    $notifier2 = User::factory()->create();
+    $writing1 = Writing::factory()->create();
+    $writing2 = Writing::factory()->create();
 
-    createDatabaseNotification($recipient, ['user_id' => $notifiers[0]->id, 'writing_id' => $writings[0]->id], now()->subMinute());
-    createDatabaseNotification($recipient, ['user_id' => $notifiers[1]->id, 'writing_id' => $writings[1]->id], now());
+    createDatabaseNotification($recipient, ['user_id' => $notifier1->id, 'writing_id' => $writing1->id], now()->subMinute());
+    createDatabaseNotification($recipient, ['user_id' => $notifier2->id, 'writing_id' => $writing2->id], now());
 
-    $response = $this->actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']));
+    $response = actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']));
 
     $response->assertOk();
-    $response->assertJsonPath('data.0.notifier_user.id', $notifiers[1]->id);
-    $response->assertJsonPath('data.0.notifier_writing.id', $writings[1]->id);
-    $response->assertJsonPath('data.1.notifier_user.id', $notifiers[0]->id);
-    $response->assertJsonPath('data.1.notifier_writing.id', $writings[0]->id);
+    $response->assertJsonPath('data.0.notifier_user.id', $notifier2->id);
+    $response->assertJsonPath('data.0.notifier_writing.id', $writing2->id);
+    $response->assertJsonPath('data.1.notifier_user.id', $notifier1->id);
+    $response->assertJsonPath('data.1.notifier_writing.id', $writing1->id);
 });
 
 test('index query count does not scale with the number of notifications', function (): void {
@@ -47,7 +54,7 @@ test('index query count does not scale with the number of notifications', functi
     createDatabaseNotification($recipient, ['user_id' => $notifier->id, 'writing_id' => $writing->id]);
 
     DB::enableQueryLog();
-    $this->actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
+    actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
     $queryCountForOneNotification = count(DB::getQueryLog());
     DB::flushQueryLog();
 
@@ -56,7 +63,7 @@ test('index query count does not scale with the number of notifications', functi
     }
 
     DB::flushQueryLog();
-    $this->actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
+    actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
     $queryCountForTenNotifications = count(DB::getQueryLog());
     DB::disableQueryLog();
 

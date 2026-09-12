@@ -32,10 +32,8 @@ class GenerateAssetLinks extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $path = public_path('.well-known/assetlinks.json');
         $assetLinks = [
@@ -53,19 +51,19 @@ class GenerateAssetLinks extends Command
             ],
         ];
 
-        if ($this->write($path, json_encode($assetLinks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))) {
+        if ($this->write($path, (string) json_encode($assetLinks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))) {
             $this->info('The command was completed successfully!');
         } else {
             $this->error('Something went wrong!');
         }
+
+        return self::SUCCESS;
     }
 
     /**
      * Write the file and create directories if they don't exist.
-     *
-     * @return int
      */
-    private function write($path, $contents, $flags = 0)
+    private function write(string $path, string $contents, int $flags = 0): int
     {
         $parts = explode('/', $path);
         array_pop($parts);
@@ -75,6 +73,8 @@ class GenerateAssetLinks extends Command
             mkdir($dir, 0775, true);
         }
 
-        return file_put_contents($path, $contents, $flags);
+        $result = file_put_contents($path, $contents, $flags);
+
+        return $result === false ? 0 : $result;
     }
 }

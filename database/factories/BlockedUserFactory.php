@@ -14,14 +14,12 @@ class BlockedUserFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var string
+     * @var class-string<BlockedUser>
      */
     protected $model = BlockedUser::class;
 
     /**
      * Define the model's default state.
-     *
-     * @return array<string, mixed>
      */
     public function definition(): array
     {

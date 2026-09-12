@@ -4,19 +4,26 @@ namespace App\Models;
 
 use App\Notifications\WritingFeatured;
 use Carbon\Carbon;
+use Database\Factories\WritingFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 
 class Writing extends Model
 {
+    /** @use HasFactory<WritingFactory> */
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -33,7 +40,7 @@ class Writing extends Model
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'extra_info' => 'array',
@@ -44,32 +51,44 @@ class Writing extends Model
         return 'slug';
     }
 
-    public function path()
+    public function path(): string
     {
         return route('writings.show', $this->slug);
     }
 
-    public function author()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function mainCategory()
+    /**
+     * @return BelongsToMany<Category, $this>
+     */
+    public function mainCategory(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->whereNull('parent_id');
     }
 
-    public function altCategories()
+    /**
+     * @return BelongsToMany<Category, $this>
+     */
+    public function altCategories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->whereNotNull('parent_id');
     }
 
-    public function categories()
+    /**
+     * @return BelongsToMany<Category, $this>
+     */
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
     }
 
-    public function excerpt()
+    public function excerpt(): string
     {
         $len = mb_strlen($this->text);
 
@@ -80,29 +99,41 @@ class Writing extends Model
         return mb_substr($this->text, 0, 400).'...';
     }
 
-    public function comments()
+    /**
+     * @return HasMany<Comment, $this>
+     */
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    public function likes()
+    /**
+     * @return MorphMany<Like, $this>
+     */
+    public function likes(): MorphMany
     {
         return $this->morphMany(Like::class, 'likeable');
     }
 
-    public function likers()
+    /**
+     * @return Collection<int, User>
+     */
+    public function likers(): Collection
     {
         $likes = $this->likes()->pluck('user_id');
 
         return User::forAuthorSummary()->whereIn('id', $likes)->get();
     }
 
-    public function tags()
+    /**
+     * @return BelongsToMany<Tag, $this>
+     */
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
-    public function categoriesAsString($delimiter = ', ')
+    public function categoriesAsString(string $delimiter = ', '): string
     {
         $array = $this->categories
             ->map(function ($category) {
@@ -113,7 +144,7 @@ class Writing extends Model
         return implode($delimiter, $array);
     }
 
-    public function tagsAsString($delimiter = ', ')
+    public function tagsAsString(string $delimiter = ', '): string
     {
         $array = $this->tags
             ->map(function ($tag) {
@@ -124,23 +155,26 @@ class Writing extends Model
         return implode($delimiter, $array);
     }
 
-    public function shelf()
+    /**
+     * @return BelongsToMany<User, $this>
+     */
+    public function shelf(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'shelves');
     }
 
-    public function incrementViews()
+    public function incrementViews(): void
     {
-        DB::table($this->getTable())->whereId($this->id)->increment('views');
+        DB::table($this->getTable())->where('id', $this->id)->increment('views');
     }
 
-    public function updateAura()
+    public function updateAura(): void
     {
         // What's the minimum to be featured at home?
         $auraHome = getSiteConfig('aura.min_at_home');
 
         // Count user content
-        $writing = Writing::whereId($this->id)->withCount(['likes', 'comments', 'shelf'])->firstOrFail();
+        $writing = Writing::where('id', $this->id)->withCount(['likes', 'comments', 'shelf'])->firstOrFail();
         $countables = [
             'likes' => $writing->likes_count,
             'comments' => $writing->comments_count,
@@ -173,29 +207,31 @@ class Writing extends Model
 
         // Persist to the database
         if ($auraNew >= $auraHome && $postedAt <= 31 && ! $awarded) {
-            DB::table($this->getTable())->whereId($this->id)->update([
+            DB::table($this->getTable())->where('id', $this->id)->update([
                 'aura' => $auraNew,
                 'aura_updated_at' => Carbon::now(),
                 'home_posted_at' => Carbon::now(),
             ]);
 
-            $this->author->notify(new WritingFeatured($this));
+            $this->author?->notify(new WritingFeatured($this));
         } else {
-            DB::table($this->getTable())->whereId($this->id)->update([
+            DB::table($this->getTable())->where('id', $this->id)->update([
                 'aura' => $auraNew,
                 'aura_updated_at' => Carbon::now(),
             ]);
         }
     }
 
-    public function externalLink()
+    public function externalLink(): ?string
     {
         if (! empty($this->extra_info['link'])) {
             return $this->extra_info['link'];
         }
+
+        return null;
     }
 
-    public function coverPath()
+    public function coverPath(): ?string
     {
         if (! empty($this->extra_info['cover'])) {
             $path = '/storage/'.$this->extra_info['cover'];
@@ -204,9 +240,14 @@ class Writing extends Model
                 return $path;
             }
         }
+
+        return null;
     }
 
-    public function complaints()
+    /**
+     * @return MorphMany<Complaint, $this>
+     */
+    public function complaints(): MorphMany
     {
         return $this->morphMany(Complaint::class, 'complainable');
     }
@@ -214,7 +255,9 @@ class Writing extends Model
     /**
      * Exclude writings authored by any of the given blocked user ids.
      *
+     * @param  Builder<Writing>  $query
      * @param  array<int>  $blockedUserIds
+     * @return Builder<Writing>
      */
     public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
     {
@@ -226,6 +269,9 @@ class Writing extends Model
      * break ties by aura (desc) so that, among writings with an identical
      * views/likes count, the higher-quality (higher-aura) one surfaces
      * first.
+     *
+     * @param  Builder<Writing>  $query
+     * @return Builder<Writing>
      */
     public function scopeSorted(Builder $query, string $sort): Builder
     {
@@ -238,6 +284,9 @@ class Writing extends Model
 
     /**
      * Counts and author summary eager-loaded by every writings listing.
+     *
+     * @param  Builder<Writing>  $query
+     * @return Builder<Writing>
      */
     public function scopeWithListingRelations(Builder $query): Builder
     {

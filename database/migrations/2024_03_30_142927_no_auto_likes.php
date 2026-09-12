@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Like;
+use App\Models\Writing;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -13,7 +14,7 @@ return new class extends Migration
         $likes = Like::where('likeable_type', 'App\Models\Writing')->get();
 
         foreach ($likes as $like) {
-            if ($like->likeable !== null) {
+            if ($like->likeable instanceof Writing) {
                 $likeable_author_id = $like->likeable->user_id;
                 $liker_id = $like->user_id;
 

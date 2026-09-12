@@ -1,5 +1,6 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    - vendor/pestphp/pest/extension.neon
 
 parameters:
     parseModelCastsMethod: true

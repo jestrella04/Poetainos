@@ -12,21 +12,8 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
-    protected $writing;
-
-    protected $user;
-
-    protected $notification;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct(Writing $writing, User $user)
+    public function __construct(protected Writing $writing, protected User $user)
     {
-        $this->writing = $writing;
-        $this->user = $user;
         $this->notification = [
             'title' => __('Updates from :name at :site', [
                 'name' => $this->user->getName(),
@@ -49,9 +36,9 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<int, string>
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail', 'database', 'broadcast', WebPushChannel::class];
     }
@@ -60,9 +47,9 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             'writing_id' => $this->writing->id,

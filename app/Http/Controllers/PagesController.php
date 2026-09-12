@@ -12,10 +12,8 @@ class PagesController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return Response
      */
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('pages/PoPagesIndex', [
             'meta' => [],
@@ -24,31 +22,9 @@ class PagesController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response | void
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response | void
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
-     *
-     * @return Response
      */
-    public function show(Page $page)
+    public function show(Page $page): Response
     {
         $page->text = hydrateSettings($page->text);
 
@@ -61,22 +37,11 @@ class PagesController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response | void
-     */
-    public function edit(Page $page)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param  Page  $page
-     * @return \Illuminate\Http\Response | array
+     * @return array<string, mixed>
      */
-    public function update(Request $request)
+    public function update(Request $request): array
     {
         // Get type model
         $page = Page::where('id', request('id'))->firstOrNew();
@@ -114,9 +79,9 @@ class PagesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response | array
+     * @return array<string, string>
      */
-    public function destroy(Page $page)
+    public function destroy(Page $page): array
     {
         $page->delete();
 

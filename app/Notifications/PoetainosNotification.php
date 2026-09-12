@@ -15,7 +15,10 @@ use NotificationChannels\WebPush\WebPushMessage;
  */
 abstract class PoetainosNotification extends Notification
 {
-    protected $notification = [];
+    /**
+     * @var array<string, mixed>
+     */
+    protected array $notification = [];
 
     /**
      * Get the mail representation of the notification.
@@ -55,8 +58,9 @@ abstract class PoetainosNotification extends Notification
      * Get the broadcastable representation of the notification.
      *
      * @param  mixed  $notifiable
+     * @return array<int|string, mixed>|null
      */
-    public function toBroadcast($notifiable)
+    public function toBroadcast($notifiable): ?array
     {
         return event(new NotificationEvent($notifiable));
     }

@@ -6,8 +6,12 @@ use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Illuminate\Support\Facades\Notification;
 
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+
 test('reasons returns the configured complaint reasons', function (): void {
-    $this->getJson('/complaints/reasons')->assertOk()->assertJson([
+    getJson('/complaints/reasons')->assertOk()->assertJson([
         'reasons' => [
             ['value' => 'spam', 'label' => 'Spam or advertising'],
             ['value' => 'abuse', 'label' => 'Harassment or abuse'],
@@ -15,18 +19,18 @@ test('reasons returns the configured complaint reasons', function (): void {
     ]);
 });
 
-test('a complaint can be submitted for a writing, a comment, or a user', function (string $type, Closure $makeSubject): void {
+it('can submit a complaint for a writing, a comment, or a user', function (string $type, Closure $makeSubject): void {
     Notification::fake();
 
     $subject = $makeSubject();
 
-    $this->postJson('/complaints/store', [
+    postJson('/complaints/store', [
         'complainable_type' => $type,
         'complainable_id' => $subject->id,
         'reasons' => ['spam'],
     ])->assertOk();
 
-    $this->assertDatabaseHas('complaints', [
+    assertDatabaseHas('complaints', [
         'complainable_type' => get_class($subject),
         'complainable_id' => $subject->id,
     ]);
@@ -40,7 +44,7 @@ test('a complaint can be submitted for a writing, a comment, or a user', functio
 test('submitting a complaint requires at least one reason', function (): void {
     $writing = Writing::factory()->create();
 
-    $this->postJson('/complaints/store', [
+    postJson('/complaints/store', [
         'complainable_type' => 'writings',
         'complainable_id' => $writing->id,
         'reasons' => [],
@@ -48,7 +52,7 @@ test('submitting a complaint requires at least one reason', function (): void {
 });
 
 test('submitting a complaint about a nonexistent subject 404s instead of crashing', function (): void {
-    $this->postJson('/complaints/store', [
+    postJson('/complaints/store', [
         'complainable_type' => 'writings',
         'complainable_id' => 999999,
         'reasons' => ['spam'],

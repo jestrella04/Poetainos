@@ -46,16 +46,16 @@ class HandleInertiaRequests extends Middleware
             'ziggy' => $ziggy->toArray(),
             'auth' => [
                 'user' => $user,
-                'admin' => auth()->check() ? $user->isAllowed('admin') : null,
-                'notifications' => auth()->check() ? $user->unreadNotifications->count() : 0,
+                'admin' => $user?->isAllowed('admin'),
+                'notifications' => $user?->unreadNotifications->count() ?? 0,
                 'liked' => [
-                    'writings' => auth()->check() ? Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))->pluck('id') : [],
-                    'comments' => auth()->check() ? Comment::whereIn('id', $user->likes()->where('likeable_type', Comment::class)->pluck('likeable_id'))->pluck('id') : [],
+                    'writings' => $user !== null ? Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))->pluck('id') : [],
+                    'comments' => $user !== null ? Comment::whereIn('id', $user->likes()->where('likeable_type', Comment::class)->pluck('likeable_id'))->pluck('id') : [],
                 ],
-                'shelved' => auth()->check() ? $user->shelf()->pluck('id') : [],
+                'shelved' => $user?->shelf()->pluck('id') ?? [],
             ],
             'route' => [
-                'name' => $request->route()->getName(),
+                'name' => $request->route()?->getName(),
             ],
             'site' => [
                 'name' => getSiteConfig('name'),

@@ -1,5 +1,7 @@
 <?php
 
+use function Pest\Laravel\get;
+
 test('the offline page renders', function (): void {
-    $this->get('/offline')->assertOk();
+    get('/offline')->assertOk();
 });

@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use Database\Factories\TagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Tag extends Model
 {
+    /** @use HasFactory<TagFactory> */
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -31,12 +34,15 @@ class Tag extends Model
         return 'slug';
     }
 
-    public function path()
+    public function path(): string
     {
         return route('tags.show', $this->slug);
     }
 
-    public function writings()
+    /**
+     * @return BelongsToMany<Writing, $this>
+     */
+    public function writings(): BelongsToMany
     {
         return $this->belongsToMany(Writing::class);
     }

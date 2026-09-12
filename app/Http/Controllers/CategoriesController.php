@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Writing;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -11,41 +13,11 @@ use Inertia\Response;
 class CategoriesController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return Response|Paginator<int, Writing>
      */
-    public function show(Category $category)
+    public function show(Category $category): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
         $params = [
@@ -78,21 +50,11 @@ class CategoriesController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return array<string, mixed>
      */
-    public function update(Request $request)
+    public function update(Request $request): array
     {
         // Get category model
         $category = Category::where('id', request('id'))->firstOrNew();
@@ -132,9 +94,9 @@ class CategoriesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return array<string, string>
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category): array
     {
         $category->delete();
 

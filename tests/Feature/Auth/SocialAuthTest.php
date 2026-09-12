@@ -5,6 +5,8 @@ use Carbon\Carbon;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
+use function Pest\Laravel\get;
+
 test('social login verifies the email once and does not re-verify on a later login', function (): void {
     $verifiedAt = Carbon::parse('2020-01-01 00:00:00');
     $user = User::factory()->create([
@@ -18,9 +20,9 @@ test('social login verifies the email once and does not re-verify on a later log
     $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
     Socialite::fake('google', $socialUser);
 
-    $this->get('/login/google/callback')->assertRedirect();
+    get('/login/google/callback')->assertRedirect();
 
-    expect($user->fresh()->email_verified_at->equalTo($verifiedAt))->toBeTrue();
+    expect($user->refresh()->email_verified_at?->equalTo($verifiedAt) ?? false)->toBeTrue();
 });
 
 test('social login verifies a not-yet-verified email on first login', function (): void {
@@ -33,9 +35,9 @@ test('social login verifies a not-yet-verified email on first login', function (
     $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
     Socialite::fake('google', $socialUser);
 
-    $this->get('/login/google/callback')->assertRedirect();
+    get('/login/google/callback')->assertRedirect();
 
-    expect($user->fresh()->email_verified_at)->not->toBeNull();
+    expect($user->refresh()->email_verified_at)->not->toBeNull();
 });
 
 test('social login does not crash when the provider avatar cannot be fetched', function (): void {
@@ -45,7 +47,7 @@ test('social login does not crash when the provider avatar cannot be fetched', f
     ]);
     Socialite::fake('google', $socialUser);
 
-    $this->get('/login/google/callback')->assertRedirect();
+    get('/login/google/callback')->assertRedirect();
 
     $user = User::where('email', 'new-writer@example.com')->firstOrFail();
     expect($user->extra_info['avatar'] ?? null)->toBeNull();

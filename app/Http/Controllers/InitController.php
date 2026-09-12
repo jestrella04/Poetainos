@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class InitController extends Controller
 {
-    public function init()
+    public function init(): RedirectResponse
     {
         $token = config('services.installer.token');
 
@@ -23,7 +24,7 @@ class InitController extends Controller
         }
 
         // Create default JSON settings
-        $site = file_get_contents(base_path('resources/json/settings.default.json'));
+        $site = (string) file_get_contents(base_path('resources/json/settings.default.json'));
         $site = str_replace('{{site_name}}', '', $site);
         $site = str_replace('{{site_slogan}}', '', $site);
 
@@ -34,7 +35,7 @@ class InitController extends Controller
 
         // Create default master role
         $extra_info = ['permissions' => []];
-        $permissions = json_decode(file_get_contents(base_path('resources/json/roles_permissions.json')));
+        $permissions = json_decode((string) file_get_contents(base_path('resources/json/roles_permissions.json')));
         $permissions = $permissions->permissions;
 
         foreach ($permissions as $permission) {

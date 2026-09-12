@@ -6,11 +6,16 @@ use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class GenericController extends Controller
 {
-    public function writings(User $user)
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function writings(User $user): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
         $writings = $user->writings()
@@ -32,7 +37,10 @@ class GenericController extends Controller
         ]);
     }
 
-    public function shelf(User $user)
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function shelf(User $user): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
         $writings = Writing::whereIn('id', $user->shelf()->pluck('id'))
@@ -54,7 +62,10 @@ class GenericController extends Controller
         ]);
     }
 
-    public function likes(User $user)
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function likes(User $user): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
         $writings = Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
@@ -77,7 +88,7 @@ class GenericController extends Controller
         ]);
     }
 
-    public function explore()
+    public function explore(): Response
     {
         return Inertia::render('generic/PoExploreIndex', [
             'meta' => [
@@ -97,8 +108,9 @@ class GenericController extends Controller
             ],
             'tags' => Tag::withCount('writings')
                 ->orderByDesc('writings_count')
-                ->having('writings_count', '>', 0)->get()
-                ->take(20),
+                ->having('writings_count', '>', 0)
+                ->take(20)
+                ->get(),
             'authors' => User::select(
                 'id',
                 'username',
@@ -112,9 +124,9 @@ class GenericController extends Controller
         ]);
     }
 
-    public function manifest()
+    public function manifest(): \stdClass
     {
-        $json = json_decode(file_get_contents(base_path('resources/json/manifest.json')));
+        $json = json_decode((string) file_get_contents(base_path('resources/json/manifest.json')));
 
         $json->name = getSiteConfig('name');
         $json->gcm_sender_id = config('webpush.gcm.sender_id');
@@ -183,7 +195,7 @@ class GenericController extends Controller
         return $json;
     }
 
-    public function offline()
+    public function offline(): Response
     {
         return Inertia::render('generic/PoOffline', [
             'meta' => [],

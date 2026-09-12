@@ -12,18 +12,23 @@ use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
+use Inertia\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AdminController extends Controller
 {
-    private $log;
+    private string $log;
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->log = storage_path('logs/laravel.log');
     }
 
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('admin/PoAdminIndex', [
             'counters' => [
@@ -64,7 +69,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function settings()
+    public function settings(): Response
     {
         return Inertia::render('admin/PoAdminSettings', [
             'settings' => json_encode(Setting::where('name', 'site')->value('data'), JSON_PRETTY_PRINT),
@@ -77,7 +82,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function categories()
+    /**
+     * @return Response|Paginator<int, Category>
+     */
+    public function categories(): Response|Paginator
     {
         if (request()->expectsJson()) {
             return Category::simplePaginate($this->pagination)->withQueryString();
@@ -94,7 +102,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function tags()
+    /**
+     * @return Response|Paginator<int, Tag>
+     */
+    public function tags(): Response|Paginator
     {
         if (request()->expectsJson()) {
             return Tag::simplePaginate($this->pagination)->withQueryString();
@@ -111,7 +122,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function users()
+    /**
+     * @return Response|Paginator<int, User>
+     */
+    public function users(): Response|Paginator
     {
         $users = User::select('id', 'username', 'name', 'email', 'created_at', 'aura', 'karma');
 
@@ -130,7 +144,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function writings()
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function writings(): Response|Paginator
     {
         $writings = Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
             ->with([
@@ -154,7 +171,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function pages()
+    /**
+     * @return Response|Paginator<int, Page>
+     */
+    public function pages(): Response|Paginator
     {
         if (request()->expectsJson()) {
             return Page::simplePaginate($this->pagination)->withQueryString();
@@ -171,7 +191,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function tools()
+    public function tools(): Response
     {
         return Inertia::render('admin/PoAdminTools', [
             'meta' => [
@@ -194,12 +214,15 @@ class AdminController extends Controller
         ]);
     }
 
-    public function log()
+    public function log(): BinaryFileResponse
     {
         return response()->download($this->log);
     }
 
-    public function complaints()
+    /**
+     * @return Response|Paginator<int, Complaint>
+     */
+    public function complaints(): Response|Paginator
     {
         if (request()->expectsJson()) {
             return Complaint::simplePaginate($this->pagination)->withQueryString();
@@ -216,7 +239,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function websockets()
+    public function websockets(): Response
     {
         return Inertia::render('admin/PoAdminWebsockets', [
             'meta' => [
@@ -228,7 +251,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function analytics()
+    public function analytics(): Response
     {
         $user = config('services.counter.user_id');
         $token = config('services.counter.access_token');

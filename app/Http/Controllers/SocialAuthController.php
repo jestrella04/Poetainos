@@ -6,7 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Carbon\Carbon;
-use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
@@ -17,10 +17,8 @@ class SocialAuthController extends Controller
 {
     /**
      * Redirect the user to the external authentication page.
-     *
-     * @return Response
      */
-    public function redirectToProvider($service)
+    public function redirectToProvider(string $service): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (! empty(request('redirect'))) {
             Redirect::setIntendedUrl(request('redirect'));
@@ -31,29 +29,28 @@ class SocialAuthController extends Controller
 
     /**
      * Obtain the user information from the external service.
-     *
-     * @return Response
      */
-    public function handleProviderCallback($service)
+    public function handleProviderCallback(string $service): RedirectResponse
     {
         // Get user data from the external service
         $social = Socialite::driver($service)->user();
-        $exists = User::where('email', $social->getEmail())->exists();
-        $nick = $social->getNickname() ?? explode('@', $social->getEmail())[0];
+        $email = (string) $social->getEmail();
+        $exists = User::where('email', $email)->exists();
+        $nick = $social->getNickname() ?? explode('@', $email)[0];
 
         // Check if user already exists
         // If not, one will be created
         $user = User::firstOrCreate([
-            'email' => $social->getEmail(),
+            'email' => $email,
         ], [
             'name' => $social->getName(),
             'username' => slugify('users', $nick, 'username', '_'),
             'password' => Hash::make(bin2hex(random_bytes(10))),
-            'role_id' => Role::where('name', 'user')->first()->id,
+            'role_id' => Role::where('name', 'user')->firstOrFail()->id,
         ]);
 
         // Grab avatar
-        if (empty($user->extra_info['avatar'])) {
+        if (empty($user->extra_info['avatar']) && $social->getAvatar() !== null) {
             $avatar = @file_get_contents($social->getAvatar());
             $size = $avatar !== false ? getimagesizefromstring($avatar) : false;
 

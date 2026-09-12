@@ -9,14 +9,12 @@ class PushNotificationsController extends Controller
 {
     /**
      * Update user's subscription.
-     *
-     * @return JsonResponse
      */
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         $this->validate($request, ['endpoint' => 'required']);
 
-        $request->user()->updatePushSubscription(
+        $request->user()?->updatePushSubscription(
             $request->endpoint,
             $request->publicKey,
             $request->authToken,
@@ -28,14 +26,12 @@ class PushNotificationsController extends Controller
 
     /**
      * Delete the specified subscription.
-     *
-     * @return JsonResponse
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): JsonResponse
     {
         $this->validate($request, ['endpoint' => 'required']);
 
-        $request->user()->deletePushSubscription($request->endpoint);
+        $request->user()?->deletePushSubscription($request->endpoint);
 
         return response()->json(null, 204);
     }

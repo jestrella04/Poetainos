@@ -11,26 +11,22 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected $pagination;
-
-    protected $aura;
-
-    protected $auraHome;
-
-    protected $blockedUsers;
+    protected ?int $pagination = null;
 
     public function __construct()
     {
-        $this->pagination = getSiteConfig('pagination');
-        $this->auraHome = getSiteConfig('aura.min_at_home');
+        $this->pagination = (int) getSiteConfig('pagination');
     }
 
-    public function getBlockedUsers()
+    /**
+     * @return array<int, int>
+     */
+    public function getBlockedUsers(): array
     {
-        $blockedUsers = auth()->check()
-            ? auth()->user()->blockedAuthors()->pluck('blocked_user_id')->toArray()
-            : [0];
+        $user = auth()->user();
 
-        return $blockedUsers;
+        return $user !== null
+            ? $user->blockedAuthors()->pluck('blocked_user_id')->toArray()
+            : [0];
     }
 }

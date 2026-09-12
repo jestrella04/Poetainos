@@ -3,19 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\ContactFormSubmitted;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ContactsController extends Controller
 {
     /**
      * Show the form for creating a new resource.
-     *
-     * @return Response
      */
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('forms/PoContactForm', [
             'meta' => [
@@ -27,9 +26,9 @@ class ContactsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return array<int, mixed>
      */
-    public function store(Request $request)
+    public function store(Request $request): array
     {
         // Validate user input
         request()->validate([
@@ -41,10 +40,10 @@ class ContactsController extends Controller
             'captcha' => 'required|captcha_api:'.request('key').',math',
         ]);
 
-        $name = request('name');
-        $email = request('email');
-        $subject = request('subject');
-        $message = request('message');
+        $name = (string) request('name');
+        $email = (string) request('email');
+        $subject = (string) request('subject');
+        $message = (string) request('message');
 
         // Schedule email notification
         $recipients = getSiteConfig('emails.admin');
@@ -54,7 +53,7 @@ class ContactsController extends Controller
         return [];
     }
 
-    public function reloadCaptcha()
+    public function reloadCaptcha(): JsonResponse
     {
         return response()->json(['captcha' => captcha_src()]);
     }

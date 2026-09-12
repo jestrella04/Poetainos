@@ -11,7 +11,7 @@ class Page extends Model
         return 'slug';
     }
 
-    public function path()
+    public function path(): string
     {
         return route('pages.show', $this->slug);
     }

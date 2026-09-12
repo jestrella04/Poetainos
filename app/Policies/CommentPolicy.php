@@ -57,7 +57,7 @@ class CommentPolicy
      */
     public function delete(User $user, Comment $comment)
     {
-        if ($comment->author->is($user) || $user->isAllowed('admin')) {
+        if ($comment->author?->is($user) || $user->isAllowed('admin')) {
             return true;
         }
     }

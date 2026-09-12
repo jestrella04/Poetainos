@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -13,12 +17,13 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
+    /** @use HasFactory<UserFactory> */
     use HasFactory, HasPushSubscriptions, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'username',
@@ -35,7 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [
         'password',
@@ -45,7 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -57,22 +62,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return 'username';
     }
 
-    public function path()
+    public function path(): string
     {
         return route('users.show', $this->username);
     }
 
-    public function writingsPath()
+    public function writingsPath(): string
     {
         return route('users.writings.index', $this->username);
     }
 
-    public function shelfPath()
+    public function shelfPath(): string
     {
         return route('users.shelf.index', $this->username);
     }
 
-    public function avatarPath()
+    public function avatarPath(): ?string
     {
         if (! empty($this->extra_info['avatar'])) {
             $path = '/storage/'.$this->extra_info['avatar'];
@@ -81,9 +86,11 @@ class User extends Authenticatable implements MustVerifyEmail
                 return $path;
             }
         }
+
+        return null;
     }
 
-    public function getName()
+    public function getName(): string
     {
         if (! empty($this->name)) {
             return $this->name;
@@ -92,7 +99,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->username;
     }
 
-    public function firstName()
+    public function firstName(): string
     {
         if (! empty($this->name)) {
             return explode(' ', $this->name)[0];
@@ -101,7 +108,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->username;
     }
 
-    public function initials()
+    public function initials(): string
     {
         if (! empty($this->name) && ! empty($this->last_name)) {
             return strtoupper(substr($this->name, 0, 1).substr($this->last_name, 0, 1));
@@ -110,7 +117,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return strtoupper(substr($this->username, 0, 1));
     }
 
-    public function getTwitterUsername()
+    public function getTwitterUsername(): string
     {
         if (! empty($this->extra_info['social']['twitter'])) {
             return '@'.$this->extra_info['social']['twitter'];
@@ -119,7 +126,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->getName();
     }
 
-    public function role()
+    /**
+     * @return BelongsTo<Role, $this>
+     */
+    public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
@@ -128,6 +138,9 @@ class User extends Authenticatable implements MustVerifyEmail
      * Minimal author summary columns reused across every listing/eager-load
      * that only needs to display "who wrote this" (id, username, name,
      * avatar), optionally including karma.
+     *
+     * @param  Builder<User>  $query
+     * @return Builder<User>
      */
     public function scopeForAuthorSummary(Builder $query, bool $withKarma = false): Builder
     {
@@ -140,36 +153,55 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query->select($columns);
     }
 
-    public function writings()
+    /**
+     * @return HasMany<Writing, $this>
+     */
+    public function writings(): HasMany
     {
         return $this->hasMany(Writing::class);
     }
 
-    public function shelf()
+    /**
+     * @return BelongsToMany<Writing, $this>
+     */
+    public function shelf(): BelongsToMany
     {
         return $this->belongsToMany(Writing::class, 'shelves');
     }
 
-    public function comments()
+    /**
+     * @return HasMany<Comment, $this>
+     */
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    public function likes()
+    /**
+     * @return HasMany<Like, $this>
+     */
+    public function likes(): HasMany
     {
         return $this->hasMany(Like::class);
     }
 
-    public function awards()
+    /**
+     * @return HasMany<Writing, $this>
+     */
+    public function awards(): HasMany
     {
         return $this->hasMany(Writing::class)->whereNotNull('home_posted_at');
     }
 
-    public function incrementViews()
+    public function incrementViews(): void
     {
-        DB::table($this->getTable())->whereId($this->id)->increment('profile_views');
+        DB::table($this->getTable())->where('id', $this->id)->increment('profile_views');
     }
 
+    /**
+     * @param  array<string, int|float>  $count
+     * @return array{base: int|float, total: int|float, score: float}
+     */
     private function calcPoints(array $count): array
     {
         $countables = [
@@ -194,10 +226,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return calculateWeightedAuraScore($countables, $weights);
     }
 
-    public function updateAura()
+    public function updateAura(): void
     {
         // Count user content
-        $user = User::whereId($this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
+        $user = User::where('id', $this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
         $count = [
             'writings' => $user->writings_count,
             'likes' => $user->likes_count,
@@ -212,14 +244,14 @@ class User extends Authenticatable implements MustVerifyEmail
         // Do the math
         if ($points['total'] > 0 && $points['base'] > 0) {
             // Persist to the database
-            DB::table('users')->whereId($this->id)->update([
+            DB::table('users')->where('id', $this->id)->update([
                 'aura' => $points['score'],
                 'aura_updated_at' => Carbon::now(),
             ]);
         }
     }
 
-    public function updateKarma()
+    public function updateKarma(): self
     {
         // Count user content
         $dateTrigger = Carbon::now()->subDays(90);
@@ -241,7 +273,7 @@ class User extends Authenticatable implements MustVerifyEmail
             $karma = 'C';
         } elseif (inRange($points['total'], 3000, 4000)) {
             $karma = 'B';
-        } elseif ($points['total'] >= 4000) {
+        } else {
             $karma = 'A';
         }
 
@@ -262,10 +294,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $permission = collect($this->role->permissions())->firstWhere('name', $task);
 
-        return $permission['enabled'] ?? false;
+        return (bool) ($permission['enabled'] ?? false);
     }
 
-    public function isInAgreement()
+    public function isInAgreement(): bool
     {
         $terms = $this->extra_info['agreement']['terms_of_use'] ?? false;
         $privacy = $this->extra_info['agreement']['privacy_policy'] ?? false;
@@ -277,7 +309,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return false;
     }
 
-    public function acceptAgreements()
+    public function acceptAgreements(): void
     {
         $info = $this->extra_info;
         $info['agreement']['terms_of_use'] = 'on';
@@ -286,7 +318,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->update(['extra_info' => $info]);
     }
 
-    public function block($userToBlock)
+    public function block(User $userToBlock): BlockedUser
     {
         return BlockedUser::firstOrCreate([
             'user_id' => $this->id,
@@ -294,12 +326,15 @@ class User extends Authenticatable implements MustVerifyEmail
         ]);
     }
 
-    public function blockedAuthors()
+    /**
+     * @return HasMany<BlockedUser, $this>
+     */
+    public function blockedAuthors(): HasMany
     {
         return $this->hasMany(BlockedUser::class);
     }
 
-    public function isAuthorBlocked(User $author)
+    public function isAuthorBlocked(User $author): bool
     {
         $blocked = $this->blockedAuthors()->pluck('blocked_user_id')->toArray();
 
@@ -310,7 +345,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return false;
     }
 
-    public function emailNotifications($enable)
+    public function emailNotifications(string $enable): void
     {
         $info = $this->extra_info;
 
@@ -323,27 +358,23 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->update(['extra_info' => $info]);
     }
 
-    public function todayEmpathySummary()
+    public function todayEmpathySummary(): int
     {
         $likes = $this->likes()
-            ->select('likeable_id')
             ->where('likeable_type', 'App\Models\Writing')
             ->whereDate('created_at', now()->today())
-            ->get()
             ->pluck('likeable_id')
             ->all();
 
         $comments = $this->comments()
             ->distinct('writing_id')
             ->whereDate('created_at', now()->today())
-            ->get()
             ->pluck('writing_id')
             ->all();
 
         $shelves = Shelf::where('user_id', $this->id)
             ->distinct('writing_id')
             ->whereDate('created_at', now()->today())
-            ->get()
             ->pluck('writing_id')
             ->all();
 

@@ -36,8 +36,10 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Check if an email exist.
+     *
+     * @return array<string, bool>
      */
-    public function check()
+    public function check(): array
     {
         // Validate user input
         request()->validate([
@@ -49,6 +51,8 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Handle an incoming authentication request.
+     *
+     * @return array<string, string>
      */
     public function store(LoginRequest $request): array
     {

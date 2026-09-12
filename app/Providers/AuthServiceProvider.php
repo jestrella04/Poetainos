@@ -25,7 +25,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         Gate::define('viewWebSocketsDashboard', function ($user = null) {
-            return auth()->user()->isAllowed('admin');
+            return auth()->user()?->isAllowed('admin') ?? false;
         });
     }
 }

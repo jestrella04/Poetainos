@@ -3,26 +3,29 @@
 use App\Models\Role;
 use App\Models\User;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
+
 test('guests are redirected away from the admin area', function (): void {
-    $this->get('/admin')->assertRedirect(route('login'));
+    get('/admin')->assertRedirect(route('login'));
 });
 
 test('authenticated non-admins are redirected to login from the admin area', function (): void {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get('/admin')->assertRedirect(route('login'));
+    actingAs($user)->get('/admin')->assertRedirect(route('login'));
 });
 
 test('admins can access the admin area', function (): void {
     $admin = actingAsAdmin();
 
-    $this->actingAs($admin)->get('/admin')->assertOk();
+    actingAs($admin)->get('/admin')->assertOk();
 });
 
 test('the tools page exposes structured server info and a log tail', function (): void {
     $admin = actingAsAdmin();
 
-    $this->actingAs($admin)->get(route('admin.tools'))
+    actingAs($admin)->get(route('admin.tools'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->has('info')

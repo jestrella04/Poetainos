@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
                     'privacy_policy' => $request->privacy_agreement,
                 ],
             ],
-            'role_id' => Role::where('name', 'user')->first()->id,
+            'role_id' => Role::where('name', 'user')->firstOrFail()->id,
         ]);
 
         // event(new Registered($user));

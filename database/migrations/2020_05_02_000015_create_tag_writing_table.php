@@ -18,8 +18,8 @@ class CreateTagWritingTable extends Migration
             $table->unsignedBigInteger('tag_id');
             $table->primary(['writing_id', 'tag_id']);
 
-            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('CASCADE');
-            $table->foreign('writing_id')->references('id')->on('writings')->onDelete('CASCADE');
+            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+            $table->foreign('writing_id')->references('id')->on('writings')->onDelete('cascade');
         });
     }
 

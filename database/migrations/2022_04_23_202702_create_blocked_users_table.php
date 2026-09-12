@@ -18,8 +18,8 @@ class CreateBlockedUsersTable extends Migration
             $table->unsignedBigInteger('blocked_user_id');
             $table->primary(['user_id', 'blocked_user_id']);
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
-            $table->foreign('blocked_user_id')->references('id')->on('users')->onDelete('CASCADE');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('blocked_user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

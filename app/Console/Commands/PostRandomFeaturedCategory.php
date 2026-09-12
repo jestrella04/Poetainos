@@ -35,12 +35,12 @@ class PostRandomFeaturedCategory extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $category = Category::has('writings', '>', 0)->inRandomOrder()->firstOrFail();
         Notification::route('twitter', '')->notify(new CategoryFeaturedRandom($category));
+
+        return self::SUCCESS;
     }
 }

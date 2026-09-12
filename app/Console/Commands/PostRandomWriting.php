@@ -34,10 +34,8 @@ class PostRandomWriting extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $writing = User::whereHas('writings')
             ->inRandomOrder()
@@ -45,6 +43,8 @@ class PostRandomWriting extends Command
             ->writings()
             ->inRandomOrder()
             ->firstOrFail();
-        $writing->author->notify(new WritingRandom($writing));
+        $writing->author?->notify(new WritingRandom($writing));
+
+        return self::SUCCESS;
     }
 }

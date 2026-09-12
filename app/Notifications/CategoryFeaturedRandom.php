@@ -14,20 +14,12 @@ class CategoryFeaturedRandom extends Notification
 {
     use Queueable;
 
-    protected $category;
+    protected string $msg;
 
-    protected $msg;
+    protected string $url;
 
-    protected $url;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct(Category $category)
+    public function __construct(protected Category $category)
     {
-        $this->category = $category;
         $this->msg = __('Discover all the beauty we have for you under the ":category" category.', [
             'category' => $this->category->name,
         ]);
@@ -38,9 +30,9 @@ class CategoryFeaturedRandom extends Notification
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<int, string>
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return [TwitterChannel::class, FacebookPosterChannel::class];
     }
@@ -49,23 +41,23 @@ class CategoryFeaturedRandom extends Notification
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //
         ];
     }
 
-    public function toTwitter($notifiable)
+    public function toTwitter(mixed $notifiable): TwitterStatusUpdate
     {
         $msg = $this->msg.' '.$this->url;
 
         return new TwitterStatusUpdate($msg);
     }
 
-    public function toFacebookPoster($notifiable)
+    public function toFacebookPoster(mixed $notifiable): FacebookPosterPost
     {
         return (new FacebookPosterPost($this->msg))->withLink($this->url);
     }

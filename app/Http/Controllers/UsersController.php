@@ -9,8 +9,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Intervention\Image\Laravel\Facades\Image;
@@ -21,9 +21,9 @@ class UsersController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return User|Paginator|Response
+     * @return Paginator<int, User>|Response
      */
-    public function index()
+    public function index(): Paginator|Response
     {
         $sort = resolveSort(['latest', 'popular', 'featured'], 'featured');
         $users = User::select(
@@ -50,7 +50,7 @@ class UsersController extends Controller
                 ->orderBy('profile_views', 'desc')
                 ->simplePaginate($this->pagination)
                 ->withQueryString();
-        } elseif ($sort === 'featured') {
+        } else {
             $users = $users
                 ->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
                 ->orderBy('aura', 'desc')
@@ -75,45 +75,23 @@ class UsersController extends Controller
     /**
      * Query list of matching resources.
      *
-     * @return Collection
+     * @return Collection<int, User>
      */
-    public function query()
+    public function query(): Collection
     {
         $wildcard = '%'.request('query').'%';
 
         return User::where('name', 'like', $wildcard)
             ->orWhere('username', 'like', $wildcard)
             ->select('name', 'username')
-            ->take($this->pagination)
+            ->take($this->pagination ?? 15)
             ->get();
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(): void
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request): void
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
-     *
-     * @return Response
      */
-    public function show(User $user)
+    public function show(User $user): Response
     {
         // Increment writing views
         $user->incrementViews();
@@ -144,7 +122,7 @@ class UsersController extends Controller
                 'extra_info->location AS location',
                 'extra_info->interests AS interests',
             )
-                ->whereId($user->id)
+                ->where('id', $user->id)
                 ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
                 ->firstOrFail(),
             'writings' => [
@@ -181,16 +159,14 @@ class UsersController extends Controller
                     ->take(5)
                     ->get(),
             ],
-            'isAuthorBlocked' => auth()->check() ? $authUser->isAuthorBlocked($user) : false,
+            'isAuthorBlocked' => $authUser !== null ? $authUser->isAuthorBlocked($user) : false,
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @return Response
      */
-    public function edit(User $user)
+    public function edit(User $user): Response
     {
         $this->authorize('update', $user);
 
@@ -207,9 +183,9 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): array
     {
         $this->authorize('update', $user);
 
@@ -236,7 +212,7 @@ class UsersController extends Controller
         ]);
 
         // Working with avatars
-        $remove = request('avatar-remove') || false;
+        $remove = (bool) request('avatar-remove');
 
         if ($remove) {
             $avatar = '';
@@ -277,7 +253,7 @@ class UsersController extends Controller
         }
 
         // Only an admin may change a user's role
-        if (! empty(request('role')) && auth()->user()->isAllowed('admin')) {
+        if (! empty(request('role')) && auth()->user()?->isAllowed('admin') === true) {
             $user->role_id = request('role');
         }
 
@@ -301,21 +277,21 @@ class UsersController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return array|RedirectResponse|Redirector
+     * @return array<int, mixed>|RedirectResponse|Redirector
      */
-    public function destroy(User $user)
+    public function destroy(User $user): array|RedirectResponse|Redirector
     {
         $this->authorize('delete', $user);
         $user->deleteOrFail();
 
         // Delete related notifications
         $user->notifications()->delete();
-        DatabaseNotification::where('data->user_id', $user->id)->delete();
+        DB::table('notifications')->where('data->user_id', $user->id)->delete();
 
         // Delete related likes
         $user->likes()->delete();
 
-        if (auth()->user()->id === $user->id) {
+        if (auth()->user()?->id === $user->id) {
             request()
                 ->session()
                 ->flash('flash', __('Your account and related data have been deleted successfully!'));
@@ -328,20 +304,22 @@ class UsersController extends Controller
 
     /**
      * Get the currently authenticated user.
-     *
-     * @return User
      */
-    public function me(Request $request)
+    public function me(Request $request): User
     {
-        return $request->user();
+        $user = $request->user();
+
+        if ($user === null) {
+            abort(401);
+        }
+
+        return $user;
     }
 
     /**
      * Recalculate the given user's karma.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function karma(User $user)
+    public function karma(User $user): \Illuminate\Http\Response
     {
         $user->updateKarma();
 
@@ -351,25 +329,26 @@ class UsersController extends Controller
     /**
      * Block another user.
      *
-     * @return array
+     * @return array<int, mixed>
      */
-    public function blockUser(User $user)
+    public function blockUser(User $user): array
     {
-        auth()->user()->block($user);
+        auth()->user()?->block($user);
 
         return [];
     }
 
     /**
      * Display the specified resource.
-     *
-     * @param  User  $user
-     * @return Response
      */
-    public function account()
+    public function account(): Response
     {
         $user = auth()->user();
         $this->authorize('delete', $user);
+
+        if ($user === null) {
+            abort(401);
+        }
 
         $params = [];
 

@@ -33,12 +33,12 @@ class GenerateSitemap extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         SitemapGenerator::create(config('app.url'))
             ->writeToFile(public_path('sitemap.xml'));
+
+        return self::SUCCESS;
     }
 }
