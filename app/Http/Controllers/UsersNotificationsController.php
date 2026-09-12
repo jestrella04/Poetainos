@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,7 +21,7 @@ class UsersNotificationsController extends Controller
      */
     public function index(): Response|LengthAwarePaginator
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user === null) {
             abort(401);
@@ -76,14 +77,14 @@ class UsersNotificationsController extends Controller
 
     public function clear(): RedirectResponse
     {
-        auth()->user()?->unreadNotifications->markAsRead();
+        Auth::user()?->unreadNotifications->markAsRead();
 
         return redirect(route('notifications.index'));
     }
 
     public function show(string $notificationId): RedirectResponse
     {
-        $notification = auth()->user()?->notifications()->find($notificationId);
+        $notification = Auth::user()?->notifications()->find($notificationId);
 
         if ($notification !== null) {
             $notification->markAsRead();
@@ -102,7 +103,7 @@ class UsersNotificationsController extends Controller
 
     public function email(string $enable): JsonResponse
     {
-        auth()->user()?->emailNotifications($enable);
+        Auth::user()?->emailNotifications($enable);
 
         return response()->json(null, 204);
     }
@@ -112,7 +113,7 @@ class UsersNotificationsController extends Controller
      */
     public function status(): array
     {
-        $info = auth()->user()->extra_info ?? [];
+        $info = Auth::user()->extra_info ?? [];
         $status = [];
 
         if (array_key_exists('notifications', $info)) {

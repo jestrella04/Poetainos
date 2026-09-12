@@ -9,6 +9,7 @@ use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CommentsController extends Controller
@@ -22,7 +23,7 @@ class CommentsController extends Controller
     {
         $filter = [0];
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user !== null) {
             $filter = $user->blockedAuthors()->pluck('blocked_user_id');
@@ -52,7 +53,7 @@ class CommentsController extends Controller
             'writing_id' => 'required|exists:writings,id',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user === null) {
             return;

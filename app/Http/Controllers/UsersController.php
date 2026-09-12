@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -100,7 +101,7 @@ class UsersController extends Controller
         $user->updateAura();
         // $user->updateKarma();
 
-        $authUser = auth()->user();
+        $authUser = Auth::user();
 
         return Inertia::render('users/PoUsersShow', [
             'meta' => [
@@ -229,7 +230,7 @@ class UsersController extends Controller
         }
 
         // Only an admin may change a user's role
-        if (! empty(request('role')) && auth()->user()?->isAllowed('admin') === true) {
+        if (! empty(request('role')) && Auth::user()?->isAllowed('admin') === true) {
             $user->role_id = request('role');
         }
 
@@ -267,7 +268,7 @@ class UsersController extends Controller
         // Delete related likes
         $user->likes()->delete();
 
-        if (auth()->user()?->id === $user->id) {
+        if (Auth::user()?->id === $user->id) {
             request()
                 ->session()
                 ->flash('flash', __('Your account and related data have been deleted successfully!'));
@@ -309,7 +310,7 @@ class UsersController extends Controller
      */
     public function blockUser(User $user): array
     {
-        auth()->user()?->block($user);
+        Auth::user()?->block($user);
 
         return [];
     }
@@ -319,7 +320,7 @@ class UsersController extends Controller
      */
     public function account(): Response
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $this->authorize('delete', $user);
 
         if ($user === null) {

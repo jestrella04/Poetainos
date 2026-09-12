@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Auth;
 
 class Controller extends BaseController
 {
@@ -24,7 +25,7 @@ class Controller extends BaseController
      */
     public function getBlockedUsers(): array
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         return $user !== null
             ? $user->blockedAuthors()->pluck('blocked_user_id')->toArray()
@@ -37,7 +38,7 @@ class Controller extends BaseController
      */
     public function requireAuthUser(): User
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user === null) {
             abort(401);

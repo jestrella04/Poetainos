@@ -13,6 +13,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -80,7 +81,7 @@ class WritingsController extends Controller
         // Update Aura
         $writing->updateAura();
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         return Inertia::render('writings/PoWritingsShow', [
             'meta' => [
@@ -171,7 +172,7 @@ class WritingsController extends Controller
             ],
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
-            'agreement' => auth()->user()?->isInAgreement() ?? false,
+            'agreement' => Auth::user()?->isInAgreement() ?? false,
         ]);
     }
 
