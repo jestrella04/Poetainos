@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
@@ -9,7 +8,7 @@ use Illuminate\Support\Facades\URL;
 use function Pest\Laravel\actingAs;
 
 test('email verification screen can be rendered', function (): void {
-    $user = User::factory()->create([
+    $user = createUser([
         'email_verified_at' => null,
     ]);
 
@@ -19,7 +18,7 @@ test('email verification screen can be rendered', function (): void {
 });
 
 test('email can be verified', function (): void {
-    $user = User::factory()->create([
+    $user = createUser([
         'email_verified_at' => null,
     ]);
 
@@ -39,7 +38,7 @@ test('email can be verified', function (): void {
 });
 
 test('email is not verified with invalid hash', function (): void {
-    $user = User::factory()->create([
+    $user = createUser([
         'email_verified_at' => null,
     ]);
 

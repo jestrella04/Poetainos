@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Comment;
-use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Illuminate\Support\Facades\Notification;
@@ -38,7 +37,7 @@ it('can submit a complaint for a writing, a comment, or a user', function (strin
 })->with([
     'a writing' => ['writings', fn () => Writing::factory()->create()],
     'a comment' => ['comments', fn () => Comment::factory()->create()],
-    'a user' => ['users', fn () => User::factory()->create()],
+    'a user' => ['users', fn () => createUser()],
 ]);
 
 test('submitting a complaint requires at least one reason', function (): void {

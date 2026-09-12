@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @mixin IdeHelperWriting
+ */
 class Writing extends Model
 {
     /** @use HasFactory<WritingFactory> */

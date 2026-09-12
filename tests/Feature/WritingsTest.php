@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Category;
-use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingPublished;
 use Illuminate\Support\Facades\Notification;
@@ -47,7 +46,7 @@ test('updateAura does not throw when all writing aura points are zeroed', functi
 test('the daily post limit is configurable via site settings', function (): void {
     config(['writerhood.writings' => ['daily_post_limit' => 1]]);
 
-    $user = User::factory()->create();
+    $user = createUser();
     Writing::factory()->for($user, 'author')->create();
 
     actingAs($user)
@@ -72,7 +71,7 @@ test('guests are redirected away from writings create', function (): void {
 test('verified users can publish a writing', function (): void {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $user = createUser();
     $mainCategory = Category::factory()->create(['parent_id' => null]);
     $subCategory = Category::factory()->create(['parent_id' => $mainCategory->id]);
 
@@ -91,7 +90,7 @@ test('verified users can publish a writing', function (): void {
 });
 
 test('users cannot publish more than 3 writings a day', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
     $mainCategory = Category::factory()->create(['parent_id' => null]);
 
     Writing::factory()->for($user, 'author')->count(3)->create(['created_at' => now()]);
@@ -105,7 +104,7 @@ test('users cannot publish more than 3 writings a day', function (): void {
 });
 
 test('the author can edit and delete their own writing', function (): void {
-    $author = User::factory()->create();
+    $author = createUser();
     $writing = Writing::factory()->for($author, 'author')->create();
 
     actingAs($author)->get('/writings/edit/'.$writing->slug)->assertOk();
@@ -116,7 +115,7 @@ test('the author can edit and delete their own writing', function (): void {
 
 test('a different verified user cannot edit or delete someone else\'s writing', function (): void {
     $writing = Writing::factory()->create();
-    $other = User::factory()->create();
+    $other = createUser();
 
     actingAs($other)->get('/writings/edit/'.$writing->slug)->assertForbidden();
     actingAs($other)->delete('/writings/delete/'.$writing->slug)->assertForbidden();

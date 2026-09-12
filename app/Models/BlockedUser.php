@@ -6,6 +6,9 @@ use Database\Factories\BlockedUserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperBlockedUser
+ */
 class BlockedUser extends Model
 {
     /** @use HasFactory<BlockedUserFactory> */

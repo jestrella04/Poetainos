@@ -6,6 +6,9 @@ use Database\Factories\ShelfFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperShelf
+ */
 class Shelf extends Model
 {
     /** @use HasFactory<ShelfFactory> */

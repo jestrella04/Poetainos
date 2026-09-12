@@ -1,4 +1,6 @@
 {
+  "intelephense.files.maxSize": 5000000,
+  "intelephense.diagnostics.argumentCount": "declared",
   "cSpell.words": [
     "axios",
     "goodreads",

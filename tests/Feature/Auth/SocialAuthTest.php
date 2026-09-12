@@ -9,7 +9,7 @@ use function Pest\Laravel\get;
 
 test('social login verifies the email once and does not re-verify on a later login', function (): void {
     $verifiedAt = Carbon::parse('2020-01-01 00:00:00');
-    $user = User::factory()->create([
+    $user = createUser([
         'email' => 'writer@example.com',
         // Already has an avatar so the callback's avatar-download branch is
         // skipped — this test targets the email-verification branch only.
@@ -26,7 +26,7 @@ test('social login verifies the email once and does not re-verify on a later log
 });
 
 test('social login verifies a not-yet-verified email on first login', function (): void {
-    $user = User::factory()->create([
+    $user = createUser([
         'email' => 'writer@example.com',
         'extra_info' => ['avatar' => 'avatars/existing.png'],
         'email_verified_at' => null,

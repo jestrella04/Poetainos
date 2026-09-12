@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Writing;
 
 use function Pest\Laravel\getJson;
@@ -21,7 +20,7 @@ test('scopeSorted breaks popular and likes ties by aura descending', function ()
 });
 
 test('a user\'s writings listing breaks popular ties by aura the same way the homepage does', function (): void {
-    $author = User::factory()->create();
+    $author = createUser();
     $lowerAura = Writing::factory()->for($author, 'author')->create(['views' => 10, 'aura' => 1.0]);
     $higherAura = Writing::factory()->for($author, 'author')->create(['views' => 10, 'aura' => 5.0]);
 
@@ -38,7 +37,7 @@ test('a user\'s writings listing breaks popular ties by aura the same way the ho
 });
 
 test('writings listings include the author karma alongside the other author fields', function (): void {
-    $author = User::factory()->create(['karma' => 'A']);
+    $author = createUser(['karma' => 'A']);
     Writing::factory()->for($author, 'author')->create();
 
     $response = getJson('/?sort=latest');

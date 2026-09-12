@@ -1,13 +1,11 @@
 <?php
 
-use App\Models\User;
-
 use function Pest\Laravel\actingAs;
 
 // The GET /confirm-password "screen" route is commented out in routes/auth.php —
 // only POST /confirm-password (named password.confirmer) exists in this app.
 test('password can be confirmed', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     $response = actingAs($user)->post('/confirm-password', [
         'password' => 'password',
@@ -20,7 +18,7 @@ test('password can be confirmed', function (): void {
 });
 
 test('password is not confirmed with invalid password', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     $response = actingAs($user)->post('/confirm-password', [
         'password' => 'wrong-password',

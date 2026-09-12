@@ -15,6 +15,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
+/**
+ * @mixin IdeHelperUser
+ */
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */

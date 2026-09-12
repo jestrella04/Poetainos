@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Tag;
-use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -34,7 +33,7 @@ test('admin can delete a tag', function (): void {
 });
 
 test('non-admins are redirected to login for admin tag routes', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
     $tag = Tag::factory()->create();
 
     actingAs($user)

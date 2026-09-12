@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 
@@ -12,7 +11,7 @@ use function Pest\Laravel\post;
 test('reset password link can be requested', function (): void {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $user = createUser();
 
     post('/forgot-password', ['email' => $user->email]);
 
@@ -22,7 +21,7 @@ test('reset password link can be requested', function (): void {
 test('reset password screen can be rendered', function (): void {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $user = createUser();
 
     post('/forgot-password', ['email' => $user->email]);
 
@@ -38,7 +37,7 @@ test('reset password screen can be rendered', function (): void {
 test('password can be reset with valid token', function (): void {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $user = createUser();
 
     post('/forgot-password', ['email' => $user->email]);
 

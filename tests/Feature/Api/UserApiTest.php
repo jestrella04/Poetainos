@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\User;
-
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\putJson;
@@ -11,7 +9,7 @@ test('guests cannot access the authenticated user endpoint', function (): void {
 });
 
 test('an authenticated user can fetch themselves', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     actingAs($user)->getJson('/api/user')->assertOk()->assertJson([
         'id' => $user->id,
@@ -20,14 +18,14 @@ test('an authenticated user can fetch themselves', function (): void {
 });
 
 test('guests cannot recalculate a user\'s karma', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     putJson("/api/karma/{$user->username}")->assertUnauthorized();
 });
 
 test('an authenticated user can trigger a karma recalculation', function (): void {
-    $user = User::factory()->create();
-    $requester = User::factory()->create();
+    $user = createUser();
+    $requester = createUser();
 
     actingAs($requester)->putJson("/api/karma/{$user->username}")->assertOk();
 });

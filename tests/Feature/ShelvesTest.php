@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
 use Illuminate\Support\Facades\Notification;
@@ -10,9 +9,9 @@ use function Pest\Laravel\actingAs;
 test('a user can shelve and unshelve a writing', function (): void {
     Notification::fake();
 
-    $author = User::factory()->create();
+    $author = createUser();
     $writing = Writing::factory()->for($author, 'author')->create();
-    $reader = User::factory()->create();
+    $reader = createUser();
 
     actingAs($reader)->post("/shelves/{$writing->slug}/store")
         ->assertJson(['method' => 'store', 'count' => 1]);
@@ -26,7 +25,7 @@ test('a user can shelve and unshelve a writing', function (): void {
 test('shelving your own writing does not notify you', function (): void {
     Notification::fake();
 
-    $author = User::factory()->create();
+    $author = createUser();
     $writing = Writing::factory()->for($author, 'author')->create();
 
     actingAs($author)->post("/shelves/{$writing->slug}/store");
@@ -36,8 +35,8 @@ test('shelving your own writing does not notify you', function (): void {
 
 test('deleting a shelf entry only detaches the acting user', function (): void {
     $writing = Writing::factory()->create();
-    $reader = User::factory()->create();
-    $otherReader = User::factory()->create();
+    $reader = createUser();
+    $otherReader = createUser();
 
     actingAs($reader)->post("/shelves/{$writing->slug}/store");
     actingAs($otherReader)->post("/shelves/{$writing->slug}/store");

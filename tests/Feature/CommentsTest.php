@@ -2,7 +2,6 @@
 
 use App\Models\BlockedUser;
 use App\Models\Comment;
-use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
@@ -12,9 +11,9 @@ use function Pest\Laravel\actingAs;
 
 test('comments index excludes comments from authors the viewer has blocked', function (): void {
     $writing = Writing::factory()->create();
-    $visibleAuthor = User::factory()->create();
-    $blockedAuthor = User::factory()->create();
-    $viewer = User::factory()->create();
+    $visibleAuthor = createUser();
+    $blockedAuthor = createUser();
+    $viewer = createUser();
 
     BlockedUser::factory()->create([
         'user_id' => $viewer->id,
@@ -33,9 +32,9 @@ test('comments index excludes comments from authors the viewer has blocked', fun
 test('commenting notifies the writing author unless the commenter is the author', function (): void {
     Notification::fake();
 
-    $author = User::factory()->create();
+    $author = createUser();
     $writing = Writing::factory()->for($author, 'author')->create();
-    $commenter = User::factory()->create();
+    $commenter = createUser();
 
     actingAs($commenter)->post('/comments/create', [
         'comment' => 'Lovely piece!',
@@ -57,10 +56,10 @@ test('commenting notifies the writing author unless the commenter is the author'
 test('mentioning a user notifies them unless they are the author or the commenter', function (): void {
     Notification::fake();
 
-    $author = User::factory()->create();
+    $author = createUser();
     $writing = Writing::factory()->for($author, 'author')->create();
-    $commenter = User::factory()->create();
-    $mentioned = User::factory()->create(['username' => 'mentioned_user']);
+    $commenter = createUser();
+    $mentioned = createUser(['username' => 'mentioned_user']);
 
     actingAs($commenter)->post('/comments/create', [
         'comment' => 'Great work @mentioned_user!',
@@ -73,9 +72,9 @@ test('mentioning a user notifies them unless they are the author or the commente
 });
 
 test('the author can delete their comment but another user cannot', function (): void {
-    $author = User::factory()->create();
+    $author = createUser();
     $comment = Comment::factory()->for($author, 'author')->create();
-    $other = User::factory()->create();
+    $other = createUser();
 
     actingAs($other)->delete('/comments/delete/'.$comment->id)->assertForbidden();
     actingAs($author)->delete('/comments/delete/'.$comment->id)->assertOk();

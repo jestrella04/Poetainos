@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Role;
-use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -11,7 +10,7 @@ test('guests are redirected away from the admin area', function (): void {
 });
 
 test('authenticated non-admins are redirected to login from the admin area', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     actingAs($user)->get('/admin')->assertRedirect(route('login'));
 });
@@ -34,17 +33,17 @@ test('the tools page exposes structured server info and a log tail', function ()
 });
 
 test('isAllowed reflects the role\'s admin permission', function (): void {
-    $noRole = User::factory()->create();
+    $noRole = createUser();
     expect($noRole->isAllowed('admin'))->toBeFalse();
 
     $plainRole = Role::factory()->create();
-    $plainRoleUser = User::factory()->create(['role_id' => $plainRole->id]);
+    $plainRoleUser = createUser(['role_id' => $plainRole->id]);
     expect($plainRoleUser->isAllowed('admin'))->toBeFalse();
 
     $disabledAdminRole = Role::factory()->create([
         'extra_info' => ['permissions' => [['name' => 'admin', 'enabled' => false]]],
     ]);
-    $disabledAdminUser = User::factory()->create(['role_id' => $disabledAdminRole->id]);
+    $disabledAdminUser = createUser(['role_id' => $disabledAdminRole->id]);
     expect($disabledAdminUser->isAllowed('admin'))->toBeFalse();
 
     $admin = actingAsAdmin();
@@ -55,7 +54,7 @@ test('isAllowed returns false when the role has permissions but none match the r
     $role = Role::factory()->create([
         'extra_info' => ['permissions' => [['name' => 'moderate', 'enabled' => true]]],
     ]);
-    $user = User::factory()->create(['role_id' => $role->id]);
+    $user = createUser(['role_id' => $role->id]);
 
     expect($user->isAllowed('admin'))->toBeFalse();
 });

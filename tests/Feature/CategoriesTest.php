@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Category;
-use App\Models\User;
 use App\Models\Writing;
 
 use function Pest\Laravel\actingAs;
@@ -54,7 +53,7 @@ test('admin can delete a category', function (): void {
 });
 
 test('non-admins are redirected to login for admin category routes', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
     $category = Category::factory()->create();
 
     actingAs($user)

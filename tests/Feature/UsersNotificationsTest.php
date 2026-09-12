@@ -28,9 +28,9 @@ function createDatabaseNotification(User $recipient, array $data, ?Carbon $creat
 }
 
 test('index attaches the notifier user and writing without querying per notification', function (): void {
-    $recipient = User::factory()->create();
-    $notifier1 = User::factory()->create();
-    $notifier2 = User::factory()->create();
+    $recipient = createUser();
+    $notifier1 = createUser();
+    $notifier2 = createUser();
     $writing1 = Writing::factory()->create();
     $writing2 = Writing::factory()->create();
 
@@ -47,8 +47,8 @@ test('index attaches the notifier user and writing without querying per notifica
 });
 
 test('index query count does not scale with the number of notifications', function (): void {
-    $recipient = User::factory()->create();
-    $notifier = User::factory()->create();
+    $recipient = createUser();
+    $notifier = createUser();
     $writing = Writing::factory()->create();
 
     createDatabaseNotification($recipient, ['user_id' => $notifier->id, 'writing_id' => $writing->id]);

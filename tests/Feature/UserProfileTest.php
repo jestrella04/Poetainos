@@ -6,7 +6,7 @@ use App\Models\User;
 use function Pest\Laravel\actingAs;
 
 test('a user can view and update their own profile', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     actingAs($user)->get('/users/edit/'.$user->username)->assertOk();
 
@@ -22,8 +22,8 @@ test('a user can view and update their own profile', function (): void {
 });
 
 test('a different verified user cannot view or update someone else\'s profile', function (): void {
-    $user = User::factory()->create();
-    $other = User::factory()->create();
+    $user = createUser();
+    $other = createUser();
 
     actingAs($other)->get('/users/edit/'.$user->username)->assertForbidden();
     actingAs($other)->put('/users/edit/'.$user->username, [
@@ -33,7 +33,7 @@ test('a different verified user cannot view or update someone else\'s profile', 
 });
 
 test('an admin can view and update any profile', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
     $admin = actingAsAdmin();
 
     actingAs($admin)->get('/users/edit/'.$user->username)->assertOk();
@@ -47,7 +47,7 @@ test('an admin can view and update any profile', function (): void {
 
 test('a non-admin cannot change their own role', function (): void {
     $adminRole = Role::factory()->admin()->create();
-    $user = User::factory()->create();
+    $user = createUser();
 
     actingAs($user)->put('/users/edit/'.$user->username, [
         'name' => 'Just a user',
@@ -60,7 +60,7 @@ test('a non-admin cannot change their own role', function (): void {
 
 test('an admin can change a user\'s role', function (): void {
     $adminRole = Role::factory()->admin()->create();
-    $user = User::factory()->create();
+    $user = createUser();
     $admin = actingAsAdmin();
 
     actingAs($admin)->put('/users/edit/'.$user->username, [
@@ -73,7 +73,7 @@ test('an admin can change a user\'s role', function (): void {
 });
 
 test('a user can delete their own account after confirming their password', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     actingAs($user)
         ->withSession(['auth.password_confirmed_at' => time()])
@@ -84,7 +84,7 @@ test('a user can delete their own account after confirming their password', func
 });
 
 test('an admin can delete a different user without confirming a password', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
     $admin = actingAsAdmin();
 
     actingAs($admin)->delete('/admin/users/delete/'.$user->username)->assertOk();
@@ -93,8 +93,8 @@ test('an admin can delete a different user without confirming a password', funct
 });
 
 test('a user can block another user', function (): void {
-    $user = User::factory()->create();
-    $author = User::factory()->create();
+    $user = createUser();
+    $author = createUser();
 
     actingAs($user)->post('/users/block/'.$author->username)->assertOk();
 

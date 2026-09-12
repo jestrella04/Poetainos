@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
 
 use function Pest\Laravel\actingAs;
@@ -16,7 +15,7 @@ test('login screen can be rendered', function (): void {
 });
 
 test('users can authenticate using the login screen', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     $response = post('/login', [
         'email' => $user->email,
@@ -31,7 +30,7 @@ test('users can authenticate using the login screen', function (): void {
 });
 
 test('users can not authenticate with invalid password', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     post('/login', [
         'email' => $user->email,
@@ -42,7 +41,7 @@ test('users can not authenticate with invalid password', function (): void {
 });
 
 test('users can logout', function (): void {
-    $user = User::factory()->create();
+    $user = createUser();
 
     $response = actingAs($user)->post('/logout');
 

@@ -83,6 +83,14 @@ pest()->extend(TestCase::class)
 /**
  * @param  array<string, mixed>  $attributes
  */
+function createUser(array $attributes = []): User
+{
+    return User::factory()->create($attributes);
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
 function actingAsAdmin(array $attributes = []): User
 {
     $role = Role::factory()->admin()->create();

@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
+/**
+ * @mixin IdeHelperCategory
+ */
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
