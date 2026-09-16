@@ -13,7 +13,13 @@ const unreadCount = injectStrict(unreadCountKey)
 </script>
 
 <template>
-  <v-bottom-navigation v-model="page.props.route.name" bg-color="primary" class="hidden-lg-and-up">
+  <v-bottom-navigation
+    v-model="page.props.route.name"
+    bg-color="surface"
+    :elevation="0"
+    border="t"
+    class="hidden-lg-and-up"
+  >
     <po-button value="home" :href="route('home')" :title="$t('main.home')" inertia>
       <v-icon icon="fas fa-home" />
     </po-button>

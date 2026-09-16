@@ -24,7 +24,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
 
 <template>
   <po-wrapper>
-    <po-head></po-head>
+    <po-head />
 
     <template v-if="page.props.isAuthorBlocked">
       <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px">
@@ -32,7 +32,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
           :msg-title="$t('users.user-is-blocked')"
           :msg-body="$t('main.author-blocked')"
           icon="fas fa-ban"
-        ></po-msg-block>
+        />
       </div>
     </template>
     <template v-else>

@@ -166,7 +166,7 @@ function resetForm() {
 
 <template>
   <po-wrapper class="w-100" style="max-width: 900px">
-    <po-head></po-head>
+    <po-head />
 
     <v-card
       :title="
@@ -195,7 +195,7 @@ function resetForm() {
           persistent-placeholder
           clearable
           required
-        ></v-text-field>
+        />
 
         <v-select
           v-model="formData.main_category"
@@ -210,7 +210,7 @@ function resetForm() {
           clearable
           required
           chips
-        ></v-select>
+        />
 
         <v-select
           v-model="formData.alt_categories"
@@ -227,7 +227,7 @@ function resetForm() {
           required
           chips
           :disabled="isAltCategoriesDisabled"
-        ></v-select>
+        />
 
         <v-combobox
           v-model="formData.tags"
@@ -242,7 +242,7 @@ function resetForm() {
           clearable
           chips
           closable-chips
-        ></v-combobox>
+        />
 
         <v-textarea
           v-model="formData.text"
@@ -255,7 +255,7 @@ function resetForm() {
           persistent-placeholder
           clearable
           required
-        ></v-textarea>
+        />
 
         <v-text-field
           v-model="formData.link"
@@ -268,7 +268,7 @@ function resetForm() {
           maxlength="250"
           persistent-placeholder
           clearable
-        ></v-text-field>
+        />
 
         <v-file-input
           v-model="formData.cover"
@@ -281,9 +281,9 @@ function resetForm() {
           :hint="$t('main.max-file-size-is', { size: page.props['max-file-size'] }) + 'kb'"
           persistent-hint
           clearable
-        ></v-file-input>
+        />
 
-        <po-agreement v-if="!page.props.agreement"></po-agreement>
+        <po-agreement v-if="!page.props.agreement" />
 
         <po-button
           v-if="isUpdate"
@@ -296,16 +296,10 @@ function resetForm() {
           {{ $t('writings.delete-writing-ask') }}
         </po-button>
 
-        <po-writing-delete
-          v-if="isUpdate"
-          v-model="isDelete"
-          :slug="writing.data.slug ?? ''"
-        ></po-writing-delete>
+        <po-writing-delete v-if="isUpdate" v-model="isDelete" :slug="writing.data.slug ?? ''" />
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-          <template v-if="isPosting"
-            ><v-progress-circular indeterminate></v-progress-circular
-          ></template>
+          <template v-if="isPosting"><v-progress-circular indeterminate /></template>
           <template v-else>{{ isUpdate ? $t('main.save') : $t('main.send') }}</template>
         </po-button>
       </v-form>

@@ -54,7 +54,7 @@ function togglePushNotifications(value: boolean | null): void {
 
 <template>
   <po-wrapper>
-    <po-head></po-head>
+    <po-head />
 
     <v-card>
       <v-card-text style="max-width: 400px">
@@ -117,7 +117,7 @@ function togglePushNotifications(value: boolean | null): void {
             hide-details="auto"
             color="primary"
             @update:model-value="toggleEmailNotifications"
-          ></v-switch>
+          />
 
           <v-switch
             :model-value="notifications.push"
@@ -126,7 +126,7 @@ function togglePushNotifications(value: boolean | null): void {
             hide-details="auto"
             color="primary"
             @update:model-value="togglePushNotifications"
-          ></v-switch>
+          />
         </div>
         <div class="mb-5">
           <p class="text-caption text-uppercase text-disabled mb-3">
@@ -148,7 +148,7 @@ function togglePushNotifications(value: boolean | null): void {
             {{ $t('accounts.delete-account') }}
           </po-button>
 
-          <po-user-delete v-model="isDelete" :username="username"></po-user-delete>
+          <po-user-delete v-model="isDelete" :username="username" />
         </div>
       </v-card-text>
     </v-card>

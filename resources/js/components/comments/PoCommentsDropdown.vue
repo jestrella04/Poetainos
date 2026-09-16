@@ -20,9 +20,9 @@ provide(isDeleteKey, isDelete)
 </script>
 
 <template>
-  <po-complainer v-model="complainer" comp-type="comments" :comp-id="comment.id"></po-complainer>
-  <po-blocker v-model="blocker" :user="comment.author"></po-blocker>
-  <po-comments-delete v-model="isDelete" :comment="comment"></po-comments-delete>
+  <po-complainer v-model="complainer" comp-type="comments" :comp-id="comment.id" />
+  <po-blocker v-model="blocker" :user="comment.author" />
+  <po-comments-delete v-model="isDelete" :comment="comment" />
 
   <v-menu>
     <template v-slot:activator="{ props }">
@@ -33,8 +33,7 @@ provide(isDeleteKey, isDelete)
         size="x-small"
         variant="tonal"
         :aria-label="$t('main.more-actions')"
-      >
-      </v-btn>
+      />
     </template>
 
     <v-list>
@@ -42,7 +41,7 @@ provide(isDeleteKey, isDelete)
         <po-list-item prepend-icon="fas fa-eraser" @click.prevent="isDelete = true">
           <span>{{ $t('comments.delete-comment') }}</span>
         </po-list-item>
-        <v-divider class="my-0"></v-divider>
+        <v-divider class="my-0" />
       </template>
 
       <po-list-item prepend-icon="fas fa-flag" @click.prevent="complainer = true">
@@ -50,7 +49,7 @@ provide(isDeleteKey, isDelete)
       </po-list-item>
 
       <template v-if="auth() && authUser()!.username !== comment.author.username">
-        <v-divider class="my-0"></v-divider>
+        <v-divider class="my-0" />
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>
         </po-list-item>

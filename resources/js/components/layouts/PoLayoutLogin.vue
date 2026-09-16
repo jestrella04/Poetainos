@@ -59,7 +59,7 @@ body {
         <po-head :title="page.props.title" />
         <v-col class="login-col d-none d-md-block">
           <v-sheet class="d-flex align-center justify-center">
-            <v-img src="/images/logo.svg" class="logo"></v-img>
+            <v-img src="/images/logo.svg" class="logo" />
           </v-sheet>
         </v-col>
 
@@ -67,7 +67,7 @@ body {
           <v-sheet class="d-flex align-center justify-center">
             <div style="width: 100%; max-width: 100%">
               <div class="d-flex align-center justify-center pb-10 d-md-none">
-                <v-img src="/images/logo.svg" class="logo"></v-img>
+                <v-img src="/images/logo.svg" class="logo" />
               </div>
               <slot />
             </div>

@@ -87,7 +87,7 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<UserAdmin>(
             icon
             inertia
           >
-            <v-icon icon="fas fa-eye"></v-icon>
+            <v-icon icon="fas fa-eye" />
           </po-button>
 
           <po-button
@@ -97,11 +97,11 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<UserAdmin>(
             icon
             inertia
           >
-            <v-icon icon="fas fa-edit"></v-icon>
+            <v-icon icon="fas fa-edit" />
           </po-button>
 
           <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-trash"></v-icon>
+            <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>

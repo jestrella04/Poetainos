@@ -13,7 +13,8 @@ export default tseslint.config(
       'public',
       'bootstrap/ssr',
       'resources/js/i18n/*.json',
-      'resources/js/components.d.ts'
+      'resources/js/components.d.ts',
+      '.claude/redesign'
     ]
   },
   js.configs.recommended,
@@ -67,5 +68,22 @@ export default tseslint.config(
     files: ['*.config.ts', '*.config.js'],
     extends: [tseslint.configs.disableTypeChecked]
   },
-  skipFormatting
+  skipFormatting,
+  {
+    // @vue/eslint-config-prettier's skip-formatting turns this rule off
+    // (it normally treats self-closing as a formatting concern left to
+    // Prettier), but Prettier doesn't manage self-closing for Vue
+    // templates at all, so re-enable it here to autofix e.g.
+    // `<v-divider />` instead of `<v-divider></v-divider>`.
+    rules: {
+      'vue/html-self-closing': [
+        'error',
+        {
+          html: { void: 'always', normal: 'always', component: 'always' },
+          svg: 'always',
+          math: 'always'
+        }
+      ]
+    }
+  }
 )

@@ -38,7 +38,7 @@ async function submit(): Promise<void> {
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('main.block-user')">
-      <po-modal-close @click.prevent="blocker = false"></po-modal-close>
+      <po-modal-close @click.prevent="blocker = false" />
 
       <v-card-text>
         <p>
@@ -46,7 +46,7 @@ async function submit(): Promise<void> {
           {{ $t('users.block-user-ask', { name: userDisplayName(user) }) }}
         </p>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form
           id="blocking-form"
@@ -55,7 +55,7 @@ async function submit(): Promise<void> {
         >
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.block') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

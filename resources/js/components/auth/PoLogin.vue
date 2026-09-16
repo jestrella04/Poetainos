@@ -223,8 +223,7 @@ async function resetPassword(): Promise<void> {
           :clearable="step === 'checking'"
           required
           hide-details="auto"
-        >
-        </v-text-field>
+        />
 
         <template v-if="step === 'register'">
           <v-text-field
@@ -238,8 +237,7 @@ async function resetPassword(): Promise<void> {
             clearable
             required
             hide-details="auto"
-          >
-          </v-text-field>
+          />
 
           <v-text-field
             v-model="formData.password"
@@ -252,8 +250,7 @@ async function resetPassword(): Promise<void> {
             clearable
             required
             hide-details="auto"
-          >
-          </v-text-field>
+          />
 
           <v-text-field
             v-model="formData.confirmPassword"
@@ -265,10 +262,9 @@ async function resetPassword(): Promise<void> {
             persistent-placeholder
             clearable
             hide-details="auto"
-          >
-          </v-text-field>
+          />
 
-          <po-agreement></po-agreement>
+          <po-agreement />
         </template>
 
         <template v-if="step === 'login'">
@@ -282,13 +278,12 @@ async function resetPassword(): Promise<void> {
             clearable
             required
             hide-details="auto"
-          >
-          </v-text-field>
+          />
         </template>
 
         <po-button type="submit" color="primary" size="large" block :disabled="isLoading">
           <span v-if="!isLoading">{{ $t('main.continue') }}</span>
-          <v-progress-circular v-else indeterminate></v-progress-circular>
+          <v-progress-circular v-else indeterminate />
         </po-button>
 
         <po-button
@@ -303,7 +298,7 @@ async function resetPassword(): Promise<void> {
         </po-button>
 
         <po-button type="reset" size="large" variant="plain" class="mt-5" block>
-          <v-icon icon="fas fa-arrow-left"></v-icon>
+          <v-icon icon="fas fa-arrow-left" />
         </po-button>
       </v-form>
 

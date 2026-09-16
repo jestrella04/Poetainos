@@ -54,7 +54,7 @@ async function submit(): Promise<void> {
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('accounts.delete-account')">
-      <po-modal-close @click.prevent="isDelete = false"></po-modal-close>
+      <po-modal-close @click.prevent="isDelete = false" />
       <v-card-text>
         <p class="mb-2">
           {{ $t('accounts.sorry-see-you-go') }}
@@ -66,7 +66,7 @@ async function submit(): Promise<void> {
           <p>{{ $t('accounts.delete-account-warning') }}</p>
         </v-alert>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form
           id="user-delete-form"
@@ -83,12 +83,11 @@ async function submit(): Promise<void> {
             clearable
             required
             hide-details="auto"
-          >
-          </v-text-field>
+          />
 
           <po-button color="primary" type="submit" block :disabled="isPosting">
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

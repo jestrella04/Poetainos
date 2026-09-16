@@ -16,19 +16,19 @@ const mobileUserMenu = injectStrict(mobileUserMenuKey)
           <po-list-item :href="route('users.account')" prepend-icon="fas fa-user" inertia>
             <span>{{ $t('accounts.my-account') }}</span>
           </po-list-item>
-          <v-divider class="my-0"></v-divider>
+          <v-divider class="my-0" />
 
           <po-list-item :href="route('notifications.index')" prepend-icon="fas fa-bell" inertia>
             <span>{{ $t('accounts.notifications') }}</span>
-            <po-badge :count="unreadCount" inline></po-badge>
+            <po-badge :count="unreadCount" inline />
           </po-list-item>
-          <v-divider class="my-0"></v-divider>
+          <v-divider class="my-0" />
 
           <template v-if="admin()">
             <po-list-item :href="route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
               <span>{{ $t('main.administration') }}</span>
             </po-list-item>
-            <v-divider class="my-0"></v-divider>
+            <v-divider class="my-0" />
           </template>
 
           <po-list-item

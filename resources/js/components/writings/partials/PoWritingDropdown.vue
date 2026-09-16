@@ -28,9 +28,9 @@ function share(): void {
     v-model="sharer"
     :link-title="writing.title"
     :link-url="route('writings.show', [writing.slug])"
-  ></po-sharer>
-  <po-complainer v-model="complainer" comp-type="writings" :comp-id="writing.id"></po-complainer>
-  <po-blocker v-model="blocker" :user="writing.author"></po-blocker>
+  />
+  <po-complainer v-model="complainer" comp-type="writings" :comp-id="writing.id" />
+  <po-blocker v-model="blocker" :user="writing.author" />
 
   <v-menu>
     <template v-slot:activator="{ props }">
@@ -42,15 +42,14 @@ function share(): void {
         variant="tonal"
         class="po-btn-more"
         :aria-label="$t('main.more-actions')"
-      >
-      </v-btn>
+      />
     </template>
 
     <v-list>
       <po-list-item prepend-icon="fas fa-share-nodes" @click="share">
         <span>{{ $t('main.share-writing') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <v-divider class="my-0" />
 
       <template v-if="canEdit(writing.author)">
         <po-list-item
@@ -60,7 +59,7 @@ function share(): void {
         >
           <span>{{ $t('main.edit-delete') }}</span>
         </po-list-item>
-        <v-divider class="my-0"></v-divider>
+        <v-divider class="my-0" />
       </template>
 
       <po-list-item prepend-icon="fas fa-flag" @click.prevent="complainer = true">
@@ -68,7 +67,7 @@ function share(): void {
       </po-list-item>
 
       <template v-if="auth() && authUser()!.username !== writing.author.username">
-        <v-divider class="my-0"></v-divider>
+        <v-divider class="my-0" />
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>
         </po-list-item>

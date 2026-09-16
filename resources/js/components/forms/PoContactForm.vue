@@ -89,7 +89,7 @@ async function submitForm() {
 </script>
 
 <template>
-  <po-head></po-head>
+  <po-head />
   <v-card :title="$t('main.contact-form').toUpperCase()">
     <v-form
       id="contact-form"
@@ -108,7 +108,7 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <v-text-field
         v-model="formData.email"
@@ -121,7 +121,7 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <v-text-field
         v-model="formData.subject"
@@ -134,7 +134,7 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <v-textarea
         v-model="formData.message"
@@ -146,7 +146,7 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-textarea>
+      />
 
       <div class="d-flex">
         <div>
@@ -155,7 +155,7 @@ async function submitForm() {
 
         <div>
           <po-button :title="$t('main.reload-captcha')" class="ms-3" @click.prevent="reloadCaptcha">
-            <v-icon icon="fas fa-rotate-right"></v-icon>
+            <v-icon icon="fas fa-rotate-right" />
             <span class="d-sr-only">{{ $t('main.reload-captcha') }}</span>
           </po-button>
         </div>
@@ -170,12 +170,10 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-        <template v-if="isPosting"
-          ><v-progress-circular indeterminate></v-progress-circular
-        ></template>
+        <template v-if="isPosting"><v-progress-circular indeterminate /></template>
         <template v-else>{{ $t('main.send') }}</template>
       </po-button>
     </v-form>

@@ -32,7 +32,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
 
 <template>
   <po-wrapper>
-    <po-head></po-head>
+    <po-head />
 
     <template v-if="page.props.isAuthorBlocked">
       <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px">
@@ -40,7 +40,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
           :msg-title="$t('users.user-is-blocked')"
           :msg-body="$t('main.author-blocked')"
           icon="fas fa-ban"
-        ></po-msg-block>
+        />
       </div>
     </template>
     <template v-else>
@@ -52,7 +52,9 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
         <v-col cols="12" md="4">
           <v-card v-if="!isEmpty(page.props.writings.from_author)" class="mb-6">
             <v-card-text class="mt-3">
-              <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-author') }}</p>
+              <p class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-5">
+                {{ $t('main.more-from-author') }}
+              </p>
 
               <template v-for="writing in page.props.writings.from_author" :key="writing.id">
                 <div class="mb-2 position-relative">
@@ -64,7 +66,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
                     {{ writing.title }}
                   </po-link>
 
-                  <p class="text-caption text-disabled">
+                  <p class="text-caption text-eyebrow text-on-surface-variant">
                     {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
                     {{ relativeDate(writing.created_at) }}
                   </p>
@@ -75,7 +77,9 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
 
           <v-card v-if="!isEmpty(page.props.writings.from_shelf)" class="mb-6">
             <v-card-text>
-              <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-shelf') }}</p>
+              <p class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-5">
+                {{ $t('main.more-from-shelf') }}
+              </p>
 
               <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
                 <div class="mb-2 position-relative">
@@ -87,7 +91,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
                     {{ writing.title }}
                   </po-link>
 
-                  <p class="text-caption text-disabled">
+                  <p class="text-caption text-eyebrow text-on-surface-variant">
                     {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
                     {{ relativeDate(writing.created_at) }}
                   </p>
@@ -98,7 +102,9 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
 
           <v-card v-if="!isEmpty(page.props.writings.from_liked)">
             <v-card-text>
-              <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-liked') }}</p>
+              <p class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-5">
+                {{ $t('main.more-from-liked') }}
+              </p>
 
               <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
                 <div class="mb-2 position-relative">
@@ -110,7 +116,7 @@ const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
                     {{ writing.title }}
                   </po-link>
 
-                  <p class="text-caption text-disabled">
+                  <p class="text-caption text-eyebrow text-on-surface-variant">
                     {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
                     {{ relativeDate(writing.created_at) }}
                   </p>

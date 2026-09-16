@@ -63,11 +63,11 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<ComplaintAdmi
       <template v-slot:item.actions>
         <div class="d-flex ga-2">
           <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-eye"></v-icon>
+            <v-icon icon="fas fa-eye" />
           </po-button>
 
           <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-circle-check"></v-icon>
+            <v-icon icon="fas fa-circle-check" />
           </po-button>
         </div>
       </template>

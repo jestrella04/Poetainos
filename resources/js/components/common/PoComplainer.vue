@@ -72,12 +72,12 @@ async function submit(): Promise<void> {
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('complaints.complaint')">
-      <po-modal-close @click.prevent="complainer = false"></po-modal-close>
+      <po-modal-close @click.prevent="complainer = false" />
       <v-card-text>
         <p class="text-bold">{{ $t('complaints.report-reason-ask') }}</p>
         <p class="text-disabled">{{ $t('complaints.select-all-apply') }}</p>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form id="complaint-form" :action="route('complaints.store')" @submit.prevent="submit">
           <p v-if="errors" class="text-caption text-error mt-3" style="margin-bottom: -10px">
@@ -97,7 +97,7 @@ async function submit(): Promise<void> {
               :value="reason"
               multiple
               hide-details
-            ></v-switch>
+            />
           </template>
 
           <v-textarea
@@ -105,10 +105,10 @@ async function submit(): Promise<void> {
             class="mt-5 mb-1"
             :label="$t('main.tell-bit-more-optional')"
             rows="2"
-          ></v-textarea>
+          />
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.send') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

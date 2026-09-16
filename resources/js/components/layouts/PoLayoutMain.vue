@@ -164,14 +164,6 @@ body,
   cursor: pointer;
 }
 
-/* Positions the "more actions" trigger button over the top-right corner of a card. */
-.po-btn-more {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 999;
-}
-
 /* Sticks the tab bar below the fixed navbar; offset changes once the navbar stops being fixed. */
 .sticky-tabs {
   position: sticky !important;
@@ -186,25 +178,16 @@ body,
     top: 0 !important;
   }
 }
-
-/* Caps content to a comfortable reading width; Vuetify's v-container has no such preset. */
-.user-container,
-.writing-container {
-  width: 100% !important;
-  max-width: 35rem;
-  margin: 0 auto !important;
-  margin-bottom: 1.5rem !important;
-}
 </style>
 
 <template>
   <v-app>
     <po-head />
-    <po-snack-bar></po-snack-bar>
-    <po-login-modal v-model="loginModal"></po-login-modal>
-    <po-pwa-prompt></po-pwa-prompt>
+    <po-snack-bar />
+    <po-login-modal v-model="loginModal" />
+    <po-pwa-prompt />
 
-    <v-toolbar color="primary" :elevation="4" class="po-navbar px-3 d-none d-lg-flex">
+    <v-toolbar color="surface" :elevation="0" border="b" class="po-navbar px-3 d-none d-lg-flex">
       <v-container class="d-inline-flex justify-space-between">
         <div class="align-self-center">
           <po-link
@@ -214,7 +197,7 @@ body,
             class="font-weight-bold"
             inertia
           >
-            <v-img height="42" width="42" src="/images/logo.svg"></v-img>
+            <v-img height="42" width="42" src="/images/logo.svg" />
           </po-link>
         </div>
 
@@ -229,11 +212,8 @@ body,
           <po-tab :href="route('users.index')" value="users.index" inertia>{{
             $t('users.authors')
           }}</po-tab>
-          <po-tab :href="route('writings.create')" value="writings.create" inertia>{{
-            $t('main.publish')
-          }}</po-tab>
           <po-tab @click.prevent="desktopSiteMenu = true">
-            <v-icon icon="fas fa-ellipsis-vertical"></v-icon>
+            <v-icon icon="fas fa-ellipsis-vertical" />
             <v-menu v-model="desktopSiteMenu" target="parent">
               <v-list>
                 <po-list-item
@@ -243,22 +223,22 @@ body,
                 >
                   <span>{{ $t('main.contact-us') }}</span>
                 </po-list-item>
-                <v-divider class="my-0"></v-divider>
+                <v-divider class="my-0" />
 
                 <po-list-item :href="faqPath()" prepend-icon="fas fa-circle-question" inertia>
                   <span>{{ $t('main.faq') }}</span>
                 </po-list-item>
-                <v-divider class="my-0"></v-divider>
+                <v-divider class="my-0" />
 
                 <po-list-item :href="aboutPath()" prepend-icon="fas fa-address-card" inertia>
                   <span>{{ $t('main.about-us') }}</span>
                 </po-list-item>
-                <v-divider class="my-0"></v-divider>
+                <v-divider class="my-0" />
 
                 <po-list-item :href="termsPath()" prepend-icon="fas fa-pen-ruler" inertia>
                   <span>{{ $t('main.terms-of-use') }}</span>
                 </po-list-item>
-                <v-divider class="my-0"></v-divider>
+                <v-divider class="my-0" />
 
                 <po-list-item
                   :href="privacyPath()"
@@ -273,20 +253,23 @@ body,
           </po-tab>
         </v-tabs>
 
-        <div v-if="!auth()" class="align-self-center">
+        <div class="align-self-center d-flex align-center ga-3">
           <po-button
-            prepend-icon="fas fa-arrow-right-to-bracket"
-            variant="tonal"
+            v-if="!auth()"
+            variant="text"
+            color="on-surface-variant"
             :href="route('login')"
             style="font-size: 0.7rem"
             inertia
           >
             {{ $t('accounts.login-alt') }}
           </po-button>
-        </div>
 
-        <div v-else class="align-self-center">
-          <v-menu target="parent">
+          <po-button color="primary" variant="plain" :href="route('writings.create')" inertia>
+            {{ $t('main.publish') }}
+          </po-button>
+
+          <v-menu v-if="auth()" target="parent">
             <template v-slot:activator="{ props }">
               <po-button icon v-bind="props" style="font-size: 0.7rem">
                 <po-badge :count="unreadCount">
@@ -299,19 +282,19 @@ body,
               <po-list-item :href="route('users.account')" prepend-icon="fas fa-user" inertia>
                 <span>{{ $t('accounts.my-account') }}</span>
               </po-list-item>
-              <v-divider class="my-0"></v-divider>
+              <v-divider class="my-0" />
 
               <po-list-item :href="route('notifications.index')" prepend-icon="fas fa-bell" inertia>
                 <span>{{ $t('accounts.notifications') }}</span>
-                <po-badge :count="unreadCount" inline></po-badge>
+                <po-badge :count="unreadCount" inline />
               </po-list-item>
-              <v-divider class="my-0"></v-divider>
+              <v-divider class="my-0" />
 
               <template v-if="admin()">
                 <po-list-item :href="route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
                   <span>{{ $t('main.administration') }}</span>
                 </po-list-item>
-                <v-divider class="my-0"></v-divider>
+                <v-divider class="my-0" />
               </template>
 
               <po-list-item
@@ -334,7 +317,7 @@ body,
       </v-container>
     </v-main>
 
-    <po-footer></po-footer>
-    <po-bottom-nav></po-bottom-nav>
+    <po-footer />
+    <po-bottom-nav />
   </v-app>
 </template>

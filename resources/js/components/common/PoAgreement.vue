@@ -17,12 +17,12 @@ const { termsPath, privacyPath } = useStaticPages()
         class="mb-0"
         required
         hide-details
-      ></v-switch>
+      />
     </div>
 
     <div class="pt-4 ps-4">
       <po-link :href="termsPath()" target="_blank" inertia>
-        <v-icon icon="fas fa-arrow-up-right-from-square"></v-icon>
+        <v-icon icon="fas fa-arrow-up-right-from-square" />
       </po-link>
     </div>
   </div>
@@ -35,12 +35,12 @@ const { termsPath, privacyPath } = useStaticPages()
         color="primary"
         required
         hide-details
-      ></v-switch>
+      />
     </div>
 
     <div class="pt-4 ps-4">
       <po-link :href="privacyPath()" inertia>
-        <v-icon icon="fas fa-arrow-up-right-from-square"></v-icon>
+        <v-icon icon="fas fa-arrow-up-right-from-square" />
       </po-link>
     </div>
   </div>

@@ -38,13 +38,7 @@ interface PostedResult {
   url: string
 }
 
-type SocialNetworkKey =
-  | 'twitter'
-  | 'threads'
-  | 'instagram'
-  | 'facebook'
-  | 'youtube'
-  | 'goodreads'
+type SocialNetworkKey = 'twitter' | 'threads' | 'instagram' | 'facebook' | 'youtube' | 'goodreads'
 
 interface SocialLinkField {
   key: SocialNetworkKey
@@ -174,7 +168,7 @@ function openAvatarPicker(): void {
 
 <template>
   <po-wrapper class="w-100" style="max-width: 900px">
-    <po-head></po-head>
+    <po-head />
     <v-card :title="$t('accounts.update-profile').toUpperCase()">
       <v-form
         id="profile-form"
@@ -183,7 +177,7 @@ function openAvatarPicker(): void {
         @submit.prevent="submitForm"
       >
         <div class="d-flex ga-3 mb-3 align-center">
-          <po-avatar :user="user" size="72" color="secondary"></po-avatar>
+          <po-avatar :user="user" size="72" color="secondary" />
           <po-button color="primary" variant="tonal" @click="openAvatarPicker">{{
             $t('main.choose-image')
           }}</po-button>
@@ -194,7 +188,7 @@ function openAvatarPicker(): void {
             v-model="formData.avatar"
             label="avatar"
             hide-details
-          ></v-file-input>
+          />
         </div>
 
         <template v-if="admin()">
@@ -207,7 +201,7 @@ function openAvatarPicker(): void {
             item-value="id"
             item-title="name"
             required
-          ></v-select>
+          />
         </template>
 
         <v-text-field
@@ -220,7 +214,7 @@ function openAvatarPicker(): void {
           maxlength="250"
           required
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.username"
@@ -231,7 +225,7 @@ function openAvatarPicker(): void {
           maxlength="100"
           required
           readonly
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.email"
@@ -243,7 +237,7 @@ function openAvatarPicker(): void {
           maxlength="250"
           required
           clearable
-        ></v-text-field>
+        />
 
         <v-textarea
           v-model="formData.bio"
@@ -254,7 +248,7 @@ function openAvatarPicker(): void {
           maxlength="300"
           clearable
           required
-        ></v-textarea>
+        />
 
         <v-text-field
           v-model="formData.location"
@@ -265,7 +259,7 @@ function openAvatarPicker(): void {
           minlength="3"
           maxlength="250"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.occupation"
@@ -276,7 +270,7 @@ function openAvatarPicker(): void {
           minlength="3"
           maxlength="100"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.interests"
@@ -287,7 +281,7 @@ function openAvatarPicker(): void {
           minlength="3"
           maxlength="250"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.website"
@@ -298,7 +292,7 @@ function openAvatarPicker(): void {
           minlength="3"
           maxlength="250"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-for="field in socialLinkFields"
@@ -311,14 +305,12 @@ function openAvatarPicker(): void {
           minlength="3"
           :maxlength="field.maxlength"
           clearable
-        ></v-text-field>
+        />
 
-        <po-agreement v-if="!page.props.agreement && user.id === authUser()!.id"></po-agreement>
+        <po-agreement v-if="!page.props.agreement && user.id === authUser()!.id" />
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-          <template v-if="isPosting"
-            ><v-progress-circular indeterminate></v-progress-circular
-          ></template>
+          <template v-if="isPosting"><v-progress-circular indeterminate /></template>
           <template v-else>{{ $t('main.save') }}</template>
         </po-button>
       </v-form>

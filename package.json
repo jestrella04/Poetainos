@@ -70,5 +70,9 @@
     "vue-tsc": "^3.3.11",
     "vuetify": "^4.0.0",
     "workbox-build": "^7.3.0"
+  },
+  "dependencies": {
+    "@fontsource/eb-garamond": "^5.3.0",
+    "@fontsource/karla": "^5.3.0"
   }
 }

@@ -65,12 +65,10 @@ function submitForm() {
         :error-messages="errors.json"
         persistent-hint
         required
-      ></v-textarea>
+      />
 
       <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-        <template v-if="isPosting"
-          ><v-progress-circular indeterminate></v-progress-circular
-        ></template>
+        <template v-if="isPosting"><v-progress-circular indeterminate /></template>
         <template v-else>{{ $t('main.save') }}</template>
       </po-button>
     </v-form>

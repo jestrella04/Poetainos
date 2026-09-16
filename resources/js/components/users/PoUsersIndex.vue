@@ -10,7 +10,11 @@ import type { User } from '@/types/models'
 const page = computed(() => usePage<InertiaPageProps<{ sort: string }>>())
 const { isEmpty } = useTypeGuards()
 
-const { items: users, fetched, loadMore } = usePaginatedTabList<User>({
+const {
+  items: users,
+  fetched,
+  loadMore
+} = usePaginatedTabList<User>({
   tabOrder: ['featured', 'latest', 'popular'],
   currentTab: () => page.value.props.sort,
   reloadPropKey: 'users'
@@ -42,7 +46,7 @@ const { items: users, fetched, loadMore } = usePaginatedTabList<User>({
   </v-row>
 
   <template v-if="!fetched">
-    <po-loading type="avatar, paragraph, divider, text"></po-loading>
+    <po-loading type="avatar, paragraph, divider, text" />
   </template>
 
   <template v-else-if="!isEmpty(users)">
@@ -50,7 +54,7 @@ const { items: users, fetched, loadMore } = usePaginatedTabList<User>({
       <po-users-card :alone="false" :data="user" />
     </template>
 
-    <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+    <po-infinite-scroll @load="loadMore" />
   </template>
 
   <template v-else>
@@ -59,6 +63,6 @@ const { items: users, fetched, loadMore } = usePaginatedTabList<User>({
       msg-title=""
       :msg-body="$t('main.nothing-to-display')"
       icon="fas fa-sad-tear"
-    ></po-msg-block>
+    />
   </template>
 </template>

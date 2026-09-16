@@ -56,7 +56,7 @@ if (navigator.getInstalledRelatedApps !== undefined) {
             :href="socialLink(user.value, social)"
             :title="$t('main.follow-on', { app: social })"
           >
-            <v-icon :icon="socialIcon()[social]"></v-icon>
+            <v-icon :icon="socialIcon()[social]" />
           </po-button>
         </template>
       </template>

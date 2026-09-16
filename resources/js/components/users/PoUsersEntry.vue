@@ -24,49 +24,62 @@ const socialLinks = computed<Record<string, string>>(() =>
 </script>
 
 <template>
-  <v-card class="mb-5 position-relative" elevation="2" rounded>
-    <po-user-dropdown></po-user-dropdown>
+  <v-card class="mb-5 position-relative">
+    <po-user-dropdown />
 
     <v-card-text>
-      <div class="text-center mb-5">
-        <po-avatar-award :user="data" avatar-size="96" avatar-color="secondary" />
-        <p class="font-weight-bold">{{ userDisplayName(data) }}</p>
-        <p class="text-medium-emphasis">@{{ data.username }}</p>
-      </div>
+      <div class="d-flex flex-column flex-sm-row ga-6 align-center align-sm-start">
+        <po-avatar-award :user="data" avatar-size="104" avatar-color="secondary" />
 
-      <template v-if="!strNullOrEmpty(data.website) || !isEmpty(socialLinks)">
-        <div class="d-flex flex-wrap justify-center ga-3 mb-5">
-          <template v-if="!strNullOrEmpty(data.website)">
-            <div>
-              <po-button icon color="primary" size="x-small" :href="data.website" target="_blank">
-                <v-icon icon="fas fa-globe"></v-icon>
-              </po-button>
-            </div>
-          </template>
+        <div class="flex-grow-1 text-center text-sm-left">
+          <p
+            v-if="!strNullOrEmpty(data.location)"
+            class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-1"
+          >
+            {{ data.location }}
+          </p>
+          <p class="text-h4 mb-1">{{ userDisplayName(data) }}</p>
+          <p class="text-on-surface-variant mb-4">@{{ data.username }}</p>
 
-          <template v-for="(user, network) in socialLinks" :key="network">
-            <div v-if="!strNullOrEmpty(user)">
-              <po-button
-                icon
-                color="primary"
-                size="x-small"
-                :href="socialLink(user, network)"
-                target="_blank"
-              >
-                <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`"></v-icon>
-                <v-icon v-else :icon="`fab fa-${network}`"></v-icon>
-              </po-button>
+          <p v-if="!strNullOrEmpty(data.bio)" class="po-prose">{{ data.bio }}</p>
+
+          <template v-if="!strNullOrEmpty(data.website) || !isEmpty(socialLinks)">
+            <div class="d-flex flex-wrap justify-center justify-sm-start ga-3 mt-4">
+              <template v-if="!strNullOrEmpty(data.website)">
+                <div>
+                  <po-button
+                    icon
+                    color="primary"
+                    size="x-small"
+                    :href="data.website"
+                    target="_blank"
+                  >
+                    <v-icon icon="fas fa-globe" />
+                  </po-button>
+                </div>
+              </template>
+
+              <template v-for="(user, network) in socialLinks" :key="network">
+                <div v-if="!strNullOrEmpty(user)">
+                  <po-button
+                    icon
+                    color="primary"
+                    size="x-small"
+                    :href="socialLink(user, network)"
+                    target="_blank"
+                  >
+                    <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`" />
+                    <v-icon v-else :icon="`fab fa-${network}`" />
+                  </po-button>
+                </div>
+              </template>
             </div>
           </template>
         </div>
-      </template>
-
-      <div class="mx-auto" style="width: 100%; max-width: 400px">
-        <p>{{ data.bio }}</p>
       </div>
     </v-card-text>
 
-    <v-divider></v-divider>
+    <v-divider />
     <v-card-actions>
       <po-users-stats :data="data" :alone="true" />
     </v-card-actions>
@@ -76,7 +89,7 @@ const socialLinks = computed<Record<string, string>>(() =>
     <v-card-text>
       <v-row v-if="!strNullOrEmpty(data.created_at)">
         <v-col cols="12" md="4">
-          <v-icon icon="fas fa-calendar" class="mr-2"></v-icon>
+          <v-icon icon="fas fa-calendar" class="mr-2" />
           {{ $t('main.registered') }}:
         </v-col>
         <v-col cols="12" md="8">
@@ -84,19 +97,9 @@ const socialLinks = computed<Record<string, string>>(() =>
         </v-col>
       </v-row>
 
-      <v-row v-if="!strNullOrEmpty(data.location)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-map-marker-alt" class="mr-2"></v-icon>
-          {{ $t('main.location') }}:
-        </v-col>
-        <v-col cols="12" md="8">
-          {{ data.location }}
-        </v-col>
-      </v-row>
-
       <v-row v-if="!strNullOrEmpty(data.occupation)">
         <v-col cols="12" md="4">
-          <v-icon icon="fas fa-toolbox" class="mr-2"></v-icon>
+          <v-icon icon="fas fa-toolbox" class="mr-2" />
           {{ $t('main.occupation') }}:
         </v-col>
         <v-col cols="12" md="8">
@@ -106,7 +109,7 @@ const socialLinks = computed<Record<string, string>>(() =>
 
       <v-row v-if="!strNullOrEmpty(data.interests)">
         <v-col cols="12" md="4">
-          <v-icon icon="fas fa-masks-theater" class="mr-2"></v-icon>
+          <v-icon icon="fas fa-masks-theater" class="mr-2" />
           {{ $t('main.interests') }}:</v-col
         >
         <v-col cols="12" md="8">

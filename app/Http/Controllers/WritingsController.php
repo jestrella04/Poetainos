@@ -31,6 +31,7 @@ class WritingsController extends Controller
     public function index(): Response|Paginator
     {
         $awards = request()->route()?->getName() === 'writings.awards';
+        $isHome = request()->route()?->getName() === 'home';
         $sort = resolveSort(['latest', 'popular', 'likes']);
         $filterAwards = $awards ? 'home_posted_at' : 'id';
         $writings = Writing::visibleTo($this->getBlockedUsers())
@@ -49,6 +50,23 @@ class WritingsController extends Controller
             ],
             'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
+            'isHome' => $isHome,
+            'authors' => $isHome ? User::select(
+                'id',
+                'username',
+                'name',
+                'karma',
+                'extra_info->avatar AS avatar',
+            )->withCount('writings')
+                ->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
+                ->orderBy('aura', 'desc')
+                ->take(4)
+                ->get() : null,
+            'tags' => $isHome ? Tag::withCount('writings')
+                ->orderByDesc('writings_count')
+                ->having('writings_count', '>', 0)
+                ->take(6)
+                ->get() : null,
         ]);
     }
 

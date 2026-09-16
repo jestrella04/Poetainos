@@ -47,7 +47,7 @@ async function resendLink(): Promise<void> {
       color="success"
       variant="tonal"
       rounded
-    ></v-alert>
+    />
 
     <v-alert
       v-if="showError"
@@ -56,7 +56,7 @@ async function resendLink(): Promise<void> {
       color="error"
       variant="tonal"
       rounded
-    ></v-alert>
+    />
 
     <p class="text-center text-uppercase font-weight-bold mb-3">
       {{ $t('accounts.verify-email') }}

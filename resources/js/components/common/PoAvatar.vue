@@ -31,11 +31,7 @@ const avatar = computed(() => {
 
 <template>
   <v-avatar>
-    <v-img
-      v-if="!strNullOrEmpty(avatar)"
-      :src="storage(avatar)"
-      :alt="userDisplayName(user)"
-    ></v-img>
+    <v-img v-if="!strNullOrEmpty(avatar)" :src="storage(avatar)" :alt="userDisplayName(user)" />
     <span v-else>{{ userInitials(user) }}</span>
   </v-avatar>
 </template>

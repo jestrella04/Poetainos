@@ -49,10 +49,10 @@ const data = page.value.props.page
 </style>
 
 <template>
-  <po-head></po-head>
+  <po-head />
   <v-card :title="data.title.toUpperCase()">
     <v-card-text>
-      <div v-html="markdown(data.text)" class="text-justify"></div>
+      <div v-html="markdown(data.text)" class="text-justify" />
     </v-card-text>
   </v-card>
 </template>

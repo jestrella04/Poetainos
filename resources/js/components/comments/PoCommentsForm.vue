@@ -61,7 +61,7 @@ async function submitForm() {
       clearable
       persistent-placeholder
       required
-    ></v-textarea>
+    />
     <po-button type="submit" block class="mt-1">{{ $t('comments.post-comment') }}</po-button>
   </v-form>
 </template>

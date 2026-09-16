@@ -8,10 +8,10 @@ const loginModal = injectStrict(loginModalKey)
 <template>
   <v-dialog width="500" class="text-center" persistent>
     <v-card class="pb-10">
-      <po-modal-close @click.prevent="loginModal = false"></po-modal-close>
+      <po-modal-close @click.prevent="loginModal = false" />
 
       <v-card-text class="pt-15">
-        <po-inline-login :message="$t('accounts.login-to-interact')"></po-inline-login>
+        <po-inline-login :message="$t('accounts.login-to-interact')" />
 
         <p class="mt-5 text-caption text-disabled">
           {{ $t('accounts.account-let-you') }}

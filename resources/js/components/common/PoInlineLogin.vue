@@ -27,7 +27,7 @@ const { asset } = useFormatting()
           :href="route('social.login', { service: 'facebook', redirect: asset($page.url) })"
           :title="$t('accounts.continue-with-facebook')"
         >
-          <v-icon icon="fab fa-facebook-f"></v-icon>
+          <v-icon icon="fab fa-facebook-f" />
         </po-button>
       </div>
 
@@ -38,7 +38,7 @@ const { asset } = useFormatting()
           :href="route('social.login', { service: 'twitter', redirect: asset($page.url) })"
           :title="$t('accounts.continue-with-x-twitter')"
         >
-          <v-icon icon="fab fa-x-twitter"></v-icon>
+          <v-icon icon="fab fa-x-twitter" />
         </po-button>
       </div>
 
@@ -49,7 +49,7 @@ const { asset } = useFormatting()
           :href="route('social.login', { service: 'google', redirect: asset($page.url) })"
           :title="$t('accounts.continue-with-google')"
         >
-          <v-icon icon="fab fa-google"></v-icon>
+          <v-icon icon="fab fa-google" />
         </po-button>
       </div>
 
@@ -61,7 +61,7 @@ const { asset } = useFormatting()
           :title="$t('accounts.continue-with-email')"
           inertia
         >
-          <v-icon icon="fas fa-at"></v-icon>
+          <v-icon icon="fas fa-at" />
         </po-button>
       </div>
     </div>

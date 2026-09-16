@@ -30,7 +30,7 @@ iframe {
     <po-head />
 
     <v-main>
-      <po-admin-menu></po-admin-menu>
+      <po-admin-menu />
 
       <po-wrapper class="admin-wrapper pa-5">
         <v-card class="pa-5 h-100">

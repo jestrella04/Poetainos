@@ -30,7 +30,7 @@ function copy(event: MouseEvent): void {
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('main.share-content')">
-      <po-modal-close @click.prevent="sharer = false"></po-modal-close>
+      <po-modal-close @click.prevent="sharer = false" />
       <v-card-text class="text-center">
         <p class="text-bold">{{ linkTitle }}</p>
         <p class="text-disabled">{{ cropUrl(linkUrl) }}</p>
@@ -49,7 +49,7 @@ function copy(event: MouseEvent): void {
               :title="'copy' === data.name ? $t('main.copy-link') : data.name"
               @click="copy"
             >
-              <v-icon :icon="data.icon"></v-icon>
+              <v-icon :icon="data.icon" />
             </po-button>
           </div>
         </template>

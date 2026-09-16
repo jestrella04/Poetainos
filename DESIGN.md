@@ -1,194 +1,91 @@
 # Theme & Color System
 
-> **Superseded:** `resources/js/plugins/theme.ts` was reset to Vuetify's stock default palette ahead of the upcoming UI redesign. The brand palette documented below is no longer live — kept here as historical rationale until the redesign defines a new palette.
-
 ## Overview
 
-Encolame uses **Vuetify 4** with a fully custom MD3-aligned color system. The single source of truth is `resources/js/plugins/theme.ts`. All color decisions must trace back to the designer-provided brand anchors or a documented rationale.
+Poetaínos uses **Vuetify 4** with a color system derived from a Claude Design mockup (`.claude/redesign/Poetainos Rediseño.dc.html`): an editorial, paper-like palette (greenish-gray surfaces, plum/mauve accent) paired with EB Garamond (serif) and Karla (sans). The single source of truth for colors is `resources/js/plugins/theme.ts`; for fonts and other global overrides it's `resources/css/app.css`. All color decisions should trace back to the mockup's anchors or a documented rationale below.
 
 ---
 
-## Brand Primary Palette
+## Brand Anchors
 
-Three official anchors define the MD3 tonal palette at **hue ≈267° (blue-violet)**:
-
-| Anchor | Hex | MD3 Tone | Role |
-|---|---|---|---|
-| Primary dark | `#633CAF` | ~40 | Light mode `primary`; `primary-darken-1` in dark mode |
-| Primary neutral | `#8C57FF` | ~60 | Dark mode `primary`; Inertia progress bar; gradients |
-| Primary light | `#F4F0FF` | ~95 | Light mode `surface`; containers; light backgrounds |
-
-### Why three anchors instead of one?
-
-MD3 generates a full tonal palette (tones 0–100) from a single seed color. The designer provided three explicit tones from that palette, which gives us exact reference points without needing to run the generation tooling. Future derivations should interpolate/extrapolate within this range or use [Material Theme Builder](https://m3.material.io/theme-builder) with `#633CAF` as the seed.
-
----
-
-## MD3 Mode Assignment
-
-### Light mode
-- `primary` = tone 40 → `#633CAF`
-- White (`#FFFFFF`) on `#633CAF` achieves **~7.3:1 contrast** (WCAG AA + AAA) ✓
-- Surfaces use tone 95 (`#F4F0FF`) — a very light lavender that maintains brand identity without competing with primary
-
-### Dark mode
-- `primary` = tone 60 → `#8C57FF` (brighter than tone 40, readable on dark backgrounds)
-- `on-primary` = tone ~10 → `#21005E` (dark violet text on the bright purple)
-  - **Why not white?** White on `#8C57FF` only achieves ~4.1:1 — marginal for normal text. Dark text gives ~19:1.
-- This is the canonical MD3 pattern: as the surface darkens, primary shifts to a higher (lighter) tone
-
----
-
-## Derived Tones
-
-Values computed by linear interpolation between the three anchors:
-
-| Value | Hex | Usage |
+| Anchor | Hex | Role |
 |---|---|---|
-| Tone ~30 | `#4E2D97` | `primary-darken-1` (light mode); glass gradient mid-point |
-| Tone ~10 | `#1A0050` | `staticGlassDarkColor` — deepest dark in gradients |
-| Neutral-variant ~10 | `#1D1040` | `on-background`, `on-surface`, `grey-900` in light mode |
+| Primary | `#8e5686` | Plum/mauve accent — buttons, links, active tabs |
+| Primary hover/darken | `#6f3f68` | Hover/pressed state |
+| Paper | `#f2f3ef` | The only page tone — used for both `background` and `surface` |
+
+**Note:** an earlier pass also pulled `#dfe1dc` out of the mockup as a second "outer canvas" tone and mapped it to `background` (distinct from `surface`). That was wrong: `#dfe1dc` is only the `<body>` background of the Claude Design *canvas document* itself (`.claude/redesign/Poetainos Rediseño.dc.html`), i.e. the backdrop behind the four separate artboards in that file — not a color used by any actual screen. Every real screen ("Inicio", "Lectura", "Explorar", "Perfil") backgrounds itself with `#f2f3ef`. There is no second page tone in the design; cards are separated by borders/shadow, not a background shift, so `background` and `surface` share the same value.
 
 ---
 
-## Complete Token Reference
-
-### Static exports (`theme.ts` lines 3–5)
-
-These are used by components that need raw hex values outside Vuetify's theme system (progress bar, charts).
-
-| Export | Value | Consumer |
-|---|---|---|
-| `staticPrimaryColor` | `#8C57FF` | Inertia page progress bar (`app.ts`); chart primary series (`useChartTheme.ts`) |
-| `staticPrimaryDarkColor` | `#633CAF` | Available for gradients and darken-state references |
-| `staticPrimaryLightColor` | `#F4F0FF` | Available for light surface and container references |
+## Token Reference
 
 ### Light theme
 
-#### Primary family
+| Token | Value | Notes |
+|---|---|---|
+| `background` | `#f2f3ef` | the page's only tone — same as `surface` |
+| `on-background` | `#1e221d` | |
+| `surface` | `#f2f3ef` | cards/panels ("papers") |
+| `on-surface` | `#1e221d` | ≈15.5:1 on surface (AAA) |
+| `surface-variant` | `#e4e6e0` | thin borders/dividers, subtle fills |
+| `on-surface-variant` | `#5a6057` | ≈4.9:1 on surface (AA) — eyebrow labels, meta text, captions |
+| `primary` | `#8e5686` | |
+| `on-primary` | `#f7f2f6` | ≈5.4:1 on primary (AA) |
+| `primary-darken-1` | `#6f3f68` | ≈8.1:1 on white (AAA) — hover/pressed |
+| `secondary` | `#dfe2da` | **neutral** grey-green (not a second brand hue) — avatar/chip fills |
+| `on-secondary` | `#5a6057` | ≈4.9:1 (AA) |
+| `secondary-darken-1` | `#cdd2c7` | hover state for neutral chips/buttons |
+| `success` | `#059669` | functional, hue-neutral |
+| `info` | `#0284C7` | functional |
+| `warning` | `#D97706` | functional |
+| `error` | `#DC2626` | functional |
+
+### Dark theme (derived)
 
 | Token | Value | Notes |
 |---|---|---|
-| `primary` | `#633CAF` | Tone 40 — all primary interactive elements |
-| `on-primary` | `#FFFFFF` | 7.3:1 contrast ✓ |
-| `primary-darken-1` | `#4E2D97` | Tone ~30 — hover/pressed states |
+| `background` | `#23261f` | the page's only tone — same as `surface`; borders separate cards, not elevation |
+| `on-background` | `#e7e8e3` | |
+| `surface` | `#23261f` | same value as `background` |
+| `on-surface` | `#e7e8e3` | ≈14:1 on surface |
+| `surface-variant` | `#33362d` | dark borders/dividers |
+| `on-surface-variant` | `#9aa093` | muted meta text on dark |
+| `primary` | `#c48fba` | lightened/desaturated plum, ≈7.1:1 on background |
+| `on-primary` | `#2a1027` | ≈6.9:1 on primary |
+| `primary-darken-1` | `#8e5686` | reuses the light theme's primary as the dark "darken" step |
+| `secondary` | `#33362d` | dark neutral avatar/chip fill |
+| `on-secondary` | `#c7ccc0` | ≈10:1 |
+| `success` / `info` / `warning` / `error` | `#34D399` / `#38BDF8` / `#FBBF24` / `#F87171` | functional, unchanged in spirit from light |
 
-#### Neutral surfaces
+### Why `secondary` is neutral, not a second brand hue
 
-| Token | Value | Notes |
-|---|---|---|
-| `background` | `#E2D4F0` | Neutral-variant tone ~85 — page-level background |
-| `on-background` | `#1D1040` | Neutral-variant tone ~10 |
-| `surface` | `#F4F0FF` | Brand primary light (tone 95) — cards, dialogs, inputs |
-| `on-surface` | `#1D1040` | Same as on-background |
+The mockup's avatar circles and default chip fills are a neutral grey-green (`#dfe2da` bg, `#5a6057` text), not a saturated accent. Since the codebase already uses `color="secondary"` pervasively for avatars, award badges, and category/tag chips, `secondary` is mapped to this neutral pairing so all existing usages read as "neutral" without per-call-site changes.
 
-#### Grey scale (neutral-variant, hue ≈267°)
+---
 
-| Token | Value |
-|---|---|
-| `grey-50` | `#FAF9FF` |
-| `grey-100` | `#F5F0FF` |
-| `grey-200` | `#EDE5FF` |
-| `grey-300` | `#D9CCFF` |
-| `grey-400` | `#B5A5F0` |
-| `grey-500` | `#8E79D4` |
-| `grey-600` | `#6E5AB0` |
-| `grey-700` | `#503D85` |
-| `grey-800` | `#352860` |
-| `grey-900` | `#1D1040` |
+## Fonts
 
-#### UI alias tokens (light)
+Self-hosted via `@fontsource/eb-garamond` and `@fontsource/karla` (npm packages, bundled by Vite — no external request, precached by the PWA build), imported in `resources/js/app.ts`.
 
-| Token | Value | Follows |
-|---|---|---|
-| `perfect-scrollbar-thumb` | `#D9CCFF` | `grey-300` |
-| `track-bg` | `#EDE5FF` | `grey-200` |
-| `chat-bg` | `#F5F0FF` | `grey-100` |
-| `expansion-panel-text-custom-bg` | `#FAF9FF` | `grey-50` |
-| `skin-bordered-background` | `#FFFFFF` | Pure white |
-| `skin-bordered-surface` | `#FFFFFF` | Pure white |
+Wired into Vuetify via its own CSS custom-property hooks — no SASS rebuild needed. Vuetify's compiled CSS already reads `html { font-family: var(--v-font-body, "Roboto", ...) }` and all `text-h*`/`title-*`/`v-card-title`/etc. use `var(--v-font-heading, ...)`. Declared once in `resources/css/app.css`:
 
-#### Variables (light)
+```css
+:root {
+  --v-font-body: 'Karla', system-ui, sans-serif;
+  --v-font-heading: 'EB Garamond', Georgia, serif;
+}
+```
 
-| Variable | Value |
-|---|---|
-| `code-color` | `#633CAF` |
-| `overlay-scrim-background` | `#1D1040` |
-| `tooltip-background` | `#1D1040` |
-| `border-color` | `#1D1040` |
-| `table-header-color` | `#F5F0FF` |
-| `shadow-key-umbra-color` | `#1D1040` |
+Body prose (writing text, comments, bios) lives in plain tags outside Vuetify's typography-class system, so it needs an explicit `.po-prose { font-family: var(--v-font-heading); }` class (also in `app.css`), applied where that prose appears.
 
-### Dark theme
+`resources/css/app.css` also defines `.text-eyebrow { letter-spacing: 0.08em; }` for the small-caps-style uppercase labels used throughout (category+date lines, author bylines, section headers).
 
-#### Primary family
+---
 
-| Token | Value | Notes |
-|---|---|---|
-| `primary` | `#8C57FF` | Tone 60 — bright enough on dark backgrounds |
-| `on-primary` | `#21005E` | Tone ~10 — ~19:1 contrast ✓ |
-| `primary-darken-1` | `#633CAF` | Tone 40 — darken state in dark mode |
+## Component defaults
 
-#### Neutral surfaces
-
-| Token | Value | Notes |
-|---|---|---|
-| `background` | `#0A0618` | Very dark, near-black with purple tint |
-| `on-background` | `#EDE5FF` | Tone ~93 light lavender |
-| `surface` | `#181229` | Dark card/dialog surface (tone ~12 — intentionally elevated to "Surface Container" for visual lift; slightly above strict MD3 tone 6) |
-| `on-surface` | `#EDE5FF` | Same as on-background |
-
-#### Grey scale (dark, hue ≈267°)
-
-| Token | Value |
-|---|---|
-| `grey-50` | `#130B30` |
-| `grey-100` | `#1A1040` |
-| `grey-200` | `#231660` |
-| `grey-300` | `#2D2070` |
-| `grey-400` | `#3B3380` |
-| `grey-500` | `#5C52A8` |
-| `grey-600` | `#8A7FD4` |
-| `grey-700` | `#ACA2E8` |
-| `grey-800` | `#CBC0F8` |
-| `grey-900` | `#EDE5FF` |
-
-#### UI alias tokens (dark)
-
-| Token | Value | Follows |
-|---|---|---|
-| `perfect-scrollbar-thumb` | `#2D2070` | `grey-300` |
-| `skin-bordered-background` | `#130B30` | `grey-50` |
-| `skin-bordered-surface` | `#130B30` | `grey-50` |
-| `track-bg` | `#231660` | `grey-200` |
-| `expansion-panel-text-custom-bg` | `#1A1040` | `grey-100` |
-| `chat-bg` | `#1A1040` | `grey-100` |
-
-#### Variables (dark)
-
-| Variable | Value |
-|---|---|
-| `code-color` | `#C084FC` |
-| `overlay-scrim-background` | `#080810` |
-| `tooltip-background` | `#EDE5FF` |
-| `border-color` | `#EDE5FF` |
-| `table-header-color` | `#1A1040` |
-| `shadow-key-umbra-color` | `#000000` |
-
-### Semantic / functional colors (unchanged by brand)
-
-These are not brand colors — they're functional. Do not derive them from the primary palette.
-
-| Token | Light | Dark |
-|---|---|---|
-| `secondary` | `#9333EA` | `#9333EA` |
-| `secondary-darken-1` | `#7E22CE` | `#7E22CE` |
-| `success` | `#059669` | `#34D399` |
-| `info` | `#0284C7` | `#38BDF8` |
-| `warning` | `#D97706` | `#FBBF24` |
-| `error` | `#DC2626` | `#F87171` |
-
-Secondary has not been updated — no secondary tonal palette was provided by the designer. It sits at a similar hue family (~280°) and reads well alongside the new primary. Revisit when the designer delivers a full palette.
+Flat, bordered "paper" look instead of Material shadows, set once in `resources/js/plugins/vuetify.ts`'s `defaults` block: `VCard`/`VBtn`/`VChip` at `rounded: 0, elevation: 0` (`VCard` also gets `border: true`), `VTextField` underlined, `VDivider` colored `surface-variant`. Component-wide look changes belong here, not as scattered per-instance props — check this file before adding new one-off styling.
 
 ---
 
@@ -196,16 +93,13 @@ Secondary has not been updated — no secondary tonal palette was provided by th
 
 ```vue
 <!-- Vuetify color prop (preferred) -->
-<v-btn color="primary">Save</v-btn>
+<v-btn color="primary">Guardar</v-btn>
 
 <!-- CSS custom property -->
 <div :style="{ borderColor: 'rgb(var(--v-theme-primary))' }"></div>
 
 <!-- Utility class -->
-<span class="text-primary">Label</span>
-
-<!-- Static export (only when outside Vuetify's theme system) -->
-import { staticPrimaryColor } from '@/plugins/theme';
+<span class="text-on-surface-variant">Meta text</span>
 ```
 
 Never use raw hex values in components. Never hard-code colors outside `theme.ts`.
@@ -214,13 +108,7 @@ Never use raw hex values in components. Never hard-code colors outside `theme.ts
 
 ## Updating Colors in the Future
 
-1. Get the designer's new anchor colors (minimum: primary dark, primary neutral, primary light)
-2. Identify the MD3 tones they map to using [Material Theme Builder](https://m3.material.io/theme-builder) or run:
-   ```js
-   import { Hct, argbFromHex } from '@material/material-color-utilities';
-   const hct = Hct.fromInt(argbFromHex('#yourColor'));
-   console.log(hct.tone); // MD3 tone value
-   ```
-3. Assign tones to roles (light primary = tone 40, dark primary = tone 60–80, surface = tone 95)
-4. Derive the neutral-variant grey scale by taking the same hue at chroma ~16
-5. Update `theme.ts` and this document together
+1. Get the new brand anchors (minimum: primary, a paper background/surface pair).
+2. Assign tones to roles the same way as above (primary/on-primary/darken-1, background/surface pairs, a neutral `secondary` unless a real second accent is provided).
+3. Derive a dark counterpart in the same spirit: darken backgrounds, lighten/desaturate the accent enough to hit ~7:1+ contrast on the new dark background.
+4. Update `theme.ts` and this document together.

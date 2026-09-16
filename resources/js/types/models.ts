@@ -17,6 +17,7 @@ export interface UserLike {
     social?: Record<string, string>
   } | null
   karma?: 'A' | 'B' | 'C' | 'D' | 'F' | null
+  writings_count?: number
 }
 
 // The full profile shape returned by UsersController::show() — a User
@@ -76,6 +77,7 @@ export interface CategoryLike {
   id: number
   name: string
   slug: string
+  description?: string | null
   writings_count?: number
 }
 

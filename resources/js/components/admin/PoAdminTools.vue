@@ -44,14 +44,9 @@ const tab = ref<string | null>(null)
           :title="$t('admin.download-full-copy')"
           class="mb-2"
         >
-          <v-icon icon="fas fa-download"></v-icon>
+          <v-icon icon="fas fa-download" />
         </po-button>
-        <v-textarea
-          v-model="page.props.log"
-          :label="$t('admin.log')"
-          rows="20"
-          readonly
-        ></v-textarea>
+        <v-textarea v-model="page.props.log" :label="$t('admin.log')" rows="20" readonly />
       </v-window-item>
     </v-window>
   </po-wrapper>

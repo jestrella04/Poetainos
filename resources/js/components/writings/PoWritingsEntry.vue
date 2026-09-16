@@ -27,79 +27,40 @@ provide(loadingCommentsKey, loadingComments)
 provide(writingKey, props.data)
 </script>
 
-<style scoped>
-/* Tighter line-height for the title and preserved whitespace in user-authored body text; content-specific, not a Vuetify concern. */
-.writing-title {
-  line-height: 1.6rem !important;
-  margin-bottom: 0.3rem;
-}
-
-.writing-body {
-  white-space: pre-wrap !important;
-}
-</style>
-
 <template>
   <po-wrapper>
-    <v-card
-      :class="{ 'position-relative': true, 'writing-container': !alone }"
-      elevation="2"
-      rounded
-    >
-      <po-writing-dropdown></po-writing-dropdown>
-      <template v-if="!isEmpty(data.extra_info) && !strNullOrEmpty(data.extra_info?.cover)">
-        <v-img
-          class="align-end text-white"
-          height="200"
-          :src="storage(data.extra_info?.cover ?? '')"
-          alt=""
-          cover
-        >
-          <div class="text-center py-3">
+    <!-- Single-writing reading view -->
+    <template v-if="alone">
+      <v-card class="position-relative">
+        <po-writing-dropdown />
+
+        <template v-if="!isEmpty(data.extra_info) && !strNullOrEmpty(data.extra_info?.cover)">
+          <v-img height="220" :src="storage(data.extra_info?.cover ?? '')" alt="" cover />
+        </template>
+
+        <v-card-text class="position-relative">
+          <p class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-2">
+            {{ toLocaleDate(data.created_at) }}
+          </p>
+
+          <p class="writing-title text-h4">{{ data.title }}</p>
+
+          <div class="d-flex align-center ga-3 mt-4 mb-6 pb-4 border-b">
             <po-link :href="route('users.show', data.author.username)" inertia>
-              <po-avatar-award :user="data.author" avatar-size="64" avatar-color="secondary" />
+              <po-avatar-award :user="data.author" avatar-size="36" avatar-color="secondary" />
+            </po-link>
+            <po-link :href="route('users.show', data.author.username)" inertia>
+              {{ userDisplayName(data.author) }}
             </po-link>
           </div>
-        </v-img>
-      </template>
 
-      <div v-else class="text-center pt-6">
-        <po-link :href="route('users.show', data.author.username)" inertia>
-          <po-avatar-award :user="data.author" avatar-size="64" avatar-color="secondary" />
-        </po-link>
-      </div>
-
-      <v-card-text class="position-relative pt-1">
-        <div class="text-center mb-3">
-          <p class="text-h6 text-uppercase writing-title">
-            <po-link
-              v-if="!alone"
-              :href="route('writings.show', data.slug)"
-              class="stretched"
-              inertia
-            >
-              {{ data.title }}
-            </po-link>
-            <span v-else>{{ data.title }}</span>
-          </p>
-
-          <p class="text-caption text-uppercase text-medium-emphasis">
-            {{
-              `${toLocaleDate(data.created_at)}
-            — ${$t('main.by-name', { name: userDisplayName(data.author) })}
-            `
-            }}
-          </p>
-        </div>
-
-        <template v-if="alone">
-          <blockquote class="writing-body mb-4">
+          <blockquote class="writing-body writing-body--reading po-prose mb-4">
             {{ data.text }}
           </blockquote>
 
           <template v-if="!isEmpty(data.extra_info) && !strNullOrEmpty(data.extra_info?.link)">
             <div class="d-flex align-center mb-4">
-              <v-icon icon="fas fa-link" size="24" class="mr-3"></v-icon>
+              <v-icon icon="fas fa-link" size="24" class="mr-3" />
               <po-link :href="data.extra_info?.link" target="_blank" rel="nofollow noopener">
                 {{ cropUrl(data.extra_info?.link ?? '') }}
               </po-link>
@@ -109,7 +70,7 @@ provide(writingKey, props.data)
           <div class="d-flex flex-column ga-3 mb-4">
             <div v-if="!isEmpty(data.categories)" class="d-flex">
               <div class="mr-3">
-                <v-icon icon="fas fa-folder-open" size="24"></v-icon>
+                <v-icon icon="fas fa-folder-open" size="24" />
               </div>
 
               <div class="d-inline-flex flex-wrap ga-1">
@@ -117,7 +78,6 @@ provide(writingKey, props.data)
                   v-for="category in data.categories"
                   :key="category.slug"
                   color="secondary"
-                  variant="elevated"
                   size="small"
                   :href="route('categories.show', category.slug)"
                   inertia
@@ -129,7 +89,7 @@ provide(writingKey, props.data)
 
             <div v-if="!isEmpty(data.tags)" class="d-flex">
               <div class="mr-3">
-                <v-icon icon="fas fa-hashtag" size="24"></v-icon>
+                <v-icon icon="fas fa-hashtag" size="24" />
               </div>
 
               <div class="d-inline-flex flex-wrap ga-1">
@@ -137,7 +97,6 @@ provide(writingKey, props.data)
                   v-for="tag in data.tags"
                   :key="tag.slug"
                   color="secondary"
-                  variant="elevated"
                   size="small"
                   :href="route('tags.show', tag.slug)"
                   inertia
@@ -167,42 +126,70 @@ provide(writingKey, props.data)
               </div>
             </div>
           </div>
-        </template>
+        </v-card-text>
 
-        <template v-else>
-          <blockquote class="writing-body">
-            {{ excerpt(data.text) }}
-          </blockquote>
-        </template>
-      </v-card-text>
+        <v-divider />
+        <v-card-actions>
+          <po-writing-stats />
+        </v-card-actions>
+      </v-card>
 
-      <v-divider></v-divider>
-      <v-card-actions>
-        <po-writing-stats></po-writing-stats>
-      </v-card-actions>
-    </v-card>
-
-    <template v-if="alone">
       <v-skeleton-loader
         v-if="loadingComments"
         :elevation="2"
         type="list-item-avatar"
         class="mb-2"
-      ></v-skeleton-loader>
+      />
       <v-skeleton-loader
         v-if="loadingComments"
         :elevation="2"
         type="list-item-avatar"
         class="mb-2"
-      ></v-skeleton-loader>
+      />
       <v-skeleton-loader
         v-if="loadingComments"
         :elevation="2"
         type="list-item-avatar"
         class="mb-2"
-      ></v-skeleton-loader>
+      />
 
       <po-comments-index />
+    </template>
+
+    <!-- Feed row (listing) -->
+    <template v-else>
+      <article class="position-relative py-12 border-b">
+        <po-writing-dropdown />
+
+        <p class="text-medium-emphasis text-uppercase text-eyebrow ma-0">
+          {{ toLocaleDate(data.created_at) }}
+        </p>
+
+        <p class="po-prose text-display-small ma-0 mb-2">
+          <po-link :href="route('writings.show', data.slug)" class="stretched" inertia>
+            {{ data.title }}
+          </po-link>
+        </p>
+
+        <p class="po-prose text-title-large mb-6">
+          {{ excerpt(data.text) }}
+        </p>
+
+        <div class="d-flex align-center flex-wrap ga-2 position-relative" style="z-index: 2">
+          <po-link :href="route('users.show', data.author.username)" inertia>
+            <po-avatar-award :user="data.author" avatar-size="28" avatar-color="secondary" />
+          </po-link>
+
+          <po-link :href="route('users.show', data.author.username)" class="text-body-2" inertia>
+            {{ userDisplayName(data.author) }}
+          </po-link>
+
+          <span class="">
+            · {{ $t('main.count-likes', { count: data.likes_count }) }} ·
+            {{ $t('main.count-comments', { count: data.comments_count }) }}
+          </span>
+        </div>
+      </article>
     </template>
   </po-wrapper>
 </template>

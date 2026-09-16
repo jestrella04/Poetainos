@@ -56,13 +56,7 @@ const {
 
   <div class="mx-auto column-full">
     <template v-if="!fetched">
-      <po-loading
-        type="avatar, paragraph, button"
-        cols="12"
-        md="12"
-        lg="12"
-        class="mx-auto"
-      ></po-loading>
+      <po-loading type="avatar, paragraph, button" cols="12" md="12" lg="12" class="mx-auto" />
     </template>
 
     <template v-else-if="!isEmpty(notifications)">
@@ -75,7 +69,7 @@ const {
             inertia
             @click="unreadCount = 0"
           >
-            <v-icon icon="fas fa-check-double" class="me-2"></v-icon>
+            <v-icon icon="fas fa-check-double" class="me-2" />
             {{ $t('main.mark-all-read') }}
           </po-button>
         </div>
@@ -115,8 +109,7 @@ const {
                       :href="route('notifications.show', notification.id)"
                       class="stretched"
                       inertia
-                    >
-                    </po-link>
+                    />
                   </div>
                 </div>
               </div>
@@ -125,7 +118,7 @@ const {
         </v-card>
       </template>
 
-      <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+      <po-infinite-scroll @load="loadMore" />
     </template>
 
     <template v-else>
@@ -134,7 +127,7 @@ const {
         msg-title=""
         :msg-body="$t('accounts.notifications-empty')"
         icon="fas fa-bell-slash"
-      ></po-msg-block>
+      />
     </template>
   </div>
 </template>

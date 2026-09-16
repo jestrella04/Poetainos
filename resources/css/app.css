@@ -1,0 +1,34 @@
+/* Vuetify's compiled CSS reads typography font-family from these two custom
+   properties (html uses --v-font-body; heading-scale classes like text-h1
+   and v-card-title use --v-font-heading) — this is Vuetify's own theming
+   hook, no SASS rebuild needed. */
+:root {
+  --v-font-body: 'Karla', system-ui, sans-serif;
+  --v-font-heading: 'EB Garamond', Georgia, serif;
+}
+
+/* Vuetify has no letter-spacing utility; eyebrow/meta labels (category+date
+   lines, author bylines, etc.) need one consistently across components. */
+.text-eyebrow {
+  letter-spacing: 0.08em;
+}
+
+/* Body prose (writing text/excerpts, comments, bio) lives in plain tags
+   outside Vuetify's typography-class system, so it wouldn't otherwise pick
+   up the serif heading font from html's --v-font-body default. */
+.po-prose {
+  font-family: var(--v-font-heading);
+}
+
+/* Vuetify sets no default anchor color/decoration, so plain <a> tags (titles,
+   author bylines, "load more" links, etc.) render as unstyled browser blue
+   unless given one here — this is the mockup's own base link treatment. */
+a {
+  color: rgb(var(--v-theme-on-surface));
+  text-decoration: none;
+}
+
+
+::selection {
+  background: rgba(var(--v-theme-primary), 0.2);
+}

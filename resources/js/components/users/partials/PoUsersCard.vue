@@ -29,7 +29,7 @@ const { userDisplayName } = useFormatting()
       <p>{{ data.bio }}</p>
     </v-card-text>
 
-    <v-divider></v-divider>
+    <v-divider />
     <v-card-actions>
       <po-users-stats :data="data" />
     </v-card-actions>

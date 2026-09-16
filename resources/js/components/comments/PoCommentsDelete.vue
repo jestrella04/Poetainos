@@ -39,14 +39,14 @@ async function submit(): Promise<void> {
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('main.proceed-with-caution')">
-      <po-modal-close @click.prevent="isDelete = false"></po-modal-close>
+      <po-modal-close @click.prevent="isDelete = false" />
       <v-card-text>
         <p class="mb-2">
           {{ $t('main.permanent-delete-ask') }}
           {{ $t('main.action-irreversible') }}
         </p>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form
           id="comment-delete-form"
@@ -55,7 +55,7 @@ async function submit(): Promise<void> {
         >
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

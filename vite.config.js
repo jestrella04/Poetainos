@@ -105,6 +105,9 @@ export default defineConfig(({ mode }) => {
         cleanupOutdatedCaches: true
       },
       injectManifest: {
+        // Default glob only covers js/css/html; the self-hosted EB Garamond/Karla
+        // woff2 files need to be included explicitly to be precached offline.
+        globPatterns: ['**/*.{js,css,html,woff2}'],
         maximumFileSizeToCacheInBytes: 3000000
       }
     })

@@ -60,13 +60,13 @@ async function shelf(event: MouseEvent): Promise<void> {
 </script>
 
 <template>
-  <div class="d-flex justify-center ga-8 mx-auto text-medium-emphasis text-caption text-center">
+  <div class="d-flex justify-center ga-8 mx-auto text-on-surface-variant text-caption text-center">
     <div
       v-if="!strNullOrEmpty(writing.home_posted_at)"
       class="d-flex flex-column"
       :title="$t('writings.awarded')"
     >
-      <div><v-icon icon="fas fa-fan" color="amber-accent-4"></v-icon></div>
+      <div><v-icon icon="fas fa-fan" color="amber-accent-4" /></div>
       <div>:</div>
     </div>
 
@@ -76,7 +76,7 @@ async function shelf(event: MouseEvent): Promise<void> {
       :title="$t('main.count-likes', { count: likesCount })"
       @click="like"
     >
-      <div><v-icon icon="fas fa-heart"></v-icon></div>
+      <div><v-icon icon="fas fa-heart" /></div>
       <div>{{ readable(likesCount) }}</div>
     </div>
 
@@ -84,12 +84,12 @@ async function shelf(event: MouseEvent): Promise<void> {
       class="d-flex flex-column"
       :title="$t('main.count-comments', { count: writing.comments_count })"
     >
-      <div><v-icon icon="fas fa-comment"></v-icon></div>
+      <div><v-icon icon="fas fa-comment" /></div>
       <div>{{ readable(writing.comments_count) }}</div>
     </div>
 
     <div class="d-flex flex-column" :title="$t('main.count-views', { count: writing.views })">
-      <div><v-icon icon="fas fa-book-reader"></v-icon></div>
+      <div><v-icon icon="fas fa-book-reader" /></div>
       <div>{{ readable(writing.views) }}</div>
     </div>
 
@@ -99,12 +99,12 @@ async function shelf(event: MouseEvent): Promise<void> {
       :title="$t('main.count-shelved', { count: shelfCount })"
       @click="shelf"
     >
-      <div><v-icon icon="fas fa-bookmark"></v-icon></div>
+      <div><v-icon icon="fas fa-bookmark" /></div>
       <div>{{ readable(shelfCount) }}</div>
     </div>
 
     <div class="d-flex flex-column" :title="$t('main.aura-value', { aura: writing.aura })">
-      <div><v-icon icon="fas fa-dove"></v-icon></div>
+      <div><v-icon icon="fas fa-dove" /></div>
       <div>{{ writing.aura }}</div>
     </div>
   </div>

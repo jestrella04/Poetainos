@@ -109,8 +109,7 @@ async function submitForm() {
         clearable
         required
         hide-details="auto"
-      >
-      </v-text-field>
+      />
 
       <v-text-field
         v-model="formData.confirmPassword"
@@ -122,12 +121,11 @@ async function submitForm() {
         persistent-placeholder
         clearable
         hide-details="auto"
-      >
-      </v-text-field>
+      />
 
       <po-button type="submit" color="primary" size="large" block :disabled="isLoading">
         <span v-if="!isLoading">{{ $t('main.send') }}</span>
-        <v-progress-circular v-else indeterminate></v-progress-circular>
+        <v-progress-circular v-else indeterminate />
       </po-button>
     </v-form>
   </div>

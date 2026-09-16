@@ -37,7 +37,7 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
       <div class="w-100 d-flex align-center ga-5">
         <div>
           <v-avatar size="48">
-            <v-img src="/images/logo.svg" alt=""></v-img>
+            <v-img src="/images/logo.svg" alt="" />
           </v-avatar>
         </div>
 

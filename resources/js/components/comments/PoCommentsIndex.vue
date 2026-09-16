@@ -104,18 +104,18 @@ function reply(comment: Comment) {
 
                 <div class="">
                   <p class="text-caption mb-0">{{ userDisplayName(comment.author) }}</p>
-                  <p class="text-caption mb-2 text-medium-emphasis">
+                  <p class="text-caption mb-2 text-eyebrow text-on-surface-variant">
                     {{ toLocaleDate(comment.created_at) }}
                   </p>
                 </div>
               </div>
 
               <div>
-                <po-comments-dropdown :comment="comment"></po-comments-dropdown>
+                <po-comments-dropdown :comment="comment" />
               </div>
             </div>
 
-            <div v-html="linkify(comment.message)"></div>
+            <div class="po-prose" v-html="linkify(comment.message)" />
           </v-card-text>
 
           <v-card-actions class="justify-end">
@@ -130,12 +130,12 @@ function reply(comment: Comment) {
                 }
               "
             >
-              <v-icon class="me-2" icon="fas fa-heart"></v-icon>
+              <v-icon class="me-2" icon="fas fa-heart" />
               <span class="count">{{ readable(comment.likes_count) }}</span>
             </po-button>
 
             <po-button variant="tonal" size="small" @click.prevent="toggleReply(comment.id)">
-              <v-icon class="me-2" icon="fa fa-reply"></v-icon>
+              <v-icon class="me-2" icon="fa fa-reply" />
               <span>{{ $t('main.reply') }}</span>
             </po-button>
           </v-card-actions>
