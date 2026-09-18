@@ -11,11 +11,13 @@ import type { UserLike, Writing } from '@/types/models'
 const props = withDefaults(
   defineProps<{
     alone?: boolean
+    hero?: boolean
     data: Writing
     likers?: UserLike[]
   }>(),
   {
-    alone: true
+    alone: true,
+    hero: false
   }
 )
 
@@ -158,36 +160,37 @@ provide(writingKey, props.data)
 
     <!-- Feed row (listing) -->
     <template v-else>
-      <article class="position-relative py-12 border-b">
-        <po-writing-dropdown />
+      <article :class="hero ? 'pb-16' : 'py-12 border-b'">
+        <div class="d-flex align-center justify-space-between">
+          <p class="text-medium-emphasis text-uppercase text-eyebrow ma-0">
+            {{ toLocaleDate(data.created_at) }}
+          </p>
 
-        <p class="text-medium-emphasis text-uppercase text-eyebrow ma-0">
-          {{ toLocaleDate(data.created_at) }}
-        </p>
+          <po-writing-dropdown />
+        </div>
 
-        <p class="po-prose text-display-small ma-0 mb-2">
-          <po-link :href="route('writings.show', data.slug)" class="stretched" inertia>
-            {{ data.title }}
-          </po-link>
-        </p>
+        <div class="position-relative">
+          <p :class="hero ? 'text-display-large' : 'text-display-small'" class="po-prose ma-0 mb-2">
+            <po-link :href="route('writings.show', data.slug)" class="stretched" inertia>
+              {{ data.title }}
+            </po-link>
+          </p>
 
-        <p class="po-prose text-title-large mb-6">
-          {{ excerpt(data.text) }}
-        </p>
+          <p :class="hero ? 'text-headline-small' : 'text-title-large'" class="po-prose mb-6">
+            {{ excerpt(data.text) }}
+          </p>
+        </div>
 
         <div class="d-flex align-center flex-wrap ga-2 position-relative" style="z-index: 2">
           <po-link :href="route('users.show', data.author.username)" inertia>
-            <po-avatar-award :user="data.author" avatar-size="28" avatar-color="secondary" />
-          </po-link>
-
-          <po-link :href="route('users.show', data.author.username)" class="text-body-2" inertia>
+            <po-avatar-award :user="data.author" avatar-size="28" avatar-color="primary" />
             {{ userDisplayName(data.author) }}
           </po-link>
 
-          <span class="">
-            · {{ $t('main.count-likes', { count: data.likes_count }) }} ·
-            {{ $t('main.count-comments', { count: data.comments_count }) }}
-          </span>
+          <span>{{ $t('main.count-views', { count: data.views }) }}</span>
+          <span>{{ $t('main.count-likes', { count: data.likes_count }) }}</span>
+          <span>{{ $t('main.count-comments', { count: data.comments_count }) }}</span>
+          <span>{{ $t('main.count-shelved', { count: data.shelf_count }) }}</span>
         </div>
       </article>
     </template>

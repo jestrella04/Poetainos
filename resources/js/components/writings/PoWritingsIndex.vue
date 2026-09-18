@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
-import PoWritingsHero from './partials/PoWritingsHero.vue'
 import PoWritingsSidebar from './partials/PoWritingsSidebar.vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
@@ -62,7 +61,13 @@ const restWritings = computed(() =>
   <po-wrapper class="h-100">
     <po-head />
 
-    <po-writings-hero v-if="page.props.isHome && heroWriting !== null" :data="heroWriting" />
+    <template v-if="page.props.isHome && heroWriting !== null">
+      <p class="text-uppercase text-primary mb-6">
+        {{ $t('main.pick-of-the-day') }}
+      </p>
+
+      <po-writings-entry :alone="false" :data="heroWriting" hero />
+    </template>
 
     <v-row>
       <v-col v-if="page.props.isHome" cols="12" md="3" order="1" order-md="2">

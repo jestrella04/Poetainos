@@ -38,8 +38,8 @@ function share(): void {
         v-bind="props"
         icon="fas fa-ellipsis-vertical"
         color="secondary"
-        size="x-small"
         variant="tonal"
+        size="x-small"
         class="po-btn-more"
         :aria-label="$t('main.more-actions')"
       />

@@ -51,8 +51,7 @@ const { userDisplayName } = useFormatting()
         <po-chip
           v-for="tag in tags"
           :key="tag.id"
-          color="secondary"
-          size="small"
+          color="primary"
           :href="route('tags.show', tag.slug)"
           inertia
         >

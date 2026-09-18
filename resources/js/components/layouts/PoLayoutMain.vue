@@ -120,66 +120,6 @@ function getFlashMessages() {
 }
 </script>
 
-<style>
-/* Vuetify's height:100% isn't applied to html/body/root container by default; needed for full-height layouts. */
-html,
-body,
-.po-container {
-  height: 100% !important;
-}
-
-/* po-navbar uses v-toolbar (not v-app-bar), which isn't part of Vuetify's layout system, so it needs manual fixed positioning. */
-@media screen and (min-width: 1280px) {
-  .po-navbar {
-    position: fixed !important;
-    z-index: 999 !important;
-    min-height: 64px !important;
-  }
-}
-
-/* Stretched-link pattern: makes an ancestor card fully clickable via a positioned pseudo-element. No Vuetify equivalent. */
-.stretched::after {
-  position: absolute !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  z-index: 1 !important;
-  content: '' !important;
-}
-
-/* Like/shelve icon state coloring; no Vuetify prop drives this from a plain CSS class. */
-.liked i,
-.do-like:hover i {
-  color: rgb(var(--v-theme-error));
-}
-
-.shelved i,
-.do-shelf:hover i {
-  color: rgb(var(--v-theme-info));
-}
-
-.do-shelf,
-.do-like {
-  cursor: pointer;
-}
-
-/* Sticks the tab bar below the fixed navbar; offset changes once the navbar stops being fixed. */
-.sticky-tabs {
-  position: sticky !important;
-  top: 64px !important;
-  z-index: 990;
-  background-color: rgb(var(--v-theme-background));
-  margin-bottom: 0.8rem;
-}
-
-@media screen and (max-width: 1280px) {
-  .sticky-tabs {
-    top: 0 !important;
-  }
-}
-</style>
-
 <template>
   <v-app>
     <po-head />
@@ -187,7 +127,12 @@ body,
     <po-login-modal v-model="loginModal" />
     <po-pwa-prompt />
 
-    <v-toolbar color="surface" :elevation="0" border="b" class="po-navbar px-3 d-none d-lg-flex">
+    <v-toolbar
+      color="primary"
+      :elevation="0"
+      border="b"
+      class="po-navbar px-3 d-none d-lg-flex text-on-primary"
+    >
       <v-container class="d-inline-flex justify-space-between">
         <div class="align-self-center">
           <po-link
@@ -203,15 +148,15 @@ body,
 
         <v-tabs :model-value="page.props.route.name">
           <po-tab :href="route('explore')" value="explore" inertia>{{ $t('main.explore') }}</po-tab>
-          <po-tab :href="route('writings.awards')" value="writings.awards" inertia>{{
-            $t('main.awards')
-          }}</po-tab>
-          <po-tab :href="route('writings.random')" value="writings.random" inertia>{{
-            $t('main.random')
-          }}</po-tab>
-          <po-tab :href="route('users.index')" value="users.index" inertia>{{
-            $t('users.authors')
-          }}</po-tab>
+          <po-tab :href="route('writings.awards')" value="writings.awards" inertia>
+            {{ $t('main.awards') }}
+          </po-tab>
+          <po-tab :href="route('writings.random')" value="writings.random" inertia>
+            {{ $t('main.random') }}
+          </po-tab>
+          <po-tab :href="route('users.index')" value="users.index" inertia>
+            {{ $t('users.authors') }}
+          </po-tab>
           <po-tab @click.prevent="desktopSiteMenu = true">
             <v-icon icon="fas fa-ellipsis-vertical" />
             <v-menu v-model="desktopSiteMenu" target="parent">
