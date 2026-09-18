@@ -78,8 +78,4 @@ return [
         'user_id' => env('COUNTER_USER_ID'),
         'access_token' => env('COUNTER_ACCESS_TOKEN'),
     ],
-
-    'installer' => [
-        'token' => env('APP_INSTALLER_TOKEN'),
-    ],
 ];

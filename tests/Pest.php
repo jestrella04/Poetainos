@@ -19,10 +19,9 @@ use Tests\TestCase;
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->beforeEach(function (): void {
-        // AppServiceProvider only loads the `writerhood` config from the `settings`
-        // table when NOT running in console, which is always true for artisan test/pest
-        // (even inside a simulated HTTP request), so it never loads here. Seed the
-        // values controllers/models read via getSiteConfig() directly instead.
+        // EnsureSiteIsConfigured loads the `writerhood` config from the `settings`
+        // table only when it isn't already set. Seed the values controllers/models
+        // read via getSiteConfig() directly so requests don't need a `site` row.
         config(['writerhood' => [
             'name' => 'Poetainos',
             'slogan' => 'A place for writers',

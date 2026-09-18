@@ -6,7 +6,6 @@ use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ComplaintsController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\GenericController;
-use App\Http\Controllers\InitController;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PushNotificationsController;
@@ -98,9 +97,6 @@ Route::middleware(['verified'])->group(function (): void {
 });
 
 /* Public routes */
-
-// Installation
-Route::get('/init', [InitController::class, 'init'])->name('init.show');
 
 // Generic
 Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.manifest');
