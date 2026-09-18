@@ -27,7 +27,7 @@ class WritingFactory extends Factory
             'user_id' => User::factory(),
             'title' => $this->faker->text(45),
             'slug' => $this->faker->unique()->slug(3),
-            'text' => $this->faker->paragraph,
+            'text' => implode("\n\n", $this->faker->paragraphs($this->faker->numberBetween(2, 10))),
         ];
     }
 }

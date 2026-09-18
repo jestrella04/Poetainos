@@ -2,38 +2,111 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Category;
 use App\Models\Comment;
 use App\Models\Like;
+use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class DatabaseSeeder extends Seeder
 {
+    private const int USERS_COUNT = 15;
+
+    private const int WRITINGS_COUNT = 30;
+
+    private const int TAGS_COUNT = 10;
+
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
-        $count = 10;
+        $this->call(CategorySeeder::class);
 
-        User::factory($count)->create()->each(function ($user) {
-            $user->writings()->save(Writing::factory()->make());
-            // $user->likes()->save(Like::factory()->make());
-            $user->comments()->save(Comment::factory()->make());
+        $users = User::factory(self::USERS_COUNT)->create();
+        $tags = Tag::factory(self::TAGS_COUNT)->create();
+        $mainCategories = Category::whereNull('parent_id')->with('categories')->get();
+
+        $writings = $this->seedWritings($users, $tags, $mainCategories);
+
+        $this->seedComments($writings, $users);
+        $this->seedEngagement($writings, $users);
+    }
+
+    /**
+     * @param  Collection<int, User>  $users
+     * @param  Collection<int, Tag>  $tags
+     * @param  Collection<int, Category>  $mainCategories
+     * @return Collection<int, Writing>
+     */
+    private function seedWritings(Collection $users, Collection $tags, Collection $mainCategories): Collection
+    {
+        return collect(range(1, self::WRITINGS_COUNT))->map(function () use ($users, $tags, $mainCategories) {
+            $mainCategory = $mainCategories->random();
+            $subCategories = $mainCategory->categories->random(random_int(0, 2));
+
+            $writing = Writing::factory()->create(['user_id' => $users->random()->id]);
+
+            $writing->categories()->attach(
+                collect([$mainCategory->id])->merge($subCategories->pluck('id'))
+            );
+            $writing->tags()->attach($tags->random(random_int(1, 3))->pluck('id'));
+
+            return $writing;
         });
+    }
 
-        Writing::factory($count)->create()->each(function ($writing) {
-            $writing->categories()->save(Category::factory()->make());
-            $writing->tags()->save(Tag::factory()->make());
-        });
+    /**
+     * @param  Collection<int, Writing>  $writings
+     * @param  Collection<int, User>  $users
+     */
+    private function seedComments(Collection $writings, Collection $users): void
+    {
+        foreach ($writings as $writing) {
+            Comment::factory(random_int(0, 5))->create([
+                'writing_id' => $writing->id,
+                'user_id' => fn () => $users->random()->id,
+            ]);
+        }
+    }
 
-        // factory(App\Models\Hood::class, $count)->make();
-        // factory(App\Models\Shelf::class, $count)->make();
+    /**
+     * Half of the writings get no engagement at all; the other half get
+     * between 1 and 5 likes and, separately, between 1 and 5 shelf entries,
+     * each from distinct non-author users (to respect the `likes` unique
+     * constraint, the `shelves` composite primary key, and the app's
+     * no-self-like rule).
+     *
+     * @param  Collection<int, Writing>  $writings
+     * @param  Collection<int, User>  $users
+     */
+    private function seedEngagement(Collection $writings, Collection $users): void
+    {
+        $engagedWritings = $writings->shuffle()->take((int) floor($writings->count() / 2));
+
+        foreach ($engagedWritings as $writing) {
+            $candidates = $users->reject(fn (User $user) => $user->id === $writing->user_id);
+
+            $likers = $candidates->random(min(random_int(1, 5), $candidates->count()));
+            foreach ($likers as $liker) {
+                Like::factory()->create([
+                    'likeable_type' => Writing::class,
+                    'likeable_id' => $writing->id,
+                    'user_id' => $liker->id,
+                ]);
+            }
+
+            $shelvers = $candidates->random(min(random_int(1, 5), $candidates->count()));
+            foreach ($shelvers as $sheller) {
+                Shelf::factory()->create([
+                    'user_id' => $sheller->id,
+                    'writing_id' => $writing->id,
+                ]);
+            }
+        }
     }
 }
