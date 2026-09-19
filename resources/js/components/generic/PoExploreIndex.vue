@@ -78,7 +78,7 @@ const categories = computed(() => [
     {{ $t('main.featured-authors') }}
   </p>
 
-  <v-avatar-group size="96" border="lg" hoverable>
+  <v-avatar-group size="96" border="md" hoverable>
     <po-avatar
       v-for="author in page.props.authors"
       :key="author.id"

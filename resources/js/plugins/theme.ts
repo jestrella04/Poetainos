@@ -4,7 +4,7 @@ export const themes: Record<string, ThemeDefinition> = {
   light: {
     dark: false,
     colors: {
-      background: '#f5fafb',
+      background: '#f5fdff',
       'on-background': '#161d1d',
       surface: '#f5fafb',
       'on-surface': '#161d1d',
@@ -34,7 +34,7 @@ export const themes: Record<string, ThemeDefinition> = {
   dark: {
     dark: true,
     colors: {
-      background: '#0e1415',
+      background: '#182022',
       'on-background': '#dee4e4',
       surface: '#0e1415',
       'on-surface': '#dee4e4',
