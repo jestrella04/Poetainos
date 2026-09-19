@@ -20,6 +20,12 @@ class DatabaseSeeder extends Seeder
 
     private const int TAGS_COUNT = 10;
 
+    private const array VIEWS_RANGES = [
+        [0, 10],
+        [500, 900],
+        [3000, 4000],
+    ];
+
     /**
      * Seed the application's database.
      */
@@ -30,7 +36,6 @@ class DatabaseSeeder extends Seeder
         $users = User::factory(self::USERS_COUNT)->create();
         $tags = Tag::factory(self::TAGS_COUNT)->create();
         $mainCategories = Category::whereNull('parent_id')->with('categories')->get();
-
         $writings = $this->seedWritings($users, $tags, $mainCategories);
 
         $this->seedComments($writings, $users);
@@ -48,16 +53,30 @@ class DatabaseSeeder extends Seeder
         return collect(range(1, self::WRITINGS_COUNT))->map(function () use ($users, $tags, $mainCategories) {
             $mainCategory = $mainCategories->random();
             $subCategories = $mainCategory->categories->random(random_int(0, 2));
-
-            $writing = Writing::factory()->create(['user_id' => $users->random()->id]);
+            $writing = Writing::factory()->create([
+                'user_id' => $users->random()->id,
+                'views' => $this->randomViewsCount(),
+            ]);
 
             $writing->categories()->attach(
                 collect([$mainCategory->id])->merge($subCategories->pluck('id'))
             );
+
             $writing->tags()->attach($tags->random(random_int(1, 3))->pluck('id'));
 
             return $writing;
         });
+    }
+
+    /**
+     * Picks one of the VIEWS_RANGES at random (low, medium or high traffic)
+     * and returns a random view count within it.
+     */
+    private function randomViewsCount(): int
+    {
+        [$min, $max] = self::VIEWS_RANGES[array_rand(self::VIEWS_RANGES)];
+
+        return random_int($min, $max);
     }
 
     /**

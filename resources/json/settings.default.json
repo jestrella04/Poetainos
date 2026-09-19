@@ -35,7 +35,7 @@
   },
   "aura": {
     "min_at_home": {
-      "value": 10,
+      "value": 1,
       "description": "The minimum aura for a writing to be displayed on homepage."
     },
     "points": {

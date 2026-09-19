@@ -28,6 +28,7 @@ class WritingFactory extends Factory
             'title' => $this->faker->text(45),
             'slug' => $this->faker->unique()->slug(3),
             'text' => implode("\n\n", $this->faker->paragraphs($this->faker->numberBetween(2, 10))),
+            'extra_info' => $this->faker->boolean() ? ['cover' => 'covers/4onBuGectl8znoQneqi6jARmJv3oy7hL4bxYLXbc.jpeg'] : null,
         ];
     }
 }

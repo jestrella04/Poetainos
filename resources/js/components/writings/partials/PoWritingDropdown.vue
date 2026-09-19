@@ -32,17 +32,17 @@ function share(): void {
   <po-complainer v-model="complainer" comp-type="writings" :comp-id="writing.id" />
   <po-blocker v-model="blocker" :user="writing.author" />
 
-  <v-menu>
+  <v-menu open-on-hover>
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        icon="fas fa-ellipsis-vertical"
-        color="secondary"
+        prepend-icon="fas fa-plus"
+        color="primary"
         variant="tonal"
-        size="x-small"
-        class="po-btn-more"
         :aria-label="$t('main.more-actions')"
-      />
+      >
+        {{ $t('main.more') }}
+      </v-btn>
     </template>
 
     <v-list>
