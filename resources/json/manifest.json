@@ -80,8 +80,8 @@
     "writing",
     "short stories"
   ],
-  "background_color": "#512DA8",
-  "theme_color": "#512DA8",
+  "background_color": "#f5fafb",
+  "theme_color": "#006971",
   "scope": "/",
   "dir": "ltr",
   "prefer_related_applications": true,

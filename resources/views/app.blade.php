@@ -12,7 +12,7 @@
     <link rel="alternate icon" href="/images/logo-32.png" sizes="32x32" type="image/png">
 
     <!-- PWA -->
-    <meta name="theme-color" content="#673AB7" />
+    <meta name="theme-color" content="#006971" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="{{ getSiteConfig('name') }}">
