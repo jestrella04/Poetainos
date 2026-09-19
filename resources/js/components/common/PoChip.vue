@@ -15,18 +15,19 @@ const props = withDefaults(
 )
 
 const { visit } = useInertiaVisit(props)
+
+function handleClick(event: MouseEvent | KeyboardEvent): void {
+  if (props.inertia === true) {
+    event.preventDefault()
+    visit()
+  }
+}
 </script>
 
 <template>
-  <template v-if="!inertia">
-    <v-chip :href="href">
-      <slot />
-    </v-chip>
-  </template>
-
-  <template v-else>
-    <v-chip :href="href" @click.prevent="visit">
-      <slot />
-    </v-chip>
-  </template>
+  <v-chip :href="href" @click="handleClick">
+    <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
+  </v-chip>
 </template>

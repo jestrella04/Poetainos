@@ -101,7 +101,6 @@
     "create-category": "Crear categoría",
     "delete-category-warning": "Eliminar una categoría no eliminará los textos asociados",
     "edit-category": "Editar categoría",
-    "main-categories": "Categorías principales",
     "main-category": "Categoría principal",
     "select-alt": "Selecciona las categorías secundarias (máximo 2)",
     "select-main": "Selecciona la categoría principal"

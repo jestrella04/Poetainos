@@ -50,7 +50,7 @@ const taxonomies = computed(() => [
     <div v-if="!isEmpty(likers)">
       <p class="text-caption mb-2">{{ $t('main.liked-by') }}</p>
 
-      <v-avatar-group size="64" border hoverable>
+      <v-avatar-group size="64" border="lg" hoverable>
         <po-avatar
           v-for="liker in likers"
           :key="liker.id"

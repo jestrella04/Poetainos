@@ -13,14 +13,14 @@ const { userDisplayName } = useFormatting()
 <template>
   <aside>
     <div v-if="authors.length > 0" class="mb-10">
-      <p class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-4">
+      <p class="text-uppercase text-eyebrow mb-4">
         {{ $t('main.authors-to-follow') }}
       </p>
 
       <div class="d-flex flex-column ga-4">
         <div v-for="author in authors" :key="author.id" class="d-flex align-center ga-3">
           <po-link :href="route('users.show', author.username)" inertia>
-            <po-avatar-award :user="author" avatar-size="32" avatar-color="secondary" />
+            <po-avatar-award :user="author" avatar-size="32" avatar-color="primary" />
           </po-link>
 
           <div class="flex-grow-1">
@@ -31,19 +31,20 @@ const { userDisplayName } = useFormatting()
             >
               {{ userDisplayName(author) }}
             </po-link>
-            <span class="text-caption text-on-surface-variant">
+
+            <span class=" ">
               {{ $t('main.count-writings', { count: author.writings_count ?? 0 }) }}
             </span>
           </div>
 
           <!-- Not wired up yet: following authors has no backend support. -->
-          <span class="text-caption text-primary">{{ $t('main.follow') }}</span>
+          <span class="text-primary">{{ $t('main.follow') }}</span>
         </div>
       </div>
     </div>
 
     <div v-if="tags.length > 0">
-      <p class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-4">
+      <p class="text-uppercase text-eyebrow mb-4">
         {{ $t('main.trending-topics') }}
       </p>
 
@@ -51,11 +52,16 @@ const { userDisplayName } = useFormatting()
         <po-chip
           v-for="tag in tags"
           :key="tag.id"
-          color="primary"
           :href="route('tags.show', tag.slug)"
+          color="primary"
+          size="large"
+          variant="tonal"
           inertia
         >
           {{ tag.name }}
+          <template v-slot:append>
+            <v-avatar color="primary" end>{{ tag.writings_count }}</v-avatar>
+          </template>
         </po-chip>
       </div>
     </div>

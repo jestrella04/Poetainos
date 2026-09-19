@@ -22,10 +22,17 @@
 
 /* Vuetify sets no default anchor color/decoration, so plain <a> tags (titles,
    author bylines, "load more" links, etc.) render as unstyled browser blue
-   unless given one here — this is the mockup's own base link treatment. */
-a {
-  color: inherit;
-  text-decoration: none;
+   unless given one here — this is the mockup's own base link treatment.
+   Kept inside Vuetify's lowest cascade layer: unlayered rules, and layers
+   declared after Vuetify's, beat every Vuetify layer, so a bare `a` rule would
+   override the color of any Vuetify component rendered as an anchor (e.g. a
+   `v-chip` with an `href`). It must be the nested `vuetify-core.base` — a
+   plain `@layer base` would create a new top-level layer that outranks Vuetify. */
+@layer vuetify-core.base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 
