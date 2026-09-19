@@ -24,16 +24,16 @@ provide(isDeleteKey, isDelete)
   <po-blocker v-model="blocker" :user="comment.author" />
   <po-comments-delete v-model="isDelete" :comment="comment" />
 
-  <v-menu>
+  <v-menu open-on-hover>
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        icon="fas fa-ellipsis-vertical"
-        color="secondary"
-        size="x-small"
+        prepend-icon="fas fa-plus"
+        color="primary"
         variant="tonal"
         :aria-label="$t('main.more-actions')"
-      />
+        >{{ $t('main.more') }}</v-btn
+      >
     </template>
 
     <v-list>

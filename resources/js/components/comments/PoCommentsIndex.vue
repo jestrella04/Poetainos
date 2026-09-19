@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, provide } from 'vue'
+import { ref, onMounted, provide } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import PoCommentsForm from './PoCommentsForm.vue'
@@ -9,14 +9,12 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
-import { useToggleReaction } from '@/composables/useToggleReaction'
 import type { Comment, Paginated } from '@/types/models'
 
-const page = computed(() => usePage())
+const page = usePage()
 const { auth } = useAuth()
 const { isEmpty } = useTypeGuards()
-const { userDisplayName, toLocaleDate, linkify, readable } = useFormatting()
-const { toggleReaction } = useToggleReaction()
+const { userDisplayName, toLocaleDate, linkify } = useFormatting()
 const comments = ref<Partial<Paginated<Comment>>>({})
 const loadingComments = injectStrict(loadingCommentsKey)
 const writing = injectStrict(writingKey)
@@ -36,29 +34,8 @@ async function loadComments() {
   })
 }
 
-async function like(event: MouseEvent, id: number): Promise<void> {
-  const isAuthenticated = auth()
-
-  await toggleReaction({
-    event,
-    doerSelector: '.do-like',
-    canReact: isAuthenticated,
-    isAuthenticated,
-    onUnauthenticated: () => {
-      loginModal.value = true
-    },
-    postUrl: route('likes.store', ['comment', id]),
-    activeClass: 'liked',
-    onCount: (count) => {
-      const countEl = (event.target as HTMLElement)
-        .closest<HTMLElement>('.do-like')
-        ?.querySelector<HTMLElement>('span.count')
-
-      if (countEl !== null && countEl !== undefined) {
-        countEl.textContent = readable(count)
-      }
-    }
-  })
+function isLiked(commentId: number): boolean {
+  return page.props.auth.liked.comments.includes(commentId)
 }
 
 function toggleReply(commentId: number) {
@@ -93,52 +70,52 @@ function reply(comment: Comment) {
     </div>
 
     <template v-if="!isEmpty(comments.data)">
-      <p class="text-h6 mb-3">{{ $t('comments.comments') }}</p>
+      <p class="text-uppercase text-medium-emphasis mb-3">{{ $t('comments.comments') }}</p>
 
       <template v-for="comment in comments.data" :key="comment.id">
-        <v-card class="mb-2 position-relative">
-          <v-card-text class="pb-1">
-            <div class="d-flex ga-3">
-              <div class="flex-grow-1 d-inline-flex ga-3">
-                <po-avatar size="40" color="secondary" :user="comment.author" />
+        <div class="py-12 border-b">
+          <div class="d-flex align-center flex-wrap mb-4 ga-6">
+            <po-link :href="route('users.show', comment.author.username)" inertia>
+              <po-avatar-award
+                :user="comment.author"
+                avatar-size="28"
+                avatar-color="primary"
+                class="me-1"
+              />
+              {{ userDisplayName(comment.author) }}
+            </po-link>
 
-                <div class="">
-                  <p class="text-caption mb-0">{{ userDisplayName(comment.author) }}</p>
-                  <p class="text-caption mb-2 text-eyebrow text-on-surface-variant">
-                    {{ toLocaleDate(comment.created_at) }}
-                  </p>
-                </div>
-              </div>
+            <span class="text-medium-emphasis">{{ toLocaleDate(comment.created_at) }}</span>
+          </div>
 
-              <div>
-                <po-comments-dropdown :comment="comment" />
-              </div>
-            </div>
+          <div class="po-prose text-title-large mb-6" v-html="linkify(comment.message)" />
 
-            <div class="po-prose" v-html="linkify(comment.message)" />
-          </v-card-text>
+          <div class="d-flex ga-2">
+            <po-reaction-button
+              icon="fa-heart"
+              :count="comment.likes_count"
+              :is-active="isLiked(comment.id)"
+              :post-url="route('likes.store', ['comment', comment.id])"
+              :can-react="true"
+              :activate-title="$t('comments.like-comment')"
+              :deactivate-title="$t('comments.unlike-comment')"
+            />
 
-          <v-card-actions class="justify-end">
-            <po-button
-              variant="tonal"
-              size="small"
-              class="do-like"
-              :class="{ liked: page.props.auth.liked.comments.includes(comment.id) }"
-              @click="
-                (event: MouseEvent) => {
-                  like(event, comment.id)
-                }
-              "
-            >
-              <v-icon class="me-2" icon="fas fa-heart" />
-              <span class="count">{{ readable(comment.likes_count) }}</span>
-            </po-button>
+            <v-hover v-slot="{ isHovering, props: hoverProps }">
+              <po-button
+                v-bind="hoverProps"
+                color="primary"
+                variant="tonal"
+                :title="$t('comments.reply-comment')"
+                :prepend-icon="`${isHovering === true ? 'fas' : 'far'} fa-comment`"
+                @click.prevent="toggleReply(comment.id)"
+              >
+                {{ $t('main.reply') }}
+              </po-button>
+            </v-hover>
 
-            <po-button variant="tonal" size="small" @click.prevent="toggleReply(comment.id)">
-              <v-icon class="me-2" icon="fa fa-reply" />
-              <span>{{ $t('main.reply') }}</span>
-            </po-button>
-          </v-card-actions>
+            <po-comments-dropdown :comment="comment" />
+          </div>
 
           <template v-if="auth() && replyBox === comment.id">
             <div id="" class="reply-box pa-3">
@@ -149,7 +126,7 @@ function reply(comment: Comment) {
               />
             </div>
           </template>
-        </v-card>
+        </div>
       </template>
     </template>
 

@@ -24,7 +24,7 @@
    author bylines, "load more" links, etc.) render as unstyled browser blue
    unless given one here — this is the mockup's own base link treatment. */
 a {
-  color: rgb(var(--v-theme-on-surface));
+  color: inherit;
   text-decoration: none;
 }
 
@@ -65,21 +65,7 @@ body,
   content: '' !important;
 }
 
-/* Like/shelve icon state coloring; no Vuetify prop drives this from a plain CSS class. */
-.liked i,
-.do-like:hover i {
-  color: rgb(var(--v-theme-error));
-}
 
-.shelved i,
-.do-shelf:hover i {
-  color: rgb(var(--v-theme-info));
-}
-
-.do-shelf,
-.do-like {
-  cursor: pointer;
-}
 
 /* Sticks the tab bar below the fixed navbar; offset changes once the navbar stops being fixed. */
 .sticky-tabs {

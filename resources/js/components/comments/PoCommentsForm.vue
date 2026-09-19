@@ -62,6 +62,9 @@ async function submitForm() {
       persistent-placeholder
       required
     />
-    <po-button type="submit" block class="mt-1">{{ $t('comments.post-comment') }}</po-button>
+
+    <po-button color="primary" variant="tonal" class="mt-1" type="submit" block>{{
+      $t('comments.post-comment')
+    }}</po-button>
   </v-form>
 </template>

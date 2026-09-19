@@ -4,7 +4,6 @@ import { usePage } from '@inertiajs/vue3'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
 import PoWritingExtras from './partials/PoWritingExtras.vue'
 import PoWritingDropdown from './partials/PoWritingDropdown.vue'
-import PoWritingReactionButton from './partials/PoWritingReactionButton.vue'
 import { loadingCommentsKey, writingKey } from '@/composables/keys'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
@@ -33,6 +32,7 @@ const hasCover = !isEmpty(props.data.extra_info) && !strNullOrEmpty(props.data.e
 const isLiked = computed(() => page.props.auth.liked.writings.includes(props.data.id))
 const isShelved = computed(() => page.props.auth.shelved.includes(props.data.id))
 const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
+const hasSideCover = hasCover && !props.alone
 const isProminent = props.alone || props.hero
 const listSpacingClass = props.hero ? 'pb-16' : 'py-12 border-b'
 
@@ -42,13 +42,23 @@ provide(writingKey, props.data)
 
 <template>
   <po-wrapper>
-    <article :class="{ [listSpacingClass]: !alone }">
+    <article :class="{ [listSpacingClass]: !alone }" class="pe-md-8">
+      <v-img
+        v-if="hasCover && alone"
+        height="320"
+        :src="storage(data.extra_info?.cover ?? '')"
+        alt=""
+        class="mb-6"
+        rounded
+        cover
+      />
+
       <v-row>
-        <v-col v-if="hasCover" cols="12" md="3" order="1" order-md="2">
+        <v-col v-if="hasSideCover" cols="12" md="3" order="1" order-md="2">
           <v-img height="200" :src="storage(data.extra_info?.cover ?? '')" alt="" rounded cover />
         </v-col>
 
-        <v-col cols="12" :md="hasCover ? 9 : 12" order="2" order-md="1">
+        <v-col cols="12" :md="hasSideCover ? 9 : 12" order="2" order-md="1">
           <div class="d-flex ga-4">
             <span class="text-medium-emphasis text-uppercase text-eyebrow ma-0">
               {{ toLocaleDate(data.created_at) }}
@@ -80,6 +90,34 @@ provide(writingKey, props.data)
               <template v-else>{{ data.title }}</template>
             </p>
 
+            <div class="d-flex align-center flex-wrap mb-4 ga-6">
+              <po-link :href="route('users.show', data.author.username)" inertia>
+                <po-avatar-award
+                  :user="data.author"
+                  avatar-size="28"
+                  avatar-color="primary"
+                  class="me-1"
+                />
+                {{ userDisplayName(data.author) }}
+              </po-link>
+
+              <div class="d-inline-flex align-center ga-3 text-medium-emphasis">
+                <span>{{
+                  $t('main.count-views', { count: readable(data.views) }, data.views)
+                }}</span>
+
+                <span>
+                  {{
+                    $t(
+                      'main.count-comments',
+                      { count: readable(data.comments_count) },
+                      data.comments_count
+                    )
+                  }}
+                </span>
+              </div>
+            </div>
+
             <p
               :class="[
                 isProminent ? 'text-headline-small' : 'text-title-large',
@@ -91,34 +129,10 @@ provide(writingKey, props.data)
             </p>
           </div>
 
-          <div class="d-flex align-center flex-wrap mb-4 ga-6">
-            <po-link :href="route('users.show', data.author.username)" inertia>
-              <po-avatar-award
-                :user="data.author"
-                avatar-size="28"
-                avatar-color="primary"
-                class="me-2"
-              />
-              {{ userDisplayName(data.author) }}
-            </po-link>
-
-            <div class="d-inline-flex align-center ga-3 text-medium-emphasis">
-              <span>{{ $t('main.count-views', { count: readable(data.views) }, data.views) }}</span>
-
-              <span>
-                {{
-                  $t(
-                    'main.count-comments',
-                    { count: readable(data.comments_count) },
-                    data.comments_count
-                  )
-                }}
-              </span>
-            </div>
-          </div>
+          <po-writing-extras v-if="alone" :data="data" :likers="likers" />
 
           <div class="d-flex ga-2">
-            <po-writing-reaction-button
+            <po-reaction-button
               icon="fa-heart"
               :count="data.likes_count"
               :is-active="isLiked"
@@ -128,7 +142,7 @@ provide(writingKey, props.data)
               :deactivate-title="$t('writings.unlike-writing')"
             />
 
-            <po-writing-reaction-button
+            <po-reaction-button
               icon="fa-bookmark"
               :count="data.shelf_count"
               :is-active="isShelved"
@@ -140,8 +154,6 @@ provide(writingKey, props.data)
 
             <po-writing-dropdown />
           </div>
-
-          <po-writing-extras v-if="alone" :data="data" :likers="likers" />
         </v-col>
       </v-row>
     </article>
