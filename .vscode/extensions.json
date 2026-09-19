@@ -13,6 +13,7 @@
     "gruntfuggly.todo-tree",
     "vue.volar",
     "mskelton.npm-outdated",
-    "laravel.vscode-laravel"
+    "laravel.vscode-laravel",
+    "anthropic.claude-code"
   ]
 }

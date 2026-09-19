@@ -11,7 +11,8 @@
         "felixfbecker.php-debug",
         "bmewburn.vscode-intelephense-client",
         "ms-azuretools.vscode-docker",
-        "laravel.vscode-laravel"
+        "laravel.vscode-laravel",
+        "Anthropic.claude-code"
       ]
     }
   }

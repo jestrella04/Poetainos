@@ -24,6 +24,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get update && apt-get install -y nodejs \
     && npm --version
 
+# Install Inkscape CLI (used for SVG -> PNG/PDF conversion)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends inkscape \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \
     && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
