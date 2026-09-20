@@ -14,12 +14,14 @@ const props = withDefaults(
   defineProps<{
     alone?: boolean
     hero?: boolean
+    hideAuthor?: boolean
     data: Writing
     likers?: UserLike[]
   }>(),
   {
     alone: true,
-    hero: false
+    hero: false,
+    hideAuthor: false
   }
 )
 
@@ -91,7 +93,7 @@ provide(writingKey, props.data)
             </p>
 
             <div class="d-flex align-center flex-wrap mb-4 ga-6">
-              <po-link :href="route('users.show', data.author.username)" inertia>
+              <po-link v-if="!hideAuthor" :href="route('users.show', data.author.username)" inertia>
                 <po-avatar-award
                   :user="data.author"
                   avatar-size="28"

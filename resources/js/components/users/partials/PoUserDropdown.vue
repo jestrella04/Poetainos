@@ -34,14 +34,13 @@ function share(): void {
   <po-complainer v-model="complainer" comp-type="users" :comp-id="user.id" />
   <po-blocker v-model="blocker" :user="user" />
 
-  <v-menu>
+  <v-menu open-on-hover>
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        icon="fas fa-ellipsis-vertical"
-        color="secondary"
+        icon="fas fa-plus"
+        color="primary"
         size="x-small"
-        variant="tonal"
         class="po-btn-more"
         :aria-label="$t('main.more-actions')"
       />

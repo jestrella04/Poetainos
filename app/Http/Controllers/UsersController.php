@@ -109,6 +109,8 @@ class UsersController extends Controller
                 'title' => getPageTitle([$user->getName(), __('Writers')]),
                 'canonical' => $user->path(),
             ],
+            // MariaDB's JSON_VALUE (what `extra_info->social` compiles to) returns NULL for objects,
+            // so `social` is decoded from the bound model instead of selected.
             'user' => User::select(
                 'id',
                 'username',
@@ -118,17 +120,23 @@ class UsersController extends Controller
                 'karma',
                 'created_at',
                 'extra_info->bio AS bio',
-                'extra_info->social AS social',
                 'extra_info->avatar AS avatar',
                 'extra_info->website AS website',
                 'extra_info->location AS location',
                 'extra_info->interests AS interests',
+                'extra_info->occupation AS occupation',
             )
                 ->where('id', $user->id)
                 ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
-                ->firstOrFail(),
+                ->firstOrFail()
+                ->setAttribute('social', json_encode($user->extra_info['social'] ?? [])),
+            'authorWritings' => Inertia::optional(fn () => $user->writings()
+                ->visibleTo($this->getBlockedUsers())
+                ->withListingRelations()
+                ->latest()
+                ->simplePaginate($this->pagination)
+                ->withPath(route('users.writings.index', $user))),
             'writings' => [
-                'from_author' => randomWritingsWithAuthor($user->writings()),
                 'from_shelf' => randomWritingsWithAuthor($user->shelf()),
                 'from_liked' => randomWritingsWithAuthor(
                     Writing::whereIn(

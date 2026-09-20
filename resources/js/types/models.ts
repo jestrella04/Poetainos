@@ -23,11 +23,7 @@ export interface UserLike {
 // The full profile shape returned by UsersController::show() — a User
 // model select() with several extra_info->x AS x JSON extractions (raw
 // JSON text, not auto-decoded, hence `social` staying a JSON string) plus
-// withCount() aggregates. `occupation` is deliberately not marked
-// required: UsersController::show() never selects it even though
-// PoUsersEntry.vue's template reads it, so it's always undefined there —
-// a pre-existing backend gap, not something to paper over with a type that
-// claims it's always present.
+// withCount() aggregates.
 export interface User extends UserLike {
   id: number
   profile_views: number

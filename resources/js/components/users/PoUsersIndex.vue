@@ -27,10 +27,6 @@ const {
   <po-wrapper class="h-100">
     <po-head />
 
-    <p class="text-uppercase text-eyebrow text-primary mb-3">
-      {{ $t('main.community') }}
-    </p>
-
     <p class="text-display-large po-prose ma-0 mb-2">
       {{ $t('users.authors') }}
     </p>

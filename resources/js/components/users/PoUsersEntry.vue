@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, provide } from 'vue'
-import PoUsersStats from './partials/PoUsersStats.vue'
+import { useI18n } from 'vue-i18n'
 import PoUserDropdown from './partials/PoUserDropdown.vue'
 import { userKey } from '@/composables/keys'
 import { useTypeGuards } from '@/composables/useTypeGuards'
@@ -12,11 +12,18 @@ const props = defineProps<{
   data: User
 }>()
 
+const { t } = useI18n()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const { userDisplayName, relativeDate } = useFormatting()
+const { userDisplayName, relativeDate, readable, cropUrl } = useFormatting()
 const { socialLink } = useSocialLinks()
 
 provide(userKey, props.data)
+
+const headlineStats = computed<{ label: string; value: string }[]>(() => [
+  { label: t('writings.writings'), value: readable(props.data.writings_count) },
+  { label: t('main.likes'), value: readable(props.data.likes_count) },
+  { label: t('main.profile-views'), value: readable(props.data.profile_views) }
+])
 
 const socialLinks = computed<Record<string, string>>(() =>
   props.data.social ? (JSON.parse(props.data.social) as Record<string, string>) : {}
@@ -24,98 +31,101 @@ const socialLinks = computed<Record<string, string>>(() =>
 </script>
 
 <template>
-  <v-card class="mb-5 position-relative">
-    <po-user-dropdown />
+  <div class="position-relative mb-8">
+    <div class="d-flex flex-column flex-md-row ga-8 align-center align-md-start">
+      <po-avatar-award :user="data" avatar-size="112" avatar-color="secondary" />
 
-    <v-card-text>
-      <div class="d-flex flex-column flex-sm-row ga-6 align-center align-sm-start">
-        <po-avatar-award :user="data" avatar-size="104" avatar-color="secondary" />
+      <div class="flex-grow-1 text-center text-md-left">
+        <p
+          v-if="!strNullOrEmpty(data.location)"
+          class="text-uppercase text-eyebrow text-primary ma-0 mb-2"
+        >
+          {{ data.location }}
+        </p>
 
-        <div class="flex-grow-1 text-center text-sm-left">
-          <p
-            v-if="!strNullOrEmpty(data.location)"
-            class="text-caption text-uppercase text-eyebrow text-on-surface-variant mb-1"
-          >
-            {{ data.location }}
-          </p>
-          <p class="text-h4 mb-1">{{ userDisplayName(data) }}</p>
-          <p class="text-on-surface-variant mb-4">@{{ data.username }}</p>
+        <p class="text-display-large po-prose ma-0 mb-1">{{ userDisplayName(data) }}</p>
+        <p class="ma-0 mb-4">@{{ data.username }}</p>
 
-          <p v-if="!strNullOrEmpty(data.bio)" class="po-prose">{{ data.bio }}</p>
+        <p v-if="!strNullOrEmpty(data.bio)" class="text-title-large po-prose ma-0 mb-4">
+          {{ data.bio }}
+        </p>
 
-          <template v-if="!strNullOrEmpty(data.website) || !isEmpty(socialLinks)">
-            <div class="d-flex flex-wrap justify-center justify-sm-start ga-3 mt-4">
-              <template v-if="!strNullOrEmpty(data.website)">
-                <div>
-                  <po-button
-                    icon
-                    color="primary"
-                    size="x-small"
-                    :href="data.website"
-                    target="_blank"
-                  >
-                    <v-icon icon="fas fa-globe" />
-                  </po-button>
-                </div>
-              </template>
-
-              <template v-for="(user, network) in socialLinks" :key="network">
-                <div v-if="!strNullOrEmpty(user)">
-                  <po-button
-                    icon
-                    color="primary"
-                    size="x-small"
-                    :href="socialLink(user, network)"
-                    target="_blank"
-                  >
-                    <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`" />
-                    <v-icon v-else :icon="`fab fa-${network}`" />
-                  </po-button>
-                </div>
-              </template>
-            </div>
+        <div class="d-flex flex-wrap justify-center justify-md-start ga-3">
+          <template v-if="!isEmpty(socialLinks)">
+            <template v-for="(user, network) in socialLinks" :key="network">
+              <div v-if="!strNullOrEmpty(user)">
+                <po-button
+                  icon
+                  color="primary"
+                  size="x-small"
+                  :href="socialLink(user, network)"
+                  target="_blank"
+                >
+                  <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`" />
+                  <v-icon v-else :icon="`fab fa-${network}`" />
+                </po-button>
+              </div>
+            </template>
           </template>
+
+          <po-user-dropdown />
         </div>
       </div>
-    </v-card-text>
 
-    <v-divider />
-    <v-card-actions>
-      <po-users-stats :data="data" :alone="true" />
-    </v-card-actions>
-  </v-card>
+      <div class="d-flex ga-8 pt-md-2 text-center text-md-left">
+        <div v-for="stat in headlineStats" :key="stat.label">
+          <p class="text-display-small po-prose ma-0">{{ stat.value }}</p>
+          <p class="text-uppercase text-eyebrow mt-1 mb-0">
+            {{ stat.label }}
+          </p>
+        </div>
+      </div>
+    </div>
 
-  <v-card :subtitle="$t('main.more-info').toUpperCase()">
-    <v-card-text>
-      <v-row v-if="!strNullOrEmpty(data.created_at)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-calendar" class="mr-2" />
-          {{ $t('main.registered') }}:
-        </v-col>
-        <v-col cols="12" md="8">
-          {{ relativeDate(data.created_at ?? '') }}
-        </v-col>
-      </v-row>
+    <v-divider class="my-6" />
 
-      <v-row v-if="!strNullOrEmpty(data.occupation)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-toolbox" class="mr-2" />
-          {{ $t('main.occupation') }}:
-        </v-col>
-        <v-col cols="12" md="8">
-          {{ data.occupation }}
-        </v-col>
-      </v-row>
+    <v-row>
+      <v-col v-if="!strNullOrEmpty(data.created_at)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.registered') }}
+        </p>
+        <p class="ma-0">{{ relativeDate(data.created_at ?? '') }}</p>
+      </v-col>
 
-      <v-row v-if="!strNullOrEmpty(data.interests)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-masks-theater" class="mr-2" />
-          {{ $t('main.interests') }}:</v-col
-        >
-        <v-col cols="12" md="8">
-          {{ data.interests }}
-        </v-col>
-      </v-row>
-    </v-card-text>
-  </v-card>
+      <v-col v-if="!strNullOrEmpty(data.website)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.website') }}
+        </p>
+
+        <p class="ma-0">
+          <po-link
+            :href="data.website"
+            class="text-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ cropUrl(data.website ?? '') }}
+          </po-link>
+        </p>
+      </v-col>
+
+      <v-col v-if="!strNullOrEmpty(data.occupation)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.occupation') }}
+        </p>
+        <p class="ma-0">{{ data.occupation }}</p>
+      </v-col>
+
+      <v-col v-if="!strNullOrEmpty(data.interests)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.interests') }}
+        </p>
+        <p class="ma-0">{{ data.interests }}</p>
+      </v-col>
+    </v-row>
+
+    <v-divider class="my-6" />
+    <!-- <po-users-stats :data="data" :alone="true" />
+    <v-divider class="mt-6" /> -->
+  </div>
 </template>

@@ -8,8 +8,8 @@ Poetaínos uses **Vuetify 4** with a **Material Design 3** color system generate
 
 ## Seed & Generation
 
-| Seed | Hex | Scheme |
-|---|---|---|
+| Seed         | Hex       | Scheme                                                                                     |
+| ------------ | --------- | ------------------------------------------------------------------------------------------ |
 | Primary seed | `#176B73` | MD3 Tonal Spot (`@material/material-color-utilities`, `SchemeTonalSpot`, contrast level 0) |
 
 The seed is only an input: the generated light primary (tone 40) is `#006971`, not `#176B73` itself. Values in `theme.ts` are literal hex generated once from the seed — the library is **not** a project dependency.
@@ -20,22 +20,22 @@ Only Vuetify's built-in token names are used (no `tertiary`, `*-container`, or `
 
 ## Token Reference
 
-| Vuetify token | MD3 role | Light | Dark |
-|---|---|---|---|
-| `primary` / `on-primary` | primary / on-primary | `#006971` / `#ffffff` (6.4:1) | `#81d3dd` / `#00363b` (7.7:1) |
-| `secondary` / `on-secondary` | secondary-container / on-secondary-container | `#cde7eb` / `#324b4e` (7.2:1) | `#324b4e` / `#cde7eb` (7.2:1) |
-| `background`, `surface` | surface | `#f5fafb` | `#0e1415` |
-| `on-background`, `on-surface` | on-surface | `#161d1d` (16.3:1) | `#dee4e4` (14.5:1) |
-| `surface-bright` | surface-bright | `#f5fafb` | `#343a3b` |
-| `surface-light` | surface-container-high | `#e3e9ea` | `#252b2c` |
-| `surface-variant` | surface-variant | `#dae4e5` | `#3f484a` |
-| `on-surface-variant` | on-surface-variant | `#3f484a` (8.9:1 on surface) | `#bec8c9` (10.9:1 on surface) |
-| `error` / `on-error` | error / on-error | `#ba1a1a` / `#ffffff` (6.5:1) | `#ffb4ab` / `#690005` (7.7:1) |
-| `success` / `on-success` | functional | `#1e6b3a` / `#ffffff` (6.5:1) | `#7fd99a` / `#00391c` (7.7:1) |
-| `info` / `on-info` | functional | `#00658f` / `#ffffff` (6.4:1) | `#8ccdff` / `#00344d` (7.7:1) |
-| `warning` / `on-warning` | functional | `#8a5100` / `#ffffff` (6.4:1) | `#ffb867` / `#4a2800` (7.7:1) |
+| Vuetify token                 | MD3 role                                     | Light                         | Dark                          |
+| ----------------------------- | -------------------------------------------- | ----------------------------- | ----------------------------- |
+| `primary` / `on-primary`      | primary / on-primary                         | `#006971` / `#ffffff` (6.4:1) | `#81d3dd` / `#00363b` (7.7:1) |
+| `secondary` / `on-secondary`  | secondary-container / on-secondary-container | `#cde7eb` / `#324b4e` (7.2:1) | `#324b4e` / `#cde7eb` (7.2:1) |
+| `background`, `surface`       | surface                                      | `#f5fafb`                     | `#0e1415`                     |
+| `on-background`, `on-surface` | on-surface                                   | `#161d1d` (16.3:1)            | `#dee4e4` (14.5:1)            |
+| `surface-bright`              | surface-bright                               | `#f5fafb`                     | `#343a3b`                     |
+| `surface-light`               | surface-container-high                       | `#e3e9ea`                     | `#252b2c`                     |
+| `surface-variant`             | surface-variant                              | `#dae4e5`                     | `#3f484a`                     |
+| `on-surface-variant`          | on-surface-variant                           | `#3f484a` (8.9:1 on surface)  | `#bec8c9` (10.9:1 on surface) |
+| `error` / `on-error`          | error / on-error                             | `#ba1a1a` / `#ffffff` (6.5:1) | `#ffb4ab` / `#690005` (7.7:1) |
+| `success` / `on-success`      | functional                                   | `#1e6b3a` / `#ffffff` (6.5:1) | `#7fd99a` / `#00391c` (7.7:1) |
+| `info` / `on-info`            | functional                                   | `#00658f` / `#ffffff` (6.4:1) | `#8ccdff` / `#00344d` (7.7:1) |
+| `warning` / `on-warning`      | functional                                   | `#8a5100` / `#ffffff` (6.4:1) | `#ffb867` / `#4a2800` (7.7:1) |
 
-Borders and dividers use MD3 **outline-variant** through Vuetify's `border-color` / `border-opacity` theme variables (`#bec8c9` light, `#3f484a` dark, opacity 1).
+Borders and dividers use MD3 **outline-variant** through Vuetify's `border-color` / `border-opacity` theme variables (`#bec8c9` light, `#3f484a` dark, opacity 0.15 to keep borders subtle).
 
 Primary also meets AA as text on `surface` (6.1:1 light, 10.9:1 dark), so it is safe for links and text buttons. `resources/js/plugins/__tests__/theme.test.ts` enforces ≥4.5:1 for every `on-*` / fill pair above.
 
