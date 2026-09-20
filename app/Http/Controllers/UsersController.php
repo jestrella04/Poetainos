@@ -38,7 +38,7 @@ class UsersController extends Controller
             // 'extra_info->social AS social',
             'extra_info->avatar AS avatar',
             // 'extra_info->website AS website',
-            // 'extra_info->location AS location',
+            'extra_info->location AS location',
             // 'extra_info->interests AS interests',
         )
             ->has('writings')
@@ -69,6 +69,7 @@ class UsersController extends Controller
                 'canonical' => route('users.index'),
             ],
             'sort' => $sort,
+            'totalAuthors' => User::has('writings')->count(),
             'users' => Inertia::optional(fn () => $users),
         ]);
     }

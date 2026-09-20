@@ -17,6 +17,8 @@ class UserFactory extends Factory
      */
     protected $model = User::class;
 
+    private const int BIO_MAX_LENGTH = 300;
+
     /**
      * Define the model's default state.
      */
@@ -24,9 +26,28 @@ class UserFactory extends Factory
     {
         return [
             'username' => $this->faker->unique()->userName,
+            'name' => $this->randomName(),
             'email' => $this->faker->unique()->safeEmail,
             'password' => '$2y$10$Qh9yxR9v6OfLQU5Lw61hQOLVvdegUt7WxG9/HXGVvxZB2Wd.Si.aK', // password
             'email_verified_at' => now(),
+            'extra_info' => $this->faker->boolean() ? ['bio' => $this->randomBio()] : null,
         ];
+    }
+
+    /**
+     * Picks at random between no name, first name only, or first plus last name.
+     */
+    private function randomName(): ?string
+    {
+        return match ($this->faker->numberBetween(0, 2)) {
+            0 => null,
+            1 => $this->faker->firstName(),
+            default => $this->faker->firstName().' '.$this->faker->lastName(),
+        };
+    }
+
+    private function randomBio(): string
+    {
+        return $this->faker->text($this->faker->numberBetween(50, self::BIO_MAX_LENGTH));
     }
 }

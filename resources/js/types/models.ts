@@ -37,13 +37,13 @@ export interface User extends UserLike {
   likes_count: number
   comments_count: number
   shelf_count: number
-  // Only selected by UsersController::show(), not index() — optional to
-  // match.
-  created_at?: string
+  // `bio` and `location` are selected by both index() and show(); the rest
+  // only by UsersController::show() — optional to match.
   bio?: string
+  location?: string
+  created_at?: string
   social?: string
   website?: string
-  location?: string
   occupation?: string
   interests?: string
 }

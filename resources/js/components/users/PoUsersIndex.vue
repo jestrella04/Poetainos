@@ -2,13 +2,15 @@
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
+import { useFormatting } from '@/composables/useFormatting'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { User } from '@/types/models'
 
-const page = computed(() => usePage<InertiaPageProps<{ sort: string }>>())
+const page = computed(() => usePage<InertiaPageProps<{ sort: string; totalAuthors: number }>>())
 const { isEmpty } = useTypeGuards()
+const { formatCount } = useFormatting()
 
 const {
   items: users,
@@ -22,11 +24,23 @@ const {
 </script>
 
 <template>
-  <po-head />
+  <po-wrapper class="h-100">
+    <po-head />
 
-  <v-row class="sticky-tabs">
-    <v-col cols="12">
-      <v-tabs :model-value="page.props.sort" fixed-tabs>
+    <p class="text-uppercase text-eyebrow text-primary mb-3">
+      {{ $t('main.community') }}
+    </p>
+
+    <p class="text-display-large po-prose ma-0 mb-2">
+      {{ $t('users.authors') }}
+    </p>
+
+    <p class="text-headline-small text-medium-emphasis po-prose ma-0 mb-8">
+      {{ $t('main.authors-subtitle', { authors: formatCount(page.props.totalAuthors) }) }}
+    </p>
+
+    <div class="sticky-tabs">
+      <v-tabs :model-value="page.props.sort" color="primary" fixed-tabs>
         <po-tab href="?sort=featured" value="featured" :aria-label="$t('main.featured')" inertia>
           <v-icon icon="fas fa-fan" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.featured') }}</span>
@@ -42,27 +56,29 @@ const {
           <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
         </po-tab>
       </v-tabs>
-    </v-col>
-  </v-row>
+    </div>
 
-  <template v-if="!fetched">
-    <po-loading type="avatar, paragraph, divider, text" />
-  </template>
-
-  <template v-else-if="!isEmpty(users)">
-    <template v-for="user in users" :key="user.id">
-      <po-users-card :alone="false" :data="user" />
+    <template v-if="!fetched">
+      <po-loading />
     </template>
 
-    <po-infinite-scroll @load="loadMore" />
-  </template>
+    <template v-else-if="!isEmpty(users)">
+      <v-row class="mt-8">
+        <v-col v-for="user in users" :key="user.id" cols="12" sm="6">
+          <po-users-card :data="user" />
+        </v-col>
+      </v-row>
 
-  <template v-else>
-    <po-msg-block
-      class="py-15"
-      msg-title=""
-      :msg-body="$t('main.nothing-to-display')"
-      icon="fas fa-sad-tear"
-    />
-  </template>
+      <po-infinite-scroll @load="loadMore" />
+    </template>
+
+    <template v-else>
+      <po-msg-block
+        class="py-15"
+        msg-title=""
+        :msg-body="$t('main.nothing-to-display')"
+        icon="fas fa-sad-tear"
+      />
+    </template>
+  </po-wrapper>
 </template>
