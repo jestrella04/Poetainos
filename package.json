@@ -37,7 +37,6 @@
     "@vue/test-utils": "^2.5.0",
     "@vue/tsconfig": "^0.9.1",
     "@vueuse/core": "^14.0.0",
-    "animate.css": "^4.1.1",
     "autoprefixer": "^10.4.20",
     "axios": "^1.13.2",
     "crop-url": "^4.0.1",
