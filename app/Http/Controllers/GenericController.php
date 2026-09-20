@@ -94,6 +94,10 @@ class GenericController extends Controller
             'meta' => [
                 'title' => getPageTitle([__('Explore')]),
             ],
+            'totals' => [
+                'writings' => Writing::count(),
+                'authors' => User::has('writings')->count(),
+            ],
             'categories' => [
                 'main' => Category::withCount('writings')
                     ->whereNull('parent_id')

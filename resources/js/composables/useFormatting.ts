@@ -35,6 +35,11 @@ export function useFormatting() {
     return millify(value)
   }
 
+  function formatCount(value: number): string {
+    // The plain 'es' locale skips the thousands separator on 4-digit numbers (3412).
+    return value.toLocaleString('es-CO')
+  }
+
   function toLocaleDate(date: string | number | Date): string {
     return new Date(date).toLocaleDateString('es-DO', {
       year: 'numeric',
@@ -110,6 +115,7 @@ export function useFormatting() {
     userDisplayName,
     userInitials,
     readable,
+    formatCount,
     toLocaleDate,
     relativeDate,
     excerpt,

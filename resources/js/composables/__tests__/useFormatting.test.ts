@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { useFormatting } from '../useFormatting'
 
-const { userDisplayName, userInitials, excerpt, karmaMedal, linkify } = useFormatting()
+const { userDisplayName, userInitials, excerpt, karmaMedal, linkify, formatCount } = useFormatting()
 
 describe('userDisplayName', () => {
   it('prefers the name when present', () => {
@@ -86,5 +86,13 @@ describe('karmaMedal', () => {
 
   it('returns null for an unknown grade', () => {
     expect(karmaMedal('Z')).toBeNull()
+  })
+})
+
+describe('formatCount', () => {
+  it('separates thousands with a dot, including on 4-digit numbers', () => {
+    expect(formatCount(980)).toBe('980')
+    expect(formatCount(3412)).toBe('3.412')
+    expect(formatCount(1234567)).toBe('1.234.567')
   })
 })

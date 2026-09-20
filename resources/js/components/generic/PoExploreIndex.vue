@@ -8,6 +8,10 @@ import type { CategoryLike, TagLike, UserLike } from '@/types/models'
 import type { InertiaPageProps } from '@/types/inertia'
 
 interface ExploreProps {
+  totals: {
+    writings: number
+    authors: number
+  }
   categories: {
     main: CategoryLike[]
     alt: CategoryLike[]
@@ -16,7 +20,7 @@ interface ExploreProps {
   authors: UserLike[]
 }
 
-const { userDisplayName } = useFormatting()
+const { userDisplayName, formatCount } = useFormatting()
 const { strNullOrEmpty } = useTypeGuards()
 const page = computed(() => usePage<InertiaPageProps<ExploreProps>>())
 const categories = computed(() => [
@@ -27,6 +31,19 @@ const categories = computed(() => [
 
 <template>
   <po-head />
+
+  <p class="text-display-large po-prose ma-0 mb-2">
+    {{ $t('main.explore') }}
+  </p>
+
+  <p class="text-headline-small text-medium-emphasis po-prose ma-0 mb-8">
+    {{
+      $t('main.explore-subtitle', {
+        writings: formatCount(page.props.totals.writings),
+        authors: formatCount(page.props.totals.authors)
+      })
+    }}
+  </p>
 
   <p class="text-uppercase text-eyebrow mb-3">
     {{ $t('categories.category') }}
