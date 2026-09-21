@@ -3,32 +3,30 @@
 namespace App\Console\Commands;
 
 use App\Models\DailySelection;
-use App\Notifications\WritingRandom;
 use Illuminate\Console\Command;
 
-class PostRandomWriting extends Command
+class PickWritingOfTheDay extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'writing:random';
+    protected $signature = 'writing:pick-of-the-day';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Post the writing that is the pick of the day';
+    protected $description = 'Set the writing that is the pick of the day';
 
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $writing = DailySelection::pickForToday()->writing;
-        $writing->author?->notify(new WritingRandom($writing));
+        DailySelection::pickForToday();
 
         return self::SUCCESS;
     }

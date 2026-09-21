@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\DailySelection;
 use App\Models\Like;
 use App\Models\Tag;
 use App\Models\User;
@@ -51,6 +52,7 @@ class WritingsController extends Controller
             'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
             'sort' => $sort,
             'isHome' => $isHome,
+            'pickOfTheDay' => $isHome ? DailySelection::current()?->visibleWriting($this->getBlockedUsers()) : null,
             'authors' => $isHome ? User::select(
                 'id',
                 'username',

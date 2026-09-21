@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import PoWritingsSidebar from './partials/PoWritingsSidebar.vue'
@@ -11,6 +11,7 @@ import type { TagLike, UserLike, Writing } from '@/types/models'
 interface WritingsIndexProps {
   sort: string
   isHome: boolean
+  pickOfTheDay: Writing | null
   authors: UserLike[] | null
   tags: TagLike[] | null
 }
@@ -29,26 +30,7 @@ const {
   reloadPropKey: 'writings'
 })
 
-const heroWriting = ref<Writing | null>(null)
-
-// Temporary placeholder curation: pick a random writing from the first
-// loaded batch as the "pick of the day" feature. Real curation logic is
-// planned separately.
-watch(
-  fetched,
-  (isFetched) => {
-    if (
-      isFetched &&
-      page.value.props.isHome &&
-      heroWriting.value === null &&
-      !isEmpty(writings.value)
-    ) {
-      const index = Math.floor(Math.random() * writings.value.length)
-      heroWriting.value = writings.value[index] ?? null
-    }
-  },
-  { immediate: true }
-)
+const heroWriting = computed(() => page.value.props.pickOfTheDay ?? null)
 
 const restWritings = computed(() =>
   heroWriting.value === null
