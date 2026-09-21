@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,7 +18,7 @@ class EmailVerificationPromptController extends Controller
         $user = $request->user();
 
         return $user !== null && $user->hasVerifiedEmail()
-            ? redirect()->intended(RouteServiceProvider::HOME)
+            ? redirect()->intended(route('home'))
             : Inertia::render('auth/PoVerify', [
                 'meta' => [
                     'title' => getPageTitle([__('Verify Account')]),

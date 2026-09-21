@@ -22,9 +22,12 @@ class Setting extends Model
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'data' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 }

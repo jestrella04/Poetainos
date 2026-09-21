@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use App\Notifications\ConfirmSocialLogin;
-use App\Providers\RouteServiceProvider;
 use App\Services\ImageStorage;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
@@ -95,7 +94,7 @@ class SocialAuthController extends Controller
 
         request()->session()->flash('message', $exists === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
 
-        return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
+        return redirect(Redirect::intended(route('home'))->getTargetUrl());
     }
 
     /**
@@ -111,7 +110,7 @@ class SocialAuthController extends Controller
 
         request()->session()->flash('message', 'accounts.welcome-back');
 
-        return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
+        return redirect(Redirect::intended(route('home'))->getTargetUrl());
     }
 
     /**

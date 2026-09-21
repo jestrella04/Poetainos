@@ -163,17 +163,14 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 # Laravel 12
 
 - CRITICAL: ALWAYS use `search-docs` tool for version-specific Laravel documentation and updated code examples.
-- This project upgraded from Laravel 10 without migrating to the new streamlined Laravel file structure.
-- This is perfectly fine and recommended by Laravel. Follow the existing structure from Laravel 10. We do not need to migrate to the new Laravel structure unless the user explicitly requests it.
+- This project uses the streamlined Laravel 11+ structure: there are no `app/Http/Kernel.php`, `app/Console/Kernel.php` or `app/Exceptions/Handler.php` classes.
 
-## Laravel 10 Structure
+## Laravel 12 Structure
 
-- Middleware typically lives in `app/Http/Middleware/` and service providers in `app/Providers/`.
-- There is no `bootstrap/app.php` application configuration in a Laravel 10 structure:
-    - Middleware registration happens in `app/Http/Kernel.php`
-    - Exception handling is in `app/Exceptions/Handler.php`
-    - Console commands and schedule register in `app/Console/Kernel.php`
-    - Rate limits likely exist in `RouteServiceProvider` or `app/Http/Kernel.php`
+- Routing, middleware (global stack, groups, aliases) and exception handling are configured in `bootstrap/app.php` via `Application::configure()`.
+- `app/Http/Middleware/` holds only app-specific middleware; framework middleware is used directly and customised through `withMiddleware()`.
+- `bootstrap/providers.php` lists the application service providers (`AppServiceProvider` is the only one). Rate limiters and gates are defined in its `boot()`.
+- The schedule is defined in `routes/console.php`; commands in `app/Console/Commands` register automatically.
 
 ## Database
 

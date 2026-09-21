@@ -1,7 +1,5 @@
 <?php
 
-use App\Providers\RouteServiceProvider;
-
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\assertGuest;
@@ -35,7 +33,7 @@ describe('authenticating', function (): void {
         // for the frontend to navigate to, rather than an HTTP redirect response.
         assertAuthenticated();
         $response->assertOk();
-        $response->assertJson(['redirect' => url(RouteServiceProvider::HOME)]);
+        $response->assertJson(['redirect' => route('home')]);
     });
 
     it('honors a safe, same-site redirect target after login', function (): void {
@@ -65,7 +63,7 @@ describe('authenticating', function (): void {
         ]);
 
         // Then
-        $response->assertJson(['redirect' => url(RouteServiceProvider::HOME)]);
+        $response->assertJson(['redirect' => route('home')]);
     });
 
     it('does not authenticate with an invalid password', function (): void {

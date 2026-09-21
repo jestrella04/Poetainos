@@ -28,11 +28,14 @@ class Role extends Model
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'extra_info' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'extra_info' => 'array',
+        ];
+    }
 
     /**
      * @return array<array-key, mixed>

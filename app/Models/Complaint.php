@@ -30,11 +30,14 @@ class Complaint extends Model
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'reasons' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'reasons' => 'array',
+        ];
+    }
 
     /**
      * Get the parent complainable model (writing, user or comment).

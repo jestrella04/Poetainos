@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -17,7 +16,7 @@ class EmailVerificationNotificationController extends Controller
         $user = $request->user();
 
         if ($user === null || $user->hasVerifiedEmail()) {
-            return redirect()->intended(RouteServiceProvider::HOME);
+            return redirect()->intended(route('home'));
         }
 
         $user->sendEmailVerificationNotification();
