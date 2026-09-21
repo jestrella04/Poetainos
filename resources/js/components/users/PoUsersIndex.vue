@@ -32,7 +32,12 @@ const {
     </p>
 
     <p class="text-headline-small text-medium-emphasis po-prose ma-0 mb-8">
-      {{ $t('main.authors-subtitle', { authors: formatCount(page.props.totalAuthors) }) }}
+      {{
+        $t('main.authors-subtitle', {
+          site_name: page.props.site.name,
+          authors: formatCount(page.props.totalAuthors)
+        })
+      }}
     </p>
 
     <div class="sticky-tabs">

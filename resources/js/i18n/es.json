@@ -171,7 +171,7 @@
     "aura": "Aura",
     "aura-value": "Aura: {aura}",
     "author-blocked": "Tienes a este autor bloqueado. Si has cambiado de parecer, por favor procede a desbloquearlo.",
-    "authors-subtitle": "{authors} personas publican en Poetaínos. Descubre a quien quieras leer.",
+    "authors-subtitle": "{authors} personas publican en {site_name}. Descubre a quien quieras leer.",
     "authors-to-follow": "Autores a seguir",
     "auto": "Automático",
     "awarded": "Condecorado",

@@ -12,7 +12,13 @@ const { strNullOrEmpty } = useTypeGuards()
 </script>
 
 <template>
-  <po-card :href="route('users.show', data.username)" height="100%" inertia>
+  <po-card
+    variant="filled"
+    class="border-b-md"
+    :href="route('users.show', data.username)"
+    height="100%"
+    inertia
+  >
     <v-card-text class="d-flex flex-column h-100">
       <div class="d-flex align-center ga-4 mb-4">
         <po-avatar-award :user="data" avatar-size="64" avatar-color="secondary" />
