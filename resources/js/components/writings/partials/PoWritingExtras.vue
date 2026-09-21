@@ -57,7 +57,7 @@ const taxonomies = computed(() => [
     </template>
 
     <div v-if="!isEmpty(likers)">
-      <p class="text-caption mb-2">{{ $t('main.liked-by') }}</p>
+      <p class="mb-2">{{ $t('main.liked-by') }}</p>
 
       <po-avatar-stack :users="likers ?? []" :size="64" color="secondary" />
     </div>

@@ -118,7 +118,7 @@ function reply(comment: Comment) {
           </div>
 
           <template v-if="auth() && replyBox === comment.id">
-            <div id="" class="reply-box pa-3">
+            <div class="reply-box pa-3">
               <po-comments-form
                 :form-id="`reply-${comment.id}-form`"
                 :reply-to="reply(comment)"

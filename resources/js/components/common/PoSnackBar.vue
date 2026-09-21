@@ -25,7 +25,7 @@ const snackBar = injectStrict(snackBarKey)
       </div>
 
       <div class="flex-grow-1">
-        <p class="text-caption">{{ $t(snackBar.message) }}</p>
+        <p>{{ $t(snackBar.message) }}</p>
       </div>
     </div>
   </v-snackbar>

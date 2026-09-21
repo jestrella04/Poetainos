@@ -34,8 +34,8 @@ const counters = page.value.props.counters
     <div class="d-flex flex-wrap ga-5">
       <template v-for="counter in counters" :key="counter.title">
         <v-card color="primary" class="counter pa-5" rounded>
-          <p class="text-h3">{{ readable(counter.count) }}</p>
-          <span class="text-caption">{{ counter.title }}</span>
+          <p>{{ readable(counter.count) }}</p>
+          <span>{{ counter.title }}</span>
         </v-card>
       </template>
     </div>

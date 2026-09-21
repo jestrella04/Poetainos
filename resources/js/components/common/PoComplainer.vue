@@ -80,11 +80,11 @@ async function submit(): Promise<void> {
         <v-divider class="mt-3" />
 
         <v-form id="complaint-form" :action="route('complaints.store')" @submit.prevent="submit">
-          <p v-if="errors" class="text-caption text-error mt-3" style="margin-bottom: -10px">
+          <p v-if="errors" class="text-error mt-3" style="margin-bottom: -10px">
             {{ $t('main.select-least-one') }}
           </p>
 
-          <p v-if="hasReasonsLoadError" class="text-caption text-error mt-3">
+          <p v-if="hasReasonsLoadError" class="text-error mt-3">
             {{ $t('main.error-try-again') }}
           </p>
 

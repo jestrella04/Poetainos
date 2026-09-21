@@ -29,7 +29,7 @@ nav {
       <po-list-item prepend-avatar="/images/logo.svg">
         <div class="d-none d-md-inline">
           <p>{{ page.props.site.name }}</p>
-          <p class="text-disabled text-caption">{{ $t('admin.admin-panel') }}</p>
+          <p class="text-disabled">{{ $t('admin.admin-panel') }}</p>
         </div>
       </po-list-item>
       <v-divider class="my-0" />

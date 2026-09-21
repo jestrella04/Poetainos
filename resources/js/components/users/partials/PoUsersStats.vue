@@ -10,7 +10,7 @@ const { readable } = useFormatting()
 </script>
 
 <template>
-  <div class="d-flex justify-center ga-8 mx-auto text-on-surface-variant text-caption text-center">
+  <div class="d-flex justify-center ga-8 mx-auto text-on-surface-variant text-center">
     <div class="d-flex flex-column" :title="$t('main.count-awards', { count: data.awards_count })">
       <div><v-icon icon="fas fa-fan" /></div>
       <div>{{ readable(data.awards_count) }}</div>

@@ -11,7 +11,7 @@ const { userDisplayName, excerpt } = useFormatting()
 
 <template>
   <po-wrapper class="mb-8">
-    <p class="text-caption text-uppercase text-eyebrow text-primary mb-4">
+    <p class="text-uppercase text-eyebrow text-primary mb-4">
       {{ $t('main.pick-of-the-day') }}
     </p>
 
@@ -34,7 +34,7 @@ const { userDisplayName, excerpt } = useFormatting()
         {{ userDisplayName(data.author) }}
       </po-link>
 
-      <span class="">
+      <span>
         {{ $t('main.count-views', { count: data.views }) }}
       </span>
     </div>

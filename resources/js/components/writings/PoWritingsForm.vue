@@ -180,7 +180,7 @@ function resetForm() {
         @submit.prevent="submitForm"
         @reset.prevent="resetForm"
       >
-        <p class="mb-4 text-caption text-disabled" style="margin-top: -0.5rem">
+        <p class="mb-4 text-disabled" style="margin-top: -0.5rem">
           {{ $t('main.required-fields-marked') }}
         </p>
 

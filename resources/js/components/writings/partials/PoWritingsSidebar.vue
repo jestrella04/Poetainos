@@ -24,11 +24,7 @@ const { userDisplayName } = useFormatting()
           </po-link>
 
           <div class="flex-grow-1">
-            <po-link
-              :href="route('users.show', author.username)"
-              class="d-block text-body-2"
-              inertia
-            >
+            <po-link :href="route('users.show', author.username)" class="d-block" inertia>
               {{ userDisplayName(author) }}
             </po-link>
 

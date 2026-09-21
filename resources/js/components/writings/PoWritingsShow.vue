@@ -45,7 +45,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
           <v-card class="mb-6">
             <v-card-text>
               <div v-if="!isEmpty(page.props.related.from_author)">
-                <p class="text-uppercase text-caption mb-5">{{ $t('main.more-from-author') }}</p>
+                <p class="text-uppercase mb-5">{{ $t('main.more-from-author') }}</p>
 
                 <template v-for="writing in page.props.related.from_author" :key="writing.id">
                   <div class="mb-2 position-relative">
@@ -57,7 +57,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
                       {{ writing.title }}
                     </po-link>
 
-                    <p class="text-caption text-disabled">
+                    <p class="text-disabled">
                       {{
                         $t('main.by-name', {
                           name: userDisplayName(page.props.writing.author)
@@ -74,7 +74,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
           <v-card>
             <v-card-text>
               <div v-if="!isEmpty(page.props.related.from_category)">
-                <p class="text-uppercase text-caption mb-5">{{ $t('main.related-writings') }}</p>
+                <p class="text-uppercase mb-5">{{ $t('main.related-writings') }}</p>
                 <template v-for="writing in page.props.related.from_category" :key="writing.id">
                   <div class="mb-2 position-relative">
                     <po-link
@@ -85,7 +85,7 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
                       {{ writing.title }}
                     </po-link>
 
-                    <p class="text-caption text-disabled">
+                    <p class="text-disabled">
                       {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
                       {{ relativeDate(writing.created_at) }}
                     </p>

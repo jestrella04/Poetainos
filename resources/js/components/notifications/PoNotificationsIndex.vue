@@ -88,16 +88,13 @@ const {
                 </template>
               </div>
               <div class="w-100">
-                <p class="text-caption font-weight-medium">
+                <p class="font-weight-medium">
                   {{ relativeDate(notification.created_at) }}
                 </p>
                 <div class="d-flex w-100 justify-space-between">
                   <div>
                     <p>{{ notificationMessage(notification, $t) }}.</p>
-                    <p
-                      v-if="notification.notifier_writing !== null"
-                      class="text-caption text-disabled"
-                    >
+                    <p v-if="notification.notifier_writing !== null" class="text-disabled">
                       {{ $t('main.title') }}: {{ notification.notifier_writing.title }}
                     </p>
                   </div>

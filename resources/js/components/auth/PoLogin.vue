@@ -297,7 +297,7 @@ async function resetPassword(): Promise<void> {
         v-if="resetEmailSent || arrivedFromPasswordReset"
         type="success"
         variant="tonal"
-        class="mt-5 mx-auto text-caption"
+        class="mt-5 mx-auto"
         style="width: 85%; max-width: 600px"
       >
         <span v-if="resetEmailSent">{{ $t('accounts.reset-password-link-sent') }}</span>

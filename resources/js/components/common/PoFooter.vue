@@ -30,7 +30,7 @@ onMounted(() => {
 <template>
   <v-footer
     :elevation="2"
-    class="d-flex flex-wrap align-center justify-space-around ga-2 pa-4 text-caption text-center"
+    class="d-flex flex-wrap align-center justify-space-around ga-2 pa-4 text-center"
   >
     <div class="d-inline-flex ga-3">&copy; 2020 {{ page.props.site.name }}</div>
 

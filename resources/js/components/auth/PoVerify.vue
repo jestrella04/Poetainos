@@ -43,7 +43,7 @@ async function resendLink(): Promise<void> {
     <v-alert
       v-if="showSuccess"
       :text="$t('accounts.verification-link-sent')"
-      class="text-caption po-success text-center mb-10"
+      class="po-success text-center mb-10"
       color="success"
       variant="tonal"
       rounded
@@ -52,7 +52,7 @@ async function resendLink(): Promise<void> {
     <v-alert
       v-if="showError"
       :text="$t('main.error-try-again')"
-      class="text-caption po-error text-center mb-10"
+      class="po-error text-center mb-10"
       color="error"
       variant="tonal"
       rounded
@@ -62,7 +62,7 @@ async function resendLink(): Promise<void> {
       {{ $t('accounts.verify-email') }}
     </p>
 
-    <p class="text-caption text-justify mb-5">
+    <p class="text-justify mb-5">
       {{ $t('accounts.verification-warning-1') }}
       {{ $t('accounts.verification-warning-2') }}
       {{ $t('accounts.verification-warning-3') }}

@@ -13,7 +13,7 @@ const loginModal = injectStrict(loginModalKey)
       <v-card-text class="pt-15">
         <po-inline-login :message="$t('accounts.login-to-interact')" />
 
-        <p class="mt-5 text-caption text-disabled">
+        <p class="mt-5 text-disabled">
           {{ $t('accounts.account-let-you') }}
         </p>
       </v-card-text>
