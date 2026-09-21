@@ -12,6 +12,8 @@ use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -87,19 +89,7 @@ class AdminController extends Controller
      */
     public function categories(): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return Category::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminCategories', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Categories'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Category::count(),
-        ]);
+        return $this->listing('admin/PoAdminCategories', __('Categories'), Category::query());
     }
 
     /**
@@ -107,19 +97,7 @@ class AdminController extends Controller
      */
     public function tags(): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return Tag::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminTags', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Tags'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Tag::count(),
-        ]);
+        return $this->listing('admin/PoAdminTags', __('Tags'), Tag::query());
     }
 
     /**
@@ -127,21 +105,11 @@ class AdminController extends Controller
      */
     public function users(): Response|Paginator
     {
-        $users = User::select('id', 'username', 'name', 'email', 'created_at', 'aura', 'karma');
-
-        if (request()->expectsJson()) {
-            return $users->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminUsers', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Users'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => User::count(),
-        ]);
+        return $this->listing(
+            'admin/PoAdminUsers',
+            __('Users'),
+            User::select('id', 'username', 'name', 'email', 'created_at', 'aura', 'karma'),
+        );
     }
 
     /**
@@ -149,26 +117,12 @@ class AdminController extends Controller
      */
     public function writings(): Response|Paginator
     {
-        $writings = Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
-            ->with([
-                'author' => function ($query): void {
-                    $query->select('id', 'username', 'name');
-                },
-            ]);
-
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminWritings', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Writings'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Writing::count(),
-        ]);
+        return $this->listing(
+            'admin/PoAdminWritings',
+            __('Writings'),
+            Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
+                ->with(['author' => fn ($query) => $query->select('id', 'username', 'name')]),
+        );
     }
 
     /**
@@ -176,19 +130,7 @@ class AdminController extends Controller
      */
     public function pages(): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return Page::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminPages', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Pages'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Page::count(),
-        ]);
+        return $this->listing('admin/PoAdminPages', __('Pages'), Page::query());
     }
 
     public function tools(): Response
@@ -224,19 +166,7 @@ class AdminController extends Controller
      */
     public function complaints(): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return Complaint::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminComplaints', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Complaints'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Complaint::count(),
-        ]);
+        return $this->listing('admin/PoAdminComplaints', __('Complaints'), Complaint::query());
     }
 
     public function websockets(): Response
@@ -267,6 +197,28 @@ class AdminController extends Controller
                 'user' => $user,
                 'token' => $token,
             ]),
+        ]);
+    }
+
+    /**
+     * An admin table: one page of rows for JSON requests, the table's page otherwise.
+     *
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $rows
+     * @return Response|Paginator<int, TModel>
+     */
+    private function listing(string $component, string $title, Builder $rows): Response|Paginator
+    {
+        if (request()->expectsJson()) {
+            return $rows->simplePaginate($this->pagination)->withQueryString();
+        }
+
+        return Inertia::render($component, [
+            'meta' => [
+                'title' => getPageTitle([$title, __('Administration')]),
+            ],
+            'total' => $rows->count(),
         ]);
     }
 }

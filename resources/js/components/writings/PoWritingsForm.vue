@@ -34,47 +34,45 @@ interface WritingFormProps {
   main_categories: CategoryWithDescendants[]
   'max-file-size': number
   agreement: boolean
+  isUpdate: boolean
 }
 
 interface PostedResult {
   url: string
 }
 
-const page = computed(() => usePage<InertiaPageProps<WritingFormProps>>())
+const page = usePage<InertiaPageProps<WritingFormProps>>()
 const { t } = useI18n()
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { isEmpty } = useTypeGuards()
 const { checkFormValidity } = useFormValidation()
 
 function requiredLabel(key: string): string {
   return `${t(key)} *`
 }
-const writing = page.value.props.writing
+const writing = page.props.writing
 const formData = reactive({
-  title: (writing.data.title ??= ''),
+  title: writing.data.title ?? '',
   main_category: null as number | null, // Properly set onMounted
   alt_categories: [] as number[], // Properly set onMounted
-  tags: (writing.tags ??= []),
-  text: (writing.data.text ??= ''),
+  tags: [...(writing.tags ?? [])],
+  text: writing.data.text ?? '',
   link: '',
   cover: [] as File[],
   serviceAgreement: false,
   privacyAgreement: false
 })
 const errors = ref<LaravelValidationErrors>({})
-const mainCategories = ref(page.value.props.main_categories)
+const mainCategories = ref(page.props.main_categories)
 const altCategories = ref<CategoryOption[]>([])
 const isPosting = ref(false)
 const isPosted = ref<Partial<PostedResult>>({})
-const isUpdate = ref(false)
+const isUpdate = ref(page.props.isUpdate)
 const isDelete = ref(false)
 
 provide(formDataKey, formData)
 provide(isDeleteKey, isDelete)
 
 onMounted(() => {
-  // Is the user updating?
-  isUpdate.value = !strNullOrEmpty(writing.data.title)
-
   // If updating, trigger category update
   if (isUpdate.value) {
     formData.main_category = writing.main_category
@@ -310,7 +308,8 @@ function resetForm() {
         type="success"
         variant="tonal"
         class="mb-5 mx-auto"
-        style="width: 85%; max-width: 600px"
+        width="85%"
+        max-width="600"
       >
         {{ isUpdate ? $t('writings.writing-updated') : $t('writings.writing-published') }}
         {{ $t('main.take-a-look') }}

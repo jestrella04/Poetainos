@@ -41,7 +41,7 @@ class WritingPublished extends Notification implements ShouldQueue
 
     public function toTwitter(mixed $notifiable): TwitterStatusUpdate
     {
-        $msg = str_replace(':author', $this->writing->author?->getTwitterUsername() ?? '', $this->msg).' '.$this->url;
+        $msg = str_replace(':author', $this->writing->author?->twitterHandleOrName() ?? '', $this->msg).' '.$this->url;
 
         return new TwitterStatusUpdate($msg);
     }

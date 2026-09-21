@@ -44,9 +44,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::put('settings/edit', [SettingsController::class, 'update'])->name('settings.edit');
     Route::put('categories/edit', [CategoriesController::class, 'update'])->name('categories.edit');
-    Route::put('tags/edit', [TagsController::class, 'update'])->name('tags.edit');
     Route::put('pages/edit', [PagesController::class, 'update'])->name('pages.edit');
-    Route::put('complaints', [ComplaintsController::class, 'update'])->name('complaints.edit');
 
     Route::delete('categories/delete/{category}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
     Route::delete('tags/delete/{tag}', [TagsController::class, 'destroy'])->name('tags.destroy');
@@ -56,7 +54,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 /* Non public routes */
-Route::middleware(['verified'])->group(function (): void {
+Route::middleware(['auth', 'verified'])->group(function (): void {
     // Writings
     Route::get('/writings/create', [WritingsController::class, 'create'])->name('writings.create');
     Route::post('/writings/create', [WritingsController::class, 'store'])->name('writings.store');
@@ -68,8 +66,9 @@ Route::middleware(['verified'])->group(function (): void {
     Route::get('/users/edit/{user}', [UsersController::class, 'edit'])->name('users.edit');
     Route::put('/users/edit/{user}', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/delete/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
-    Route::post('/users/query/{query}', [UsersController::class, 'query'])->name('users.query');
+    Route::get('/users/query', [UsersController::class, 'query'])->name('users.query');
     Route::post('/users/block/{user}', [UsersController::class, 'blockUser'])->name('users.block');
+    Route::delete('/users/block/{user}', [UsersController::class, 'unblockUser'])->name('users.unblock');
     Route::get('/account', [UsersController::class, 'account'])->name('users.account');
 
     // Comments
@@ -81,14 +80,13 @@ Route::middleware(['verified'])->group(function (): void {
     Route::delete('/likes/{type}/{id}/delete', [LikesController::class, 'destroy'])->middleware('throttle:60,1')->name('likes.destroy');
 
     // Other user tasks
-    Route::post('/shelves/{writing}/store', [ShelvesController::class, 'store'])->name('shelves.store');
-    Route::delete('/shelves/{writing}/delete', [ShelvesController::class, 'destroy'])->name('shelves.destroy');
+    Route::post('/shelves/{writing}/store', [ShelvesController::class, 'store'])->middleware('throttle:60,1')->name('shelves.store');
+    Route::delete('/shelves/{writing}/delete', [ShelvesController::class, 'destroy'])->middleware('throttle:60,1')->name('shelves.destroy');
 
     // Notifications
     Route::get('/notifications', [UsersNotificationsController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/show/{notification}', [UsersNotificationsController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/clear/read', [UsersNotificationsController::class, 'clear'])->name('notifications.clear');
-    Route::post('/notifications/status', [UsersNotificationsController::class, 'status'])->name('notifications.status');
     Route::post('/notifications/email/{enable}', [UsersNotificationsController::class, 'email'])->name('notifications.email');
 
     // Push Subscriptions
@@ -128,11 +126,11 @@ Route::get('/tags/query', [TagsController::class, 'query'])->name('tags.query');
 Route::get('/tags/{tag}', [TagsController::class, 'show'])->name('tags.show');
 
 // Comments
-Route::get('/comments/{writing}', [CommentsController::class, 'index'])->name('comments.index');
+Route::get('/comments/{writingId}', [CommentsController::class, 'index'])->name('comments.index');
 
 // Contact form
 Route::get('/contact', [ContactsController::class, 'create'])->name('contact.create');
-Route::post('/contact', [ContactsController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactsController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::get('/reload-captcha', [ContactsController::class, 'reloadCaptcha'])->name('captcha.reload');
 
 // Complaints

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, reactive, provide, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
 import { formDataKey } from '@/composables/keys'
+import { useFormErrors } from '@/composables/useFormErrors'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSnackbar } from '@/composables/useSnackbar'
-import type { ValidationError } from '@/types/http'
+import { PASSWORD_PATTERN, USERNAME_PATTERN } from '@/composables/validationRules'
 
 defineOptions({
   layout: PoLayoutLogin
@@ -14,6 +16,14 @@ defineOptions({
 
 type LoginStep = 'guest' | 'checking' | 'login' | 'register'
 
+const socialProviders = [
+  { name: 'facebook', icon: 'fab fa-facebook-f', label: 'accounts.continue-with-facebook' },
+  { name: 'twitter', icon: 'fab fa-x-twitter', label: 'accounts.continue-with-x-twitter' },
+  { name: 'google', icon: 'fab fa-google', label: 'accounts.continue-with-google' }
+]
+
+const { t } = useI18n()
+const { validationErrors } = useFormErrors()
 const { strNullOrEmpty } = useTypeGuards()
 const { setSnackBar } = useSnackbar()
 const isLoading = ref(false)
@@ -80,15 +90,32 @@ function resetForm(): void {
   }, 500)
 }
 
+// A failure that carries no field messages (throttled, offline, server error) still has to be shown
+function showFailure(error: unknown, fallbackField: 'email' | 'password' = 'email'): void {
+  const failures = validationErrors(error)
+
+  if (Object.keys(failures).length === 0) {
+    errors[fallbackField] = [t('main.error-try-again')]
+    return
+  }
+
+  errors.email = failures.email ?? []
+  errors.username = failures.username ?? []
+  errors.password = failures.password ?? []
+}
+
 async function checkEmail(): Promise<void> {
   isLoading.value = true
+  clearErrors()
 
   await axios
     .post<{ exists: boolean }>(route('email.check'), { email: formData.email })
     .then((response) => {
       step.value = response.data.exists === true ? 'login' : 'register'
     })
-    .catch(() => undefined)
+    .catch((error: unknown) => {
+      showFailure(error)
+    })
     .finally(() => {
       isLoading.value = false
     })
@@ -112,13 +139,18 @@ async function login(): Promise<void> {
 
       router.get(response.data.redirect)
     })
-    .catch((error: ValidationError) => {
+    .catch((error: unknown) => {
       // Laravel's LoginRequest::authenticate() always keys a failed-login
       // error "email" (deliberately ambiguous about whether the email or
       // the password was wrong). By this point the email is already
       // confirmed to exist (see the checkEmail() step above) and only the
       // password field is visible, so we surface the message there.
-      errors.password = error.response?.data.errors.email ?? []
+      const failures = validationErrors(error)
+
+      errors.password =
+        Object.keys(failures).length === 0
+          ? [t('main.error-try-again')]
+          : (failures.email ?? failures.password ?? [])
     })
     .finally(() => {
       isLoading.value = false
@@ -141,10 +173,8 @@ async function register(): Promise<void> {
     .then(() => {
       router.get(route('verification.notice'))
     })
-    .catch((error: ValidationError) => {
-      errors.email = error.response?.data.errors.email ?? []
-      errors.username = error.response?.data.errors.username ?? []
-      errors.password = error.response?.data.errors.password ?? []
+    .catch((error: unknown) => {
+      showFailure(error)
     })
     .finally(() => {
       isLoading.value = false
@@ -184,8 +214,8 @@ async function resetPassword(): Promise<void> {
     .then(() => {
       resetEmailSent.value = true
     })
-    .catch((error: ValidationError) => {
-      errors.email = error.response?.data.errors.email ?? []
+    .catch((error: unknown) => {
+      showFailure(error)
     })
 }
 </script>
@@ -221,7 +251,7 @@ async function resetPassword(): Promise<void> {
             v-model="formData.username"
             type="text"
             :label="$t('users.user')"
-            pattern="^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$"
+            :pattern="USERNAME_PATTERN"
             :placeholder="$t('main.enter-your-user')"
             :error-messages="errors.username"
             persistent-placeholder
@@ -234,7 +264,7 @@ async function resetPassword(): Promise<void> {
             v-model="formData.password"
             type="password"
             :label="$t('main.password')"
-            pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+            :pattern="PASSWORD_PATTERN"
             :placeholder="$t('main.enter-your-password')"
             :error-messages="errors.password"
             persistent-placeholder
@@ -247,11 +277,12 @@ async function resetPassword(): Promise<void> {
             v-model="formData.confirmPassword"
             type="password"
             :label="$t('accounts.confirm-password')"
-            pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+            :pattern="PASSWORD_PATTERN"
             :placeholder="$t('main.enter-your-password')"
             :error-messages="errors.password"
             persistent-placeholder
             clearable
+            required
             hide-details="auto"
           />
 
@@ -298,7 +329,8 @@ async function resetPassword(): Promise<void> {
         type="success"
         variant="tonal"
         class="mt-5 mx-auto"
-        style="width: 85%; max-width: 600px"
+        width="85%"
+        max-width="600"
       >
         <span v-if="resetEmailSent">{{ $t('accounts.reset-password-link-sent') }}</span>
         <span v-else>{{ $t('accounts.new-password-set') }}</span>
@@ -307,36 +339,14 @@ async function resetPassword(): Promise<void> {
 
     <template v-else>
       <div class="po-login d-flex flex-column ga-3">
-        <div>
+        <div v-for="provider in socialProviders" :key="provider.name">
           <po-button
             block
             color="primary"
-            :href="route('social.login', 'facebook')"
-            prepend-icon="fab fa-facebook-f"
+            :href="route('social.login', provider.name)"
+            :prepend-icon="provider.icon"
           >
-            {{ $t('accounts.continue-with-facebook') }}
-          </po-button>
-        </div>
-
-        <div>
-          <po-button
-            block
-            color="primary"
-            :href="route('social.login', 'twitter')"
-            prepend-icon="fab fa-x-twitter"
-          >
-            {{ $t('accounts.continue-with-x-twitter') }}
-          </po-button>
-        </div>
-
-        <div>
-          <po-button
-            block
-            color="primary"
-            :href="route('social.login', 'google')"
-            prepend-icon="fab fa-google"
-          >
-            {{ $t('accounts.continue-with-google') }}
+            {{ $t(provider.label) }}
           </po-button>
         </div>
 

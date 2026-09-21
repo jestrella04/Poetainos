@@ -36,3 +36,18 @@ describe('user initials', function (): void {
         expect($initials)->toBe('J');
     })->with([null, ' ']);
 });
+
+describe('the X (Twitter) handle', function (): void {
+    it('is the stored handle with a single @, or the display name without one', function (?string $stored, string $expected): void {
+        // Given
+        $user = createUser(['name' => 'Emily Dickinson', 'extra_info' => $stored === null ? null : ['social' => ['twitter' => $stored]]]);
+
+        // Then
+        expect($user->twitterHandleOrName())->toBe($expected);
+    })->with([
+        'a bare handle' => ['emily', '@emily'],
+        'a handle typed with an @' => ['@emily', '@emily'],
+        'an empty handle' => ['', 'Emily Dickinson'],
+        'no social links' => [null, 'Emily Dickinson'],
+    ]);
+});

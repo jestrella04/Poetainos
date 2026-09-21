@@ -3,7 +3,9 @@
 use App\Models\User;
 use App\Notifications\ConfirmSocialLogin;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
@@ -142,4 +144,76 @@ describe('social login', function (): void {
         $user = User::where('email', 'new-writer@example.com')->firstOrFail();
         expect($user->extra_info['avatar'] ?? null)->toBeNull();
     });
+
+    it('refuses a login when the provider shares no email address', function (): void {
+        // Given
+        Socialite::fake('twitter', SocialiteUser::fake(['email' => null]));
+
+        // When
+        $response = get('/login/twitter/callback');
+
+        // Then
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('message', 'accounts.social-email-missing');
+        assertGuest();
+        expect(User::count())->toBe(0);
+    });
+
+    it('keeps the rest of the profile when it imports the provider avatar', function (): void {
+        // Given
+        Storage::fake('local');
+        ob_start();
+        imagepng(imagecreatetruecolor(800, 600));
+        $png = (string) ob_get_clean();
+        Http::fake(['avatars.example/*' => Http::response($png)]);
+        $user = createUser([
+            'email' => 'writer@example.com',
+            'extra_info' => [
+                'bio' => 'Kept',
+                'avatar' => '',
+                'notifications' => ['email' => 'off'],
+                'linked_providers' => ['google'],
+            ],
+        ]);
+        Socialite::fake('google', SocialiteUser::fake([
+            'email' => 'writer@example.com',
+            'avatar' => 'https://avatars.example/me.png',
+        ]));
+
+        // When
+        get('/login/google/callback')->assertRedirect();
+
+        // Then
+        $info = $user->refresh()->extra_info;
+        expect($info['bio'])->toBe('Kept');
+        expect($info['notifications']['email'])->toBe('off');
+        expect($info['avatar'])->toStartWith('avatars/')->toEndWith('.png');
+        Storage::disk('local')->assertExists($info['avatar']);
+        expect(getimagesize(Storage::disk('local')->path($info['avatar']))[0])->toBe(512);
+    });
+
+    it('ignores a provider avatar that is not a supported image', function (string $body): void {
+        // Given
+        Storage::fake('local');
+        Http::fake(['avatars.example/*' => Http::response($body)]);
+        $user = createUser([
+            'email' => 'writer@example.com',
+            'extra_info' => ['bio' => 'Kept', 'linked_providers' => ['google']],
+        ]);
+        Socialite::fake('google', SocialiteUser::fake([
+            'email' => 'writer@example.com',
+            'avatar' => 'https://avatars.example/me.png',
+        ]));
+
+        // When
+        get('/login/google/callback')->assertRedirect();
+
+        // Then
+        expect($user->refresh()->extra_info['avatar'] ?? null)->toBeNull();
+        expect($user->extra_info['bio'])->toBe('Kept');
+        expect(Storage::disk('local')->allFiles())->toBe([]);
+    })->with([
+        'a web page' => ['<html>not an image</html>'],
+        'a gif' => ['GIF89a'.str_repeat("\0", 32)],
+    ]);
 });

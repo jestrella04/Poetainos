@@ -47,13 +47,13 @@ class WritingFeatured extends PoetainosNotification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        return ['mail', 'database', TwitterChannel::class, FacebookPosterChannel::class, WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), 'database', TwitterChannel::class, FacebookPosterChannel::class, WebPushChannel::class];
     }
 
     public function toTwitter(mixed $notifiable): TwitterStatusUpdate
     {
         $msg = implode(' ', $this->notification['body_social']);
-        $msg = str_replace(':author', $this->writing->author?->getTwitterUsername() ?? '', $msg);
+        $msg = str_replace(':author', $this->writing->author?->twitterHandleOrName() ?? '', $msg);
         $msg = $msg.' '.$this->notification['url'];
 
         return new TwitterStatusUpdate($msg);

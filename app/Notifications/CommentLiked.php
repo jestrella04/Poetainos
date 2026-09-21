@@ -14,22 +14,12 @@ class CommentLiked extends PoetainosNotification implements ShouldQueue
 
     public function __construct(protected Comment $comment, protected User $user)
     {
-        $this->notification = [
-            'title' => __('Updates from :name at :site', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'greeting' => __('Hello!'),
-            'body' => __('Isn\'t it amazing?, :name likes your comment at :site.', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'footer' => __('Thank you for being part of the hood!'),
-            'url' => $this->comment->writing?->path(),
-            'action' => __('View comment'),
-            'icon' => asset('images/logo-192.png'),
-            'tag' => getSiteConfig('name'),
-        ];
+        $this->notification = $this->actorContent(
+            $this->user,
+            __('Isn\'t it amazing, :name likes your comment at :site.', $this->actorPlaceholders($this->user)),
+            $this->comment->writing?->path() ?? url('/'),
+            __('View comment'),
+        );
     }
 
     /**

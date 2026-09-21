@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSocialLinks } from '@/composables/useSocialLinks'
 
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { socialLink, socialIcon } = useSocialLinks()
-const page = computed(() => usePage())
+const page = usePage()
 const relatedApps = ref<RelatedApplication[]>([])
 
 onMounted(() => {

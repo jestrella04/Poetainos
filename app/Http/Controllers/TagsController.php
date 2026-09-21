@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tag;
 use App\Models\Writing;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class TagsController extends Controller
@@ -19,10 +17,10 @@ class TagsController extends Controller
      */
     public function query(): Collection
     {
-        $wildcard = '%'.request('query').'%';
+        $wildcard = '%'.escapeLike((string) request('query')).'%';
 
         return Tag::where('name', 'like', $wildcard)
-            ->take($this->pagination ?? 15)
+            ->take($this->pagination)
             ->get()
             ->map(function ($tag, $key) {
                 return [
@@ -35,41 +33,18 @@ class TagsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return Response|Paginator<int, Writing&object{pivot: Pivot}>
+     * @return Response|Paginator<int, Writing>
      */
     public function show(Tag $tag): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
-        $writings = $tag->writings()
-            ->visibleTo($this->getBlockedUsers())
-            ->withListingRelations()
-            ->sorted($sort)
-            ->simplePaginate($this->pagination)
-            ->withQueryString();
 
-        if (request()->expectsJson()) {
-            return $writings;
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([
-                    $tag->name,
-                    __('Tags'),
-                ]),
-                'canonical' => route('home'),
-            ],
-            'writings' => $writings,
-            'sort' => $sort,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Tag $tag): void
-    {
-        //
+        return $this->writingsIndex(
+            $tag->writings()->visibleTo($this->getBlockedUsers())->withListingRelations()->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([$tag->name, __('Tags')]), 'canonical' => $tag->path()],
+            isDeferred: false,
+        );
     }
 
     /**

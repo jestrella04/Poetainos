@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Notifications\WritingFeatured;
-use Carbon\Carbon;
+use App\Services\AuraCalculator;
 use Database\Factories\WritingFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -30,14 +29,10 @@ class Writing extends Model
      */
     protected $fillable = [
         'user_id',
-        'category_id',
-        'type_id',
         'title',
         'slug',
         'text',
         'extra_info',
-        'aura',
-        'aura_updated_at',
     ];
 
     /**
@@ -91,17 +86,6 @@ class Writing extends Model
         return $this->belongsToMany(Category::class);
     }
 
-    public function excerpt(): string
-    {
-        $len = mb_strlen($this->text);
-
-        if ($len < 400) {
-            return $this->text;
-        }
-
-        return mb_substr($this->text, 0, 400).'...';
-    }
-
     /**
      * @return HasMany<Comment, $this>
      */
@@ -119,13 +103,17 @@ class Writing extends Model
     }
 
     /**
+     * A random sample of the users who liked the writing.
+     *
      * @return Collection<int, User>
      */
-    public function likers(): Collection
+    public function likers(int $limit): Collection
     {
-        $likes = $this->likes()->pluck('user_id');
-
-        return User::forAuthorSummary()->whereIn('id', $likes)->get();
+        return User::forAuthorSummary()
+            ->whereIn('id', $this->likes()->select('user_id'))
+            ->inRandomOrder()
+            ->limit($limit)
+            ->get();
     }
 
     /**
@@ -134,28 +122,6 @@ class Writing extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
-    }
-
-    public function categoriesAsString(string $delimiter = ', '): string
-    {
-        $array = $this->categories
-            ->map(function ($category) {
-                return $category->name;
-            })
-            ->toArray();
-
-        return implode($delimiter, $array);
-    }
-
-    public function tagsAsString(string $delimiter = ', '): string
-    {
-        $array = $this->tags
-            ->map(function ($tag) {
-                return $tag->name;
-            })
-            ->toArray();
-
-        return implode($delimiter, $array);
     }
 
     /**
@@ -169,82 +135,14 @@ class Writing extends Model
     public function incrementViews(): void
     {
         DB::table($this->getTable())->where('id', $this->id)->increment('views');
+
+        $this->views++;
+        $this->syncOriginalAttribute('views');
     }
 
     public function updateAura(): void
     {
-        // What's the minimum to be featured at home?
-        $auraHome = getSiteConfig('aura.min_at_home');
-
-        // Count user content
-        $writing = Writing::where('id', $this->id)->withCount(['likes', 'comments', 'shelf'])->firstOrFail();
-        $countables = [
-            'likes' => $writing->likes_count,
-            'comments' => $writing->comments_count,
-            'shelf' => $writing->shelf_count,
-            'views' => $this->views,
-        ];
-
-        // Get points from settings
-        $weights = [
-            'likes' => getSiteConfig('aura.points.writing.like'),
-            'comments' => getSiteConfig('aura.points.writing.comment'),
-            'shelf' => getSiteConfig('aura.points.writing.shelf'),
-            'views' => getSiteConfig('aura.points.writing.views'),
-        ];
-
-        $points = calculateWeightedAuraScore($countables, $weights);
-
-        // Do the math
-        if ($points['base'] <= 0) {
-            return;
-        }
-
-        $auraNew = $points['score'];
-
-        // Check when writing was posted (in days)
-        $postedAt = Carbon::parse($this->created_at)->diffInDays();
-
-        // Check if writing is awarded
-        $awarded = isset($this->home_posted_at);
-
-        // Persist to the database
-        if ($auraNew >= $auraHome && $postedAt <= 31 && ! $awarded) {
-            DB::table($this->getTable())->where('id', $this->id)->update([
-                'aura' => $auraNew,
-                'aura_updated_at' => Carbon::now(),
-                'home_posted_at' => Carbon::now(),
-            ]);
-
-            $this->author?->notify(new WritingFeatured($this));
-        } else {
-            DB::table($this->getTable())->where('id', $this->id)->update([
-                'aura' => $auraNew,
-                'aura_updated_at' => Carbon::now(),
-            ]);
-        }
-    }
-
-    public function externalLink(): ?string
-    {
-        if (! empty($this->extra_info['link'])) {
-            return $this->extra_info['link'];
-        }
-
-        return null;
-    }
-
-    public function coverPath(): ?string
-    {
-        if (! empty($this->extra_info['cover'])) {
-            $path = '/storage/'.$this->extra_info['cover'];
-
-            if (is_file(public_path($path))) {
-                return $path;
-            }
-        }
-
-        return null;
+        app(AuraCalculator::class)->updateWritingAura($this);
     }
 
     /**
@@ -264,7 +162,11 @@ class Writing extends Model
      */
     public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
     {
-        return $query->whereNotIn('user_id', $blockedUserIds);
+        if ($blockedUserIds === []) {
+            return $query;
+        }
+
+        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
     }
 
     /**

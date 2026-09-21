@@ -77,3 +77,69 @@ describe('submitting a complaint', function (): void {
         $response->assertNotFound();
     });
 });
+
+describe('validating a complaint', function (): void {
+    it('rejects a reason that is not configured', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+
+        // When
+        $response = postJson('/complaints/store', [
+            'complainable_type' => 'writings',
+            'complainable_id' => $writing->id,
+            'reasons' => ['not-a-reason'],
+        ]);
+
+        // Then
+        $response->assertJsonValidationErrors('reasons.0');
+    });
+
+    it('accepts reasons configured as plain strings', function (): void {
+        // Given
+        Notification::fake();
+        config(['poetainos.complaints' => ['Spam', 'Abuse']]);
+        $writing = Writing::factory()->create();
+
+        // When
+        $response = postJson('/complaints/store', [
+            'complainable_type' => 'writings',
+            'complainable_id' => $writing->id,
+            'reasons' => ['Spam'],
+        ]);
+
+        // Then
+        $response->assertOk();
+    });
+
+    it('limits how many reasons can be sent', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+
+        // When
+        $response = postJson('/complaints/store', [
+            'complainable_type' => 'writings',
+            'complainable_id' => $writing->id,
+            'reasons' => array_fill(0, 11, 'spam'),
+        ]);
+
+        // Then
+        $response->assertJsonValidationErrors('reasons');
+    });
+
+    it('stores the comment the reporter wrote', function (): void {
+        // Given
+        Notification::fake();
+        $writing = Writing::factory()->create();
+
+        // When
+        postJson('/complaints/store', [
+            'complainable_type' => 'writings',
+            'complainable_id' => $writing->id,
+            'reasons' => ['spam'],
+            'comment' => 'It advertises a casino.',
+        ])->assertOk();
+
+        // Then
+        assertDatabaseHas('complaints', ['comment' => 'It advertises a casino.']);
+    });
+});

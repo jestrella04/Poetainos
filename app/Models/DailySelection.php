@@ -76,7 +76,7 @@ class DailySelection extends Model
      */
     public static function current(): ?self
     {
-        return self::whereDate('selected_on', '<=', Carbon::today())
+        return self::where('selected_on', '<=', Carbon::today())
             ->orderByDesc('selected_on')
             ->first();
     }
@@ -88,7 +88,7 @@ class DailySelection extends Model
      */
     private static function randomEligibleWriting(): Writing
     {
-        $excludedIds = self::whereDate('selected_on', '>=', Carbon::today()->subDays(self::REPEAT_EXCLUSION_DAYS))
+        $excludedIds = self::where('selected_on', '>=', Carbon::today()->subDays(self::REPEAT_EXCLUSION_DAYS))
             ->pluck('writing_id');
 
         if (Writing::whereNotIn('id', $excludedIds)->doesntExist()) {

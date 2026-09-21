@@ -10,10 +10,10 @@ use Illuminate\Support\Str;
 
 function getSiteConfig(string $path = ''): mixed
 {
-    if (! empty($path)) {
-        $path = config('writerhood.'.$path);
+    if ($path !== '') {
+        $path = config('poetainos.'.$path);
     } else {
-        $path = config('writerhood');
+        $path = config('poetainos');
     }
 
     if (is_array($path) && Arr::exists($path, 'value')) {
@@ -25,28 +25,32 @@ function getSiteConfig(string $path = ''): mixed
 
 function slugify(string $table, string $title, string $column = 'slug', string $separator = '-'): string
 {
+    // Slugs that would be swallowed by a static route such as /writings/random
+    $reserved = ['create', 'edit', 'delete', 'store', 'random', 'awards', 'query'];
+
     // Normalize the title
-    $slug = Str::of($title)->slug($separator);
+    $slug = Str::of($title)->slug($separator)->toString();
 
     // Get any slug that could possibly be related.
     // This cuts the queries down by doing it once.
-    $allSlugs = getRelatedIdentifiers($table, $slug, $column);
+    $usedSlugs = getRelatedIdentifiers($table, $slug, $column)->pluck($column);
+
+    $isTaken = fn (string $candidate): bool => in_array($candidate, $reserved, true)
+        || $usedSlugs->contains($candidate);
 
     // If we haven't used it before then we are all good.
-    if (! $allSlugs->contains($column, $slug)) {
+    if ($isTaken($slug) === false) {
         return $slug;
     }
 
-    // Just append numbers like a savage until we find one not used.
-    for ($i = 1; $i <= 10; $i++) {
-        $newSlug = $slug.$separator.$i;
+    // Otherwise append the first number that is still free.
+    $suffix = 1;
 
-        if (! $allSlugs->contains($column, $newSlug)) {
-            return $newSlug;
-        }
+    while ($isTaken($slug.$separator.$suffix)) {
+        $suffix++;
     }
 
-    throw new Exception('Can not create a unique slug');
+    return $slug.$separator.$suffix;
 }
 
 /**
@@ -72,13 +76,7 @@ function getPageTitle(array $titleParts, string $separator = '–'): string
 
 function isTruthy(mixed $value): bool
 {
-    $value = strtolower((string) $value);
-
-    if (! empty($value) && in_array($value, [1, '1', true, 'true', 'on', 'yes'], true)) {
-        return true;
-    }
-
-    return false;
+    return in_array(strtolower((string) $value), ['1', 'true', 'on', 'yes'], true);
 }
 
 function hydrateSettings(string $text): string
@@ -90,11 +88,6 @@ function hydrateSettings(string $text): string
     );
 }
 
-function inRange(int|float $value, int|float $min, int|float $max): bool
-{
-    return $value >= $min && $value < $max;
-}
-
 /**
  * Whether a post-login "redirect" target is a same-site relative path,
  * safe to hand to Redirect::setIntendedUrl(). Rejects absolute and
@@ -102,7 +95,7 @@ function inRange(int|float $value, int|float $min, int|float $max): bool
  */
 function isSafeRedirectPath(?string $url): bool
 {
-    if (empty($url)) {
+    if ($url === null || $url === '') {
         return false;
     }
 
@@ -172,6 +165,15 @@ function randomWritingsWithAuthor(Builder|Relation $query, int $take = 5): Eloqu
         ->inRandomOrder()
         ->take($take)
         ->get();
+}
+
+/**
+ * Escape the characters that act as wildcards in a SQL LIKE pattern, so
+ * user input matches literally.
+ */
+function escapeLike(string $value): string
+{
+    return addcslashes($value, '\\%_');
 }
 
 function tailFile(string $path, int $lines = 100): string

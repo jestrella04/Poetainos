@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import axios from 'axios'
@@ -12,8 +12,8 @@ defineOptions({
 })
 
 const { checkFormValidity } = useFormValidation()
-const page = computed(() => usePage<InertiaPageProps<{ settings: string }>>())
-const settings = ref(page.value.props.settings)
+const page = usePage<InertiaPageProps<{ settings: string }>>()
+const settings = ref(page.props.settings)
 const isPosting = ref(false)
 const isPosted = ref(false)
 const errors = ref<LaravelValidationErrors>({})
@@ -78,7 +78,8 @@ function submitForm() {
       type="success"
       variant="tonal"
       class="mb-5 mx-auto"
-      style="width: 85%; max-width: 600px"
+      width="85%"
+      max-width="600"
     >
       {{ $t('admin.settings-saved') }}
     </v-alert>

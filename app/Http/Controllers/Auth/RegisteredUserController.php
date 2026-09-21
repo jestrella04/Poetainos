@@ -16,14 +16,6 @@ use Inertia\Response;
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
-     */
-    public function create(): Response
-    {
-        return Inertia::render('Auth/Register');
-    }
-
-    /**
      * Handle an incoming registration request.
      *
      * @throws ValidationException
@@ -38,7 +30,7 @@ class RegisteredUserController extends Controller
             'privacy_agreement' => ['required', 'accepted'],
         ]);
 
-        $user = User::create([
+        $user = User::unguarded(fn (): User => User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -50,7 +42,7 @@ class RegisteredUserController extends Controller
                 ],
             ],
             'role_id' => Role::where('name', 'user')->firstOrFail()->id,
-        ]);
+        ]));
 
         Auth::login($user);
         $user->sendEmailVerificationNotification();

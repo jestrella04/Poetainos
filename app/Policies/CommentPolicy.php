@@ -4,81 +4,14 @@ namespace App\Policies;
 
 use App\Models\Comment;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommentPolicy
 {
-    use HandlesAuthorization;
-
     /**
-     * Determine whether the user can view any models.
-     *
-     * @return mixed
+     * Comments can be deleted by their author and by admins.
      */
-    public function viewAny(User $user)
+    public function delete(User $user, Comment $comment): bool
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @return mixed
-     */
-    public function view(User $user, Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can create models.
-     *
-     * @return mixed
-     */
-    public function create(User $user)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @return mixed
-     */
-    public function update(User $user, Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @return mixed
-     */
-    public function delete(User $user, Comment $comment)
-    {
-        if ($comment->author?->is($user) || $user->isAllowed('admin')) {
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @return mixed
-     */
-    public function restore(User $user, Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @return mixed
-     */
-    public function forceDelete(User $user, Comment $comment)
-    {
-        //
+        return $comment->author?->is($user) === true || $user->isAllowed('admin');
     }
 }

@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use App\Notifications\VerifyEmailCode;
-use Carbon\Carbon;
+use App\Services\AuraCalculator;
+use App\Services\EmailVerificationCodes;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,10 +22,6 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
-    private const EMAIL_VERIFICATION_CODE_MINUTES = 15;
-
-    private const EMAIL_VERIFICATION_MAX_ATTEMPTS = 5;
-
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasPushSubscriptions, Notifiable;
 
@@ -40,10 +37,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'password_updated_at',
         'extra_info',
-        'aura',
-        'karma',
-        'aura_updated_at',
-        'role_id',
     ];
 
     /**
@@ -81,47 +74,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return route('users.writings.index', $this->username);
     }
 
-    public function shelfPath(): string
-    {
-        return route('users.shelf.index', $this->username);
-    }
-
-    public function avatarPath(): ?string
-    {
-        if (! empty($this->extra_info['avatar'])) {
-            $path = '/storage/'.$this->extra_info['avatar'];
-
-            if (is_file(public_path($path))) {
-                return $path;
-            }
-        }
-
-        return null;
-    }
-
     public function getName(): string
     {
-        if (! empty($this->name)) {
-            return $this->name;
-        }
+        $name = $this->name ?? '';
 
-        return $this->username;
-    }
-
-    public function firstName(): string
-    {
-        if (! empty($this->name)) {
-            return explode(' ', $this->name)[0];
-        }
-
-        return $this->username;
+        return $name !== '' ? $name : $this->username;
     }
 
     public function initials(): string
     {
         $nameParts = preg_split('/\s+/', trim((string) $this->name), -1, PREG_SPLIT_NO_EMPTY);
 
-        if (count($nameParts) === 0) {
+        if ($nameParts === false || count($nameParts) === 0) {
             return mb_strtoupper(mb_substr($this->username, 0, 1));
         }
 
@@ -134,13 +98,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return mb_strtoupper($initials);
     }
 
-    public function getTwitterUsername(): string
+    /**
+     * The user's X (Twitter) handle for a mention, or their display name when they have none.
+     */
+    public function twitterHandleOrName(): string
     {
-        if (! empty($this->extra_info['social']['twitter'])) {
-            return '@'.$this->extra_info['social']['twitter'];
-        }
+        $handle = ltrim($this->extra_info['social']['twitter'] ?? '', '@');
 
-        return $this->getName();
+        return $handle !== '' ? '@'.$handle : $this->getName();
     }
 
     /**
@@ -163,11 +128,22 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $columns = ['id', 'username', 'name', 'extra_info->avatar AS avatar'];
 
-        if ($withKarma) {
+        if ($withKarma === true) {
             $columns[] = 'karma';
         }
 
         return $query->select($columns);
+    }
+
+    /**
+     * Best authors first: karma A to F (users without karma count as F), then aura.
+     *
+     * @param  Builder<User>  $query
+     * @return Builder<User>
+     */
+    public function scopeRanked(Builder $query): Builder
+    {
+        return $query->orderByRaw("COALESCE(karma, 'F') ASC")->orderBy('aura', 'desc');
     }
 
     /**
@@ -213,92 +189,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function incrementViews(): void
     {
         DB::table($this->getTable())->where('id', $this->id)->increment('profile_views');
-    }
 
-    /**
-     * @param  array<string, int|float>  $count
-     * @return array{base: int|float, total: int|float, score: float}
-     */
-    private function calcPoints(array $count): array
-    {
-        $countables = [
-            'writings' => $count['writings'] ?? 0,
-            'likes' => $count['likes'] ?? 0,
-            'comments' => $count['comments'] ?? 0,
-            'shelf' => $count['shelf'] ?? 0,
-            'views' => $count['views'] ?? 0,
-            'awards' => $count['awards'] ?? 0,
-        ];
-
-        // Get points from settings
-        $weights = [
-            'writings' => getSiteConfig('aura.points.user.writing'),
-            'likes' => getSiteConfig('aura.points.user.like'),
-            'comments' => getSiteConfig('aura.points.user.comment'),
-            'shelf' => getSiteConfig('aura.points.user.shelf'),
-            'views' => getSiteConfig('aura.points.user.views'),
-            'awards' => getSiteConfig('aura.points.user.award'),
-        ];
-
-        return calculateWeightedAuraScore($countables, $weights);
+        $this->profile_views++;
+        $this->syncOriginalAttribute('profile_views');
     }
 
     public function updateAura(): void
     {
-        // Count user content
-        $user = User::where('id', $this->id)->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->firstOrFail();
-        $count = [
-            'writings' => $user->writings_count,
-            'likes' => $user->likes_count,
-            'comments' => $user->comments_count,
-            'shelf' => $user->shelf_count,
-            'awards' => $user->awards_count,
-            'views' => $this->profile_views,
-        ];
-
-        $points = $this->calcPoints($count);
-
-        // Do the math
-        if ($points['total'] > 0 && $points['base'] > 0) {
-            // Persist to the database
-            DB::table('users')->where('id', $this->id)->update([
-                'aura' => $points['score'],
-                'aura_updated_at' => Carbon::now(),
-            ]);
-        }
+        app(AuraCalculator::class)->updateUserAura($this);
     }
 
     public function updateKarma(): self
     {
-        // Count user content
-        $dateTrigger = Carbon::now()->subDays(90);
-        $count = [
-            'likes' => $this->likes()->whereDate('created_at', '>=', $dateTrigger)->count(),
-            'comments' => $this->comments()->whereDate('created_at', '>=', $dateTrigger)->count(),
-            'shelf' => Shelf::where('user_id', $this->id)->whereDate('created_at', '>=', $dateTrigger)->count(),
-            'awards' => $this->writings()->whereDate('home_posted_at', '>=', $dateTrigger)->count(),
-        ];
-
-        $points = $this->calcPoints($count);
-
-        // Do the math
-        if (inRange($points['total'], 0, 1000)) {
-            $karma = 'F';
-        } elseif (inRange($points['total'], 1000, 2000)) {
-            $karma = 'D';
-        } elseif (inRange($points['total'], 2000, 3000)) {
-            $karma = 'C';
-        } elseif (inRange($points['total'], 3000, 4000)) {
-            $karma = 'B';
-        } else {
-            $karma = 'A';
-        }
-
-        // Persist to the database
-        $this->update([
-            'karma' => $karma,
-            'aura_updated_at' => Carbon::now(),
-        ]);
+        app(AuraCalculator::class)->updateUserKarma($this);
 
         return $this;
     }
@@ -319,11 +222,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $terms = $this->extra_info['agreement']['terms_of_use'] ?? false;
         $privacy = $this->extra_info['agreement']['privacy_policy'] ?? false;
 
-        if (isTruthy($terms) && isTruthy($privacy)) {
-            return true;
-        }
-
-        return false;
+        return isTruthy($terms) && isTruthy($privacy);
     }
 
     public function acceptAgreements(): void
@@ -351,51 +250,32 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(BlockedUser::class);
     }
 
+    public function unblock(User $userToUnblock): void
+    {
+        $this->blockedAuthors()->where('blocked_user_id', $userToUnblock->id)->delete();
+    }
+
     public function isAuthorBlocked(User $author): bool
     {
-        $blocked = $this->blockedAuthors()->pluck('blocked_user_id')->toArray();
-
-        if (in_array($author->id, $blocked)) {
-            return true;
-        }
-
-        return false;
+        return $this->blockedAuthors()->where('blocked_user_id', $author->id)->exists();
     }
 
-    public function emailNotifications(string $enable): void
+    /**
+     * Whether the user wants notification emails. Users who never chose get them.
+     */
+    public function wantsEmailNotifications(): bool
+    {
+        $setting = $this->extra_info['notifications']['email'] ?? null;
+
+        return $setting === null || $setting === '' || isTruthy($setting);
+    }
+
+    public function setEmailNotifications(bool $enabled): void
     {
         $info = $this->extra_info;
-
-        if (isTruthy($enable)) {
-            $info['notifications']['email'] = 'on';
-        } else {
-            $info['notifications']['email'] = 'off';
-        }
+        $info['notifications']['email'] = $enabled ? 'on' : 'off';
 
         $this->update(['extra_info' => $info]);
-    }
-
-    public function todayEmpathySummary(): int
-    {
-        $likes = $this->likes()
-            ->where('likeable_type', 'App\Models\Writing')
-            ->whereDate('created_at', Carbon::today())
-            ->pluck('likeable_id')
-            ->all();
-
-        $comments = $this->comments()
-            ->distinct('writing_id')
-            ->whereDate('created_at', Carbon::today())
-            ->pluck('writing_id')
-            ->all();
-
-        $shelves = Shelf::where('user_id', $this->id)
-            ->distinct('writing_id')
-            ->whereDate('created_at', Carbon::today())
-            ->pluck('writing_id')
-            ->all();
-
-        return count(array_unique(array_merge($likes, $comments, $shelves)));
     }
 
     /**
@@ -404,57 +284,20 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification(): void
     {
-        $code = sprintf('%06d', random_int(0, 999999));
+        $code = app(EmailVerificationCodes::class)->issue($this);
 
-        cache()->put($this->emailVerificationCacheKey(), [
-            'hash' => $this->hashEmailVerificationCode($code),
-            'email' => $this->email,
-            'attempts' => 0,
-        ], Carbon::now()->addMinutes(self::EMAIL_VERIFICATION_CODE_MINUTES));
-
-        $this->notify(new VerifyEmailCode($code, self::EMAIL_VERIFICATION_CODE_MINUTES));
+        $this->notify(new VerifyEmailCode($code, EmailVerificationCodes::CODE_MINUTES));
     }
 
     /**
-     * Mark the email as verified when the code matches. A code is discarded
-     * after too many wrong guesses so it can't be brute-forced.
+     * Mark the email as verified when the code matches.
      */
     public function verifyEmailWithCode(string $code): bool
     {
-        $pending = cache()->get($this->emailVerificationCacheKey());
-
-        if ($pending === null || $pending['email'] !== $this->email) {
+        if (app(EmailVerificationCodes::class)->verify($this, $code) === false) {
             return false;
         }
-
-        if (hash_equals($pending['hash'], $this->hashEmailVerificationCode($code)) === false) {
-            $pending['attempts']++;
-
-            if ($pending['attempts'] >= self::EMAIL_VERIFICATION_MAX_ATTEMPTS) {
-                cache()->forget($this->emailVerificationCacheKey());
-            } else {
-                cache()->put(
-                    $this->emailVerificationCacheKey(),
-                    $pending,
-                    Carbon::now()->addMinutes(self::EMAIL_VERIFICATION_CODE_MINUTES)
-                );
-            }
-
-            return false;
-        }
-
-        cache()->forget($this->emailVerificationCacheKey());
 
         return $this->markEmailAsVerified();
-    }
-
-    private function emailVerificationCacheKey(): string
-    {
-        return 'email-verification-code:'.$this->id;
-    }
-
-    private function hashEmailVerificationCode(string $code): string
-    {
-        return hash_hmac('sha256', $code, config('app.key'));
     }
 }

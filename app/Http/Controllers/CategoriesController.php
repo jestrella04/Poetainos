@@ -7,7 +7,6 @@ use App\Models\Writing;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Validation\Rule;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class CategoriesController extends Controller
@@ -21,29 +20,19 @@ class CategoriesController extends Controller
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
 
-        $writings = $category->writingsRecursive()
-            ->visibleTo($this->getBlockedUsers())
-            ->withListingRelations()
-            ->sorted($sort)
-            ->simplePaginate($this->pagination)
-            ->withQueryString();
-
-        if (request()->expectsJson()) {
-            return $writings;
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([
-                    $category->name,
-                    __('Categories'),
-                ]),
-                'canonical' => route('home'),
+        return $this->writingsIndex(
+            $category->writingsRecursive()
+                ->visibleTo($this->getBlockedUsers())
+                ->withListingRelations()
+                ->sorted($sort),
+            $sort,
+            [
+                'title' => getPageTitle([$category->name, __('Categories')]),
+                'canonical' => $category->path(),
                 'description' => $category->description,
             ],
-            'writings' => $writings,
-            'sort' => $sort,
-        ]);
+            isDeferred: false,
+        );
     }
 
     /**
@@ -56,11 +45,14 @@ class CategoriesController extends Controller
         // Get category model
         $category = Category::where('id', request('id'))->firstOrNew();
 
+        // A category can't be moved under itself or one of its own descendants
+        $invalidParentIds = $category->exists ? $category->descendantsAndSelf()->pluck('id')->all() : [];
+
         // Validate user input
         request()->validate([
             'id' => 'required|integer',
             'name' => ['required', 'string', Rule::unique('App\Models\Category')->ignore($category), 'min:3', 'max:40'],
-            'parent' => 'nullable|integer|exists:categories,id',
+            'parent' => ['nullable', 'integer', 'exists:categories,id', Rule::notIn($invalidParentIds)],
             'description' => 'required|string|min:3|max:255',
         ]);
 

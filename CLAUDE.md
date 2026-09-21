@@ -58,7 +58,7 @@ php artisan migrate:fresh --seed   # Reset DB and seed demo data
 - **Backend:** Laravel 12, PHP 8.3, MariaDB
 - **Frontend:** Vue 3, TypeScript, Vuetify 4 (Material Design)
 - **Bridge:** Inertia.js v3 (SPA + SSR) + JSON API layer in `routes/api.php`
-- **Auth:** Laravel Fortify + Sanctum, RBAC via roles/permissions
+- **Auth:** Custom auth controllers (`routes/auth.php`) + Socialite + Sanctum, RBAC via roles/permissions
 - **Build:** Vite 7
 
 ### Events & Listeners
@@ -87,8 +87,8 @@ Listener registration is **explicit, not auto-discovered**: `app/Providers/Event
 - `@/*` path alias maps to `resources/js/*`
 - PHP follows Laravel Pint "laravel" preset
 - Tests use Pest (not raw PHPUnit); feature tests extend `TestCase` with `RefreshDatabase`
-- No `app/Http/Requests/` — validation is inline in controllers or via Zod on the frontend
-- Keep controllers thin — delegate business logic to Services
+- Validation is inline in controllers (`LoginRequest` is the only Form Request) or via Zod on the frontend
+- Keep controllers thin — delegate business logic to classes in `app/Services`
 
 ### Vuetify Design System (NON-NEGOTIABLE)
 

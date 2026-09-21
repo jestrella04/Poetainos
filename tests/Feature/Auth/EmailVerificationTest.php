@@ -134,3 +134,23 @@ describe('verifying an email', function (): void {
         $response->assertUnprocessable();
     });
 });
+
+describe('the lifetime of a code', function (): void {
+    it('expires after fifteen minutes even when wrong guesses were made in between', function (): void {
+        // Given
+        $user = createUser(['email_verified_at' => null]);
+        $code = sendVerificationCode($user);
+        $wrongCode = $code === '000000' ? '111111' : '000000';
+        $this->withoutMiddleware(ThrottleRequests::class);
+
+        // When
+        $this->travel(10)->minutes();
+        actingAs($user)->postJson(route('verification.verify'), ['code' => $wrongCode]);
+        $this->travel(6)->minutes();
+        $response = actingAs($user)->postJson(route('verification.verify'), ['code' => $code]);
+
+        // Then
+        $response->assertUnprocessable();
+        expect($user->refresh()->hasVerifiedEmail())->toBeFalse();
+    });
+});

@@ -18,7 +18,7 @@ class ContactsController extends Controller
     {
         return Inertia::render('forms/PoContactForm', [
             'meta' => [
-                'title' => __('Contact form'),
+                'title' => getPageTitle([__('Contact form')]),
             ],
         ]);
     }
@@ -30,20 +30,23 @@ class ContactsController extends Controller
      */
     public function store(Request $request): array
     {
+        // The captcha key travels inside the rule string, so keep only the characters a captcha key is made of
+        $captchaKey = (string) preg_replace('/[^A-Za-z0-9.\/$]/', '', (string) $request->input('key'));
+
         // Validate user input
-        request()->validate([
+        $request->validate([
             'name' => 'required|string|min:3|max:40',
             'email' => 'required|string|email|max:45',
             'subject' => 'required|string|min:3|max:40',
-            'message' => 'required|string|min:100',
+            'message' => 'required|string|min:100|max:2000',
             'key' => 'required|string|min:1',
-            'captcha' => 'required|captcha_api:'.request('key').',math',
+            'captcha' => 'required|captcha_api:'.$captchaKey.',math',
         ]);
 
-        $name = (string) request('name');
-        $email = (string) request('email');
-        $subject = (string) request('subject');
-        $message = (string) request('message');
+        $name = (string) $request->input('name');
+        $email = (string) $request->input('email');
+        $subject = (string) $request->input('subject');
+        $message = (string) $request->input('message');
 
         // Schedule email notification
         $recipients = getSiteConfig('emails.admin');

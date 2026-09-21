@@ -5,32 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\User;
+use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CommentsController extends Controller
 {
+    private const MAX_MENTIONS = 5;
+
     /**
      * Display a listing of the resource.
      *
      * @return Paginator<int, Comment>
      */
-    public function index(string $writing): Paginator
+    public function index(string $writingId): Paginator
     {
-        $filter = [0];
-
-        $user = Auth::user();
-
-        if ($user !== null) {
-            $filter = $user->blockedAuthors()->pluck('blocked_user_id');
-        }
-
-        $comments = Comment::where('writing_id', $writing)
-            ->whereNotIn('user_id', $filter)
+        $comments = Comment::where('writing_id', $writingId)
+            ->whereNotIn('user_id', $this->getBlockedUsers())
             ->with([
                 'author' => function ($query): void {
                     $query->forAuthorSummary();
@@ -48,53 +42,35 @@ class CommentsController extends Controller
      */
     public function store(Request $request): void
     {
-        request()->validate([
-            'comment' => 'required|min:1|max:300',
+        $request->validate([
+            'comment' => 'required|string|max:300',
             'writing_id' => 'required|exists:writings,id',
         ]);
 
-        $user = Auth::user();
+        $user = $this->requireAuthUser();
 
-        if ($user === null) {
-            return;
-        }
-
-        $message = request('comment');
         $comment = Comment::create([
             'user_id' => $user->id,
-            'writing_id' => request('writing_id'),
-            'message' => $message,
+            'writing_id' => $request->input('writing_id'),
+            'message' => $request->input('comment'),
         ]);
 
         $writing = $comment->writing;
 
         // Update aura / karma
-        $comment->author?->updateAura();
+        $user->updateAura();
         $writing?->updateAura();
 
+        if ($writing === null) {
+            return;
+        }
+
         // Notify author
-        if ($writing !== null && $writing->author !== null && ! $writing->author->is($user)) {
+        if ($writing->author !== null && $writing->author->isNot($user)) {
             $writing->author->notify(new WritingCommented($writing, $user));
         }
 
-        // Notify @mentions
-        $mentionPattern = '/\B@[a-zA-Z0-9_-]+/';
-        preg_match_all($mentionPattern, $comment->message, $mentions, PREG_PATTERN_ORDER);
-        $mentions = array_unique($mentions[0]);
-
-        foreach ($mentions as $mention) {
-            $mention = User::where('username', '=', substr($mention, 1))->first();
-
-            if (
-                $mention !== null
-                && $writing !== null
-                && $writing->author !== null
-                && ! $mention->is($writing->author)
-                && ! $mention->is($user)
-            ) {
-                $mention->notify(new WritingCommentMentioned($comment, $user));
-            }
-        }
+        $this->notifyMentions($comment, $writing, $user);
     }
 
     /**
@@ -116,6 +92,26 @@ class CommentsController extends Controller
             ['likeable_id', $comment->id],
         ])->delete();
 
+        // Update aura / karma
+        $comment->author?->updateAura();
+        $comment->writing?->updateAura();
+
         return [];
+    }
+
+    /**
+     * Notify the users @mentioned in a comment, up to MAX_MENTIONS of them.
+     * The writing's author and the commenter are already covered elsewhere.
+     */
+    private function notifyMentions(Comment $comment, Writing $writing, User $commenter): void
+    {
+        preg_match_all('/\B@([a-zA-Z0-9_-]+)/', $comment->message, $matches);
+
+        $usernames = array_slice(array_unique($matches[1]), 0, self::MAX_MENTIONS);
+
+        User::whereIn('username', $usernames)
+            ->get()
+            ->reject(fn (User $mentioned): bool => $mentioned->is($commenter) || $mentioned->is($writing->author))
+            ->each(fn (User $mentioned) => $mentioned->notify(new WritingCommentMentioned($comment, $commenter)));
     }
 }

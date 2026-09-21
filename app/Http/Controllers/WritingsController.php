@@ -9,6 +9,7 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingPublished;
+use App\Services\ImageStorage;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\RedirectResponse;
@@ -16,14 +17,31 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
-use Intervention\Image\Laravel\Facades\Image;
-use Spatie\ImageOptimizer\OptimizerChain;
 
 class WritingsController extends Controller
 {
+    private const DEFAULT_DAILY_POST_LIMIT = 3;
+
+    private const HOME_AUTHORS_SHOWN = 4;
+
+    private const HOME_TAGS_SHOWN = 6;
+
+    private const LIKERS_SHOWN = 5;
+
+    private const RELATED_SHOWN = 5;
+
+    private const MAX_TAGS = 10;
+
+    private const MAX_TAG_LENGTH = 40;
+
+    private const COVER_WIDTH = 1280;
+
+    private const COVER_HEIGHT = 720;
+
     /**
      * Display a listing of the resource.
      *
@@ -31,45 +49,45 @@ class WritingsController extends Controller
      */
     public function index(): Response|Paginator
     {
-        $awards = request()->route()?->getName() === 'writings.awards';
-        $isHome = request()->route()?->getName() === 'home';
+        $routeName = request()->route()?->getName();
+        $isAwardsListing = $routeName === 'writings.awards';
+        $isHome = $routeName === 'home';
         $sort = resolveSort(['latest', 'popular', 'likes']);
-        $filterAwards = $awards ? 'home_posted_at' : 'id';
         $writings = Writing::visibleTo($this->getBlockedUsers())
-            ->whereNotNull($filterAwards)
             ->withListingRelations()
             ->sorted($sort);
 
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
+        if ($isAwardsListing === true) {
+            $writings->whereNotNull('home_posted_at');
         }
 
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => $awards ? getPageTitle([__('Golden Flowers')]) : getPageTitle([]),
-                'canonical' => route('home'),
+        return $this->writingsIndex(
+            $writings,
+            $sort,
+            [
+                'title' => $isAwardsListing ? getPageTitle([__('Golden Flowers')]) : getPageTitle([]),
+                'canonical' => $isAwardsListing ? route('writings.awards') : route('home'),
             ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-            'isHome' => $isHome,
-            'pickOfTheDay' => $isHome ? DailySelection::current()?->visibleWriting($this->getBlockedUsers()) : null,
-            'authors' => $isHome ? User::select(
-                'id',
-                'username',
-                'name',
-                'karma',
-                'extra_info->avatar AS avatar',
-            )->withCount('writings')
-                ->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
-                ->orderBy('aura', 'desc')
-                ->take(4)
-                ->get() : null,
-            'tags' => $isHome ? Tag::withCount('writings')
-                ->orderByDesc('writings_count')
-                ->having('writings_count', '>', 0)
-                ->take(6)
-                ->get() : null,
-        ]);
+            [
+                'isHome' => $isHome,
+                'pickOfTheDay' => $isHome ? DailySelection::current()?->visibleWriting($this->getBlockedUsers()) : null,
+                'authors' => $isHome ? User::select(
+                    'id',
+                    'username',
+                    'name',
+                    'karma',
+                    'extra_info->avatar AS avatar',
+                )->withCount('writings')
+                    ->ranked()
+                    ->take(self::HOME_AUTHORS_SHOWN)
+                    ->get() : null,
+                'tags' => $isHome ? Tag::withCount('writings')
+                    ->orderByDesc('writings_count')
+                    ->has('writings')
+                    ->take(self::HOME_TAGS_SHOWN)
+                    ->get() : null,
+            ],
+        );
     }
 
     /**
@@ -85,9 +103,9 @@ class WritingsController extends Controller
      *
      * @return array<string, string>
      */
-    public function store(Request $request): array
+    public function store(Request $request, ImageStorage $images): array
     {
-        return $this->update($request, new Writing);
+        return $this->update($request, new Writing, $images);
     }
 
     /**
@@ -95,11 +113,13 @@ class WritingsController extends Controller
      */
     public function show(Writing $writing): Response
     {
-        // Increment writing views
-        $writing->incrementViews();
+        $this->countViewOnce($writing);
 
-        // Update Aura
-        $writing->updateAura();
+        $writing->loadCount(['likes', 'comments', 'shelf'])->load([
+            'author' => fn ($query) => $query->forAuthorSummary(withKarma: true),
+            'categories:id,name,slug',
+            'tags:id,name,slug',
+        ]);
 
         $user = Auth::user();
 
@@ -111,36 +131,22 @@ class WritingsController extends Controller
                 ]),
                 'canonical' => $writing->path(),
             ],
-            'writing' => Writing::where('id', $writing->id)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with([
-                    'author' => function ($query): void {
-                        $query->forAuthorSummary(withKarma: true);
-                    },
-                ])
-                ->with([
-                    'categories' => function ($query): void {
-                        $query->select('id', 'name', 'slug');
-                    },
-                ])
-                ->with([
-                    'tags' => function ($query): void {
-                        $query->select('id', 'name', 'slug');
-                    },
-                ])
-                ->first(),
-            'likers' => $writing->likers()->shuffle()->take(5),
+            'writing' => $writing,
+            'likers' => $writing->likers(self::LIKERS_SHOWN),
             'related' => [
                 'from_author' => Writing::whereNot('id', $writing->id)
                     ->where('user_id', $writing->user_id)
-                    ->inRandomOrder()->take(5)->get(),
+                    ->inRandomOrder()->take(self::RELATED_SHOWN)->get(),
                 'from_category' => randomWritingsWithAuthor(
-                    Writing::whereIn(
-                        'id',
-                        DB::table('category_writing')
-                            ->select('writing_id')
-                            ->whereIn('category_id', $writing->categories()->pluck('id'))
-                    )
+                    Writing::whereNot('id', $writing->id)
+                        ->visibleTo($this->getBlockedUsers())
+                        ->whereIn(
+                            'id',
+                            DB::table('category_writing')
+                                ->select('writing_id')
+                                ->whereIn('category_id', $writing->categories->modelKeys())
+                        ),
+                    self::RELATED_SHOWN,
                 ),
             ],
             'isAuthorBlocked' => $user !== null && $writing->author !== null ? $user->isAuthorBlocked($writing->author) : false,
@@ -168,7 +174,7 @@ class WritingsController extends Controller
     public function edit(Writing $writing): Response
     {
         // Ensure user has the proper permission
-        if ($writing->exists) {
+        if ($writing->exists === true) {
             $this->authorize('update', $writing);
         }
 
@@ -190,6 +196,7 @@ class WritingsController extends Controller
                 'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
 
             ],
+            'isUpdate' => $writing->exists,
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
             'agreement' => Auth::user()?->isInAgreement() ?? false,
@@ -201,26 +208,19 @@ class WritingsController extends Controller
      *
      * @return array<string, string>
      */
-    public function update(Request $request, Writing $writing): array
+    public function update(Request $request, Writing $writing, ImageStorage $images): array
     {
-        $action = 'create';
+        $isNew = $writing->exists === false;
 
         // Ensure user has the proper permission
-        if ($writing->exists) {
+        if ($isNew === false) {
             $this->authorize('update', $writing);
-            $action = 'update';
         }
 
         $user = $this->requireAuthUser();
 
-        // Check number of posts by user
-        $posts = $user->writings()->whereDate('created_at', '=', Carbon::today())->count();
-        $dailyPostLimit = getSiteConfig('writings.daily_post_limit') ?? 3;
-
-        if ($posts >= $dailyPostLimit) {
-            throw ValidationException::withMessages([
-                'title' => __('You have reached your maximum number of posts for today. Please try again tomorrow.'),
-            ]);
+        if ($isNew === true) {
+            $this->ensureBelowDailyPostLimit($user);
         }
 
         // The form posts unchecked agreements even when the user already accepted them
@@ -230,83 +230,59 @@ class WritingsController extends Controller
         ];
 
         // Validate user input
-        request()->validate([
+        $request->validate([
             'title' => 'required|string|min:3|max:100',
-            'main_category' => 'required|integer|exists:categories,id',
+            'main_category' => ['required', 'integer', Rule::exists('categories', 'id')->whereNull('parent_id')],
             'categories' => 'required|array|exists:categories,id|max:2',
             'text' => 'required|string|min:10|max:4000',
-            'tags' => 'nullable|array',
+            'tags' => 'nullable|array|max:'.self::MAX_TAGS,
+            'tags.*' => 'string|min:1|max:'.self::MAX_TAG_LENGTH,
             'link' => 'nullable|url|max:250',
             'cover' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
             ...$agreementRules,
         ]);
 
         // Process the uploaded cover, if any
+        $currentCover = $writing->extra_info['cover'] ?? '';
+        $cover = $currentCover;
+
         if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
-            // Persist the image
-            $cover = $request->file('cover')->store('covers');
-            $coverRealPath = storage_path('app/'.$cover);
-
-            // Scale image and enforce 16:9 aspect ratio
-            Image::read($coverRealPath)->cover(1280, 720)->save();
-
-            // Optimize the image
-            app(OptimizerChain::class)->optimize($coverRealPath);
+            $cover = $images->storeUpload($request->file('cover'), 'covers', self::COVER_WIDTH, self::COVER_HEIGHT);
         }
 
-        // Create the extra info array
-        $extraInfo = [
-            'link' => request('link') ?? '',
-            'cover' => $cover ?? ($writing->extra_info['cover'] ?? ''),
-        ];
+        DB::transaction(function () use ($request, $writing, $user, $cover): void {
+            $writing->title = $request->input('title');
 
-        // Persist to database
-        $writing->title = request('title');
-
-        if (! $writing->exists) {
-            $writing->author()->associate($user);
-            $writing->slug = slugify($writing->getTable(), $writing->title);
-        }
-
-        $writing->text = request('text');
-        $writing->extra_info = $extraInfo;
-        $writing->save();
-
-        $categories = (array) request('categories');
-        array_unshift($categories, request('main_category'));
-
-        $tagsToSync = [];
-
-        // Let's grab the entered tags
-        if (! empty(request('tags'))) {
-            foreach ((array) request('tags') as $tag) {
-                $tag = (string) preg_replace('/\s+/', ' ', (string) $tag);
-                $tag = trim($tag);
-                $tag = Tag::firstOrCreate(
-                    ['name' => $tag],
-                    ['slug' => slugify('tags', $tag)]
-                );
-
-                $tagsToSync[] = $tag->id;
+            if ($writing->exists === false) {
+                $writing->author()->associate($user);
+                $writing->slug = slugify($writing->getTable(), $writing->title);
             }
+
+            $writing->text = $request->input('text');
+            $writing->extra_info = [
+                ...($writing->extra_info ?? []),
+                'link' => $request->input('link') ?? '',
+                'cover' => $cover,
+            ];
+            $writing->save();
+
+            $writing->categories()->sync([$request->input('main_category'), ...(array) $request->input('categories')]);
+            $writing->tags()->sync($this->resolveTagIds((array) $request->input('tags')));
+        });
+
+        if ($cover !== $currentCover) {
+            $images->delete($currentCover);
         }
-
-        // Persist categories
-        $writing->categories()->sync($categories);
-
-        // Persist tags
-        $writing->tags()->sync($tagsToSync);
 
         // Update user aura / karma
         $writing->author?->updateAura();
 
         // Persist user agreements to avoid asking again
-        if (request('service_agreement') && request('privacy_agreement')) {
+        if (isTruthy($request->input('service_agreement')) && isTruthy($request->input('privacy_agreement'))) {
             $writing->author?->acceptAgreements();
         }
 
-        // Set response message and trigger notification
-        if ($action === 'create') {
+        if ($isNew === true) {
             // Share on social media
             $writing->author?->notify(new WritingPublished($writing));
         }
@@ -322,24 +298,55 @@ class WritingsController extends Controller
      *
      * @return array<int, mixed>
      */
-    public function destroy(Writing $writing): array
+    public function destroy(Writing $writing, ImageStorage $images): array
     {
         $this->authorize('delete', $writing);
-        $writing->deleteOrFail();
 
-        // Delete related notifications
-        DB::table('notifications')->where('data->writing_id', $writing->id)->delete();
+        $cover = $writing->extra_info['cover'] ?? null;
 
-        // Delete related likes
-        Like::where([
-            ['likeable_type', Writing::class],
-            ['likeable_id', $writing->id],
-        ])->delete();
+        DB::transaction(function () use ($writing): void {
+            $writing->deleteOrFail();
 
-        if (request('redirect')) {
-            request()->session()->flash('flash', __('Writing deleted successfully'));
-        }
+            // Delete related notifications
+            DB::table('notifications')->where('data->writing_id', $writing->id)->delete();
+
+            // Delete related likes
+            Like::where([
+                ['likeable_type', Writing::class],
+                ['likeable_id', $writing->id],
+            ])->delete();
+        });
+
+        $images->delete($cover);
 
         return [];
+    }
+
+    private function ensureBelowDailyPostLimit(User $user): void
+    {
+        $postsToday = $user->writings()->where('created_at', '>=', Carbon::today())->count();
+        $dailyPostLimit = getSiteConfig('writings.daily_post_limit') ?? self::DEFAULT_DAILY_POST_LIMIT;
+
+        if ($postsToday >= $dailyPostLimit) {
+            throw ValidationException::withMessages([
+                'title' => __('You have reached your maximum number of posts for today. Please try again tomorrow.'),
+            ]);
+        }
+    }
+
+    /**
+     * The ids of the given tag names, creating the tags that don't exist yet.
+     *
+     * @param  array<int, mixed>  $names
+     * @return array<int, int>
+     */
+    private function resolveTagIds(array $names): array
+    {
+        return collect($names)
+            ->map(fn (mixed $name): string => trim((string) preg_replace('/\s+/', ' ', (string) $name)))
+            ->unique()
+            ->map(fn (string $name): int => Tag::firstOrCreate(['name' => $name], ['slug' => slugify('tags', $name)])->id)
+            ->values()
+            ->all();
     }
 }

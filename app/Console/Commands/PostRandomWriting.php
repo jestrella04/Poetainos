@@ -27,7 +27,7 @@ class PostRandomWriting extends Command
      */
     public function handle(): int
     {
-        $writing = DailySelection::pickForToday()->writing;
+        $writing = DailySelection::pickForToday()->writing()->firstOrFail();
         $writing->author?->notify(new WritingRandom($writing));
 
         return self::SUCCESS;

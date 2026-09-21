@@ -65,12 +65,4 @@ class Like extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    /**
-     * @return BelongsTo<Writing, $this>
-     */
-    public function writing(): BelongsTo
-    {
-        return $this->belongsTo(Writing::class);
-    }
 }

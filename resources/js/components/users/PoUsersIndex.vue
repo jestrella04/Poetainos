@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import { useFormatting } from '@/composables/useFormatting'
@@ -8,7 +7,7 @@ import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { User } from '@/types/models'
 
-const page = computed(() => usePage<InertiaPageProps<{ sort: string; totalAuthors: number }>>())
+const page = usePage<InertiaPageProps<{ sort: string; totalAuthors: number }>>()
 const { isEmpty } = useTypeGuards()
 const { formatCount } = useFormatting()
 
@@ -18,7 +17,7 @@ const {
   loadMore
 } = usePaginatedTabList<User>({
   tabOrder: ['featured', 'latest', 'popular'],
-  currentTab: () => page.value.props.sort,
+  currentTab: () => page.props.sort,
   reloadPropKey: 'users'
 })
 </script>

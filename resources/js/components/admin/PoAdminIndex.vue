@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import { useFormatting } from '@/composables/useFormatting'
@@ -15,8 +14,8 @@ interface Counter {
 }
 
 const { readable } = useFormatting()
-const page = computed(() => usePage<InertiaPageProps<{ counters: Record<string, Counter> }>>())
-const counters = page.value.props.counters
+const page = usePage<InertiaPageProps<{ counters: Record<string, Counter> }>>()
+const counters = page.props.counters
 </script>
 
 <style scoped>

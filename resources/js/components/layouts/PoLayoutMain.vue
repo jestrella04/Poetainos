@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, reactive, onMounted, onUpdated, watch, provide } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import Echo from 'laravel-echo'
-import Pusher from 'pusher-js'
+import { ref, reactive, onMounted, onBeforeUnmount, watch, provide } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
 import {
   forceSnackBarKey,
   loginModalKey,
@@ -12,12 +10,13 @@ import {
   unreadCountKey
 } from '@/composables/keys'
 import { useAuth } from '@/composables/useAuth'
+import { useNotificationsChannel } from '@/composables/useNotificationsChannel'
 import { useSystemTheme } from '@/composables/useSystemTheme'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { useStaticPages } from '@/composables/useStaticPages'
 
-const page = computed(() => usePage())
+const page = usePage()
 const { auth, authUser, admin } = useAuth()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { getSnackBar } = useSnackbar()
@@ -25,7 +24,7 @@ const { faqPath, aboutPath, termsPath, privacyPath } = useStaticPages()
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
-const unreadCount = ref(page.value.props.auth.notifications)
+const unreadCount = ref(page.props.auth.notifications)
 const loginModal = ref(false)
 const snackBar = reactive({
   active: false,
@@ -44,36 +43,43 @@ provide(mobileUserMenuKey, mobileUserMenu)
 provide(unreadCountKey, unreadCount)
 provide(loginModalKey, loginModal)
 
+let stopListeningForNavigation: () => void = () => undefined
+
 onMounted(() => {
   void import('@khmyznikov/pwa-install')
-  document.body.appendChild(document.createElement('pwa-install'))
+
+  // Other layouts mount this element too, and each mount would add another one
+  if (document.querySelector('pwa-install') === null) {
+    document.body.appendChild(document.createElement('pwa-install'))
+  }
+
   getFlashMessages()
+
+  // Flash messages arrive with a navigation; re-reading them on every re-render
+  // would bring back a snackbar the user already dismissed.
+  stopListeningForNavigation = router.on('navigate', () => {
+    getFlashMessages()
+  })
 
   if (auth() && 'setAppBadge' in navigator) {
     void navigator.setAppBadge(unreadCount.value)
   }
+})
 
-  // Listen for new user notification events coming from the server
-  if (auth()) {
-    const user = authUser()
+onBeforeUnmount(() => {
+  stopListeningForNavigation()
+})
 
-    if (user) {
-      createEcho()
-        .private(`notifications.${user.id}`)
-        .listen('NotificationEvent', (payload: { notifications: { unread: number } }) => {
-          unreadCount.value = payload.notifications.unread
+useNotificationsChannel(
+  () => (auth() ? (authUser()?.id ?? null) : null),
+  (unread) => {
+    unreadCount.value = unread
 
-          if ('setAppBadge' in navigator) {
-            void navigator.setAppBadge(payload.notifications.unread)
-          }
-        })
+    if ('setAppBadge' in navigator) {
+      void navigator.setAppBadge(unread)
     }
   }
-})
-
-onUpdated(() => {
-  getFlashMessages()
-})
+)
 
 watch(forceSnackBar, () => {
   if (forceSnackBar.value) {
@@ -82,28 +88,9 @@ watch(forceSnackBar, () => {
   }
 })
 
-function createEcho(): Echo<'pusher'> {
-  return new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    wsHost: import.meta.env.VITE_PUSHER_HOST,
-    wsPort: import.meta.env.VITE_PUSHER_PORT ? Number(import.meta.env.VITE_PUSHER_PORT) : undefined,
-    wssPort: import.meta.env.VITE_PUSHER_PORT
-      ? Number(import.meta.env.VITE_PUSHER_PORT)
-      : undefined,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: import.meta.env.VITE_PUSHER_APP_FORCETLS === 'true',
-    disableStats: true,
-    // PusherConnector connects synchronously during Echo's constructor, so
-    // Pusher must be supplied here rather than assigned on the instance
-    // afterwards (the connection attempt would already have failed).
-    Pusher
-  })
-}
-
 function getFlashMessages() {
   const snack = getSnackBar()
-  const flash = page.value.props.flash.message
+  const flash = page.props.flash.message
 
   // Check for client side flash messages
   if (snack !== null && !isEmpty(snack)) {

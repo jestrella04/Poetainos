@@ -14,22 +14,12 @@ class WritingCommentMentioned extends PoetainosNotification implements ShouldQue
 
     public function __construct(protected Comment $comment, protected User $user)
     {
-        $this->notification = [
-            'title' => __('Updates from :name at :site', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'greeting' => __('Hello!'),
-            'body' => __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id,
-            'action' => __('View comment'),
-            'icon' => asset('images/logo-192.png'),
-            'tag' => getSiteConfig('name'),
-        ];
+        $this->notification = $this->actorContent(
+            $this->user,
+            __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', $this->actorPlaceholders($this->user)),
+            route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id,
+            __('View comment'),
+        );
     }
 
     /**
@@ -40,7 +30,7 @@ class WritingCommentMentioned extends PoetainosNotification implements ShouldQue
      */
     public function via($notifiable): array
     {
-        return ['mail', 'database', 'broadcast', WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), 'database', 'broadcast', WebPushChannel::class];
     }
 
     /**

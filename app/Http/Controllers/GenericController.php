@@ -18,23 +18,12 @@ class GenericController extends Controller
     public function writings(User $user): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
-        $writings = $user->writings()
-            ->visibleTo($this->getBlockedUsers())
-            ->withListingRelations()
-            ->sorted($sort);
 
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Writings'), $user->getName()]),
-                'canonical' => route('home'),
-            ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-        ]);
+        return $this->writingsIndex(
+            $user->writings()->visibleTo($this->getBlockedUsers())->withListingRelations()->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([__('Writings'), $user->getName()]), 'canonical' => $user->writingsPath()],
+        );
     }
 
     /**
@@ -43,23 +32,15 @@ class GenericController extends Controller
     public function shelf(User $user): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
-        $writings = Writing::whereIn('id', $user->shelf()->pluck('id'))
-            ->visibleTo($this->getBlockedUsers())
-            ->withListingRelations()
-            ->sorted($sort);
 
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Shelf'), $user->getName()]),
-                'canonical' => route('home'),
-            ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-        ]);
+        return $this->writingsIndex(
+            Writing::whereIn('id', $user->shelf()->select('writings.id'))
+                ->visibleTo($this->getBlockedUsers())
+                ->withListingRelations()
+                ->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([__('Shelf'), $user->getName()]), 'canonical' => route('users.shelf.index', $user)],
+        );
     }
 
     /**
@@ -68,24 +49,16 @@ class GenericController extends Controller
     public function likes(User $user): Response|Paginator
     {
         $sort = resolveSort(['latest', 'popular', 'likes']);
-        $writings = Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
-            ->visibleTo($this->getBlockedUsers())
-            ->whereNot('user_id', $user->id)
-            ->withListingRelations()
-            ->sorted($sort);
 
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Likes'), $user->getName()]),
-                'canonical' => route('home'),
-            ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-        ]);
+        return $this->writingsIndex(
+            Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->select('likeable_id'))
+                ->visibleTo($this->getBlockedUsers())
+                ->whereNot('user_id', $user->id)
+                ->withListingRelations()
+                ->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([__('Likes'), $user->getName()]), 'canonical' => route('users.likes.index', $user)],
+        );
     }
 
     public function explore(): Response
@@ -102,17 +75,17 @@ class GenericController extends Controller
                 'main' => Category::withCount('writings')
                     ->whereNull('parent_id')
                     ->orderByDesc('writings_count')
-                    ->having('writings_count', '>', 0)
+                    ->has('writings')
                     ->get(),
                 'alt' => Category::withCount('writings')
                     ->whereNotNull('parent_id')
                     ->orderByDesc('writings_count')
-                    ->having('writings_count', '>', 0)
+                    ->has('writings')
                     ->get(),
             ],
             'tags' => Tag::withCount('writings')
                 ->orderByDesc('writings_count')
-                ->having('writings_count', '>', 0)
+                ->has('writings')
                 ->take(20)
                 ->get(),
             'authors' => User::select(
@@ -121,8 +94,7 @@ class GenericController extends Controller
                 'name',
                 'karma',
                 'extra_info->avatar AS avatar',
-            )->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
-                ->orderBy('aura', 'desc')
+            )->ranked()
                 ->take(20)
                 ->get(),
         ]);
@@ -173,7 +145,9 @@ class GenericController extends Controller
     public function offline(): Response
     {
         return Inertia::render('generic/PoOffline', [
-            'meta' => [],
+            'meta' => [
+                'title' => getPageTitle([__('Offline')]),
+            ],
         ]);
     }
 }

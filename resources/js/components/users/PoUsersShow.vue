@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoUsersEntry from './PoUsersEntry.vue'
 import PoWritingsEntry from '../writings/PoWritingsEntry.vue'
@@ -28,7 +27,7 @@ interface UsersShowProps {
 
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { userDisplayName, relativeDate, formatCount } = useFormatting()
-const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
+const page = usePage<InertiaPageProps<UsersShowProps>>()
 
 const {
   items: authorWritings,
@@ -52,7 +51,9 @@ const {
           :msg-title="$t('users.user-is-blocked')"
           :msg-body="$t('main.author-blocked')"
           icon="fas fa-ban"
-        />
+        >
+          <po-unblocker :user="page.props.user" />
+        </po-msg-block>
       </div>
     </template>
     <template v-else>

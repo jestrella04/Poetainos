@@ -8,7 +8,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,23 +20,13 @@ class UsersNotificationsController extends Controller
      */
     public function index(): Response|LengthAwarePaginator
     {
-        $user = Auth::user();
+        $user = $this->requireAuthUser();
 
-        if ($user === null) {
-            abort(401);
-        }
+        $tab = in_array(request('tab'), ['unread', 'all'], true) ? request('tab') : 'unread';
 
-        $tab = in_array(request('tab'), ['unread', 'all']) ? request('tab') : 'unread';
-
-        if ($tab === 'unread') {
-            $notifications = User::find($user->id)?->unreadNotifications()->paginate($this->pagination)->withQueryString();
-        } else {
-            $notifications = User::find($user->id)?->notifications()->paginate($this->pagination)->withQueryString();
-        }
-
-        if ($notifications === null) {
-            abort(404);
-        }
+        $notifications = ($tab === 'unread' ? $user->unreadNotifications() : $user->notifications())
+            ->paginate($this->pagination)
+            ->withQueryString();
 
         $notifierUserIds = $notifications->pluck('data.user_id')->filter()->unique();
         $notifierWritingIds = $notifications->pluck('data.writing_id')->filter()->unique();
@@ -53,15 +42,8 @@ class UsersNotificationsController extends Controller
             ->keyBy('id');
 
         $notifications->each(function (DatabaseNotification $notification) use ($notifierUsers, $notifierWritings): void {
-            $notification['notifier_user'] =
-                isset($notification->data['user_id'])
-                ? $notifierUsers->get($notification->data['user_id'])
-                : null;
-
-            $notification['notifier_writing'] =
-                isset($notification->data['writing_id'])
-                ? $notifierWritings->get($notification->data['writing_id'])
-                : null;
+            $notification['notifier_user'] = $notifierUsers->get($notification->data['user_id'] ?? null);
+            $notification['notifier_writing'] = $notifierWritings->get($notification->data['writing_id'] ?? null);
         });
 
         if (request()->expectsJson()) {
@@ -69,7 +51,9 @@ class UsersNotificationsController extends Controller
         }
 
         return Inertia::render('notifications/PoNotificationsIndex', [
-            'meta' => [],
+            'meta' => [
+                'title' => getPageTitle([__('Notifications')]),
+            ],
             'tab' => $tab,
             'notifications' => Inertia::optional(fn () => $notifications),
         ]);
@@ -77,55 +61,28 @@ class UsersNotificationsController extends Controller
 
     public function clear(): RedirectResponse
     {
-        Auth::user()?->unreadNotifications->markAsRead();
+        $this->requireAuthUser()->unreadNotifications->markAsRead();
 
-        return redirect(route('notifications.index'));
+        return to_route('notifications.index');
     }
 
     public function show(string $notificationId): RedirectResponse
     {
-        $notification = Auth::user()?->notifications()->find($notificationId);
+        $notification = $this->requireAuthUser()->notifications()->findOrFail($notificationId);
 
-        if ($notification !== null) {
-            $notification->markAsRead();
+        $notification->markAsRead();
 
-            if (isset($notification->data['url'])) {
-                $redirectUrl = redirect($notification->data['url']);
-            } else {
-                $redirectUrl = redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'])));
-            }
-
-            return $redirectUrl;
+        if (isset($notification->data['url'])) {
+            return redirect($notification->data['url']);
         }
 
-        abort(401);
+        return redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'] ?? null)));
     }
 
     public function email(string $enable): JsonResponse
     {
-        Auth::user()?->emailNotifications($enable);
+        $this->requireAuthUser()->setEmailNotifications(isTruthy($enable));
 
         return response()->json(null, 204);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function status(): array
-    {
-        $info = Auth::user()->extra_info ?? [];
-        $status = [];
-
-        if (array_key_exists('notifications', $info)) {
-            $status = $info['notifications'];
-        } else {
-            $status['email'] = 'on';
-        }
-
-        if (empty($status['email'])) {
-            $status['email'] = 'on';
-        }
-
-        return $status;
     }
 }

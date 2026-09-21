@@ -15,7 +15,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('karma-update')->daily();
+        $schedule->command('aura:update')->daily();
+        $schedule->command('karma:update')->daily();
         $schedule->command('sitemap:generate')->daily();
         $schedule->command('writing:pick-of-the-day')->daily();
         $schedule->command('writing:random')->dailyAt('13:00');

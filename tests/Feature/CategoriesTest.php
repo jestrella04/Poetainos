@@ -63,6 +63,46 @@ describe('admin category management', function (): void {
         expect($category->refresh()->description)->toBe('An updated description.');
     });
 
+    it('does not let a category become its own parent or move under a descendant', function (string $newParent): void {
+        // Given
+        $admin = actingAsAdmin();
+        $root = Category::factory()->create(['parent_id' => null, 'name' => 'Poetry']);
+        $child = Category::factory()->create(['parent_id' => $root->id, 'name' => 'Haiku']);
+        $grandchild = Category::factory()->create(['parent_id' => $child->id, 'name' => 'Senryu']);
+        $target = ['root' => $root, 'child' => $child, 'grandchild' => $grandchild][$newParent];
+
+        // When
+        $response = actingAs($admin)->putJson('/admin/categories/edit', [
+            'id' => $root->id,
+            'name' => $root->name,
+            'parent' => $target->id,
+            'description' => 'A description long enough.',
+        ]);
+
+        // Then
+        $response->assertJsonValidationErrors('parent');
+        expect($root->refresh()->parent_id)->toBeNull();
+    })->with(['itself' => 'root', 'a child' => 'child', 'a grandchild' => 'grandchild']);
+
+    it('lets a category move under an unrelated category', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+        $root = Category::factory()->create(['parent_id' => null, 'name' => 'Poetry']);
+        $other = Category::factory()->create(['parent_id' => null, 'name' => 'Prose']);
+
+        // When
+        $response = actingAs($admin)->putJson('/admin/categories/edit', [
+            'id' => $root->id,
+            'name' => $root->name,
+            'parent' => $other->id,
+            'description' => 'A description long enough.',
+        ]);
+
+        // Then
+        $response->assertOk();
+        expect($root->refresh()->parent_id)->toBe($other->id);
+    });
+
     it('deletes a category', function (): void {
         // Given
         $admin = actingAsAdmin();

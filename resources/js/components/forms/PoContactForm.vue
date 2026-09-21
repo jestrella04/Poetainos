@@ -191,7 +191,8 @@ async function submitForm() {
       type="success"
       variant="tonal"
       class="mb-5 mx-auto"
-      style="width: 85%; max-width: 600px"
+      width="85%"
+      max-width="600"
     >
       {{ $t('main.message-scheduled') }}
     </v-alert>

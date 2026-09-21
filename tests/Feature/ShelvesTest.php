@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Shelf;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Notification;
 
 use function Pest\Laravel\actingAs;
@@ -54,5 +56,19 @@ describe('shelving a writing', function (): void {
 
         // Then
         $response->assertJson(['method' => 'destroy', 'count' => 1]);
+    });
+});
+
+describe('a double click on the shelf button', function (): void {
+    it('reports the shelving instead of failing when it was already created', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        Shelf::creating(fn () => throw new UniqueConstraintViolationException('sqlite', 'insert', [], new Exception('duplicate')));
+
+        // When
+        $response = actingAs(createUser())->post("/shelves/{$writing->slug}/store");
+
+        // Then
+        $response->assertOk()->assertJson(['method' => 'store']);
     });
 });

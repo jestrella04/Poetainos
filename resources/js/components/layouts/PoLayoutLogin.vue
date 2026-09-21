@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useSystemTheme } from '@/composables/useSystemTheme'
 import type { InertiaPageProps } from '@/types/inertia'
 
-const page = computed(() => usePage<InertiaPageProps<{ title?: string }>>())
+const page = usePage<InertiaPageProps<{ title?: string }>>()
 
 const { revealStyle } = useSystemTheme()
 </script>

@@ -21,11 +21,8 @@ interface ExploreProps {
 
 const { formatCount } = useFormatting()
 const { strNullOrEmpty } = useTypeGuards()
-const page = computed(() => usePage<InertiaPageProps<ExploreProps>>())
-const categories = computed(() => [
-  ...page.value.props.categories.main,
-  ...page.value.props.categories.alt
-])
+const page = usePage<InertiaPageProps<ExploreProps>>()
+const categories = computed(() => [...page.props.categories.main, ...page.props.categories.alt])
 </script>
 
 <template>

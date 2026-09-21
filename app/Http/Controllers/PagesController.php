@@ -16,7 +16,9 @@ class PagesController extends Controller
     public function index(): Response
     {
         return Inertia::render('pages/PoPagesIndex', [
-            'meta' => [],
+            'meta' => [
+                'title' => getPageTitle([__('Pages')]),
+            ],
             'pages' => Page::all(),
         ]);
     }

@@ -2,8 +2,11 @@
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertGuest;
 
 describe('viewing and updating a profile', function (): void {
     it('allows a user to view and update their own profile', function (): void {
@@ -170,5 +173,212 @@ describe('blocking a user', function (): void {
         // Then
         $response->assertOk();
         expect($user->refresh()->isAuthorBlocked($author))->toBeTrue();
+    });
+});
+
+describe('what a profile update keeps and rejects', function (): void {
+    beforeEach(function (): void {
+        config(['inertia.testing.ensure_pages_exist' => false]);
+    });
+
+    it('keeps the stored settings the form does not own', function (): void {
+        // Given
+        $user = createUser([
+            'extra_info' => [
+                'bio' => 'Old bio',
+                'notifications' => ['email' => 'off'],
+                'linked_providers' => ['google'],
+                'agreement' => ['terms_of_use' => 'on', 'privacy_policy' => 'on'],
+            ],
+        ]);
+
+        // When
+        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => 'Updated Name',
+            'email' => $user->email,
+            'bio' => 'New bio',
+        ]);
+
+        // Then
+        $response->assertOk();
+        $info = $user->refresh()->extra_info;
+        expect($info['bio'])->toBe('New bio');
+        expect($info['notifications']['email'])->toBe('off');
+        expect($info['linked_providers'])->toBe(['google']);
+        expect($user->isInAgreement())->toBeTrue();
+    });
+
+    it('rejects an email that another account already uses', function (): void {
+        // Given
+        $taken = createUser();
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->putJson('/users/edit/'.$user->username, [
+            'name' => 'Updated Name',
+            'email' => $taken->email,
+        ]);
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors('email');
+    });
+
+    it('lets a user keep their own email', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->putJson('/users/edit/'.$user->username, [
+            'name' => 'Updated Name',
+            'email' => $user->email,
+        ]);
+
+        // Then
+        $response->assertOk();
+    });
+
+    it('only offers the role list to admins', function (): void {
+        // Given
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        $asUser = actingAs($user)->get('/users/edit/'.$user->username);
+        $asAdmin = actingAs($admin)->get('/users/edit/'.$user->username);
+
+        // Then
+        $asUser->assertInertia(fn ($page) => $page->has('roles', 0));
+        $asAdmin->assertInertia(fn ($page) => $page->has('roles', Role::count()));
+    });
+});
+
+describe('a profile avatar', function (): void {
+    beforeEach(function (): void {
+        Storage::fake('local');
+    });
+
+    it('is stored, replacing and deleting the previous file', function (): void {
+        // Given
+        Storage::disk('local')->put('avatars/old.png', 'old');
+        $user = createUser(['extra_info' => ['avatar' => 'avatars/old.png', 'bio' => 'Kept']]);
+
+        // When
+        $response = actingAs($user)->post('/users/edit/'.$user->username, [
+            '_method' => 'PUT',
+            'name' => 'Updated Name',
+            'email' => $user->email,
+            'avatar' => UploadedFile::fake()->image('me.png', 800, 600),
+        ]);
+
+        // Then
+        $response->assertOk();
+        $avatar = $user->refresh()->extra_info['avatar'];
+        expect($avatar)->toStartWith('avatars/')->not->toBe('avatars/old.png');
+        Storage::disk('local')->assertExists($avatar);
+        Storage::disk('local')->assertMissing('avatars/old.png');
+        expect(getimagesize(Storage::disk('local')->path($avatar))[0])->toBe(512);
+    });
+
+    it('is removed on request', function (): void {
+        // Given
+        Storage::disk('local')->put('avatars/old.png', 'old');
+        $user = createUser(['extra_info' => ['avatar' => 'avatars/old.png']]);
+
+        // When
+        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => 'Updated Name',
+            'email' => $user->email,
+            'avatar-remove' => 1,
+        ]);
+
+        // Then
+        $response->assertOk();
+        expect($user->refresh()->extra_info['avatar'])->toBe('');
+        Storage::disk('local')->assertMissing('avatars/old.png');
+    });
+});
+
+describe('deleting an account, in more detail', function (): void {
+    it('logs the user out and clears their avatar when they delete themselves', function (): void {
+        // Given
+        Storage::fake('local');
+        Storage::disk('local')->put('avatars/mine.png', 'x');
+        $user = createUser(['extra_info' => ['avatar' => 'avatars/mine.png']]);
+
+        // When
+        $response = actingAs($user)
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->delete('/users/delete/'.$user->username);
+
+        // Then
+        $response->assertRedirect(route('home'));
+        $response->assertSessionHas('message', 'accounts.account-deleted');
+        assertGuest();
+        Storage::disk('local')->assertMissing('avatars/mine.png');
+    });
+
+    it('keeps an admin logged in when they delete someone else', function (): void {
+        // Given
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        actingAs($admin)->delete('/admin/users/delete/'.$user->username)->assertOk();
+
+        // Then
+        expect(auth()->id())->toBe($admin->id);
+    });
+});
+
+describe('blocking, in more detail', function (): void {
+    it('does not let a user block themselves', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->post('/users/block/'.$user->username);
+
+        // Then
+        $response->assertUnprocessable();
+        expect($user->blockedAuthors()->count())->toBe(0);
+    });
+
+    it('lets a user unblock someone they blocked', function (): void {
+        // Given
+        $user = createUser();
+        $author = createUser();
+        $user->block($author);
+
+        // When
+        $response = actingAs($user)->delete('/users/block/'.$author->username);
+
+        // Then
+        $response->assertOk();
+        expect($user->isAuthorBlocked($author))->toBeFalse();
+    });
+});
+
+describe('the email notification preference', function (): void {
+    it('defaults to on and follows what the user chose', function (bool $expected, ?array $info): void {
+        // Given
+        $user = createUser(['extra_info' => $info]);
+
+        // Then
+        expect($user->wantsEmailNotifications())->toBe($expected);
+    })->with([
+        'never chosen' => [true, null],
+        'chose on' => [true, ['notifications' => ['email' => 'on']]],
+        'chose off' => [false, ['notifications' => ['email' => 'off']]],
+    ]);
+
+    it('is switched through the notifications endpoint', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        actingAs($user)->post(route('notifications.email', ['false']))->assertNoContent();
+
+        // Then
+        expect($user->refresh()->wantsEmailNotifications())->toBeFalse();
     });
 });

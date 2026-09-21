@@ -16,7 +16,7 @@ interface WritingsIndexProps {
   tags: TagLike[] | null
 }
 
-const page = computed(() => usePage<InertiaPageProps<WritingsIndexProps>>())
+const page = usePage<InertiaPageProps<WritingsIndexProps>>()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 
 const {
@@ -26,11 +26,11 @@ const {
   loadMore
 } = usePaginatedTabList<Writing>({
   tabOrder: ['latest', 'popular', 'likes'],
-  currentTab: () => page.value.props.sort,
+  currentTab: () => page.props.sort,
   reloadPropKey: 'writings'
 })
 
-const heroWriting = computed(() => page.value.props.pickOfTheDay ?? null)
+const heroWriting = computed(() => page.props.pickOfTheDay ?? null)
 
 const restWritings = computed(() =>
   heroWriting.value === null

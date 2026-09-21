@@ -2,6 +2,7 @@
 
 use App\Models\BlockedUser;
 use App\Models\Comment;
+use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
@@ -112,5 +113,56 @@ describe('deleting a comment', function (): void {
         // Then
         $response->assertOk();
         expect(Comment::find($comment->id))->toBeNull();
+    });
+});
+
+describe('mentions in a comment', function (): void {
+    it('notify at most five different users', function (): void {
+        // Given
+        Notification::fake();
+        $writing = Writing::factory()->create();
+        $commenter = createUser();
+        $mentioned = User::factory()->count(8)->sequence(fn ($sequence) => ['username' => 'writer'.$sequence->index])->create();
+        $message = $mentioned->map(fn (User $user): string => '@'.$user->username)->implode(' ');
+
+        // When
+        actingAs($commenter)->post('/comments/create', [
+            'comment' => $message,
+            'writing_id' => $writing->id,
+        ])->assertOk();
+
+        // Then
+        Notification::assertSentTimes(WritingCommentMentioned::class, 5);
+    });
+
+    it('notify each user once however many times they are mentioned', function (): void {
+        // Given
+        Notification::fake();
+        $writing = Writing::factory()->create();
+        $mentioned = createUser(['username' => 'mentioned_user']);
+
+        // When
+        actingAs(createUser())->post('/comments/create', [
+            'comment' => '@mentioned_user @mentioned_user thanks',
+            'writing_id' => $writing->id,
+        ])->assertOk();
+
+        // Then
+        Notification::assertSentToTimes($mentioned, WritingCommentMentioned::class, 1);
+    });
+
+    it('ignore usernames that do not exist', function (): void {
+        // Given
+        Notification::fake();
+        $writing = Writing::factory()->create();
+
+        // When
+        actingAs(createUser())->post('/comments/create', [
+            'comment' => '@nobody-here hello',
+            'writing_id' => $writing->id,
+        ])->assertOk();
+
+        // Then
+        Notification::assertNotSentTo($writing->author, WritingCommentMentioned::class);
     });
 });

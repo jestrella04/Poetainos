@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
@@ -24,7 +23,7 @@ interface WritingAdmin {
 
 const { t } = useI18n()
 const { userDisplayName, toLocaleDate } = useFormatting()
-const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
+const page = usePage<InertiaPageProps<{ total: number }>>()
 const headers: DataTableHeader[] = [
   { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
   { title: t('main.title'), align: 'start', sortable: false, key: 'title' },
@@ -35,7 +34,7 @@ const headers: DataTableHeader[] = [
 ]
 const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>(
   'admin.writings',
-  page.value.props.total
+  page.props.total
 )
 </script>
 

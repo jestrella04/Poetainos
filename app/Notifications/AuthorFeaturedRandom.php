@@ -51,7 +51,7 @@ class AuthorFeaturedRandom extends Notification
 
     public function toTwitter(mixed $notifiable): TwitterStatusUpdate
     {
-        $msg = str_replace(':author', $this->author->getTwitterUsername(), $this->msg).' '.$this->url;
+        $msg = str_replace(':author', $this->author->twitterHandleOrName(), $this->msg).' '.$this->url;
 
         return new TwitterStatusUpdate($msg);
     }

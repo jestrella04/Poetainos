@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 /**
@@ -44,27 +43,5 @@ class Category extends Model
         return Writing::with('categories')->whereHas('categories', function ($q): void {
             $q->whereIn('category_id', $this->descendantsAndSelf()->pluck('id'));
         });
-    }
-
-    public function writingsCount(): int
-    {
-        return $this->writings->unique()->count();
-    }
-
-    /**
-     * @return HasMany<Category, $this>
-     */
-    public function categories(): HasMany
-    {
-        return $this->hasMany(Category::class, 'parent_id');
-    }
-
-    /**
-     * @return HasMany<Category, $this>
-     */
-    public function childrenCategories(): HasMany
-    {
-        return $this->hasMany(Category::class, 'parent_id')
-            ->with('categories');
     }
 }

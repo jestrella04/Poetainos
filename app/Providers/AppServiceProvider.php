@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use Illuminate\Pagination\Paginator;
+use App\Services\SiteSettings;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,13 +20,11 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        // Use Bootstrap for pagination
-        Paginator::useBootstrap();
+        // Console commands and queue workers never pass through EnsureSiteIsConfigured
+        $this->app->make(SiteSettings::class)->load();
     }
 
     /**

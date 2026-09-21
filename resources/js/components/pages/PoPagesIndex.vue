@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -8,7 +7,7 @@ interface PageSummary {
   slug: string
 }
 
-const page = computed(() => usePage<InertiaPageProps<{ pages: PageSummary[] }>>())
+const page = usePage<InertiaPageProps<{ pages: PageSummary[] }>>()
 </script>
 
 <template>

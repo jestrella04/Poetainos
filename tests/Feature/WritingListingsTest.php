@@ -1,7 +1,11 @@
 <?php
 
+use App\Models\Category;
+use App\Models\Tag;
+use App\Models\User;
 use App\Models\Writing;
 
+use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
 describe('sorting ties', function (): void {
@@ -55,5 +59,66 @@ describe('listing fields', function (): void {
 
         // Then
         expect($response->json('data.0.author.karma'))->toBe('A');
+    });
+});
+
+describe('the canonical link of a listing', function (): void {
+    beforeEach(function (): void {
+        config(['inertia.testing.ensure_pages_exist' => false]);
+    });
+
+    it('points at the listing itself instead of the home page', function (Closure $makeListing): void {
+        // Given
+        [$url, $expectedCanonical] = $makeListing();
+
+        // When
+        $response = get($url);
+
+        // Then
+        $response->assertOk()->assertInertia(fn ($page) => $page->where('meta.canonical', $expectedCanonical));
+    })->with([
+        'the home page' => [fn () => [route('home'), route('home')]],
+        'the golden flowers' => [fn () => [route('writings.awards'), route('writings.awards')]],
+        'a category' => [function (): array {
+            $category = Category::factory()->create();
+
+            return [$category->path(), $category->path()];
+        }],
+        'a tag' => [function (): array {
+            $tag = Tag::factory()->create();
+
+            return [$tag->path(), $tag->path()];
+        }],
+        'a user\'s writings' => [function (): array {
+            $user = createUser();
+
+            return [route('users.writings.index', $user), $user->writingsPath()];
+        }],
+        'a user\'s shelf' => [function (): array {
+            $user = createUser();
+
+            return [route('users.shelf.index', $user), route('users.shelf.index', $user)];
+        }],
+        'a user\'s likes' => [function (): array {
+            $user = createUser();
+
+            return [route('users.likes.index', $user), route('users.likes.index', $user)];
+        }],
+    ]);
+});
+
+describe('ranking authors', function (): void {
+    it('puts the best karma first and treats missing karma as the lowest grade', function (): void {
+        // Given
+        $missingKarma = createUser(['karma' => null, 'aura' => 9]);
+        $gradeF = createUser(['karma' => 'F', 'aura' => 5]);
+        $gradeC = createUser(['karma' => 'C', 'aura' => 1]);
+        $gradeA = createUser(['karma' => 'A', 'aura' => 0]);
+
+        // When
+        $ranked = User::ranked()->pluck('id')->all();
+
+        // Then
+        expect($ranked)->toBe([$gradeA->id, $gradeC->id, $missingKarma->id, $gradeF->id]);
     });
 });

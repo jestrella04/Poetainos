@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import axios from 'axios'
@@ -10,10 +10,10 @@ defineOptions({
   layout: PoLayoutLogin
 })
 
-const page = computed(() => usePage<InertiaPageProps<{ token: string; email: string }>>())
+const page = usePage<InertiaPageProps<{ token: string; email: string }>>()
 const isLoading = ref(false)
-const token = page.value.props.token
-const email = page.value.props.email
+const token = page.props.token
+const email = page.props.email
 
 const formData = reactive({
   password: '',

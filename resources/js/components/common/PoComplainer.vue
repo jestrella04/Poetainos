@@ -49,7 +49,7 @@ async function submit(): Promise<void> {
       complainable_type: props.compType,
       complainable_id: props.compId,
       reasons: compReasons.value,
-      message: compMessage.value
+      comment: compMessage.value
     },
     onSuccess: () => {
       setSnackBar({

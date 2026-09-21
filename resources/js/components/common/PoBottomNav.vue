@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { mobileSiteMenuKey, mobileUserMenuKey, unreadCountKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 
 const { auth, authUser } = useAuth()
-const page = computed(() => usePage())
+const page = usePage()
 const mobileSiteMenu = injectStrict(mobileSiteMenuKey)
 const mobileUserMenu = injectStrict(mobileUserMenuKey)
 const unreadCount = injectStrict(unreadCountKey)

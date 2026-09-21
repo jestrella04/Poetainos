@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { unreadCountKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
@@ -10,7 +9,7 @@ import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { AppNotification } from '@/types/models'
 
-const page = computed(() => usePage<InertiaPageProps<{ tab: string }>>())
+const page = usePage<InertiaPageProps<{ tab: string }>>()
 const { isEmpty } = useTypeGuards()
 const { relativeDate } = useFormatting()
 const { notificationMessage } = useNotificationMessage()
@@ -22,7 +21,7 @@ const {
   loadMore
 } = usePaginatedTabList<AppNotification>({
   tabOrder: ['unread', 'all'],
-  currentTab: () => page.value.props.tab,
+  currentTab: () => page.props.tab,
   reloadPropKey: 'notifications'
 })
 </script>

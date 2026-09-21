@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { Head, usePage } from '@inertiajs/vue3'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -9,10 +8,10 @@ interface PageMeta {
   description?: string
 }
 
-const page = computed(() => usePage<InertiaPageProps<{ meta: PageMeta }>>())
-const title = (page.value.props.meta.title ??= page.value.props.site.name)
-const canonical = (page.value.props.meta.canonical ??= null)
-const description = (page.value.props.meta.description ??= page.value.props.site.slogan)
+const page = usePage<InertiaPageProps<{ meta: PageMeta }>>()
+const title = (page.props.meta.title ??= page.props.site.name)
+const canonical = (page.props.meta.canonical ??= null)
+const description = (page.props.meta.description ??= page.props.site.slogan)
 </script>
 
 <template>

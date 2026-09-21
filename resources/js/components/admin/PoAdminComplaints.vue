@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
@@ -21,7 +20,7 @@ interface ComplaintAdmin {
 
 const { t } = useI18n()
 const { toLocaleDate } = useFormatting()
-const page = computed(() => usePage<InertiaPageProps<{ total: number }>>())
+const page = usePage<InertiaPageProps<{ total: number }>>()
 const headers: DataTableHeader[] = [
   { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
   { title: t('main.type'), align: 'start', sortable: false, key: 'type' },
@@ -31,7 +30,7 @@ const headers: DataTableHeader[] = [
 ]
 const { items, totalItems, isLoading, loadItems } = useServerTable<ComplaintAdmin>(
   'admin.complaints',
-  page.value.props.total
+  page.props.total
 )
 </script>
 

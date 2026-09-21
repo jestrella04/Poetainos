@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\Category;
+use App\Models\Tag;
 use App\Models\Writing;
 use App\Notifications\WritingPublished;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -50,7 +53,7 @@ describe('showing a writing', function (): void {
 describe('aura calculation', function (): void {
     it('does not throw when all writing aura points are zeroed', function (): void {
         // Given
-        config(['writerhood.aura.points.writing' => [
+        config(['poetainos.aura.points.writing' => [
             'like' => 0,
             'comment' => 0,
             'shelf' => 0,
@@ -69,7 +72,7 @@ describe('aura calculation', function (): void {
 describe('the daily post limit', function (): void {
     it('is configurable via site settings', function (): void {
         // Given
-        config(['writerhood.writings' => ['daily_post_limit' => 1]]);
+        config(['poetainos.writings' => ['daily_post_limit' => 1]]);
         $user = createUser();
         Writing::factory()->for($user, 'author')->create();
 
@@ -108,7 +111,7 @@ describe('creating a writing', function (): void {
         $response = get('/writings/create');
 
         // Then
-        $response->assertRedirect(route('verification.notice'));
+        $response->assertRedirect(route('login'));
     });
 
     it('allows a verified user to publish a writing', function (): void {
@@ -237,5 +240,187 @@ describe('editing and deleting a writing', function (): void {
         $editResponse->assertOk();
         $deleteResponse->assertOk();
         expect(Writing::find($writing->id))->toBeNull();
+    });
+});
+
+/**
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function writingPayload(Category $mainCategory, array $overrides = []): array
+{
+    return array_merge([
+        'title' => 'A fresh title',
+        'main_category' => $mainCategory->id,
+        'categories' => [$mainCategory->id],
+        'text' => 'A sufficiently long body of text for validation purposes.',
+    ], $overrides);
+}
+
+describe('updating a writing', function (): void {
+    it('still lets an author edit once the daily post limit is reached', function (): void {
+        // Given
+        config(['poetainos.writings' => ['daily_post_limit' => 1]]);
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['created_at' => now()]);
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        $response = actingAs($author)->put(route('writings.update', $writing), writingPayload($mainCategory, [
+            'title' => 'Edited title',
+        ]));
+
+        // Then
+        $response->assertOk();
+        expect($writing->refresh()->title)->toBe('Edited title');
+    });
+
+    it('keeps the slug and the other stored details when editing', function (): void {
+        // Given
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['slug' => 'original-slug']);
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        actingAs($author)->put(route('writings.update', $writing), writingPayload($mainCategory, [
+            'link' => 'https://example.com/poem',
+        ]))->assertOk();
+
+        // Then
+        expect($writing->refresh()->slug)->toBe('original-slug');
+        expect($writing->extra_info['link'])->toBe('https://example.com/poem');
+    });
+
+    it('does not reuse a slug that a static route owns', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['title' => 'Random']))->assertOk();
+
+        // Then
+        expect(Writing::where('title', 'Random')->firstOrFail()->slug)->toBe('random-1');
+    });
+
+    it('rejects a main category that is not a top level category', function (): void {
+        // Given
+        $author = createUser();
+        $parent = Category::factory()->create(['parent_id' => null]);
+        $child = Category::factory()->create(['parent_id' => $parent->id]);
+
+        // When
+        $response = actingAs($author)->postJson(route('writings.store'), writingPayload($child));
+
+        // Then
+        $response->assertJsonValidationErrors('main_category');
+    });
+
+    it('validates the tags', function (array $tags): void {
+        // Given
+        $author = createUser();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        $response = actingAs($author)->postJson(route('writings.store'), writingPayload($mainCategory, ['tags' => $tags]));
+
+        // Then
+        $response->assertUnprocessable();
+        expect(Writing::count())->toBe(0);
+    })->with([
+        'too many tags' => [array_map(fn (int $n): string => "tag{$n}", range(1, 11))],
+        'a tag that is too long' => [[str_repeat('a', 41)]],
+        'a blank tag' => [['   ']],
+    ]);
+
+    it('normalizes whitespace and reuses existing tags', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, [
+            'tags' => ['free   verse', 'free verse', 'haiku'],
+        ]))->assertOk();
+
+        // Then
+        $writing = Writing::firstOrFail();
+        expect($writing->tags()->pluck('name')->sort()->values()->all())->toBe(['free verse', 'haiku']);
+    });
+
+    it('does not leave a half saved writing behind when syncing fails', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+        Tag::creating(fn () => throw new RuntimeException('tag failure'));
+
+        // When
+        $response = actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['tags' => ['boom']]));
+
+        // Then
+        $response->assertServerError();
+        expect(Writing::count())->toBe(0);
+    });
+});
+
+describe('a writing cover', function (): void {
+    beforeEach(function (): void {
+        Storage::fake('local');
+    });
+
+    it('is cropped to 16:9 and replaces the previous cover', function (): void {
+        // Given
+        Storage::disk('local')->put('covers/old.png', 'old');
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => 'covers/old.png']]);
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        actingAs($author)->post(route('writings.update', $writing), writingPayload($mainCategory, [
+            '_method' => 'PUT',
+            'cover' => UploadedFile::fake()->image('cover.jpg', 2000, 1000),
+        ]))->assertOk();
+
+        // Then
+        $cover = $writing->refresh()->extra_info['cover'];
+        expect($cover)->toStartWith('covers/')->not->toBe('covers/old.png');
+        expect(getimagesize(Storage::disk('local')->path($cover))[0])->toBe(1280);
+        Storage::disk('local')->assertMissing('covers/old.png');
+    });
+
+    it('is deleted together with the writing', function (): void {
+        // Given
+        Storage::disk('local')->put('covers/mine.png', 'x');
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => 'covers/mine.png']]);
+
+        // When
+        actingAs($author)->delete(route('writings.destroy', $writing))->assertOk();
+
+        // Then
+        Storage::disk('local')->assertMissing('covers/mine.png');
+    });
+});
+
+describe('the writing form', function (): void {
+    beforeEach(function (): void {
+        config(['inertia.testing.ensure_pages_exist' => false]);
+    });
+
+    it('tells the page whether it is editing an existing writing', function (): void {
+        // Given
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+
+        // When
+        $create = actingAs($author)->get(route('writings.create'));
+        $edit = actingAs($author)->get(route('writings.edit', $writing));
+
+        // Then
+        $create->assertInertia(fn ($page) => $page->where('isUpdate', false));
+        $edit->assertInertia(fn ($page) => $page->where('isUpdate', true));
     });
 });

@@ -7,7 +7,9 @@ use App\Models\Complaint;
 use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\Rule;
 
 class ComplaintsController extends Controller
 {
@@ -28,23 +30,20 @@ class ComplaintsController extends Controller
      *
      * @return array<int, mixed>
      */
-    public function store(): array
+    public function store(Request $request): array
     {
-        $complaint = new Complaint;
-
         // Validate user input
-        request()->validate([
+        $request->validate([
             'complainable_type' => 'required|string|in:writings,comments,users',
             'complainable_id' => 'required|integer',
-            'reasons' => 'required|array|min:1',
+            'reasons' => 'required|array|min:1|max:10',
+            'reasons.*' => ['string', Rule::in($this->allowedReasons())],
             'comment' => 'nullable|string|max:255',
         ]);
 
-        $id = (int) request('complainable_id');
-        $type = (string) request('complainable_type');
-
         // Resolve the reported resource
-        $complainable = match ($type) {
+        $id = (int) $request->input('complainable_id');
+        $complainable = match ((string) $request->input('complainable_type')) {
             'writings' => Writing::find($id),
             'comments' => Comment::find($id),
             'users' => User::find($id),
@@ -55,10 +54,10 @@ class ComplaintsController extends Controller
             abort(404);
         }
 
+        $complaint = new Complaint;
         $complaint->complainable()->associate($complainable);
-
-        $complaint->reasons = request('reasons');
-        $complaint->comment = request('comment');
+        $complaint->reasons = $request->input('reasons');
+        $complaint->comment = $request->input('comment');
         $complaint->save();
 
         // Schedule email notification
@@ -69,10 +68,17 @@ class ComplaintsController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * The reasons a user may pick, whether they are configured as plain
+     * strings or as value/label pairs.
+     *
+     * @return array<int, string>
      */
-    public function update(): void
+    private function allowedReasons(): array
     {
-        //
+        return collect((array) getSiteConfig('complaints'))
+            ->map(fn (mixed $reason): mixed => is_array($reason) ? ($reason['value'] ?? null) : $reason)
+            ->filter(fn (mixed $reason): bool => is_string($reason))
+            ->values()
+            ->all();
     }
 }

@@ -14,22 +14,12 @@ class WritingLiked extends PoetainosNotification implements ShouldQueue
 
     public function __construct(protected Writing $writing, protected User $user)
     {
-        $this->notification = [
-            'title' => __('Updates from :name at :site', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'greeting' => __('Hello!'),
-            'body' => __('Isn\'t it amazing?, :name likes your writing at :site.', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('writings.show', $this->writing),
-            'action' => __('View writing'),
-            'icon' => asset('images/logo-192.png'),
-            'tag' => getSiteConfig('name'),
-        ];
+        $this->notification = $this->actorContent(
+            $this->user,
+            __('Isn\'t it amazing, :name likes your writing at :site.', $this->actorPlaceholders($this->user)),
+            route('writings.show', $this->writing),
+            __('View writing'),
+        );
     }
 
     /**

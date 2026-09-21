@@ -21,7 +21,7 @@ class VerifyEmailController extends Controller
             'code' => ['required', 'digits:6'],
         ]);
 
-        $user = $request->user();
+        $user = $this->requireAuthUser();
 
         if ($user->hasVerifiedEmail() === false) {
             if ($user->verifyEmailWithCode($request->input('code')) === false) {

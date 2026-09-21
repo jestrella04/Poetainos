@@ -1,9 +1,11 @@
 <?php
 
 use App\Models\Comment;
+use App\Models\Like;
 use App\Models\Writing;
 use App\Notifications\CommentLiked;
 use App\Notifications\WritingLiked;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Notification;
 
 use function Pest\Laravel\actingAs;
@@ -102,5 +104,19 @@ describe('liking a comment', function (): void {
 
         // Then
         $unlikeResponse->assertJson(['method' => 'destroy', 'count' => 0]);
+    });
+});
+
+describe('a double click on the like button', function (): void {
+    it('reports the like instead of failing when it was already created', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        Like::creating(fn () => throw new UniqueConstraintViolationException('sqlite', 'insert', [], new Exception('duplicate')));
+
+        // When
+        $response = actingAs(createUser())->post("/likes/writing/{$writing->id}/store");
+
+        // Then
+        $response->assertOk()->assertJson(['method' => 'store']);
     });
 });

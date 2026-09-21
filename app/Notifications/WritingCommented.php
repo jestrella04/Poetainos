@@ -14,22 +14,12 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
 
     public function __construct(protected Writing $writing, protected User $user)
     {
-        $this->notification = [
-            'title' => __('Updates from :name at :site', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'greeting' => __('Hello!'),
-            'body' => __('We love sharing the good news with you, :name just commented on your writing at :site.', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('writings.show', $this->writing),
-            'action' => __('View writing'),
-            'icon' => asset('images/logo-192.png'),
-            'tag' => getSiteConfig('name'),
-        ];
+        $this->notification = $this->actorContent(
+            $this->user,
+            __('We love sharing the good news with you, :name just commented on your writing at :site.', $this->actorPlaceholders($this->user)),
+            route('writings.show', $this->writing),
+            __('View writing'),
+        );
     }
 
     /**
@@ -40,7 +30,7 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        return ['mail', 'database', 'broadcast', WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), 'database', 'broadcast', WebPushChannel::class];
     }
 
     /**

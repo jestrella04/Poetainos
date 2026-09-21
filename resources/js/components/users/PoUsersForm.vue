@@ -20,6 +20,7 @@ interface EditableUser {
   email: string
   role_id?: number | null
   extra_info?: {
+    avatar?: string
     bio?: string
     location?: string
     occupation?: string
@@ -63,6 +64,7 @@ const { checkFormValidity } = useFormValidation()
 const user = page.props.user
 const formData = reactive({
   avatar: [] as File[],
+  avatarRemove: false,
   role: '' as string | number, // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion -- widens for the later `formData.role = user.role_id` numeric assignment
   name: '',
   username: '',
@@ -130,6 +132,7 @@ async function submitForm() {
     .postForm<PostedResult>(form.action, {
       _method: 'PUT',
       avatar: formData.avatar,
+      'avatar-remove': formData.avatarRemove ? 1 : 0,
       role: formData.role,
       name: formData.name,
       email: formData.email,
@@ -186,10 +189,17 @@ function openAvatarPicker(): void {
             id="avatar-input"
             class="d-none"
             v-model="formData.avatar"
-            label="avatar"
+            :label="$t('main.choose-image')"
             hide-details
           />
         </div>
+
+        <v-checkbox
+          v-if="(user.extra_info?.avatar ?? '') !== ''"
+          v-model="formData.avatarRemove"
+          :label="$t('accounts.remove-current-avatar')"
+          hide-details
+        />
 
         <template v-if="admin()">
           <v-select
@@ -320,7 +330,8 @@ function openAvatarPicker(): void {
         type="success"
         variant="tonal"
         class="mb-5 mx-auto"
-        style="width: 85%; max-width: 600px"
+        width="85%"
+        max-width="600"
       >
         {{ $t('accounts.profile-updated') }}
         {{ $t('main.take-a-look') }}

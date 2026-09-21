@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
 
         $users = User::factory(self::USERS_COUNT)->create();
         $tags = Tag::factory(self::TAGS_COUNT)->create();
-        $mainCategories = Category::whereNull('parent_id')->with('categories')->get();
+        $mainCategories = Category::whereNull('parent_id')->with('children')->get();
         $writings = $this->seedWritings($users, $tags, $mainCategories);
 
         $this->seedComments($writings, $users);
@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
     {
         return collect(range(1, self::WRITINGS_COUNT))->map(function () use ($users, $tags, $mainCategories) {
             $mainCategory = $mainCategories->random();
-            $subCategories = $mainCategory->categories->random(random_int(0, 2));
+            $subCategories = $mainCategory->children->random(random_int(0, 2));
             $writing = Writing::factory()->create([
                 'user_id' => $users->random()->id,
                 'views' => $this->randomViewsCount(),

@@ -3,33 +3,22 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
 {
-    use HandlesAuthorization;
-
     /**
-     * Determine whether the user can update the model.
-     *
-     * @return mixed
+     * Accounts can be edited by their owner and by admins.
      */
-    public function update(User $user, User $model)
+    public function update(User $user, User $model): bool
     {
-        if ($model->is($user) || $user->isAllowed('admin')) {
-            return true;
-        }
+        return $model->is($user) || $user->isAllowed('admin');
     }
 
     /**
-     * Determine whether the user can delete the model.
-     *
-     * @return mixed
+     * Accounts can be deleted by whoever can edit them.
      */
-    public function delete(User $user, User $model)
+    public function delete(User $user, User $model): bool
     {
-        if ($model->is($user) || $user->isAllowed('admin')) {
-            return true;
-        }
+        return $this->update($user, $model);
     }
 }

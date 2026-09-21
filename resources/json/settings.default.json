@@ -40,13 +40,9 @@
     },
     "points": {
       "writing": {
-        "uplike": {
+        "like": {
           "value": 200,
-          "description": "How many points a writing will earn every time it gets a new uplike."
-        },
-        "downlike": {
-          "value": 1,
-          "description": "How many points a writing will earn every time it gets a new downlike."
+          "description": "How many points a writing will earn every time it gets a new like."
         },
         "comment": {
           "value": 100,

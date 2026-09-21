@@ -60,12 +60,12 @@ class InstallSite extends Command
             $this->createSettings();
             $role = $this->createMasterRole();
 
-            User::create([
+            User::unguarded(fn (): User => User::create([
                 'username' => $credentials['username'],
                 'role_id' => $role->id,
                 'email' => $credentials['email'],
                 'password' => Hash::make($credentials['password']),
-            ]);
+            ]));
         });
 
         $this->info('The site was installed successfully!');

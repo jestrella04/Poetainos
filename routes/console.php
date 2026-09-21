@@ -1,9 +1,7 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,13 +17,3 @@ use Illuminate\Support\Facades\Http;
 Artisan::command('inspire', function (): void {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
-
-Artisan::command('karma-update', function (): void {
-    $users = User::all(['username']);
-
-    foreach ($users as $user) {
-        $this->line('Updating karma for user: '.$user->username);
-        Http::put(route('api.karma.update', $user->username));
-        sleep(1);
-    }
-});
