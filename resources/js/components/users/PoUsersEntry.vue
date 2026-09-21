@@ -72,12 +72,10 @@ const socialLinks = computed<Record<string, string>>(() =>
         </div>
       </div>
 
-      <div class="d-flex ga-8 pt-md-2 text-center text-md-left">
+      <div class="d-flex ga-8 text-center">
         <div v-for="stat in headlineStats" :key="stat.label">
-          <p class="text-display-small po-prose ma-0">{{ stat.value }}</p>
-          <p class="text-uppercase text-eyebrow mt-1 mb-0">
-            {{ stat.label }}
-          </p>
+          <p class="text-display-small po-prose ma-0 mb-1">{{ stat.value }}</p>
+          <p class="text-uppercase text-eyebrow mb-0">{{ stat.label }}</p>
         </div>
       </div>
     </div>
@@ -125,7 +123,5 @@ const socialLinks = computed<Record<string, string>>(() =>
     </v-row>
 
     <v-divider class="my-6" />
-    <!-- <po-users-stats :data="data" :alone="true" />
-    <v-divider class="mt-6" /> -->
   </div>
 </template>

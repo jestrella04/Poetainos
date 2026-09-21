@@ -27,7 +27,7 @@ interface UsersShowProps {
 }
 
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const { userDisplayName, relativeDate } = useFormatting()
+const { userDisplayName, relativeDate, formatCount } = useFormatting()
 const page = computed(() => usePage<InertiaPageProps<UsersShowProps>>())
 
 const {
@@ -74,6 +74,20 @@ const {
             />
 
             <po-infinite-scroll v-if="!strNullOrEmpty(next)" @load="loadMore" />
+
+            <po-link
+              :href="route('users.writings.index', page.props.user.username)"
+              class="d-inline-block text-primary"
+              inertia
+            >
+              {{
+                $t(
+                  'users.view-writings-count',
+                  { count: formatCount(page.props.user.writings_count) },
+                  page.props.user.writings_count
+                )
+              }}
+            </po-link>
           </template>
 
           <template v-else>
@@ -87,55 +101,81 @@ const {
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-card v-if="!isEmpty(page.props.writings.from_shelf)" class="mb-6">
-            <v-card-text>
-              <p class="text-uppercase text-eyebrow mb-5">
-                {{ $t('main.more-from-shelf') }}
-              </p>
+          <template v-if="!isEmpty(page.props.writings.from_shelf)">
+            <p class="text-uppercase text-medium-emphasis text-primary text-eyebrow">
+              {{ $t('main.more-from-shelf') }}
+            </p>
 
-              <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
-                <div class="mb-2 position-relative">
-                  <po-link
-                    :href="route('writings.show', writing.slug)"
-                    class="text-bold stretched"
-                    inertia
-                  >
-                    {{ writing.title }}
-                  </po-link>
+            <template v-for="writing in page.props.writings.from_shelf" :key="writing.id">
+              <div class="position-relative">
+                <po-link
+                  :href="route('writings.show', writing.slug)"
+                  class="text-title-large po-prose stretched"
+                  inertia
+                >
+                  {{ writing.title }}
+                </po-link>
 
-                  <p class="text-eyebrow">
-                    {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
-                    {{ relativeDate(writing.created_at) }}
-                  </p>
+                <div class="d-inline-flex ga-3">
+                  <span>{{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}</span>
+                  <span>{{ relativeDate(writing.created_at) }}</span>
                 </div>
-              </template>
-            </v-card-text>
-          </v-card>
+              </div>
+              <v-divider class="my-4" />
+            </template>
 
-          <v-card v-if="!isEmpty(page.props.writings.from_liked)">
-            <v-card-text>
-              <p class="text-uppercase text-eyebrow mb-5">
-                {{ $t('main.more-from-liked') }}
-              </p>
+            <po-link
+              :href="route('users.shelf.index', page.props.user.username)"
+              class="d-inline-block text-primary"
+              inertia
+            >
+              {{
+                $t(
+                  'users.view-shelf-count',
+                  { count: formatCount(page.props.user.shelf_count) },
+                  page.props.user.shelf_count
+                )
+              }}
+            </po-link>
+          </template>
 
-              <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
-                <div class="mb-2 position-relative">
-                  <po-link
-                    :href="route('writings.show', writing.slug)"
-                    class="text-bold stretched"
-                    inertia
-                  >
-                    {{ writing.title }}
-                  </po-link>
+          <template v-if="!isEmpty(page.props.writings.from_liked)">
+            <p class="text-uppercase text-medium-emphasis text-primary text-eyebrow mt-12">
+              {{ $t('main.more-from-liked') }}
+            </p>
 
-                  <p class="text-eyebrow">
-                    {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
-                    {{ relativeDate(writing.created_at) }}
-                  </p>
+            <template v-for="writing in page.props.writings.from_liked" :key="writing.id">
+              <div class="position-relative">
+                <po-link
+                  :href="route('writings.show', writing.slug)"
+                  class="text-title-large po-prose stretched"
+                  inertia
+                >
+                  {{ writing.title }}
+                </po-link>
+
+                <div class="d-inline-flex ga-3">
+                  <span>{{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}</span>
+                  <span>{{ relativeDate(writing.created_at) }}</span>
                 </div>
-              </template>
-            </v-card-text>
-          </v-card>
+              </div>
+              <v-divider class="my-4" />
+            </template>
+
+            <po-link
+              :href="route('users.likes.index', page.props.user.username)"
+              class="d-inline-block text-primary"
+              inertia
+            >
+              {{
+                $t(
+                  'users.view-liked-count',
+                  { count: formatCount(page.props.user.likes_count) },
+                  page.props.user.likes_count
+                )
+              }}
+            </po-link>
+          </template>
         </v-col>
       </v-row>
     </template>

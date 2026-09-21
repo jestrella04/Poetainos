@@ -242,8 +242,8 @@
     "follow-on": "Síguenos en {app}",
     "more-from-author": "Más del autor",
     "from-categories": "De las categorías",
-    "more-from-liked": "Más de sus me gusta",
-    "more-from-shelf": "Más de sus favoritos",
+    "more-from-liked": "De sus me gusta",
+    "more-from-shelf": "De su estante",
     "get-the-app": "Descarga la app",
     "go-back": "Regresar",
     "goodreads": "Goodreads",
@@ -381,11 +381,14 @@
     "username": "Usuario",
     "users": "Usuarios",
     "view-liked": "Ver gustados",
+    "view-liked-count": "Ver el me gusta | Ver los {count} me gusta",
     "view-self-likes": "Ver mis me gusta",
     "view-self-shelf": "Ver mi estante",
     "view-self-writings": "Ver mis textos",
     "view-shelf": "Ver estante",
-    "view-writings": "Ver textos"
+    "view-shelf-count": "Ver el texto guardado | Ver los {count} textos guardados",
+    "view-writings": "Ver textos",
+    "view-writings-count": "Ver el texto | Ver los {count} textos"
   },
   "writings": {
     "awarded": "Condecorado con una Flor de Oro",

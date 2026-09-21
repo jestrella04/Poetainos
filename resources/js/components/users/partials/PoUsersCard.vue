@@ -13,7 +13,7 @@ const { strNullOrEmpty } = useTypeGuards()
 
 <template>
   <po-card
-    variant="filled"
+    variant="text"
     class="border-b-md"
     :href="route('users.show', data.username)"
     height="100%"

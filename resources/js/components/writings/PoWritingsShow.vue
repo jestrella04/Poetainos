@@ -42,58 +42,55 @@ const page = computed(() => usePage<InertiaPageProps<WritingsShowProps>>())
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-card class="mb-6">
-            <v-card-text>
-              <div v-if="!isEmpty(page.props.related.from_author)">
-                <p class="text-uppercase mb-5">{{ $t('main.more-from-author') }}</p>
+          <template v-if="!isEmpty(page.props.related.from_author)">
+            <p class="text-uppercase text-medium-emphasis text-primary text-eyebrow">
+              {{ $t('main.more-from-author') }}
+            </p>
 
-                <template v-for="writing in page.props.related.from_author" :key="writing.id">
-                  <div class="mb-2 position-relative">
-                    <po-link
-                      :href="route('writings.show', writing.slug)"
-                      class="text-bold stretched"
-                      inertia
-                    >
-                      {{ writing.title }}
-                    </po-link>
+            <template v-for="writing in page.props.related.from_author" :key="writing.id">
+              <div class="position-relative">
+                <po-link
+                  :href="route('writings.show', writing.slug)"
+                  class="text-title-large po-prose stretched"
+                  inertia
+                >
+                  {{ writing.title }}
+                </po-link>
 
-                    <p class="text-disabled">
-                      {{
-                        $t('main.by-name', {
-                          name: userDisplayName(page.props.writing.author)
-                        })
-                      }}
-                      {{ relativeDate(writing.created_at) }}
-                    </p>
-                  </div>
-                </template>
+                <div class="d-inline-flex ga-3">
+                  <span>
+                    {{ $t('main.by-name', { name: userDisplayName(page.props.writing.author) }) }}
+                  </span>
+                  <span>{{ relativeDate(writing.created_at) }}</span>
+                </div>
               </div>
-            </v-card-text>
-          </v-card>
+              <v-divider class="my-4" />
+            </template>
+          </template>
 
-          <v-card>
-            <v-card-text>
-              <div v-if="!isEmpty(page.props.related.from_category)">
-                <p class="text-uppercase mb-5">{{ $t('main.related-writings') }}</p>
-                <template v-for="writing in page.props.related.from_category" :key="writing.id">
-                  <div class="mb-2 position-relative">
-                    <po-link
-                      :href="route('writings.show', writing.slug)"
-                      class="text-bold stretched"
-                      inertia
-                    >
-                      {{ writing.title }}
-                    </po-link>
+          <template v-if="!isEmpty(page.props.related.from_category)">
+            <p class="text-uppercase text-medium-emphasis text-primary text-eyebrow mt-12">
+              {{ $t('main.related-writings') }}
+            </p>
 
-                    <p class="text-disabled">
-                      {{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}
-                      {{ relativeDate(writing.created_at) }}
-                    </p>
-                  </div>
-                </template>
+            <template v-for="writing in page.props.related.from_category" :key="writing.id">
+              <div class="position-relative">
+                <po-link
+                  :href="route('writings.show', writing.slug)"
+                  class="text-title-large po-prose stretched"
+                  inertia
+                >
+                  {{ writing.title }}
+                </po-link>
+
+                <div class="d-inline-flex ga-3">
+                  <span>{{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}</span>
+                  <span>{{ relativeDate(writing.created_at) }}</span>
+                </div>
               </div>
-            </v-card-text>
-          </v-card>
+              <v-divider class="my-4" />
+            </template>
+          </template>
         </v-col>
       </v-row>
     </template>

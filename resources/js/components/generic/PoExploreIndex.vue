@@ -51,7 +51,7 @@ const categories = computed(() => [
   <v-row class="mb-8">
     <v-col v-for="cat in categories" :key="cat.id" cols="12" sm="6" lg="4">
       <po-card
-        variant="filled"
+        variant="text"
         class="border-b-md"
         :href="route('categories.show', cat.slug)"
         height="100%"
