@@ -15,8 +15,18 @@ const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { cropUrl, userDisplayName } = useFormatting()
 
 const taxonomies = computed(() => [
-  { icon: 'fas fa-folder-open', terms: props.data.categories, routeName: 'categories.show' },
-  { icon: 'fas fa-hashtag', terms: props.data.tags, routeName: 'tags.show' }
+  {
+    icon: 'fas fa-folder-open',
+    terms: props.data.categories,
+    routeName: 'categories.show',
+    color: 'primary'
+  },
+  {
+    icon: 'fas fa-hashtag',
+    terms: props.data.tags,
+    routeName: 'tags.show',
+    color: 'default'
+  }
 ])
 </script>
 
@@ -39,6 +49,7 @@ const taxonomies = computed(() => [
             v-for="term in taxonomy.terms"
             :key="term.slug"
             :href="route(taxonomy.routeName, term.slug)"
+            :color="taxonomy.color"
             inertia
           >
             {{ term.name }}

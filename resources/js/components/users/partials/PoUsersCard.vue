@@ -12,7 +12,7 @@ const { strNullOrEmpty } = useTypeGuards()
 </script>
 
 <template>
-  <v-card :href="route('users.show', data.username)" height="100%" inertia>
+  <po-card :href="route('users.show', data.username)" height="100%" inertia>
     <v-card-text class="d-flex flex-column h-100">
       <div class="d-flex align-center ga-4 mb-4">
         <po-avatar-award :user="data" avatar-size="64" avatar-color="secondary" />
@@ -39,5 +39,5 @@ const { strNullOrEmpty } = useTypeGuards()
         {{ $t('main.count-likes', { count: data.likes_count }, data.likes_count) }}
       </p>
     </v-card-text>
-  </v-card>
+  </po-card>
 </template>

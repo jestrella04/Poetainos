@@ -51,7 +51,7 @@ const categories = computed(() => [
 
   <v-row class="mb-8">
     <v-col v-for="cat in categories" :key="cat.id" cols="12" sm="6" lg="4">
-      <v-card :href="route('categories.show', cat.slug)" height="100%" inertia>
+      <po-card :href="route('categories.show', cat.slug)" height="100%" inertia>
         <v-card-text class="d-flex flex-column h-100">
           <p class="text-headline-large po-prose ma-0 mb-2">{{ cat.name }}</p>
 
@@ -66,7 +66,7 @@ const categories = computed(() => [
             {{ $t('main.count-writings', { count: cat.writings_count ?? 0 }) }}
           </p>
         </v-card-text>
-      </v-card>
+      </po-card>
     </v-col>
   </v-row>
 

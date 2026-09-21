@@ -3,7 +3,7 @@ import type { Method, RequestPayload, VisitOptions } from '@inertiajs/core'
 
 /**
  * Shared Inertia `router.visit()` wrapper used by components that expose an
- * optional `href`/`inertia`/`method`/`data` set (PoButton, PoChip, PoListItem, PoTab, PoLink).
+ * optional `href`/`inertia`/`method`/`data` set (PoButton, PoCard, PoChip, PoListItem, PoTab, PoLink).
  */
 export function useInertiaVisit(props: {
   href?: string

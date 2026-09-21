@@ -202,17 +202,6 @@ function getFlashMessages() {
         </v-tabs>
 
         <div class="align-self-center d-flex align-center ga-3">
-          <!-- <po-button
-            v-if="!auth()"
-            variant="text"
-            color="on-surface-variant"
-            :href="route('login')"
-            style="font-size: 0.7rem"
-            inertia
-          >
-            {{ $t('accounts.login-alt') }}
-          </po-button> -->
-
           <po-button
             variant="tonal"
             :href="route('writings.create')"
@@ -220,6 +209,17 @@ function getFlashMessages() {
             inertia
           >
             {{ $t('main.publish') }}
+          </po-button>
+
+          <po-button
+            v-if="!auth()"
+            variant="tonal"
+            :href="route('login')"
+            size="small"
+            inertia
+            icon
+          >
+            <v-icon icon="fas fa-right-to-bracket" />
           </po-button>
 
           <v-menu v-if="auth()" target="parent">
