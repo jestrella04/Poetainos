@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { router } from '@inertiajs/vue3'
-import { VAvatarGroup } from 'vuetify/labs/VAvatarGroup'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
 import type { UserLike, Writing } from '@/types/models'
@@ -12,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const { cropUrl, userDisplayName } = useFormatting()
+const { cropUrl } = useFormatting()
 
 const taxonomies = computed(() => [
   {
@@ -61,18 +59,7 @@ const taxonomies = computed(() => [
     <div v-if="!isEmpty(likers)">
       <p class="text-caption mb-2">{{ $t('main.liked-by') }}</p>
 
-      <v-avatar-group size="64" border="md" hoverable>
-        <po-avatar
-          v-for="liker in likers"
-          :key="liker.id"
-          tag="a"
-          color="secondary"
-          :user="liker"
-          :href="route('users.show', liker.username)"
-          :title="userDisplayName(liker)"
-          @click.prevent="router.visit(route('users.show', liker.username))"
-        />
-      </v-avatar-group>
+      <po-avatar-stack :users="likers ?? []" :size="64" color="secondary" />
     </div>
   </div>
 </template>

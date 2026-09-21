@@ -15,7 +15,7 @@ const unreadCount = injectStrict(unreadCountKey)
 <template>
   <v-bottom-navigation
     v-model="page.props.route.name"
-    bg-color="surface"
+    bg-color="primary"
     :elevation="0"
     border="t"
     class="hidden-lg-and-up"

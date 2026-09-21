@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
-import { VAvatarGroup } from 'vuetify/labs/VAvatarGroup'
+import { usePage } from '@inertiajs/vue3'
 import { useFormatting } from '@/composables/useFormatting'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import type { CategoryLike, TagLike, UserLike } from '@/types/models'
@@ -20,7 +19,7 @@ interface ExploreProps {
   authors: UserLike[]
 }
 
-const { userDisplayName, formatCount } = useFormatting()
+const { formatCount } = useFormatting()
 const { strNullOrEmpty } = useTypeGuards()
 const page = computed(() => usePage<InertiaPageProps<ExploreProps>>())
 const categories = computed(() => [
@@ -95,16 +94,5 @@ const categories = computed(() => [
     {{ $t('main.featured-authors') }}
   </p>
 
-  <v-avatar-group size="96" border="md" hoverable>
-    <po-avatar
-      v-for="author in page.props.authors"
-      :key="author.id"
-      tag="a"
-      color="primary"
-      :user="author"
-      :href="route('users.show', author.username)"
-      :title="userDisplayName(author)"
-      @click.prevent="router.visit(route('users.show', author.username))"
-    />
-  </v-avatar-group>
+  <po-avatar-stack :users="page.props.authors" :size="96" color="primary" />
 </template>
