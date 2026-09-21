@@ -59,6 +59,10 @@ body,
     z-index: 999 !important;
     min-height: 64px !important;
   }
+
+  .v-main {
+    padding-top: 64px !important;
+  }
 }
 
 /* Stretched-link pattern: makes an ancestor card fully clickable via a positioned pseudo-element. No Vuetify equivalent. */
@@ -71,8 +75,6 @@ body,
   z-index: 1 !important;
   content: '' !important;
 }
-
-
 
 /* Sticks the tab bar below the fixed navbar; offset changes once the navbar stops being fixed. */
 .sticky-tabs {

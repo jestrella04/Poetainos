@@ -266,7 +266,7 @@ function getFlashMessages() {
       </v-container>
     </v-toolbar>
 
-    <v-main class="mt-lg-16">
+    <v-main>
       <v-container class="po-container">
         <slot />
       </v-container>
