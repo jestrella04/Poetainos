@@ -37,6 +37,30 @@ describe('the admin area', function (): void {
     });
 });
 
+describe('the shared auth props', function (): void {
+    it('flag admins so the admin menu entry is rendered', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->get('/admin');
+
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('auth.admin', true));
+    });
+
+    it('do not flag regular users as admins', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->get(route('users.index'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('auth.admin', false));
+    });
+});
+
 describe('the tools page', function (): void {
     it('exposes structured server info and a log tail', function (): void {
         // Given

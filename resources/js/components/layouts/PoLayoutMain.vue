@@ -224,9 +224,9 @@ function getFlashMessages() {
             <v-icon icon="fas fa-right-to-bracket" />
           </po-button>
 
-          <v-menu v-if="auth()" target="parent">
+          <v-menu v-if="auth()" target="parent" open-on-hover>
             <template v-slot:activator="{ props }">
-              <po-button icon v-bind="props" style="font-size: 0.7rem">
+              <po-button icon v-bind="props">
                 <po-badge :count="unreadCount">
                   <po-avatar size="32" color="secondary" :user="authUser()!" />
                 </po-badge>

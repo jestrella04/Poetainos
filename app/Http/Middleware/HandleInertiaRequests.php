@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
             'ziggy' => $ziggy->toArray(),
             'auth' => [
                 'user' => $user,
-                'admin' => $user?->isAllowed('admin'),
+                'admin' => $request->user()?->isAllowed('admin'),
                 'notifications' => $user?->unreadNotifications->count() ?? 0,
                 'liked' => [
                     'writings' => $user !== null ? Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))->pluck('id') : [],
