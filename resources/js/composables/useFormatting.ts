@@ -24,11 +24,15 @@ export function useFormatting() {
   }
 
   function userInitials(user: UserLike): string {
-    if (!_.isNil(user.name) && !_.isNil(user.last_name)) {
-      return _.toUpper(`${user.name.substring(0, 1)}${user.last_name.substring(0, 1)}`)
+    const nameParts = _.words(user.name ?? '', /\S+/g)
+
+    if (nameParts.length === 0) {
+      return _.toUpper(user.username.substring(0, 1))
     }
 
-    return _.toUpper(user.username.substring(0, 1))
+    const lastPart = nameParts.length > 1 ? _.last(nameParts) : ''
+
+    return _.toUpper(`${_.head(nameParts)?.substring(0, 1)}${lastPart?.substring(0, 1)}`)
   }
 
   function readable(value: number): string {

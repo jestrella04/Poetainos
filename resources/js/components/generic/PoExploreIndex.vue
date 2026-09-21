@@ -100,7 +100,7 @@ const categories = computed(() => [
       v-for="author in page.props.authors"
       :key="author.id"
       tag="a"
-      color="secondary"
+      color="primary"
       :user="author"
       :href="route('users.show', author.username)"
       :title="userDisplayName(author)"

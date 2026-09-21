@@ -15,12 +15,17 @@ describe('userDisplayName', () => {
 })
 
 describe('userInitials', () => {
-  it('combines the first letters of name and last_name when both are present', () => {
-    expect(userInitials({ name: 'Jane', last_name: 'Doe', username: 'jane' })).toBe('JD')
+  it('combines the first letters of the first and last words of the name', () => {
+    expect(userInitials({ name: 'jane Mary  doe', username: 'jane' })).toBe('JD')
   })
 
-  it('falls back to the first letter of the username otherwise', () => {
+  it('uses the first letter of the name when it is a single word', () => {
+    expect(userInitials({ name: 'maria', username: 'jane' })).toBe('M')
+  })
+
+  it('falls back to the first letter of the username when the name is missing or blank', () => {
     expect(userInitials({ username: 'jane' })).toBe('J')
+    expect(userInitials({ name: ' ', username: 'jane' })).toBe('J')
   })
 })
 

@@ -10,7 +10,6 @@ export interface UserLike {
   id?: number
   username: string
   name?: string | null
-  last_name?: string | null
   avatar?: string | null
   extra_info?: {
     avatar?: string | null

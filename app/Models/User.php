@@ -114,11 +114,19 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function initials(): string
     {
-        if (! empty($this->name) && ! empty($this->last_name)) {
-            return strtoupper(substr($this->name, 0, 1).substr($this->last_name, 0, 1));
+        $nameParts = preg_split('/\s+/', trim((string) $this->name), -1, PREG_SPLIT_NO_EMPTY);
+
+        if (count($nameParts) === 0) {
+            return mb_strtoupper(mb_substr($this->username, 0, 1));
         }
 
-        return strtoupper(substr($this->username, 0, 1));
+        $initials = mb_substr($nameParts[0], 0, 1);
+
+        if (count($nameParts) > 1) {
+            $initials .= mb_substr(end($nameParts), 0, 1);
+        }
+
+        return mb_strtoupper($initials);
     }
 
     public function getTwitterUsername(): string
