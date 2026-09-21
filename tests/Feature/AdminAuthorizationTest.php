@@ -61,6 +61,16 @@ describe('the shared auth props', function (): void {
     });
 });
 
+describe('the shared ziggy props', function (): void {
+    it('use the site root as base url so generated links are not nested under the current page', function (): void {
+        // When
+        $response = get(route('users.index'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('ziggy.url', rtrim(url('/'), '/')));
+    });
+});
+
 describe('the tools page', function (): void {
     it('exposes structured server info and a log tail', function (): void {
         // Given

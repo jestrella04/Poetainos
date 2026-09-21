@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $ziggy = new Ziggy($group = null, $request->url());
+        $ziggy = new Ziggy;
         $user = auth()->check()
             ? User::forAuthorSummary()->find(auth()->id())
             : null;
