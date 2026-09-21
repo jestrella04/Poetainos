@@ -52,6 +52,10 @@ export function useFormatting() {
     })
   }
 
+  function toLocaleMonthYear(date: string | number | Date): string {
+    return new Date(date).toLocaleDateString('es-DO', { year: 'numeric', month: 'long' })
+  }
+
   function relativeDate(date: string | number | Date): string {
     return intlFormatDistance(new Date(date), new Date(), { locale: 'es' })
   }
@@ -121,6 +125,7 @@ export function useFormatting() {
     readable,
     formatCount,
     toLocaleDate,
+    toLocaleMonthYear,
     relativeDate,
     excerpt,
     cropUrl,

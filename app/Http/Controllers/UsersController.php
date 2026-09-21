@@ -350,10 +350,19 @@ class UsersController extends Controller
             abort(401);
         }
 
+        $user->loadCount(['writings', 'shelf', 'likes', 'blockedAuthors']);
+
         return Inertia::render('users/PoUsersAccount', [
             'meta' => [
                 'title' => getPageTitle([__('My account')]),
             ],
+            'account' => $user->only([
+                'created_at',
+                'writings_count',
+                'shelf_count',
+                'likes_count',
+                'blocked_authors_count',
+            ]),
             'notifications' => [
                 'email' => isset($user->extra_info['notifications']['email'])
                   ? isTruthy($user->extra_info['notifications']['email'])

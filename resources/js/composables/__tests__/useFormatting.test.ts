@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { useFormatting } from '../useFormatting'
 
-const { userDisplayName, userInitials, excerpt, karmaMedal, linkify, formatCount } = useFormatting()
+const {
+  userDisplayName,
+  userInitials,
+  excerpt,
+  karmaMedal,
+  linkify,
+  formatCount,
+  toLocaleMonthYear
+} = useFormatting()
 
 describe('userDisplayName', () => {
   it('prefers the name when present', () => {
@@ -99,5 +107,11 @@ describe('formatCount', () => {
     expect(formatCount(980)).toBe('980')
     expect(formatCount(3412)).toBe('3.412')
     expect(formatCount(1234567)).toBe('1.234.567')
+  })
+})
+
+describe('toLocaleMonthYear', () => {
+  it('formats a date as the full month name and year', () => {
+    expect(toLocaleMonthYear('2019-03-15T12:00:00Z')).toBe('marzo de 2019')
   })
 })
