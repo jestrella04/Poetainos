@@ -134,6 +134,47 @@ describe('creating a writing', function (): void {
         Notification::assertSentTo($user, WritingPublished::class);
     });
 
+    it('allows a user who already accepted the agreements to publish when the form submits them unchecked', function (): void {
+        // Given
+        Notification::fake();
+        $user = createUser();
+        $user->acceptAgreements();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        $response = actingAs($user)->post('/writings/create', [
+            'title' => 'Already agreed',
+            'main_category' => $mainCategory->id,
+            'categories' => [$mainCategory->id],
+            'text' => 'A sufficiently long body of text for validation purposes.',
+            'service_agreement' => 'false',
+            'privacy_agreement' => 'false',
+        ]);
+
+        // Then
+        $response->assertOk();
+        expect(Writing::where('title', 'Already agreed')->exists())->toBeTrue();
+    });
+
+    it('rejects publishing when a user who has not agreed submits the agreements unchecked', function (): void {
+        // Given
+        $user = createUser();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        $response = actingAs($user)->post('/writings/create', [
+            'title' => 'Not agreed',
+            'main_category' => $mainCategory->id,
+            'categories' => [$mainCategory->id],
+            'text' => 'A sufficiently long body of text for validation purposes.',
+            'service_agreement' => 'false',
+            'privacy_agreement' => 'false',
+        ]);
+
+        // Then
+        $response->assertSessionHasErrors(['service_agreement', 'privacy_agreement']);
+    });
+
     it('prevents publishing more than 3 writings a day', function (): void {
         // Given
         $user = createUser();

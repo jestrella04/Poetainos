@@ -8,26 +8,25 @@ const { termsPath, privacyPath } = useStaticPages()
 </script>
 
 <template>
-  <div class="d-flex">
+  <div class="d-flex align-center">
     <div class="flex-shrink-1">
       <v-switch
         v-model="formData.serviceAgreement"
         :label="$t('accounts.i-accept-terms')"
         color="primary"
-        class="mb-0"
         required
         hide-details
       />
     </div>
 
-    <div class="pt-4 ps-4">
+    <div class="ps-4">
       <po-link :href="termsPath()" target="_blank" inertia>
-        <v-icon icon="fas fa-arrow-up-right-from-square" />
+        <v-icon icon="fas fa-arrow-up-right-from-square" size="x-small" />
       </po-link>
     </div>
   </div>
 
-  <div class="d-flex">
+  <div class="d-flex align-center mb-4">
     <div class="flex-shrink-1">
       <v-switch
         v-model="formData.privacyAgreement"
@@ -38,9 +37,9 @@ const { termsPath, privacyPath } = useStaticPages()
       />
     </div>
 
-    <div class="pt-4 ps-4">
+    <div class="ps-4">
       <po-link :href="privacyPath()" inertia>
-        <v-icon icon="fas fa-arrow-up-right-from-square" />
+        <v-icon icon="fas fa-arrow-up-right-from-square" size="x-small" />
       </po-link>
     </div>
   </div>

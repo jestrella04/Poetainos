@@ -3,8 +3,21 @@ import { createVuetify } from 'vuetify'
 import { aliases, fa } from 'vuetify/iconsets/fa-svg'
 import { themes } from './theme'
 
+const formFieldDefaults = { class: 'mb-4' }
+
 export const vuetify = createVuetify({
   ssr: true,
+  defaults: {
+    VAutocomplete: formFieldDefaults,
+    VCheckbox: formFieldDefaults,
+    VCombobox: formFieldDefaults,
+    VFileInput: formFieldDefaults,
+    VRadioGroup: formFieldDefaults,
+    VSelect: formFieldDefaults,
+    //VSwitch: formFieldDefaults,
+    VTextarea: formFieldDefaults,
+    VTextField: formFieldDefaults
+  },
   theme: {
     defaultTheme: 'light',
     themes

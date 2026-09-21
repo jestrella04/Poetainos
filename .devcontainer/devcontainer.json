@@ -12,7 +12,8 @@
         "bmewburn.vscode-intelephense-client",
         "ms-azuretools.vscode-docker",
         "laravel.vscode-laravel",
-        "Anthropic.claude-code"
+        "Anthropic.claude-code",
+        "damms005.devdb"
       ]
     }
   }

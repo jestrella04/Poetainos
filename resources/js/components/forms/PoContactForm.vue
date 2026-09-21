@@ -148,7 +148,7 @@ async function submitForm() {
         required
       />
 
-      <div class="d-flex">
+      <div class="d-flex mb-4">
         <div>
           <img :src="captcha.img" alt="" />
         </div>

@@ -165,7 +165,7 @@ function resetForm() {
 </script>
 
 <template>
-  <po-wrapper class="w-100" style="max-width: 900px">
+  <po-wrapper class="w-100">
     <po-head />
 
     <v-card

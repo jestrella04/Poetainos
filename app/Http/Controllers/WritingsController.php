@@ -223,6 +223,12 @@ class WritingsController extends Controller
             ]);
         }
 
+        // The form posts unchecked agreements even when the user already accepted them
+        $agreementRules = $user->isInAgreement() ? [] : [
+            'service_agreement' => 'sometimes|required|accepted',
+            'privacy_agreement' => 'sometimes|required|accepted',
+        ];
+
         // Validate user input
         request()->validate([
             'title' => 'required|string|min:3|max:100',
@@ -232,8 +238,7 @@ class WritingsController extends Controller
             'tags' => 'nullable|array',
             'link' => 'nullable|url|max:250',
             'cover' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
-            'service_agreement' => 'sometimes|required|accepted',
-            'privacy_agreement' => 'sometimes|required|accepted',
+            ...$agreementRules,
         ]);
 
         // Process the uploaded cover, if any
