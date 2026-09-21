@@ -36,7 +36,7 @@ function share(): void {
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        prepend-icon="fas fa-plus"
+        prepend-icon="fas fa-angle-down"
         color="primary"
         variant="tonal"
         :aria-label="$t('main.more-actions')"

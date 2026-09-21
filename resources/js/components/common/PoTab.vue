@@ -14,19 +14,11 @@ const props = withDefaults(
   }
 )
 
-const { visit } = useInertiaVisit(props)
+const { handleClick } = useInertiaVisit(props)
 </script>
 
 <template>
-  <template v-if="!props.inertia">
-    <v-tab v-bind="$attrs" :href="props.href">
-      <slot />
-    </v-tab>
-  </template>
-
-  <template v-else>
-    <v-tab v-bind="$attrs" :href="props.href" @click.prevent="visit">
-      <slot />
-    </v-tab>
-  </template>
+  <v-tab v-bind="$attrs" :href="props.href" @click="handleClick">
+    <slot />
+  </v-tab>
 </template>

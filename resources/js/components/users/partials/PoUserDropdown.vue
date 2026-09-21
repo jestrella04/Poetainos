@@ -38,7 +38,7 @@ function share(): void {
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        icon="fas fa-plus"
+        icon="fas fa-angle-down"
         color="primary"
         size="x-small"
         class="po-btn-more"

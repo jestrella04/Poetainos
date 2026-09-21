@@ -14,14 +14,7 @@ const props = withDefaults(
   }
 )
 
-const { visit } = useInertiaVisit(props)
-
-function handleClick(event: MouseEvent | KeyboardEvent): void {
-  if (props.inertia === true) {
-    event.preventDefault()
-    visit()
-  }
-}
+const { handleClick } = useInertiaVisit(props)
 </script>
 
 <template>

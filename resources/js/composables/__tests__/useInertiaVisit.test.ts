@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { visitMock } = vi.hoisted(() => ({ visitMock: vi.fn() }))
 
@@ -9,6 +9,10 @@ vi.mock('@inertiajs/vue3', () => ({
 import { useInertiaVisit } from '../useInertiaVisit'
 
 describe('useInertiaVisit', () => {
+  beforeEach(() => {
+    visitMock.mockClear()
+  })
+
   it('does not visit when href is undefined', () => {
     // Given
     const { visit } = useInertiaVisit({ href: undefined })
@@ -58,5 +62,31 @@ describe('useInertiaVisit', () => {
       method: 'delete',
       data: { reason: 'spam' }
     })
+  })
+
+  it('prevents the native navigation and visits when inertia is enabled', () => {
+    // Given
+    const event = { preventDefault: vi.fn() } as unknown as MouseEvent
+    const { handleClick } = useInertiaVisit({ href: '/writings/1', inertia: true })
+
+    // When
+    handleClick(event)
+
+    // Then
+    expect(event.preventDefault).toHaveBeenCalledOnce()
+    expect(visitMock).toHaveBeenCalledWith('/writings/1', { method: 'get' })
+  })
+
+  it('leaves native navigation untouched when inertia is disabled', () => {
+    // Given
+    const event = { preventDefault: vi.fn() } as unknown as MouseEvent
+    const { handleClick } = useInertiaVisit({ href: '/writings/1' })
+
+    // When
+    handleClick(event)
+
+    // Then
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(visitMock).not.toHaveBeenCalled()
   })
 })

@@ -24,7 +24,6 @@ const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { getSnackBar } = useSnackbar()
 const { faqPath, aboutPath, termsPath, privacyPath } = useStaticPages()
 const theme = useTheme()
-const desktopSiteMenu = ref(false)
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
@@ -127,13 +126,8 @@ function getFlashMessages() {
     <po-login-modal v-model="loginModal" />
     <po-pwa-prompt />
 
-    <v-toolbar
-      color="primary"
-      :elevation="0"
-      border="b"
-      class="po-navbar px-3 d-none d-lg-flex text-on-primary"
-    >
-      <v-container class="d-inline-flex justify-space-between">
+    <v-toolbar color="primary" border="b" class="po-navbar d-none d-lg-flex">
+      <v-container class="d-inline-flex ga-12 justify-space--between">
         <div class="align-self-center">
           <po-link
             :href="route('home')"
@@ -146,7 +140,7 @@ function getFlashMessages() {
           </po-link>
         </div>
 
-        <v-tabs :model-value="page.props.route.name">
+        <v-tabs :model-value="page.props.route.name" class="flex-grow-1">
           <po-tab :href="route('explore')" value="explore" inertia>{{ $t('main.explore') }}</po-tab>
           <po-tab :href="route('writings.awards')" value="writings.awards" inertia>
             {{ $t('main.awards') }}
@@ -157,9 +151,18 @@ function getFlashMessages() {
           <po-tab :href="route('users.index')" value="users.index" inertia>
             {{ $t('users.authors') }}
           </po-tab>
-          <po-tab @click.prevent="desktopSiteMenu = true">
-            <v-icon icon="fas fa-ellipsis-vertical" />
-            <v-menu v-model="desktopSiteMenu" target="parent">
+          <div class="align-self-center">
+            <v-menu open-on-hover>
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  icon="fas fa-angle-down"
+                  size="small"
+                  class="ms-2"
+                  :aria-label="$t('main.more-actions')"
+                />
+              </template>
+
               <v-list>
                 <po-list-item
                   :href="route('contact.create')"
@@ -195,11 +198,11 @@ function getFlashMessages() {
                 </po-list-item>
               </v-list>
             </v-menu>
-          </po-tab>
+          </div>
         </v-tabs>
 
         <div class="align-self-center d-flex align-center ga-3">
-          <po-button
+          <!-- <po-button
             v-if="!auth()"
             variant="text"
             color="on-surface-variant"
@@ -208,9 +211,14 @@ function getFlashMessages() {
             inertia
           >
             {{ $t('accounts.login-alt') }}
-          </po-button>
+          </po-button> -->
 
-          <po-button color="primary" variant="plain" :href="route('writings.create')" inertia>
+          <po-button
+            variant="tonal"
+            :href="route('writings.create')"
+            prepend-icon="fas fa-plus"
+            inertia
+          >
             {{ $t('main.publish') }}
           </po-button>
 
