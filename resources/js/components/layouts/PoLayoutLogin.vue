@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import { useTheme } from 'vuetify'
+import { useSystemTheme } from '@/composables/useSystemTheme'
 import type { InertiaPageProps } from '@/types/inertia'
 
 const page = computed(() => usePage<InertiaPageProps<{ title?: string }>>())
-const theme = useTheme()
 
-void theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+const { revealStyle } = useSystemTheme()
 </script>
 
 <style scoped>
@@ -27,7 +26,7 @@ void theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'd
 </style>
 
 <template>
-  <v-app>
+  <v-app :style="revealStyle">
     <po-head :title="page.props.title" />
 
     <v-main>

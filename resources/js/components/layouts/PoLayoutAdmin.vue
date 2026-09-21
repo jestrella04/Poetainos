@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useTheme } from 'vuetify'
+import { useSystemTheme } from '@/composables/useSystemTheme'
 import PoAdminMenu from '../admin/PoAdminMenu.vue'
 
-const theme = useTheme()
-void theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+const { revealStyle } = useSystemTheme()
 </script>
 
 <style>
@@ -26,7 +25,7 @@ iframe {
 </style>
 
 <template>
-  <v-app>
+  <v-app :style="revealStyle">
     <po-head />
 
     <v-main>

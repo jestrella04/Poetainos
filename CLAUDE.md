@@ -11,16 +11,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Development
 
 ```bash
-composer dev        # Start all dev servers: artisan serve, queue, pail, vite
-composer dev:ssr    # Dev with SSR support
+composer dev        # Start all dev servers: artisan serve, queue, pail, vite (SSR is served by vite in dev)
 composer setup      # Full project setup from scratch
 ```
 
 ### Building
 
 ```bash
-npm run build       # Production frontend build
-npm run build:ssr   # Production build with SSR
+npm run build       # Production build: client bundle + SSR bundle (bootstrap/ssr)
 ```
 
 ### Testing

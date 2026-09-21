@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSocialLinks } from '@/composables/useSocialLinks'
@@ -9,11 +9,13 @@ const { socialLink, socialIcon } = useSocialLinks()
 const page = computed(() => usePage())
 const relatedApps = ref<RelatedApplication[]>([])
 
-if (navigator.getInstalledRelatedApps !== undefined) {
-  void navigator.getInstalledRelatedApps().then((related) => {
-    relatedApps.value = related
-  })
-}
+onMounted(() => {
+  if (navigator.getInstalledRelatedApps !== undefined) {
+    void navigator.getInstalledRelatedApps().then((related) => {
+      relatedApps.value = related
+    })
+  }
+})
 </script>
 
 <style scoped>

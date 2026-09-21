@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import laravel from 'laravel-vite-plugin'
+import inertia from '@inertiajs/vite'
 import Components from 'unplugin-vue-components/vite'
 import { VuetifyResolver } from 'unplugin-vue-components/resolvers'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -38,7 +39,7 @@ function manualChunks(id) {
   }
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, isSsrBuild }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
@@ -59,8 +60,11 @@ export default defineConfig(({ mode }) => {
     include: ['vuetify']
   },
   ssr: {
-    // avoid bundling vuetify for server build, helps with ESM resolution
-    external: ['vuetify']
+    // Vuetify ships raw .css imports that Node can't load, so it must be bundled.
+    // FontAwesome must be bundled too: externalized, Node loads vue-fontawesome and
+    // the app's `library.add()` against two different svg-core copies, so the
+    // icon library looks empty and every icon renders as an empty comment.
+    noExternal: ['vuetify', /^@fortawesome\//]
   },
   build: {
     sourcemap: true,
@@ -71,12 +75,13 @@ export default defineConfig(({ mode }) => {
     }
   },
   plugins: [
-    nodePolyfills(),
+    // Browser shims for Node built-ins; the SSR bundle runs on real Node.
+    !isSsrBuild && nodePolyfills(),
     laravel({
       input: ['resources/js/app.ts'],
-      ssr: ['resources/js/ssr.js'],
       refresh: true
     }),
+    inertia(),
     vue(),
     vuetify({ autoImport: true }),
     Components({

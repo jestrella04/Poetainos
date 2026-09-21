@@ -1,7 +1,7 @@
 import { onMounted, ref, type Ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
-import { useSwipe } from '@vueuse/core'
+import { defaultDocument, useSwipe } from '@vueuse/core'
 import type { UseSwipeDirection } from '@vueuse/core'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import type { InertiaPageProps } from '@/types/inertia'
@@ -41,7 +41,7 @@ export function usePaginatedTabList<T>(config: {
     clickTab(targetTab)
   }
 
-  useSwipe(config.swipeTarget ?? document.body, {
+  useSwipe(config.swipeTarget ?? defaultDocument?.body, {
     passive: true,
     onSwipe() {
       //
