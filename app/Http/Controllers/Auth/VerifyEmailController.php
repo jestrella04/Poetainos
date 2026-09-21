@@ -3,28 +3,36 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class VerifyEmailController extends Controller
 {
     /**
-     * Mark the authenticated user's email address as verified.
+     * Mark the authenticated user's email address as verified using the code
+     * that was emailed to them.
+     *
+     * @return array{url: string}
      */
-    public function __invoke(EmailVerificationRequest $request): RedirectResponse
+    public function __invoke(Request $request): array
     {
+        $request->validate([
+            'code' => ['required', 'digits:6'],
+        ]);
+
         $user = $request->user();
 
-        if ($user === null || $user->hasVerifiedEmail()) {
-            return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
-        }
+        if ($user->hasVerifiedEmail() === false) {
+            if ($user->verifyEmailWithCode($request->input('code')) === false) {
+                throw ValidationException::withMessages([
+                    'code' => __('The verification code is invalid or has expired.'),
+                ]);
+            }
 
-        if ($user->markEmailAsVerified()) {
             event(new Verified($user));
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+        return ['url' => route('home')];
     }
 }

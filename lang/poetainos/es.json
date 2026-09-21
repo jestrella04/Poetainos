@@ -346,5 +346,9 @@
   "Your writing was successfully posted.": "Tu texto ha sido publicado con éxito.",
   "Your writing was successfully updated.": "Tu texto ha sido actualizado con éxito.",
   "Youtube": "Youtube",
-  "The site has not been configured yet.": "El sitio aún no ha sido configurado."
+  "The site has not been configured yet.": "El sitio aún no ha sido configurado.",
+  "[:site] Your verification code": "[:site] Tu código de verificación",
+  "Use the following code to verify your email address at :site. It expires in :minutes minutes.": "Usa el siguiente código para verificar tu correo en :site. Expira en :minutes minutos.",
+  "If you did not create an account, you can safely ignore this email.": "Si no creaste una cuenta, puedes ignorar este correo.",
+  "The verification code is invalid or has expired.": "El código de verificación es inválido o ha expirado."
 }

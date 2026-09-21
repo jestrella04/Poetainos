@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\VerifyEmailCode;
 use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -20,6 +21,10 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
+    private const EMAIL_VERIFICATION_CODE_MINUTES = 15;
+
+    private const EMAIL_VERIFICATION_MAX_ATTEMPTS = 5;
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasPushSubscriptions, Notifiable;
 
@@ -391,5 +396,65 @@ class User extends Authenticatable implements MustVerifyEmail
             ->all();
 
         return count(array_unique(array_merge($likes, $comments, $shelves)));
+    }
+
+    /**
+     * Email a fresh one-time code, replacing any previous one. The code is
+     * bound to the current address so changing email invalidates it.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $code = sprintf('%06d', random_int(0, 999999));
+
+        cache()->put($this->emailVerificationCacheKey(), [
+            'hash' => $this->hashEmailVerificationCode($code),
+            'email' => $this->email,
+            'attempts' => 0,
+        ], Carbon::now()->addMinutes(self::EMAIL_VERIFICATION_CODE_MINUTES));
+
+        $this->notify(new VerifyEmailCode($code, self::EMAIL_VERIFICATION_CODE_MINUTES));
+    }
+
+    /**
+     * Mark the email as verified when the code matches. A code is discarded
+     * after too many wrong guesses so it can't be brute-forced.
+     */
+    public function verifyEmailWithCode(string $code): bool
+    {
+        $pending = cache()->get($this->emailVerificationCacheKey());
+
+        if ($pending === null || $pending['email'] !== $this->email) {
+            return false;
+        }
+
+        if (hash_equals($pending['hash'], $this->hashEmailVerificationCode($code)) === false) {
+            $pending['attempts']++;
+
+            if ($pending['attempts'] >= self::EMAIL_VERIFICATION_MAX_ATTEMPTS) {
+                cache()->forget($this->emailVerificationCacheKey());
+            } else {
+                cache()->put(
+                    $this->emailVerificationCacheKey(),
+                    $pending,
+                    Carbon::now()->addMinutes(self::EMAIL_VERIFICATION_CODE_MINUTES)
+                );
+            }
+
+            return false;
+        }
+
+        cache()->forget($this->emailVerificationCacheKey());
+
+        return $this->markEmailAsVerified();
+    }
+
+    private function emailVerificationCacheKey(): string
+    {
+        return 'email-verification-code:'.$this->id;
+    }
+
+    private function hashEmailVerificationCode(string $code): string
+    {
+        return hash_hmac('sha256', $code, config('app.key'));
     }
 }

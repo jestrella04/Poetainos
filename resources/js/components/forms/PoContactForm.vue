@@ -154,7 +154,15 @@ async function submitForm() {
         </div>
 
         <div>
-          <po-button :title="$t('main.reload-captcha')" class="ms-3" @click.prevent="reloadCaptcha">
+          <po-button
+            :title="$t('main.reload-captcha')"
+            class="ms-3"
+            color="primary"
+            variant="tonal"
+            size="small"
+            @click.prevent="reloadCaptcha"
+            icon
+          >
             <v-icon icon="fas fa-rotate-right" />
             <span class="d-sr-only">{{ $t('main.reload-captcha') }}</span>
           </po-button>
