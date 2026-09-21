@@ -6,11 +6,12 @@ use App\Events\NotificationEvent;
 use App\Models\User;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
 /**
  * Base for notifications that build their content once, in the
- * constructor, into $this->notification (title/greeting/body/footer/url/
+ * constructor, into $this->content (title/greeting/body/footer/url/
  * action/icon/tag) and deliver it identically across mail, web push and
  * broadcast. Subclasses keep their own constructor, via(), and toArray().
  */
@@ -19,7 +20,7 @@ abstract class PoetainosNotification extends Notification
     /**
      * @var array<string, mixed>
      */
-    protected array $notification = [];
+    protected array $content = [];
 
     /**
      * The values every "someone did something on your content" message interpolates.
@@ -52,6 +53,18 @@ abstract class PoetainosNotification extends Notification
     }
 
     /**
+     * Get the notification's delivery channels: the in-app notification, live
+     * broadcast and web push. Subclasses that also email add `mailChannelIfWanted()`.
+     *
+     * @param  mixed  $notifiable
+     * @return array<int, string>
+     */
+    public function via($notifiable): array
+    {
+        return ['database', 'broadcast', WebPushChannel::class];
+    }
+
+    /**
      * The mail channel, unless the recipient opted out of notification emails.
      *
      * @return array<int, string>
@@ -69,11 +82,11 @@ abstract class PoetainosNotification extends Notification
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject($this->notification['title'])
-            ->greeting($this->notification['greeting'])
-            ->line($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->line($this->notification['footer']);
+            ->subject($this->content['title'])
+            ->greeting($this->content['greeting'])
+            ->line($this->content['body'])
+            ->action($this->content['action'], $this->content['url'])
+            ->line($this->content['footer']);
     }
 
     /**
@@ -85,14 +98,14 @@ abstract class PoetainosNotification extends Notification
     public function toWebPush($notifiable, $notification): WebPushMessage
     {
         return (new WebPushMessage)
-            ->title($this->notification['title'])
-            ->icon($this->notification['icon'])
-            ->body($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
+            ->title($this->content['title'])
+            ->icon($this->content['icon'])
+            ->body($this->content['body'])
+            ->action($this->content['action'], $this->content['url'])
             ->options(['TTL' => 1000])
             ->renotify()
             ->requireInteraction()
-            ->tag($this->notification['tag']);
+            ->tag($this->content['tag']);
     }
 
     /**

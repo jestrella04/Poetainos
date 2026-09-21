@@ -11,16 +11,16 @@ use Inertia\Response;
 class TagsController extends Controller
 {
     /**
-     * Query list of matching resources.
+     * Tags whose name matches the query, as select options.
      *
      * @return Collection<int, array{value: mixed, label: mixed}>
      */
-    public function query(): Collection
+    public function search(): Collection
     {
         $wildcard = '%'.escapeLike((string) request('query')).'%';
 
         return Tag::where('name', 'like', $wildcard)
-            ->take($this->pagination)
+            ->take($this->perPage)
             ->get()
             ->map(function ($tag, $key) {
                 return [
@@ -40,7 +40,7 @@ class TagsController extends Controller
         $sort = resolveSort(['latest', 'popular', 'likes']);
 
         return $this->writingsIndex(
-            $tag->writings()->visibleTo($this->getBlockedUsers())->withListingRelations()->sorted($sort),
+            $tag->writings()->visibleTo($this->blockedAuthorIds())->withListingRelations()->sorted($sort),
             $sort,
             ['title' => getPageTitle([$tag->name, __('Tags')]), 'canonical' => $tag->path()],
             isDeferred: false,

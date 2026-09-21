@@ -17,10 +17,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Inertia\Response;
+use SplFileObject;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AdminController extends Controller
 {
+    private const LOG_LINES_SHOWN = 100;
+
     private string $log;
 
     public function __construct()
@@ -142,7 +145,7 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'log' => tailFile($this->log, 100),
+            'log' => $this->tailLog(),
             'info' => [
                 __('PHP version') => PHP_VERSION,
                 __('Laravel version') => app()->version(),
@@ -211,7 +214,7 @@ class AdminController extends Controller
     private function listing(string $component, string $title, Builder $rows): Response|Paginator
     {
         if (request()->expectsJson()) {
-            return $rows->simplePaginate($this->pagination)->withQueryString();
+            return $rows->simplePaginate($this->perPage)->withQueryString();
         }
 
         return Inertia::render($component, [
@@ -220,5 +223,30 @@ class AdminController extends Controller
             ],
             'total' => $rows->count(),
         ]);
+    }
+
+    /**
+     * The last lines of the application log, or nothing when it can't be read.
+     */
+    private function tailLog(): string
+    {
+        if (! is_readable($this->log)) {
+            return '';
+        }
+
+        $file = new SplFileObject($this->log, 'r');
+        $file->seek(PHP_INT_MAX);
+        $lastLine = $file->key();
+
+        $file->seek(max(0, $lastLine - self::LOG_LINES_SHOWN));
+
+        $tail = [];
+
+        while (! $file->eof()) {
+            $tail[] = $file->fgets();
+            $file->next();
+        }
+
+        return implode('', $tail);
     }
 }

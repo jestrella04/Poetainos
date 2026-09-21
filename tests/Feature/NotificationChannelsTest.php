@@ -4,10 +4,13 @@ use App\Models\Comment;
 use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\CommentLiked;
+use App\Notifications\SocialPostNotification;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Notifications\WritingFeatured;
 use App\Notifications\WritingLiked;
+use App\Notifications\WritingOfTheDayPosted;
+use App\Notifications\WritingPublished;
 
 describe('notification emails', function (): void {
     /**
@@ -84,4 +87,28 @@ describe('the content of "someone did something on your writing" notifications',
         // Then
         expect($mail->actionUrl)->toBe($writing->path().'#comment-'.$comment->id);
     });
+});
+
+describe('social media posts about a writing', function (): void {
+    it('mention the author by handle on X and by name on Facebook, with a link to the writing', function (Closure $makeNotification): void {
+        // Given
+        $author = createUser(['name' => 'Emily Dickinson', 'extra_info' => ['social' => ['twitter' => '@emily']]]);
+        $writing = Writing::factory()->for($author, 'author')->create(['title' => 'Hope']);
+        $notification = $makeNotification($writing);
+
+        // When
+        $tweet = $notification->toTwitter($author)->getContent();
+        $facebookPost = $notification->toFacebookPoster($author)->getBody();
+
+        // Then
+        expect($tweet)->toContain('"Hope"')->toContain('@emily');
+        expect(str_ends_with($tweet, $writing->path()))->toBeTrue();
+        expect(str_contains($tweet, ':author'))->toBeFalse();
+        expect($facebookPost['message'])->toContain('"Hope"')->toContain('Emily Dickinson');
+        expect(str_contains($facebookPost['message'], '@emily') || str_contains($facebookPost['message'], ':author'))->toBeFalse();
+        expect($facebookPost['link'])->toBe($writing->path());
+    })->with([
+        'the pick of the day' => [fn (Writing $writing): SocialPostNotification => new WritingOfTheDayPosted($writing)],
+        'a new writing' => [fn (Writing $writing): SocialPostNotification => new WritingPublished($writing)],
+    ]);
 });

@@ -45,7 +45,7 @@ describe('liking a writing', function (): void {
         Notification::assertNothingSent();
     });
 
-    it('only removes the acting user\'s own like when deleting a like', function (): void {
+    it('only removes the acting user\'s own like when they unlike', function (): void {
         // Given
         $writing = Writing::factory()->create();
         $liker = createUser();
@@ -54,7 +54,7 @@ describe('liking a writing', function (): void {
         actingAs($otherLiker)->post("/likes/writing/{$writing->id}/store");
 
         // When
-        $response = actingAs($liker)->delete("/likes/writing/{$writing->id}/delete");
+        $response = actingAs($liker)->post("/likes/writing/{$writing->id}/store");
 
         // Then
         $response->assertJson(['method' => 'destroy', 'count' => 1]);

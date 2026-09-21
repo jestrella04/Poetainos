@@ -9,7 +9,7 @@ defineProps<{
   comment: Comment
 }>()
 
-const { auth, authUser, canEdit } = useAuth()
+const { isAuthenticated, authUser, canEdit } = useAuth()
 const complainer = ref(false)
 const blocker = ref(false)
 const isDelete = ref(false)
@@ -48,7 +48,7 @@ provide(isDeleteKey, isDelete)
         <span>{{ $t('complaints.report-comment') }}</span>
       </po-list-item>
 
-      <template v-if="auth() && authUser()!.username !== comment.author.username">
+      <template v-if="isAuthenticated() && authUser()!.username !== comment.author.username">
         <v-divider class="my-0" />
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>

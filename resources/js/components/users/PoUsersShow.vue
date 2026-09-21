@@ -4,7 +4,7 @@ import PoUsersEntry from './PoUsersEntry.vue'
 import PoWritingsEntry from '../writings/PoWritingsEntry.vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
-import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
+import { useInfiniteList } from '@/composables/useInfiniteList'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { User, Writing } from '@/types/models'
 
@@ -34,11 +34,7 @@ const {
   next,
   fetched,
   loadMore
-} = usePaginatedTabList<Writing>({
-  tabOrder: [],
-  currentTab: () => 'latest',
-  reloadPropKey: 'authorWritings'
-})
+} = useInfiniteList<Writing>('authorWritings')
 </script>
 
 <template>

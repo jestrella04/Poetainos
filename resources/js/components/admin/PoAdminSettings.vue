@@ -2,47 +2,34 @@
 import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
-import { useFormValidation } from '@/composables/useFormValidation'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { LaravelValidationErrors, ValidationError } from '@/types/http'
+import type { LaravelValidationErrors } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const { checkFormValidity } = useFormValidation()
+const { validationErrors } = useFormErrors()
 const page = usePage<InertiaPageProps<{ settings: string }>>()
 const settings = ref(page.props.settings)
-const isPosting = ref(false)
 const isPosted = ref(false)
-const errors = ref<LaravelValidationErrors>({})
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 
-function submitForm() {
-  const form = document.querySelector<HTMLFormElement>('#settings-form')
-
-  if (!form || !checkFormValidity(form)) {
-    return
-  }
-
-  isPosting.value = true
-
-  void axios
-    .post(form.action, {
+async function submitForm() {
+  await postForm({
+    formSelector: '#settings-form',
+    payload: {
       _method: 'PUT',
       json: settings.value
-    })
-    .then(() => {
+    },
+    cooldown: true,
+    onSuccess: () => {
       isPosted.value = true
-    })
-    .catch((error: ValidationError) => {
-      errors.value = error.response?.data.errors ?? {}
-    })
-    .finally(() => {
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    })
+    },
+    onError: validationErrors
+  })
 }
 </script>
 

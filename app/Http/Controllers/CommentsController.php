@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RecalculateAura;
 use App\Models\Comment;
-use App\Models\Like;
 use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
+use App\Services\ContentDeleter;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\DB;
 
 class CommentsController extends Controller
 {
@@ -24,7 +24,7 @@ class CommentsController extends Controller
     public function index(string $writingId): Paginator
     {
         $comments = Comment::where('writing_id', $writingId)
-            ->whereNotIn('user_id', $this->getBlockedUsers())
+            ->whereNotIn('user_id', $this->blockedAuthorIds())
             ->with([
                 'author' => function ($query): void {
                     $query->forAuthorSummary();
@@ -32,7 +32,7 @@ class CommentsController extends Controller
             ])
             ->withCount(['likes'])
             ->orderBy('created_at', 'desc')
-            ->simplePaginate($this->pagination);
+            ->simplePaginate($this->perPage);
 
         return $comments;
     }
@@ -48,22 +48,14 @@ class CommentsController extends Controller
         ]);
 
         $user = $this->requireAuthUser();
+        $writing = Writing::findOrFail((int) $request->input('writing_id'));
 
-        $comment = Comment::create([
+        $comment = $writing->comments()->create([
             'user_id' => $user->id,
-            'writing_id' => $request->input('writing_id'),
             'message' => $request->input('comment'),
         ]);
 
-        $writing = $comment->writing;
-
-        // Update aura / karma
-        $user->updateAura();
-        $writing?->updateAura();
-
-        if ($writing === null) {
-            return;
-        }
+        RecalculateAura::dispatch($user, $writing);
 
         // Notify author
         if ($writing->author !== null && $writing->author->isNot($user)) {
@@ -78,23 +70,12 @@ class CommentsController extends Controller
      *
      * @return array<int, mixed>
      */
-    public function destroy(Comment $comment): array
+    public function destroy(Comment $comment, ContentDeleter $deleter): array
     {
         $this->authorize('delete', $comment);
-        $comment->deleteOrFail();
+        $deleter->deleteComment($comment);
 
-        // Delete related notifications
-        DB::table('notifications')->where('data->comment_id', $comment->id)->delete();
-
-        // Delete related likes
-        Like::where([
-            ['likeable_type', Comment::class],
-            ['likeable_id', $comment->id],
-        ])->delete();
-
-        // Update aura / karma
-        $comment->author?->updateAura();
-        $comment->writing?->updateAura();
+        RecalculateAura::dispatch($comment->author, $comment->writing);
 
         return [];
     }

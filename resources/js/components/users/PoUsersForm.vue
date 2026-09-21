@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { provide, reactive, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import axios from 'axios'
 import { formDataKey } from '@/composables/keys'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useFormValidation } from '@/composables/useFormValidation'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { LaravelValidationErrors, ValidationError } from '@/types/http'
+import type { LaravelValidationErrors } from '@/types/http'
 
 // $user (the raw Eloquent model, not a select()) — a different shape from
 // types/models.ts's `User` (which reflects UsersController::show()'s
@@ -57,9 +57,10 @@ const socialLinkFields: SocialLinkField[] = [
 ]
 
 const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
-const { authUser, admin } = useAuth()
+const { authUser, isAdmin } = useAuth()
 const { isEmpty } = useTypeGuards()
-const { checkFormValidity } = useFormValidation()
+const { validationErrors } = useFormErrors()
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 
 const user = page.props.user
 const formData = reactive({
@@ -83,8 +84,6 @@ const formData = reactive({
   serviceAgreement: false,
   privacyAgreement: false
 })
-const errors = ref<LaravelValidationErrors>({})
-const isPosting = ref(false)
 const isPosted = ref<Partial<PostedResult>>({})
 
 provide(formDataKey, formData)
@@ -95,14 +94,14 @@ formData.name = user.name ?? ''
 formData.username = user.username ?? ''
 formData.email = user.email ?? ''
 
-if (user.extra_info) {
+if (user.extra_info !== null && user.extra_info !== undefined) {
   formData.bio = user.extra_info.bio ?? ''
   formData.location = user.extra_info.location ?? ''
   formData.occupation = user.extra_info.occupation ?? ''
   formData.interests = user.extra_info.interests ?? ''
   formData.website = user.extra_info.website ?? ''
 
-  if (user.extra_info.social) {
+  if (user.extra_info.social !== undefined) {
     formData.twitter = user.extra_info.social.twitter ?? ''
     formData.threads = user.extra_info.social.threads ?? ''
     formData.instagram = user.extra_info.social.instagram ?? ''
@@ -112,24 +111,14 @@ if (user.extra_info) {
   }
 }
 
-function clearErrors() {
-  errors.value = {}
-}
-
 async function submitForm() {
-  const form = document.querySelector<HTMLFormElement>('#profile-form')
-
-  clearErrors()
-
-  if (!form || !checkFormValidity(form)) {
-    return
-  }
-
   isPosted.value = {}
-  isPosting.value = true
 
-  await axios
-    .postForm<PostedResult>(form.action, {
+  await postForm<PostedResult>({
+    formSelector: '#profile-form',
+    multipart: true,
+    cooldown: true,
+    payload: {
       _method: 'PUT',
       avatar: formData.avatar,
       'avatar-remove': formData.avatarRemove ? 1 : 0,
@@ -149,19 +138,12 @@ async function submitForm() {
       goodreads: formData.goodreads,
       service_agreement: formData.serviceAgreement,
       privacy_agreement: formData.privacyAgreement
-    })
-    .then((response) => {
-      clearErrors()
-      isPosted.value = response.data
-    })
-    .catch((error: ValidationError) => {
-      errors.value = error.response?.data.errors ?? {}
-    })
-    .finally(() => {
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    })
+    },
+    onSuccess: (data) => {
+      isPosted.value = data
+    },
+    onError: validationErrors
+  })
 }
 
 function openAvatarPicker(): void {
@@ -201,7 +183,7 @@ function openAvatarPicker(): void {
           hide-details
         />
 
-        <template v-if="admin()">
+        <template v-if="isAdmin()">
           <v-select
             v-model="formData.role"
             :label="$t('main.role')"

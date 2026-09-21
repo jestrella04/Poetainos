@@ -51,7 +51,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
           // guarantees Response | undefined.
           const preloadResp = (await event.preloadResponse) as Response | undefined
 
-          if (preloadResp) {
+          if (preloadResp !== undefined) {
             return preloadResp
           }
 

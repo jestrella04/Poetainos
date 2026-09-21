@@ -78,6 +78,27 @@ describe('the notifications index', function (): void {
     });
 });
 
+describe('the first load of the notifications page', function (): void {
+    it('does not query the notifications, only when the page asks for them', function (): void {
+        // Given
+        $recipient = createUser();
+        createDatabaseNotification($recipient, ['writing_id' => Writing::factory()->create()->id]);
+        $queries = [];
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        // When
+        $response = actingAs($recipient)->get(route('notifications.index'));
+
+        // Then
+        $response->assertOk()->assertInertia(fn ($page) => $page->missing('notifications'));
+        expect(collect($queries)->filter(
+            fn (string $sql): bool => str_contains($sql, 'notifications') && str_contains($sql, 'limit'),
+        ))->toBeEmpty();
+    });
+});
+
 describe('the notification tabs', function (): void {
     it('shows only unread notifications unless asked for all', function (string $query, int $expected): void {
         // Given

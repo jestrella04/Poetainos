@@ -30,13 +30,15 @@ const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { storage, toLocaleDate, userDisplayName, excerpt, readable } = useFormatting()
 const loadingComments = ref(true)
 const page = usePage()
-const hasCover = !isEmpty(props.data.extra_info) && !strNullOrEmpty(props.data.extra_info?.cover)
+const hasCover = computed(
+  () => !isEmpty(props.data.extra_info) && !strNullOrEmpty(props.data.extra_info?.cover)
+)
 const isLiked = computed(() => page.props.auth.liked.writings.includes(props.data.id))
 const isShelved = computed(() => page.props.auth.shelved.includes(props.data.id))
 const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
-const hasSideCover = hasCover && !props.alone
-const isProminent = props.alone || props.hero
-const listSpacingClass = props.hero ? 'pb-16' : 'py-12 border-b'
+const hasSideCover = computed(() => hasCover.value && !props.alone)
+const isProminent = computed(() => props.alone || props.hero)
+const listSpacingClass = computed(() => (props.hero ? 'pb-16' : 'py-12 border-b'))
 
 provide(loadingCommentsKey, loadingComments)
 provide(writingKey, props.data)

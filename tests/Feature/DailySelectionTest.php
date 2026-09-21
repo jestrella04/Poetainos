@@ -3,7 +3,7 @@
 use App\Models\BlockedUser;
 use App\Models\DailySelection;
 use App\Models\Writing;
-use App\Notifications\WritingRandom;
+use App\Notifications\WritingOfTheDayPosted;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Notification;
@@ -130,12 +130,12 @@ describe('the notification command', function (): void {
         $selection = DailySelection::pickForToday();
 
         // When
-        $this->artisan('writing:random')->assertSuccessful();
+        $this->artisan('writing:post-of-the-day')->assertSuccessful();
 
         // Then
         expect(DailySelection::count())->toBe(1);
-        Notification::assertSentTo($selection->writing->author, WritingRandom::class);
-        Notification::assertSentTimes(WritingRandom::class, 1);
+        Notification::assertSentTo($selection->writing->author, WritingOfTheDayPosted::class);
+        Notification::assertSentTimes(WritingOfTheDayPosted::class, 1);
     });
 
     it('creates today\'s pick when the midnight command has not run yet', function (): void {
@@ -144,11 +144,11 @@ describe('the notification command', function (): void {
         $writing = Writing::factory()->create();
 
         // When
-        $this->artisan('writing:random')->assertSuccessful();
+        $this->artisan('writing:post-of-the-day')->assertSuccessful();
 
         // Then
         expect(DailySelection::current()?->writing_id)->toBe($writing->id);
-        Notification::assertSentTo($writing->author, WritingRandom::class);
+        Notification::assertSentTo($writing->author, WritingOfTheDayPosted::class);
     });
 });
 
@@ -190,7 +190,7 @@ describe('the homepage hero', function (): void {
         $response = get(route('writings.awards'));
 
         // Then
-        $response->assertInertia(fn ($page) => $page->where('pickOfTheDay', null));
+        $response->assertInertia(fn ($page) => $page->missing('pickOfTheDay'));
     });
 });
 
@@ -203,6 +203,6 @@ describe('the schedule', function (): void {
 
         // Then
         expect($cronFor('writing:pick-of-the-day'))->toBe('0 0 * * *');
-        expect($cronFor('writing:random'))->toBe('0 13 * * *');
+        expect($cronFor('writing:post-of-the-day'))->toBe('0 13 * * *');
     });
 });

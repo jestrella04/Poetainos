@@ -1,17 +1,23 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
-import axios from 'axios'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { ValidationError } from '@/types/http'
+import type { LaravelValidationErrors } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutLogin
 })
 
 const page = usePage<InertiaPageProps<{ token: string; email: string }>>()
-const isLoading = ref(false)
+const { validationErrors } = useFormErrors()
+const {
+  isPosting: isLoading,
+  errors,
+  submitForm: postForm
+} = useFormSubmit<LaravelValidationErrors>({})
 const token = page.props.token
 const email = page.props.email
 
@@ -20,60 +26,33 @@ const formData = reactive({
   confirmPassword: ''
 })
 
-const errors = reactive<{ password: string[] }>({
-  password: []
-})
-
 function clearInputs() {
   formData.password = ''
   formData.confirmPassword = ''
 }
 
-function clearErrors() {
-  errors.password = []
-}
-
 function resetForm() {
   setTimeout(() => {
-    // Clear inputs
     clearInputs()
-
-    // Clear errors
-    clearErrors()
+    errors.value = {}
   }, 500)
 }
 
 async function submitForm() {
-  const form = document.querySelector<HTMLFormElement>('#reset-form')
-
-  if (!form) {
-    return
-  }
-
-  if (!form.checkValidity()) {
-    form.reportValidity()
-    return
-  }
-
-  isLoading.value = true
-  clearErrors()
-
-  await axios
-    .post(route('password.store'), {
+  await postForm({
+    formSelector: '#reset-form',
+    url: route('password.store'),
+    payload: {
       token: token,
       email: email,
       password: formData.password,
       password_confirmation: formData.confirmPassword
-    })
-    .then(() => {
+    },
+    onSuccess: () => {
       router.get(route('login', { isReset: 1, isEmail: 1, email: email }))
-    })
-    .catch((error: ValidationError) => {
-      errors.password = error.response?.data.errors.password ?? []
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+    },
+    onError: validationErrors
+  })
 }
 </script>
 

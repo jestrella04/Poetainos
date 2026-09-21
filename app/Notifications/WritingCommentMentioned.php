@@ -6,7 +6,6 @@ use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use NotificationChannels\WebPush\WebPushChannel;
 
 class WritingCommentMentioned extends PoetainosNotification implements ShouldQueue
 {
@@ -14,7 +13,7 @@ class WritingCommentMentioned extends PoetainosNotification implements ShouldQue
 
     public function __construct(protected Comment $comment, protected User $user)
     {
-        $this->notification = $this->actorContent(
+        $this->content = $this->actorContent(
             $this->user,
             __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', $this->actorPlaceholders($this->user)),
             route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id,
@@ -30,7 +29,7 @@ class WritingCommentMentioned extends PoetainosNotification implements ShouldQue
      */
     public function via($notifiable): array
     {
-        return [...$this->mailChannelIfWanted($notifiable), 'database', 'broadcast', WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), ...parent::via($notifiable)];
     }
 
     /**
@@ -44,7 +43,7 @@ class WritingCommentMentioned extends PoetainosNotification implements ShouldQue
         return [
             'writing_id' => $this->comment->writing?->id,
             'user_id' => $this->user->id,
-            'url' => $this->notification['url'],
+            'url' => $this->content['url'],
         ];
     }
 }

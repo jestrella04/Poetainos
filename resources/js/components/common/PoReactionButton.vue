@@ -14,10 +14,10 @@ const props = defineProps<{
   deactivateTitle: string
 }>()
 
-const { auth } = useAuth()
+const { isAuthenticated } = useAuth()
 const loginModal = injectStrict(loginModalKey)
 const { count, isActive, isSubmitting, toggle } = useReactionToggle(props, {
-  isAuthenticated: auth,
+  isAuthenticated,
   onUnauthenticated: () => {
     loginModal.value = true
   }

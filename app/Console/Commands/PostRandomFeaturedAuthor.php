@@ -20,7 +20,7 @@ class PostRandomFeaturedAuthor extends Command
      *
      * @var string
      */
-    protected $description = 'Post a random featured author to Twitter';
+    protected $description = 'Post a random featured author on social media';
 
     /**
      * Execute the console command.

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
@@ -65,44 +66,18 @@ class SocialAuthController extends Controller
         }
 
         $exists = User::where('email', $email)->exists();
-        $nick = $social->getNickname() ?? explode('@', $email)[0];
-
-        // Check if user already exists
-        // If not, one will be created
-        $user = User::unguarded(fn (): User => User::firstOrCreate([
-            'email' => $email,
-        ], [
-            'name' => $social->getName(),
-            'username' => slugify('users', $nick, 'username', '_'),
-            'password' => Hash::make(bin2hex(random_bytes(10))),
-            'role_id' => Role::where('name', 'user')->firstOrFail()->id,
-        ]));
-
-        $linkedProviders = $user->extra_info['linked_providers'] ?? [];
+        $user = $this->findOrCreateUser($social, $email);
 
         // An existing account meeting this provider for the first time must
         // confirm ownership by email before we trust the provider's claim
         // and log in — otherwise anyone who can get a provider to report a
         // victim's email address could sign straight into their account.
-        if ($exists && ! in_array($service, $linkedProviders, true)) {
-            $confirmUrl = URL::temporarySignedRoute(
-                'social.confirm',
-                Carbon::now()->addMinutes(30),
-                ['user' => $user->id, 'service' => $service]
-            );
-
-            $user->notify(new ConfirmSocialLogin($service, $confirmUrl));
-
-            request()->session()->flash('message', 'accounts.confirm-social-link-sent');
-
-            return redirect(route('login'));
+        if ($exists && ! $this->isLinked($user, $service)) {
+            return $this->askToConfirmLink($user, $service);
         }
 
-        $updated = false;
-
-        // Grab avatar
         if (($user->extra_info['avatar'] ?? '') === '' && $social->getAvatar() !== null) {
-            $updated = $this->importAvatar($user, $social->getAvatar(), $images);
+            $this->importAvatar($user, $social->getAvatar(), $images);
         }
 
         // Social login implies a trusted email address (the provider already
@@ -110,29 +85,15 @@ class SocialAuthController extends Controller
         // object has no portable "email verified" flag across our providers
         // (Google/Facebook/Twitter), so check our own record instead.
         if ($user->email_verified_at === null) {
-            $updated = true;
             $user->email_verified_at = Carbon::now();
         }
 
-        $updated = $this->linkProvider($user, $service, $linkedProviders) || $updated;
+        $this->linkProvider($user, $service);
+        $user->save();
 
-        // Save changes, if any
-        if ($updated === true) {
-            $user->save();
-        }
-
-        // Authenticate user
         Auth::login($user);
 
-        // Set flash message content
-        if ($exists === true) {
-            $message = 'accounts.welcome-back';
-        } else {
-            $message = 'accounts.welcome-aboard';
-        }
-
-        // Set flash message
-        request()->session()->flash('message', $message);
+        request()->session()->flash('message', $exists === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
 
         return redirect(Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl());
     }
@@ -143,11 +104,8 @@ class SocialAuthController extends Controller
      */
     public function confirmProviderLink(string $service, User $user): RedirectResponse
     {
-        $linkedProviders = $user->extra_info['linked_providers'] ?? [];
-
-        if ($this->linkProvider($user, $service, $linkedProviders)) {
-            $user->save();
-        }
+        $this->linkProvider($user, $service);
+        $user->save();
 
         Auth::login($user);
 
@@ -157,16 +115,51 @@ class SocialAuthController extends Controller
     }
 
     /**
+     * The account registered with this email, created from the provider's profile on first login.
+     */
+    private function findOrCreateUser(SocialiteUser $social, string $email): User
+    {
+        $nick = $social->getNickname() ?? explode('@', $email)[0];
+
+        return User::unguarded(fn (): User => User::firstOrCreate([
+            'email' => $email,
+        ], [
+            'name' => $social->getName(),
+            'username' => slugify('users', $nick, 'username', '_'),
+            'password' => Hash::make(bin2hex(random_bytes(10))),
+            'role_id' => Role::where('name', 'user')->firstOrFail()->id,
+        ]));
+    }
+
+    /**
+     * Email the account's owner a link to confirm that this provider may sign in to it.
+     */
+    private function askToConfirmLink(User $user, string $service): RedirectResponse
+    {
+        $confirmUrl = URL::temporarySignedRoute(
+            'social.confirm',
+            Carbon::now()->addMinutes(30),
+            ['user' => $user->id, 'service' => $service]
+        );
+
+        $user->notify(new ConfirmSocialLogin($service, $confirmUrl));
+
+        request()->session()->flash('message', 'accounts.confirm-social-link-sent');
+
+        return redirect(route('login'));
+    }
+
+    /**
      * Download the provider's avatar and add it to the user's profile, keeping
      * the rest of the profile intact. Anything that isn't a small jpg, png or
      * webp image is ignored, as is a provider that can't be reached.
      */
-    private function importAvatar(User $user, string $avatarUrl, ImageStorage $images): bool
+    private function importAvatar(User $user, string $avatarUrl, ImageStorage $images): void
     {
         try {
             $response = Http::timeout(self::AVATAR_TIMEOUT_SECONDS)->get($avatarUrl);
         } catch (ConnectionException) {
-            return false;
+            return;
         }
 
         $contents = $response->body();
@@ -175,7 +168,7 @@ class SocialAuthController extends Controller
             : false;
 
         if ($imageInfo === false || isset(self::AVATAR_EXTENSIONS[$imageInfo[2]]) === false) {
-            return false;
+            return;
         }
 
         $path = $images->storeContents(
@@ -187,27 +180,28 @@ class SocialAuthController extends Controller
         );
 
         $user->extra_info = [...($user->extra_info ?? []), 'avatar' => $path];
+    }
 
-        return true;
+    /**
+     * Whether the account already trusts this provider, so its logins skip the email confirmation step.
+     */
+    private function isLinked(User $user, string $service): bool
+    {
+        return in_array($service, $user->extra_info['linked_providers'] ?? [], true);
     }
 
     /**
      * Record that a provider is now trusted for this account, so future
      * logins through it skip the email confirmation step.
-     *
-     * @param  array<int, string>  $linkedProviders
      */
-    private function linkProvider(User $user, string $service, array $linkedProviders): bool
+    private function linkProvider(User $user, string $service): void
     {
-        if (in_array($service, $linkedProviders, true)) {
-            return false;
+        if ($this->isLinked($user, $service)) {
+            return;
         }
 
-        $linkedProviders[] = $service;
         $extraInfo = $user->extra_info ?? [];
-        $extraInfo['linked_providers'] = $linkedProviders;
+        $extraInfo['linked_providers'] = [...($extraInfo['linked_providers'] ?? []), $service];
         $user->extra_info = $extraInfo;
-
-        return true;
     }
 }

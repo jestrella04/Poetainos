@@ -5,7 +5,7 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useNativeShare } from '@/composables/useNativeShare'
 
-const { auth, authUser, canEdit } = useAuth()
+const { isAuthenticated, authUser, canEdit } = useAuth()
 const { share: nativeShare } = useNativeShare()
 const writing = injectStrict(writingKey)
 const sharer = ref(false)
@@ -66,7 +66,7 @@ function share(): void {
         <span>{{ $t('complaints.report-writing') }}</span>
       </po-list-item>
 
-      <template v-if="auth() && authUser()!.username !== writing.author.username">
+      <template v-if="isAuthenticated() && authUser()!.username !== writing.author.username">
         <v-divider class="my-0" />
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>

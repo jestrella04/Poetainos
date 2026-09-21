@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
 import { replyBoxKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
-import { useFormValidation } from '@/composables/useFormValidation'
-import type { ValidationError } from '@/types/http'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { LaravelValidationErrors } from '@/types/http'
 
 const props = defineProps<{
   formId: string
@@ -14,31 +14,23 @@ const props = defineProps<{
 const emit = defineEmits<{
   commentPosted: []
 }>()
-const { checkFormValidity } = useFormValidation()
+const { validationErrors } = useFormErrors()
+const { errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 const writing = injectStrict(writingKey)
 const message = ref(props.replyTo)
-const errorMessages = ref<string[]>([])
 const replyBox = injectStrict(replyBoxKey)
 
 async function submitForm() {
-  const form = document.querySelector<HTMLFormElement>(`#${props.formId}`)
-
-  if (!form || !checkFormValidity(form)) {
-    return
-  }
-
-  errorMessages.value = []
-
-  await axios
-    .post(form.action, { writing_id: writing.id, comment: message.value })
-    .then(() => {
+  await postForm({
+    formSelector: `#${props.formId}`,
+    payload: { writing_id: writing.id, comment: message.value },
+    onSuccess: () => {
       message.value = ''
       emit('commentPosted')
       replyBox.value = 0
-    })
-    .catch((error: ValidationError) => {
-      errorMessages.value = error.response?.data.errors.comment ?? []
-    })
+    },
+    onError: validationErrors
+  })
 }
 </script>
 
@@ -56,7 +48,7 @@ async function submitForm() {
       rows="3"
       max-length="300"
       hide-details="auto"
-      :error-messages="errorMessages"
+      :error-messages="errors.comment"
       auto-grow
       clearable
       persistent-placeholder

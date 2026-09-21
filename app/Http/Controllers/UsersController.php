@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Writing;
+use App\Services\ContentDeleter;
 use App\Services\ImageStorage;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -47,36 +47,35 @@ class UsersController extends Controller
             'popular' => $users->orderByDesc('profile_views'),
             default => $users->ranked(),
         };
-        $users = $users->simplePaginate($this->pagination)->withQueryString();
 
-        if (request()->expectsJson()) {
-            return $users;
-        }
-
-        return Inertia::render('users/PoUsersIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Writers')]),
-                'canonical' => route('users.index'),
+        return $this->paginatedPage(
+            fn (): Paginator => $users->simplePaginate($this->perPage)->withQueryString(),
+            'users/PoUsersIndex',
+            [
+                'meta' => [
+                    'title' => getPageTitle([__('Writers')]),
+                    'canonical' => route('users.index'),
+                ],
+                'sort' => $sort,
+                'totalAuthors' => fn (): int => User::has('writings')->count(),
             ],
-            'sort' => $sort,
-            'totalAuthors' => User::has('writings')->count(),
-            'users' => Inertia::optional(fn () => $users),
-        ]);
+            'users',
+        );
     }
 
     /**
-     * Query list of matching resources.
+     * Writers whose name or username matches the query.
      *
      * @return Collection<int, User>
      */
-    public function query(): Collection
+    public function suggest(): Collection
     {
         $wildcard = '%'.escapeLike((string) request('query')).'%';
 
         return User::where('name', 'like', $wildcard)
             ->orWhere('username', 'like', $wildcard)
             ->select('name', 'username')
-            ->take($this->pagination)
+            ->take($this->perPage)
             ->get();
     }
 
@@ -116,18 +115,15 @@ class UsersController extends Controller
                 ->firstOrFail()
                 ->setAttribute('social', json_encode($user->extra_info['social'] ?? [])),
             'authorWritings' => Inertia::optional(fn () => $user->writings()
-                ->visibleTo($this->getBlockedUsers())
+                ->visibleTo($this->blockedAuthorIds())
                 ->withListingRelations()
                 ->latest()
-                ->simplePaginate($this->pagination)
+                ->simplePaginate($this->perPage)
                 ->withPath(route('users.writings.index', $user))),
             'writings' => [
-                'from_shelf' => randomWritingsWithAuthor($user->shelf()->visibleTo($this->getBlockedUsers())),
+                'from_shelf' => randomWritingsWithAuthor($user->shelf()->visibleTo($this->blockedAuthorIds())),
                 'from_liked' => randomWritingsWithAuthor(
-                    Writing::visibleTo($this->getBlockedUsers())->whereIn(
-                        'id',
-                        $user->likes()->where('likeable_type', Writing::class)->select('likeable_id'),
-                    )
+                    Writing::visibleTo($this->blockedAuthorIds())->whereIn('id', $user->likedWritingIds())
                 ),
             ],
             'isAuthorBlocked' => $authUser !== null ? $authUser->isAuthorBlocked($user) : false,
@@ -185,20 +181,20 @@ class UsersController extends Controller
         // Keep whatever else is stored on the profile (notification settings, linked providers…)
         $user->extra_info = [
             ...($user->extra_info ?? []),
-            ...$this->profileInfo($this->resolveAvatar($request, $user, $images)),
+            ...$this->profileInfo($request, $this->resolveAvatar($request, $user, $images)),
         ];
 
         // Only an admin may change a user's role
-        if (request('role') !== null && $request->user()?->isAllowed('admin') === true) {
-            $user->role_id = request('role');
+        if ($request->input('role') !== null && $request->user()?->isAllowed('admin') === true) {
+            $user->role_id = $request->input('role');
         }
 
         // A changed email is unverified until the user proves they own it again
-        $emailChanged = $user->email !== request('email');
+        $emailChanged = $user->email !== $request->input('email');
 
         // Persist to database
-        $user->name = request('name');
-        $user->email = request('email');
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
 
         if ($emailChanged === true) {
             $user->email_verified_at = null;
@@ -211,7 +207,7 @@ class UsersController extends Controller
         }
 
         // Persist user agreements to avoid asking again
-        if (isTruthy(request('service_agreement')) && isTruthy(request('privacy_agreement'))) {
+        if (isTruthy($request->input('service_agreement')) && isTruthy($request->input('privacy_agreement'))) {
             $user->acceptAgreements();
         }
 
@@ -226,22 +222,13 @@ class UsersController extends Controller
      *
      * @return array<int, mixed>|RedirectResponse
      */
-    public function destroy(Request $request, User $user, ImageStorage $images): array|RedirectResponse
+    public function destroy(Request $request, User $user, ContentDeleter $deleter, ImageStorage $images): array|RedirectResponse
     {
         $this->authorize('delete', $user);
 
         $avatar = $user->extra_info['avatar'] ?? null;
 
-        DB::transaction(function () use ($user): void {
-            $user->deleteOrFail();
-
-            // Delete related notifications
-            $user->notifications()->delete();
-            DB::table('notifications')->where('data->user_id', $user->id)->delete();
-
-            // Delete related likes
-            $user->likes()->delete();
-        });
+        $deleter->deleteUser($user);
 
         $images->delete($avatar);
 
@@ -268,7 +255,7 @@ class UsersController extends Controller
     /**
      * Recalculate the given user's karma.
      */
-    public function karma(User $user): \Illuminate\Http\Response
+    public function recalculateKarma(User $user): \Illuminate\Http\Response
     {
         $this->authorize('update', $user);
 
@@ -339,7 +326,7 @@ class UsersController extends Controller
     {
         $currentAvatar = $user->extra_info['avatar'] ?? '';
 
-        if (isTruthy(request('avatar-remove'))) {
+        if (isTruthy($request->input('avatar-remove'))) {
             $images->delete($currentAvatar);
 
             return '';
@@ -360,23 +347,23 @@ class UsersController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function profileInfo(string $avatar): array
+    private function profileInfo(Request $request, string $avatar): array
     {
         return [
-            'bio' => request('bio') ?? '',
+            'bio' => $request->input('bio') ?? '',
             'social' => [
-                'twitter' => request('twitter') ?? '',
-                'threads' => request('threads') ?? '',
-                'instagram' => request('instagram') ?? '',
-                'facebook' => request('facebook') ?? '',
-                'youtube' => request('youtube') ?? '',
-                'goodreads' => request('goodreads') ?? '',
+                'twitter' => $request->input('twitter') ?? '',
+                'threads' => $request->input('threads') ?? '',
+                'instagram' => $request->input('instagram') ?? '',
+                'facebook' => $request->input('facebook') ?? '',
+                'youtube' => $request->input('youtube') ?? '',
+                'goodreads' => $request->input('goodreads') ?? '',
             ],
             'avatar' => $avatar,
-            'website' => request('website') ?? '',
-            'location' => request('location') ?? '',
-            'interests' => request('interests') ?? '',
-            'occupation' => request('occupation') ?? '',
+            'website' => $request->input('website') ?? '',
+            'location' => $request->input('location') ?? '',
+            'interests' => $request->input('interests') ?? '',
+            'occupation' => $request->input('occupation') ?? '',
         ];
     }
 }

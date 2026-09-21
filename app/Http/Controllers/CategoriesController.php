@@ -22,7 +22,7 @@ class CategoriesController extends Controller
 
         return $this->writingsIndex(
             $category->writingsRecursive()
-                ->visibleTo($this->getBlockedUsers())
+                ->visibleTo($this->blockedAuthorIds())
                 ->withListingRelations()
                 ->sorted($sort),
             $sort,

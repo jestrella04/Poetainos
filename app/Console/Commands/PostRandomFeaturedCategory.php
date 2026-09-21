@@ -21,7 +21,7 @@ class PostRandomFeaturedCategory extends Command
      *
      * @var string
      */
-    protected $description = 'Post a random featured category to Twitter';
+    protected $description = 'Post a random featured category on social media';
 
     /**
      * Execute the console command.

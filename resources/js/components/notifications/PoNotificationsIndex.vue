@@ -5,7 +5,8 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
 import { useNotificationMessage } from '@/composables/useNotificationMessage'
-import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
+import { useInfiniteList } from '@/composables/useInfiniteList'
+import { useSwipeTabs } from '@/composables/useSwipeTabs'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { AppNotification } from '@/types/models'
 
@@ -19,11 +20,8 @@ const {
   items: notifications,
   fetched,
   loadMore
-} = usePaginatedTabList<AppNotification>({
-  tabOrder: ['unread', 'all'],
-  currentTab: () => page.props.tab,
-  reloadPropKey: 'notifications'
-})
+} = useInfiniteList<AppNotification>('notifications')
+useSwipeTabs({ tabOrder: ['unread', 'all'], currentTab: () => page.props.tab })
 </script>
 
 <style scoped>

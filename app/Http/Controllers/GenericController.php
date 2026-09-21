@@ -20,7 +20,7 @@ class GenericController extends Controller
         $sort = resolveSort(['latest', 'popular', 'likes']);
 
         return $this->writingsIndex(
-            $user->writings()->visibleTo($this->getBlockedUsers())->withListingRelations()->sorted($sort),
+            $user->writings()->visibleTo($this->blockedAuthorIds())->withListingRelations()->sorted($sort),
             $sort,
             ['title' => getPageTitle([__('Writings'), $user->getName()]), 'canonical' => $user->writingsPath()],
         );
@@ -35,7 +35,7 @@ class GenericController extends Controller
 
         return $this->writingsIndex(
             Writing::whereIn('id', $user->shelf()->select('writings.id'))
-                ->visibleTo($this->getBlockedUsers())
+                ->visibleTo($this->blockedAuthorIds())
                 ->withListingRelations()
                 ->sorted($sort),
             $sort,
@@ -51,8 +51,8 @@ class GenericController extends Controller
         $sort = resolveSort(['latest', 'popular', 'likes']);
 
         return $this->writingsIndex(
-            Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->select('likeable_id'))
-                ->visibleTo($this->getBlockedUsers())
+            Writing::whereIn('id', $user->likedWritingIds())
+                ->visibleTo($this->blockedAuthorIds())
                 ->whereNot('user_id', $user->id)
                 ->withListingRelations()
                 ->sorted($sort),
@@ -88,13 +88,8 @@ class GenericController extends Controller
                 ->has('writings')
                 ->take(20)
                 ->get(),
-            'authors' => User::select(
-                'id',
-                'username',
-                'name',
-                'karma',
-                'extra_info->avatar AS avatar',
-            )->ranked()
+            'authors' => User::forAuthorSummary(withKarma: true)
+                ->ranked()
                 ->take(20)
                 ->get(),
         ]);

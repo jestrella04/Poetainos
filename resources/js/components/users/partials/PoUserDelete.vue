@@ -4,16 +4,16 @@ import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 import { forceSnackBarKey, isDeleteKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
-import { useFormValidation } from '@/composables/useFormValidation'
+import { useFormErrors } from '@/composables/useFormErrors'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { useFormSubmit } from '@/composables/useFormSubmit'
-import type { LaravelValidationErrors, ValidationError } from '@/types/http'
+import type { LaravelValidationErrors } from '@/types/http'
 
 defineProps<{
   username: string
 }>()
 
-const { checkFormValidity } = useFormValidation()
+const { validationErrors } = useFormErrors()
 const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
 const forceSnackBar = injectStrict(forceSnackBarKey)
@@ -23,12 +23,6 @@ const formData = reactive({
 const { isPosting, errors, submitForm } = useFormSubmit<LaravelValidationErrors>({})
 
 async function submit(): Promise<void> {
-  const form = document.querySelector<HTMLFormElement>('#user-delete-form')
-
-  if (form === null || !checkFormValidity(form)) {
-    return
-  }
-
   await submitForm({
     formSelector: '#user-delete-form',
     payload: { _method: 'DELETE' },
@@ -46,7 +40,7 @@ async function submit(): Promise<void> {
       forceSnackBar.value = true
       isDelete.value = false
     },
-    onError: (error) => (error as ValidationError).response?.data.errors ?? {}
+    onError: validationErrors
   })
 }
 </script>

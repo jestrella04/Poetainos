@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es'
+import { escape, head, isNil, last, toUpper, words } from 'lodash-es'
 import { millify } from 'millify'
 import crop from 'crop-url'
 import linkifyHtml from 'linkify-html'
@@ -9,6 +9,14 @@ import type { UserLike } from '@/types/models'
 
 const markdownRenderer = new MarkdownIt()
 
+const EXCERPT_LENGTH = 400
+
+const KARMA_MEDALS = new Map([
+  ['A', 'amber-accent-4'],
+  ['B', 'blue-grey-lighten-3'],
+  ['C', 'deep-orange-accent-1']
+])
+
 /**
  * Display formatting for numbers, dates, text and user names.
  */
@@ -18,7 +26,7 @@ export function useFormatting() {
   }
 
   function userDisplayName(user: UserLike): string {
-    if (!_.isNil(user.name) && '' !== user.name) {
+    if (!isNil(user.name) && '' !== user.name) {
       return user.name
     }
 
@@ -26,15 +34,15 @@ export function useFormatting() {
   }
 
   function userInitials(user: UserLike): string {
-    const nameParts = _.words(user.name ?? '', /\S+/g)
+    const nameParts = words(user.name ?? '', /\S+/g)
 
     if (nameParts.length === 0) {
-      return _.toUpper(user.username.substring(0, 1))
+      return toUpper(user.username.substring(0, 1))
     }
 
-    const lastPart = nameParts.length > 1 ? _.last(nameParts) : ''
+    const lastPart = nameParts.length > 1 ? last(nameParts) : ''
 
-    return _.toUpper(`${_.head(nameParts)?.substring(0, 1)}${lastPart?.substring(0, 1)}`)
+    return toUpper(`${head(nameParts)?.substring(0, 1)}${lastPart?.substring(0, 1)}`)
   }
 
   function readable(value: number): string {
@@ -63,13 +71,11 @@ export function useFormatting() {
   }
 
   function excerpt(text: string): string {
-    const len = text.length
-
-    if (len < 400) {
+    if (text.length < EXCERPT_LENGTH) {
       return text
     }
 
-    return `${text.substring(0, 400)}...`
+    return `${text.substring(0, EXCERPT_LENGTH)}...`
   }
 
   function cropUrl(url: string, max = 40): string {
@@ -86,7 +92,7 @@ export function useFormatting() {
     // linkify-html parses its input as HTML and re-emits any existing tags
     // verbatim, so raw user text must be entity-escaped first or a comment
     // like `<img src=x onerror=...>` renders live through the `v-html` sink.
-    return linkifyHtml(_.escape(text), options)
+    return linkifyHtml(escape(text), options)
   }
 
   function markdown(md: string): string {
@@ -98,17 +104,7 @@ export function useFormatting() {
   }
 
   function karmaMedal(grade: string): string | null {
-    let medal: string | null = null
-
-    if (grade === 'C') {
-      medal = 'deep-orange-accent-1'
-    } else if (grade === 'B') {
-      medal = 'blue-grey-lighten-3'
-    } else if (grade === 'A') {
-      medal = 'amber-accent-4'
-    }
-
-    return medal
+    return KARMA_MEDALS.get(grade) ?? null
   }
 
   return {

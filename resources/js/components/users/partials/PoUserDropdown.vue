@@ -7,7 +7,7 @@ import { useFormatting } from '@/composables/useFormatting'
 import { useNativeShare } from '@/composables/useNativeShare'
 
 const user = injectStrict(userKey)
-const { auth, authUser } = useAuth()
+const { isAuthenticated, authUser } = useAuth()
 const { userDisplayName } = useFormatting()
 const { share: nativeShare } = useNativeShare()
 const sharer = ref(false)
@@ -93,7 +93,7 @@ function share(): void {
       </po-list-item>
       <v-divider class="my-0" />
 
-      <template v-if="auth() && authUser()!.username !== user.username">
+      <template v-if="isAuthenticated() && authUser()!.username !== user.username">
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>
         </po-list-item>

@@ -2,13 +2,13 @@
 import { provide, reactive, computed, ref, watch, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
-import axios from 'axios'
 import PoWritingDelete from './partials/PoWritingDelete.vue'
 import { formDataKey, isDeleteKey } from '@/composables/keys'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useFormValidation } from '@/composables/useFormValidation'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { LaravelValidationErrors, ValidationError } from '@/types/http'
+import type { LaravelValidationErrors } from '@/types/http'
 
 interface CategoryOption {
   id: number
@@ -44,7 +44,8 @@ interface PostedResult {
 const page = usePage<InertiaPageProps<WritingFormProps>>()
 const { t } = useI18n()
 const { isEmpty } = useTypeGuards()
-const { checkFormValidity } = useFormValidation()
+const { validationErrors } = useFormErrors()
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 
 function requiredLabel(key: string): string {
   return `${t(key)} *`
@@ -61,10 +62,8 @@ const formData = reactive({
   serviceAgreement: false,
   privacyAgreement: false
 })
-const errors = ref<LaravelValidationErrors>({})
 const mainCategories = ref(page.props.main_categories)
 const altCategories = ref<CategoryOption[]>([])
-const isPosting = ref(false)
 const isPosted = ref<Partial<PostedResult>>({})
 const isUpdate = ref(page.props.isUpdate)
 const isDelete = ref(false)
@@ -74,7 +73,7 @@ provide(isDeleteKey, isDelete)
 
 onMounted(() => {
   // If updating, trigger category update
-  if (isUpdate.value) {
+  if (isUpdate.value === true) {
     formData.main_category = writing.main_category
     formData.alt_categories = writing.categories
   }
@@ -94,7 +93,7 @@ watch(
 
     // Set new options
     const selected = mainCategories.value.find((category) => category.id === formData.main_category)
-    altCategories.value = selected ? selected.descendants : []
+    altCategories.value = selected !== undefined ? selected.descendants : []
   }
 )
 
@@ -110,24 +109,14 @@ function clearInputs() {
   formData.cover = []
 }
 
-function clearErrors() {
-  errors.value = {}
-}
-
 async function submitForm() {
-  const form = document.querySelector<HTMLFormElement>('#writing-form')
-
-  clearErrors()
-
-  if (!form || !checkFormValidity(form)) {
-    return
-  }
-
   isPosted.value = {}
-  isPosting.value = true
 
-  await axios
-    .postForm<PostedResult>(form.action, {
+  await postForm<PostedResult>({
+    formSelector: '#writing-form',
+    multipart: true,
+    cooldown: true,
+    payload: {
       _method: isUpdate.value ? 'PUT' : 'POST',
       title: formData.title,
       main_category: formData.main_category,
@@ -138,25 +127,19 @@ async function submitForm() {
       cover: formData.cover,
       service_agreement: formData.serviceAgreement,
       privacy_agreement: formData.privacyAgreement
-    })
-    .then((response) => {
+    },
+    onSuccess: (data) => {
       resetForm()
-      isPosted.value = response.data
-    })
-    .catch((error: ValidationError) => {
-      errors.value = error.response?.data.errors ?? {}
-    })
-    .finally(() => {
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    })
+      isPosted.value = data
+    },
+    onError: validationErrors
+  })
 }
 
 function resetForm() {
-  clearErrors()
+  errors.value = {}
 
-  if (!isUpdate.value) {
+  if (isUpdate.value === false) {
     clearInputs()
   }
 }

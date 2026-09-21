@@ -5,6 +5,11 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
+/**
+ * Lists no listeners of its own, but must stay: the framework's base provider
+ * registers the email-verification listener for `Registered` on behalf of the
+ * application's provider, so removing this class drops it.
+ */
 class EventServiceProvider extends ServiceProvider
 {
     /**

@@ -12,7 +12,7 @@ import { useFormatting } from '@/composables/useFormatting'
 import type { Comment, Paginated } from '@/types/models'
 
 const page = usePage()
-const { auth } = useAuth()
+const { isAuthenticated } = useAuth()
 const { isEmpty } = useTypeGuards()
 const { userDisplayName, toLocaleDate, linkify } = useFormatting()
 const comments = ref<Partial<Paginated<Comment>>>({})
@@ -39,7 +39,7 @@ function isLiked(commentId: number): boolean {
 }
 
 function toggleReply(commentId: number) {
-  if (auth()) {
+  if (isAuthenticated()) {
     if (replyBox.value === commentId) {
       replyBox.value = 0
     } else {
@@ -65,7 +65,7 @@ function reply(comment: Comment) {
 <template>
   <po-wrapper class="my-5">
     <div class="mb-5">
-      <po-inline-login v-if="!auth()" :message="$t('accounts.login-before-comment')" />
+      <po-inline-login v-if="!isAuthenticated()" :message="$t('accounts.login-before-comment')" />
       <po-comments-form v-else form-id="comment-form" @comment-posted="loadComments" />
     </div>
 
@@ -117,7 +117,7 @@ function reply(comment: Comment) {
             <po-comments-dropdown :comment="comment" />
           </div>
 
-          <template v-if="auth() && replyBox === comment.id">
+          <template v-if="isAuthenticated() && replyBox === comment.id">
             <div class="reply-box pa-3">
               <po-comments-form
                 :form-id="`reply-${comment.id}-form`"

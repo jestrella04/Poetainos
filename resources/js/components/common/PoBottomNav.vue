@@ -4,7 +4,7 @@ import { mobileSiteMenuKey, mobileUserMenuKey, unreadCountKey } from '@/composab
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 
-const { auth, authUser } = useAuth()
+const { isAuthenticated, authUser } = useAuth()
 const page = usePage()
 const mobileSiteMenu = injectStrict(mobileSiteMenuKey)
 const mobileUserMenu = injectStrict(mobileUserMenuKey)
@@ -31,7 +31,7 @@ const unreadCount = injectStrict(unreadCountKey)
       <v-icon icon="fas fa-circle-plus" />
     </po-button>
 
-    <template v-if="!auth()">
+    <template v-if="!isAuthenticated()">
       <po-button value="login" :href="route('login')" :title="$t('accounts.login-alt')" inertia>
         <v-icon icon="fas fa-arrow-right-to-bracket" />
       </po-button>

@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use NotificationChannels\WebPush\WebPushChannel;
 
 class WritingCommented extends PoetainosNotification implements ShouldQueue
 {
@@ -14,7 +13,7 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
 
     public function __construct(protected Writing $writing, protected User $user)
     {
-        $this->notification = $this->actorContent(
+        $this->content = $this->actorContent(
             $this->user,
             __('We love sharing the good news with you, :name just commented on your writing at :site.', $this->actorPlaceholders($this->user)),
             route('writings.show', $this->writing),
@@ -30,7 +29,7 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        return [...$this->mailChannelIfWanted($notifiable), 'database', 'broadcast', WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), ...parent::via($notifiable)];
     }
 
     /**

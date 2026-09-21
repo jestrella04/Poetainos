@@ -3,18 +3,21 @@ import { ref, reactive, provide, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
-import axios from 'axios'
 import { formDataKey } from '@/composables/keys'
 import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { PASSWORD_PATTERN, USERNAME_PATTERN } from '@/composables/validationRules'
+import type { LaravelValidationErrors } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutLogin
 })
 
 type LoginStep = 'guest' | 'checking' | 'login' | 'register'
+
+const LOGIN_FORM = '#login-form'
 
 const socialProviders = [
   { name: 'facebook', icon: 'fab fa-facebook-f', label: 'accounts.continue-with-facebook' },
@@ -26,7 +29,11 @@ const { t } = useI18n()
 const { validationErrors } = useFormErrors()
 const { strNullOrEmpty } = useTypeGuards()
 const { setSnackBar } = useSnackbar()
-const isLoading = ref(false)
+const {
+  isPosting: isLoading,
+  errors,
+  submitForm: postForm
+} = useFormSubmit<LaravelValidationErrors>({})
 const step = ref<LoginStep>('guest')
 const arrivedFromPasswordReset = ref(false)
 const resetEmailSent = ref(false)
@@ -38,12 +45,6 @@ const formData = reactive({
   confirmPassword: '',
   serviceAgreement: false,
   privacyAgreement: false
-})
-
-const errors = reactive<{ email: string[]; username: string[]; password: string[] }>({
-  email: [],
-  username: [],
-  password: []
 })
 
 provide(formDataKey, formData)
@@ -76,123 +77,88 @@ function clearInputs(): void {
   formData.privacyAgreement = false
 }
 
-function clearErrors(): void {
-  errors.email = []
-  errors.username = []
-  errors.password = []
-}
-
 function resetForm(): void {
   setTimeout(() => {
     step.value = 'guest'
     clearInputs()
-    clearErrors()
+    errors.value = {}
   }, 500)
 }
 
 // A failure that carries no field messages (throttled, offline, server error) still has to be shown
-function showFailure(error: unknown, fallbackField: 'email' | 'password' = 'email'): void {
+function failuresOf(
+  error: unknown,
+  fallbackField: 'email' | 'password' = 'email'
+): LaravelValidationErrors {
   const failures = validationErrors(error)
 
-  if (Object.keys(failures).length === 0) {
-    errors[fallbackField] = [t('main.error-try-again')]
-    return
-  }
-
-  errors.email = failures.email ?? []
-  errors.username = failures.username ?? []
-  errors.password = failures.password ?? []
+  return Object.keys(failures).length === 0
+    ? { [fallbackField]: [t('main.error-try-again')] }
+    : failures
 }
 
 async function checkEmail(): Promise<void> {
-  isLoading.value = true
-  clearErrors()
-
-  await axios
-    .post<{ exists: boolean }>(route('email.check'), { email: formData.email })
-    .then((response) => {
-      step.value = response.data.exists === true ? 'login' : 'register'
-    })
-    .catch((error: unknown) => {
-      showFailure(error)
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+  await postForm<{ exists: boolean }>({
+    formSelector: LOGIN_FORM,
+    url: route('email.check'),
+    payload: { email: formData.email },
+    onSuccess: (data) => {
+      step.value = data.exists === true ? 'login' : 'register'
+    },
+    onError: (error) => failuresOf(error)
+  })
 }
 
 async function login(): Promise<void> {
-  isLoading.value = true
-  clearErrors()
-
-  await axios
-    .post<{ redirect: string }>(route('login'), {
+  await postForm<{ redirect: string }>({
+    formSelector: LOGIN_FORM,
+    url: route('login'),
+    payload: {
       email: formData.email,
       password: formData.password
-    })
-    .then((response) => {
+    },
+    onSuccess: (data) => {
       setSnackBar({
         message: 'accounts.welcome-back',
         color: 'primary',
         active: true
       })
 
-      router.get(response.data.redirect)
-    })
-    .catch((error: unknown) => {
-      // Laravel's LoginRequest::authenticate() always keys a failed-login
-      // error "email" (deliberately ambiguous about whether the email or
-      // the password was wrong). By this point the email is already
-      // confirmed to exist (see the checkEmail() step above) and only the
-      // password field is visible, so we surface the message there.
-      const failures = validationErrors(error)
+      router.get(data.redirect)
+    },
+    // Laravel's LoginRequest::authenticate() always keys a failed-login
+    // error "email" (deliberately ambiguous about whether the email or
+    // the password was wrong). By this point the email is already
+    // confirmed to exist (see the checkEmail() step above) and only the
+    // password field is visible, so we surface the message there.
+    onError: (error) => {
+      const failures = failuresOf(error, 'password')
 
-      errors.password =
-        Object.keys(failures).length === 0
-          ? [t('main.error-try-again')]
-          : (failures.email ?? failures.password ?? [])
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+      return { password: failures.email ?? failures.password ?? [] }
+    }
+  })
 }
 
 async function register(): Promise<void> {
-  isLoading.value = true
-  clearErrors()
-
-  await axios
-    .post(route('register'), {
+  await postForm({
+    formSelector: LOGIN_FORM,
+    url: route('register'),
+    payload: {
       email: formData.email,
       username: formData.username,
       password: formData.password,
       password_confirmation: formData.confirmPassword,
       service_agreement: formData.serviceAgreement,
       privacy_agreement: formData.privacyAgreement
-    })
-    .then(() => {
+    },
+    onSuccess: () => {
       router.get(route('verification.notice'))
-    })
-    .catch((error: unknown) => {
-      showFailure(error)
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+    },
+    onError: (error) => failuresOf(error)
+  })
 }
 
 async function submitForm(): Promise<void> {
-  const form = document.querySelector<HTMLFormElement>('#login-form')
-
-  if (form === null) {
-    return
-  }
-
-  if (form.checkValidity() === false) {
-    form.reportValidity()
-    return
-  }
-
   switch (step.value) {
     case 'checking':
       await checkEmail()
@@ -209,14 +175,17 @@ async function submitForm(): Promise<void> {
 }
 
 async function resetPassword(): Promise<void> {
-  await axios
-    .post(route('password.email'), { email: formData.email })
-    .then(() => {
+  await postForm({
+    formSelector: LOGIN_FORM,
+    url: route('password.email'),
+    payload: { email: formData.email },
+    // The password field is required in this step but is left empty when asking for a reset link
+    validate: false,
+    onSuccess: () => {
       resetEmailSent.value = true
-    })
-    .catch((error: unknown) => {
-      showFailure(error)
-    })
+    },
+    onError: (error) => failuresOf(error)
+  })
 }
 </script>
 

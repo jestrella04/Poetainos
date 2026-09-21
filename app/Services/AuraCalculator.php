@@ -23,6 +23,32 @@ class AuraCalculator
     private const LOWEST_KARMA = 'F';
 
     /**
+     * Each count a user's aura is made of, mapped to its key under `aura.points.user` in the site settings.
+     *
+     * @var array<string, string>
+     */
+    private const USER_POINT_KEYS = [
+        'writings' => 'writing',
+        'likes' => 'like',
+        'comments' => 'comment',
+        'shelf' => 'shelf',
+        'views' => 'views',
+        'awards' => 'award',
+    ];
+
+    /**
+     * Each count a writing's aura is made of, mapped to its key under `aura.points.writing` in the site settings.
+     *
+     * @var array<string, string>
+     */
+    private const WRITING_POINT_KEYS = [
+        'likes' => 'like',
+        'comments' => 'comment',
+        'shelf' => 'shelf',
+        'views' => 'views',
+    ];
+
+    /**
      * Minimum total points for each karma grade, highest first.
      *
      * @var array<int, string>
@@ -40,7 +66,7 @@ class AuraCalculator
             ->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])
             ->firstOrFail();
 
-        $points = $this->userPoints([
+        $points = $this->score('user', self::USER_POINT_KEYS, [
             'writings' => $counted->writings_count,
             'likes' => $counted->likes_count,
             'comments' => $counted->comments_count,
@@ -64,7 +90,7 @@ class AuraCalculator
     {
         $since = Carbon::now()->subDays(self::KARMA_WINDOW_DAYS)->startOfDay();
 
-        $points = $this->userPoints([
+        $points = $this->score('user', self::USER_POINT_KEYS, [
             'likes' => $user->likes()->where('created_at', '>=', $since)->count(),
             'comments' => $user->comments()->where('created_at', '>=', $since)->count(),
             'shelf' => Shelf::where('user_id', $user->id)->where('created_at', '>=', $since)->count(),
@@ -83,16 +109,11 @@ class AuraCalculator
             ->withCount(['likes', 'comments', 'shelf'])
             ->firstOrFail();
 
-        $points = calculateWeightedAuraScore([
+        $points = $this->score('writing', self::WRITING_POINT_KEYS, [
             'likes' => $counted->likes_count,
             'comments' => $counted->comments_count,
             'shelf' => $counted->shelf_count,
             'views' => $counted->views,
-        ], [
-            'likes' => getSiteConfig('aura.points.writing.like'),
-            'comments' => getSiteConfig('aura.points.writing.comment'),
-            'shelf' => getSiteConfig('aura.points.writing.shelf'),
-            'views' => getSiteConfig('aura.points.writing.views'),
         ]);
 
         if ($points['base'] <= 0) {
@@ -113,26 +134,54 @@ class AuraCalculator
     }
 
     /**
+     * The aura score of a scope (`user` or `writing`) from its counts. A count
+     * that isn't given counts as zero.
+     *
+     * @param  array<string, string>  $pointKeys
      * @param  array<string, int|float>  $counts
      * @return array{base: int|float, total: int|float, score: float}
      */
-    private function userPoints(array $counts): array
+    private function score(string $scope, array $pointKeys, array $counts): array
     {
-        return calculateWeightedAuraScore([
-            'writings' => $counts['writings'] ?? 0,
-            'likes' => $counts['likes'] ?? 0,
-            'comments' => $counts['comments'] ?? 0,
-            'shelf' => $counts['shelf'] ?? 0,
-            'views' => $counts['views'] ?? 0,
-            'awards' => $counts['awards'] ?? 0,
-        ], [
-            'writings' => getSiteConfig('aura.points.user.writing'),
-            'likes' => getSiteConfig('aura.points.user.like'),
-            'comments' => getSiteConfig('aura.points.user.comment'),
-            'shelf' => getSiteConfig('aura.points.user.shelf'),
-            'views' => getSiteConfig('aura.points.user.views'),
-            'awards' => getSiteConfig('aura.points.user.award'),
-        ]);
+        $countables = [];
+        $weights = [];
+
+        foreach ($pointKeys as $name => $pointKey) {
+            $countables[$name] = $counts[$name] ?? 0;
+            $weights[$name] = getSiteConfig("aura.points.{$scope}.{$pointKey}");
+        }
+
+        return $this->weightedScore($countables, $weights);
+    }
+
+    /**
+     * Weighted average "aura" score for a set of countable metrics (e.g. likes,
+     * comments, shelf adds). Each countable's contribution is its raw count
+     * multiplied by its per-unit weight; the base is the sum of the weights
+     * themselves. The divisor is derived from the number of countables so that
+     * adding a new countable can never desync the math with a stale literal.
+     *
+     * @param  array<string, int|float>  $countables  Raw counts keyed by metric name.
+     * @param  array<string, int|float>  $weights  Per-unit point values keyed by the same metric names.
+     * @return array{base: int|float, total: int|float, score: float}
+     */
+    public function weightedScore(array $countables, array $weights): array
+    {
+        $base = array_sum($weights);
+        $total = 0;
+
+        foreach ($countables as $key => $count) {
+            $total += ($weights[$key] ?? 0) * $count;
+        }
+
+        $divisor = count($countables) * $base;
+        $score = $divisor > 0 ? (float) number_format($total / $divisor, 2) : 0.0;
+
+        return [
+            'base' => $base,
+            'total' => $total,
+            'score' => $score,
+        ];
     }
 
     private function karmaGrade(int|float $totalPoints): string

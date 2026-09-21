@@ -2,14 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Events\NotificationEvent;
 use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Notification;
 
-class WritingShelved extends Notification implements ShouldQueue
+class WritingShelved extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
@@ -24,17 +22,6 @@ class WritingShelved extends Notification implements ShouldQueue
     public function via($notifiable): array
     {
         return ['database', 'broadcast'];
-    }
-
-    /**
-     * Get the broadcastable representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array<int|string, mixed>|null
-     */
-    public function toBroadcast($notifiable): ?array
-    {
-        return event(new NotificationEvent($notifiable));
     }
 
     /**

@@ -63,7 +63,7 @@ php artisan migrate:fresh --seed   # Reset DB and seed demo data
 
 ### Events & Listeners
 
-Listener registration is **explicit, not auto-discovered**: `app/Providers/EventServiceProvider.php` sets `shouldDiscoverEvents(): false` and lists every event/listener pair by hand in its `$listen` array (there is no `app/Listeners` directory). **Never also register a listener manually via `Event::listen()`** (e.g. in `AppServiceProvider::boot()`) for an event already present in `EventServiceProvider::$listen`. Doing so double-registers the listener, so it fires twice per event dispatch — this previously caused every queued mail listener (billing emails, affiliate welcome email) to send duplicate emails silently. After adding a new event/listener pair, run `php artisan event:list` and confirm the event shows exactly **one** listener before considering the work done.
+Listener registration is **explicit, not auto-discovered**: `app/Providers/EventServiceProvider.php` sets `shouldDiscoverEvents(): false` and lists event/listener pairs by hand in its `$listen` array, which is currently empty (there is no `app/Listeners` directory). The provider must stay even while empty: the framework's base provider registers the `Registered` email-verification listener through it. **Never also register a listener manually via `Event::listen()`** (e.g. in `AppServiceProvider::boot()`) for an event already present in `EventServiceProvider::$listen`. Doing so double-registers the listener, so it fires twice per event dispatch and queued mail listeners send duplicate emails silently. After adding a new event/listener pair, run `php artisan event:list` and confirm the event shows exactly **one** listener before considering the work done.
 
 ## Key Conventions
 

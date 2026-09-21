@@ -3,7 +3,8 @@ import { usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
 import { useFormatting } from '@/composables/useFormatting'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
+import { useInfiniteList } from '@/composables/useInfiniteList'
+import { useSwipeTabs } from '@/composables/useSwipeTabs'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { User } from '@/types/models'
 
@@ -11,15 +12,8 @@ const page = usePage<InertiaPageProps<{ sort: string; totalAuthors: number }>>()
 const { isEmpty } = useTypeGuards()
 const { formatCount } = useFormatting()
 
-const {
-  items: users,
-  fetched,
-  loadMore
-} = usePaginatedTabList<User>({
-  tabOrder: ['featured', 'latest', 'popular'],
-  currentTab: () => page.props.sort,
-  reloadPropKey: 'users'
-})
+const { items: users, fetched, loadMore } = useInfiniteList<User>('users')
+useSwipeTabs({ tabOrder: ['featured', 'latest', 'popular'], currentTab: () => page.props.sort })
 </script>
 
 <template>

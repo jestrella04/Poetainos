@@ -4,7 +4,8 @@ import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import PoWritingsSidebar from './partials/PoWritingsSidebar.vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { usePaginatedTabList } from '@/composables/usePaginatedTabList'
+import { useInfiniteList } from '@/composables/useInfiniteList'
+import { useSwipeTabs } from '@/composables/useSwipeTabs'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { TagLike, UserLike, Writing } from '@/types/models'
 
@@ -19,16 +20,8 @@ interface WritingsIndexProps {
 const page = usePage<InertiaPageProps<WritingsIndexProps>>()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 
-const {
-  items: writings,
-  next,
-  fetched,
-  loadMore
-} = usePaginatedTabList<Writing>({
-  tabOrder: ['latest', 'popular', 'likes'],
-  currentTab: () => page.props.sort,
-  reloadPropKey: 'writings'
-})
+const { items: writings, next, fetched, loadMore } = useInfiniteList<Writing>('writings')
+useSwipeTabs({ tabOrder: ['latest', 'popular', 'likes'], currentTab: () => page.props.sort })
 
 const heroWriting = computed(() => page.props.pickOfTheDay ?? null)
 

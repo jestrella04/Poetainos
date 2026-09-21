@@ -1,10 +1,12 @@
 <?php
 
+use App\Jobs\RecalculateAura;
 use App\Models\Comment;
 use App\Models\Writing;
 use App\Notifications\WritingFeatured;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 
 use function Pest\Laravel\actingAs;
 
@@ -91,7 +93,7 @@ describe('a writing\'s aura', function (): void {
         // When
         actingAs($liker)->post("/likes/writing/{$writing->id}/store");
         $withLike = (float) $writing->refresh()->aura;
-        actingAs($liker)->delete("/likes/writing/{$writing->id}/delete");
+        actingAs($liker)->post("/likes/writing/{$writing->id}/store");
 
         // Then
         expect($withLike)->toBeGreaterThan(0.0);
@@ -121,7 +123,7 @@ describe('a writing\'s aura', function (): void {
         $onShelf = (float) $writing->refresh()->aura;
 
         // When
-        actingAs($reader)->delete("/shelves/{$writing->slug}/delete");
+        actingAs($reader)->post("/shelves/{$writing->slug}/store");
 
         // Then
         expect($onShelf)->toBeGreaterThan(0.0);
@@ -176,5 +178,65 @@ describe('featuring a writing on the home page', function (): void {
         // Then
         expect($writing->refresh()->home_posted_at)->toBeNull();
         expect((float) $writing->aura)->toBeGreaterThan(0.0);
+    });
+});
+
+describe('recalculating aura after an interaction', function (): void {
+    it('is queued for the liker and the writing when a writing is liked', function (): void {
+        // Given
+        Queue::fake();
+        $writing = Writing::factory()->create(['views' => 0]);
+        $liker = createUser();
+
+        // When
+        actingAs($liker)->post("/likes/writing/{$writing->id}/store");
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($liker) === true
+            && $job->writing?->is($writing) === true);
+        expect((float) $writing->refresh()->aura)->toBe(0.0);
+    });
+
+    it('is queued for the liker only when a comment is liked', function (): void {
+        // Given
+        Queue::fake();
+        $comment = Comment::factory()->create();
+        $liker = createUser();
+
+        // When
+        actingAs($liker)->post("/likes/comment/{$comment->id}/store");
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($liker) === true
+            && $job->writing === null);
+    });
+
+    it('is queued when a writing is shelved', function (): void {
+        // Given
+        Queue::fake();
+        $writing = Writing::factory()->create();
+        $reader = createUser();
+
+        // When
+        actingAs($reader)->post("/shelves/{$writing->slug}/store");
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($reader) === true
+            && $job->writing?->is($writing) === true);
+    });
+
+    it('is queued when a comment is posted and when it is deleted', function (): void {
+        // Given
+        Queue::fake();
+        $writing = Writing::factory()->create();
+        $commenter = createUser();
+
+        // When
+        actingAs($commenter)->post('/comments/create', ['writing_id' => $writing->id, 'comment' => 'Lovely.']);
+        $comment = Comment::firstOrFail();
+        actingAs($commenter)->delete("/comments/delete/{$comment->id}");
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, 2);
     });
 });

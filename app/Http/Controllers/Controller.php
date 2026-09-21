@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Writing;
+use Closure;
+use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -23,7 +25,7 @@ class Controller extends BaseController
 
     private const RECENT_VIEWS_REMEMBERED = 100;
 
-    protected int $pagination;
+    protected int $perPage;
 
     /** @var array<int, int>|null */
     private ?array $blockedUserIds = null;
@@ -32,7 +34,7 @@ class Controller extends BaseController
     {
         $configured = (int) getSiteConfig('pagination');
 
-        $this->pagination = $configured > 0 ? $configured : self::DEFAULT_PAGINATION;
+        $this->perPage = $configured > 0 ? $configured : self::DEFAULT_PAGINATION;
     }
 
     /**
@@ -40,11 +42,40 @@ class Controller extends BaseController
      *
      * @return array<int, int>
      */
-    protected function getBlockedUsers(): array
+    protected function blockedAuthorIds(): array
     {
         $this->blockedUserIds ??= Auth::user()?->blockedAuthors()->pluck('blocked_user_id')->all() ?? [];
 
         return $this->blockedUserIds;
+    }
+
+    /**
+     * A page of records: the raw page for JSON requests, the given Inertia
+     * page otherwise. `$isDeferred` leaves the records out of the first
+     * response so the page can request them with a partial reload; the query
+     * only runs when they are actually sent.
+     *
+     * @template TPage of \Illuminate\Contracts\Pagination\Paginator
+     *
+     * @param  Closure(): TPage  $page
+     * @param  array<string, mixed>  $props
+     * @return Response|TPage
+     */
+    protected function paginatedPage(
+        Closure $page,
+        string $component,
+        array $props,
+        string $recordsProp,
+        bool $isDeferred = true,
+    ): Response|PaginatorContract {
+        if (request()->expectsJson()) {
+            return $page();
+        }
+
+        return Inertia::render($component, [
+            ...$props,
+            $recordsProp => $isDeferred ? Inertia::optional($page) : $page(),
+        ]);
     }
 
     /**
@@ -64,18 +95,13 @@ class Controller extends BaseController
         array $extraProps = [],
         bool $isDeferred = true,
     ): Response|Paginator {
-        $page = fn (): Paginator => $writings->simplePaginate($this->pagination)->withQueryString();
-
-        if (request()->expectsJson()) {
-            return $page();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => $meta,
-            'writings' => $isDeferred ? Inertia::optional($page) : $page(),
-            'sort' => $sort,
-            ...$extraProps,
-        ]);
+        return $this->paginatedPage(
+            fn (): Paginator => $writings->simplePaginate($this->perPage)->withQueryString(),
+            'writings/PoWritingsIndex',
+            ['meta' => $meta, 'sort' => $sort, ...$extraProps],
+            'writings',
+            $isDeferred,
+        );
     }
 
     /**
@@ -99,7 +125,7 @@ class Controller extends BaseController
      * The currently authenticated user, aborting with a 401 if there is none.
      * Shared by every action that requires a logged-in user to proceed.
      */
-    public function requireAuthUser(): User
+    protected function requireAuthUser(): User
     {
         $user = Auth::user();
 

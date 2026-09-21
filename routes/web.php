@@ -66,7 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/users/edit/{user}', [UsersController::class, 'edit'])->name('users.edit');
     Route::put('/users/edit/{user}', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/delete/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
-    Route::get('/users/query', [UsersController::class, 'query'])->name('users.query');
+    Route::get('/users/query', [UsersController::class, 'suggest'])->name('users.query');
     Route::post('/users/block/{user}', [UsersController::class, 'blockUser'])->name('users.block');
     Route::delete('/users/block/{user}', [UsersController::class, 'unblockUser'])->name('users.unblock');
     Route::get('/account', [UsersController::class, 'account'])->name('users.account');
@@ -76,18 +76,16 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('/comments/delete/{comment}', [CommentsController::class, 'destroy'])->name('comments.destroy');
 
     // Likes
-    Route::post('/likes/{type}/{id}/store', [LikesController::class, 'store'])->middleware('throttle:60,1')->name('likes.store');
-    Route::delete('/likes/{type}/{id}/delete', [LikesController::class, 'destroy'])->middleware('throttle:60,1')->name('likes.destroy');
+    Route::post('/likes/{likeable}/{likeableId}/store', [LikesController::class, 'store'])->middleware('throttle:60,1')->name('likes.store');
 
     // Other user tasks
     Route::post('/shelves/{writing}/store', [ShelvesController::class, 'store'])->middleware('throttle:60,1')->name('shelves.store');
-    Route::delete('/shelves/{writing}/delete', [ShelvesController::class, 'destroy'])->middleware('throttle:60,1')->name('shelves.destroy');
 
     // Notifications
     Route::get('/notifications', [UsersNotificationsController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/show/{notification}', [UsersNotificationsController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/clear/read', [UsersNotificationsController::class, 'clear'])->name('notifications.clear');
-    Route::post('/notifications/email/{enable}', [UsersNotificationsController::class, 'email'])->name('notifications.email');
+    Route::post('/notifications/email/{enable}', [UsersNotificationsController::class, 'setEmailPreference'])->name('notifications.email');
 
     // Push Subscriptions
     Route::post('subscriptions', [PushNotificationsController::class, 'update'])->name('push.update');
@@ -102,8 +100,8 @@ Route::get('/offline', [GenericController::class, 'offline'])->name('offline');
 Route::get('/explore', [GenericController::class, 'explore'])->name('explore');
 
 // Writings
-Route::get('/', [WritingsController::class, 'index'])->name('home');
-Route::get('/writings/awards', [WritingsController::class, 'index'])->name('writings.awards');
+Route::get('/', [WritingsController::class, 'home'])->name('home');
+Route::get('/writings/awards', [WritingsController::class, 'awards'])->name('writings.awards');
 Route::get('/writings/random', [WritingsController::class, 'random'])->name('writings.random');
 Route::get('/writings/{writing}', [WritingsController::class, 'show'])->name('writings.show');
 
@@ -122,7 +120,7 @@ Route::get('/pages/{page}', [PagesController::class, 'show'])->name('pages.show'
 Route::get('/categories/{category}', [CategoriesController::class, 'show'])->name('categories.show');
 
 // Tags
-Route::get('/tags/query', [TagsController::class, 'query'])->name('tags.query');
+Route::get('/tags/query', [TagsController::class, 'search'])->name('tags.query');
 Route::get('/tags/{tag}', [TagsController::class, 'show'])->name('tags.show');
 
 // Comments

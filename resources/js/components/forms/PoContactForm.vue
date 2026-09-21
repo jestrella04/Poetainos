@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { onMounted, reactive, ref } from 'vue'
-import { useFormValidation } from '@/composables/useFormValidation'
-import type { LaravelValidationErrors, ValidationError } from '@/types/http'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { LaravelValidationErrors } from '@/types/http'
 
 interface Captcha {
   key: string
   img: string
 }
 
-const { checkFormValidity } = useFormValidation()
-const isPosting = ref(false)
+const { validationErrors } = useFormErrors()
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 const isPosted = ref(false)
 const captcha = ref<Captcha>({ key: '', img: '' })
-const errors = ref<LaravelValidationErrors>({})
 const formData = reactive({
   name: '',
   email: '',
@@ -34,10 +34,6 @@ async function reloadCaptcha() {
   })
 }
 
-function clearErrors() {
-  errors.value = {}
-}
-
 function clearInputs() {
   formData.name = ''
   formData.email = ''
@@ -51,40 +47,31 @@ function clearInputs() {
 function resetForm() {
   isPosted.value = false
   clearInputs()
-  clearErrors()
+  errors.value = {}
 }
 
 async function submitForm() {
-  const form = document.querySelector<HTMLFormElement>('#contact-form')
-
-  if (!form || !checkFormValidity(form)) {
-    return
-  }
-
-  isPosting.value = true
-
-  await axios
-    .post(form.action, {
+  await postForm({
+    formSelector: '#contact-form',
+    payload: {
       name: formData.name,
       email: formData.email,
       subject: formData.subject,
       message: formData.message,
       key: captcha.value.key,
       captcha: formData.captcha
-    })
-    .then(() => {
+    },
+    cooldown: true,
+    onSuccess: () => {
       resetForm()
       isPosted.value = true
-    })
-    .catch((error: ValidationError) => {
-      errors.value = error.response?.data.errors ?? {}
+    },
+    onError: (error) => {
       void reloadCaptcha()
-    })
-    .finally(() => {
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    })
+
+      return validationErrors(error)
+    }
+  })
 }
 </script>
 

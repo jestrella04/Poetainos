@@ -43,7 +43,7 @@ describe('shelving a writing', function (): void {
         Notification::assertNothingSent();
     });
 
-    it('only detaches the acting user when deleting a shelf entry', function (): void {
+    it('only detaches the acting user when they take the writing off the shelf', function (): void {
         // Given
         $writing = Writing::factory()->create();
         $reader = createUser();
@@ -52,7 +52,7 @@ describe('shelving a writing', function (): void {
         actingAs($otherReader)->post("/shelves/{$writing->slug}/store");
 
         // When
-        $response = actingAs($reader)->delete("/shelves/{$writing->slug}/delete");
+        $response = actingAs($reader)->post("/shelves/{$writing->slug}/store");
 
         // Then
         $response->assertJson(['method' => 'destroy', 'count' => 1]);

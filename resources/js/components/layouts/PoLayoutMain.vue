@@ -17,7 +17,7 @@ import { useSnackbar } from '@/composables/useSnackbar'
 import { useStaticPages } from '@/composables/useStaticPages'
 
 const page = usePage()
-const { auth, authUser, admin } = useAuth()
+const { isAuthenticated, authUser, isAdmin } = useAuth()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { getSnackBar } = useSnackbar()
 const { faqPath, aboutPath, termsPath, privacyPath } = useStaticPages()
@@ -61,7 +61,7 @@ onMounted(() => {
     getFlashMessages()
   })
 
-  if (auth() && 'setAppBadge' in navigator) {
+  if (isAuthenticated() && 'setAppBadge' in navigator) {
     void navigator.setAppBadge(unreadCount.value)
   }
 })
@@ -71,7 +71,7 @@ onBeforeUnmount(() => {
 })
 
 useNotificationsChannel(
-  () => (auth() ? (authUser()?.id ?? null) : null),
+  () => (isAuthenticated() ? (authUser()?.id ?? null) : null),
   (unread) => {
     unreadCount.value = unread
 
@@ -82,7 +82,7 @@ useNotificationsChannel(
 )
 
 watch(forceSnackBar, () => {
-  if (forceSnackBar.value) {
+  if (forceSnackBar.value === true) {
     getFlashMessages()
     forceSnackBar.value = false
   }
@@ -201,7 +201,7 @@ function getFlashMessages() {
           </po-button>
 
           <po-button
-            v-if="!auth()"
+            v-if="!isAuthenticated()"
             variant="tonal"
             :href="route('login')"
             size="small"
@@ -211,7 +211,7 @@ function getFlashMessages() {
             <v-icon icon="fas fa-right-to-bracket" />
           </po-button>
 
-          <v-menu v-if="auth()" target="parent" open-on-hover>
+          <v-menu v-if="isAuthenticated()" target="parent" open-on-hover>
             <template v-slot:activator="{ props }">
               <po-button icon v-bind="props">
                 <po-badge :count="unreadCount">
@@ -232,7 +232,7 @@ function getFlashMessages() {
               </po-list-item>
               <v-divider class="my-0" />
 
-              <template v-if="admin()">
+              <template v-if="isAdmin()">
                 <po-list-item :href="route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
                   <span>{{ $t('main.administration') }}</span>
                 </po-list-item>

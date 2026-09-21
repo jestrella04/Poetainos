@@ -6,7 +6,6 @@ use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use NotificationChannels\WebPush\WebPushChannel;
 
 class CommentLiked extends PoetainosNotification implements ShouldQueue
 {
@@ -14,23 +13,12 @@ class CommentLiked extends PoetainosNotification implements ShouldQueue
 
     public function __construct(protected Comment $comment, protected User $user)
     {
-        $this->notification = $this->actorContent(
+        $this->content = $this->actorContent(
             $this->user,
             __('Isn\'t it amazing, :name likes your comment at :site.', $this->actorPlaceholders($this->user)),
             $this->comment->writing?->path() ?? url('/'),
             __('View comment'),
         );
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array<int, string>
-     */
-    public function via($notifiable): array
-    {
-        return ['database', 'broadcast', WebPushChannel::class];
     }
 
     /**

@@ -32,7 +32,7 @@ void createInertiaApp({
     showSpinner: true
   },
   withApp(app, { page, ssr }) {
-    if (ssr) {
+    if (ssr === true) {
       // Composables call the global `route()`, which the browser gets from the
       // `@routes` script; the SSR process has no such script.
       Object.assign(globalThis, { route, Ziggy: page.props.ziggy })

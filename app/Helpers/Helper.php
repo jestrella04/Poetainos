@@ -8,6 +8,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+/**
+ * A site setting by dot path, or every setting when the path is empty. A
+ * setting is stored as `{"description": …, "value": …}`; asking for it returns
+ * just the value.
+ */
 function getSiteConfig(string $path = ''): mixed
 {
     if ($path !== '') {
@@ -33,7 +38,7 @@ function slugify(string $table, string $title, string $column = 'slug', string $
 
     // Get any slug that could possibly be related.
     // This cuts the queries down by doing it once.
-    $usedSlugs = getRelatedIdentifiers($table, $slug, $column)->pluck($column);
+    $usedSlugs = existingSlugsLike($table, $slug, $column)->pluck($column);
 
     $isTaken = fn (string $candidate): bool => in_array($candidate, $reserved, true)
         || $usedSlugs->contains($candidate);
@@ -56,7 +61,7 @@ function slugify(string $table, string $title, string $column = 'slug', string $
 /**
  * @return Collection<int, stdClass>
  */
-function getRelatedIdentifiers(string $table, string $slug, string $column): Collection
+function existingSlugsLike(string $table, string $slug, string $column): Collection
 {
     return DB::table($table)
         ->select($column)
@@ -107,36 +112,6 @@ function isSafeRedirectPath(?string $url): bool
 }
 
 /**
- * Weighted average "aura" score for a set of countable metrics (e.g. likes,
- * comments, shelf adds). Each countable's contribution is its raw count
- * multiplied by its per-unit weight; the base is the sum of the weights
- * themselves. The divisor is derived from the number of countables so that
- * adding a new countable can never desync the math with a stale literal.
- *
- * @param  array<string, int|float>  $countables  Raw counts keyed by metric name.
- * @param  array<string, int|float>  $weights  Per-unit point values keyed by the same metric names.
- * @return array{base: int|float, total: int|float, score: float}
- */
-function calculateWeightedAuraScore(array $countables, array $weights): array
-{
-    $base = array_sum($weights);
-    $total = 0;
-
-    foreach ($countables as $key => $count) {
-        $total += ($weights[$key] ?? 0) * $count;
-    }
-
-    $divisor = count($countables) * $base;
-    $score = $divisor > 0 ? (float) number_format($total / $divisor, 2) : 0.0;
-
-    return [
-        'base' => $base,
-        'total' => $total,
-        'score' => $score,
-    ];
-}
-
-/**
  * Resolve a request's `sort` value against a controller-specific whitelist,
  * falling back to a default when the value is missing or not allowed.
  *
@@ -174,26 +149,4 @@ function randomWritingsWithAuthor(Builder|Relation $query, int $take = 5): Eloqu
 function escapeLike(string $value): string
 {
     return addcslashes($value, '\\%_');
-}
-
-function tailFile(string $path, int $lines = 100): string
-{
-    if (! is_readable($path)) {
-        return '';
-    }
-
-    $file = new SplFileObject($path, 'r');
-    $file->seek(PHP_INT_MAX);
-    $lastLine = $file->key();
-
-    $file->seek(max(0, $lastLine - $lines));
-
-    $tail = [];
-
-    while (! $file->eof()) {
-        $tail[] = $file->fgets();
-        $file->next();
-    }
-
-    return implode('', $tail);
 }

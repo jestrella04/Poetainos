@@ -16,5 +16,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/user', [UsersController::class, 'me'])->name('api.user.show');
-    Route::put('/karma/{user}', [UsersController::class, 'karma'])->name('api.karma.update');
+    Route::put('/karma/{user}', [UsersController::class, 'recalculateKarma'])->name('api.karma.update');
 });

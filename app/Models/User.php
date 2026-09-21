@@ -179,6 +179,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * The ids of the writings the user liked, for use as a `whereIn` subquery.
+     *
+     * @return HasMany<Like, $this>
+     */
+    public function likedWritingIds(): HasMany
+    {
+        return $this->likes()->where('likeable_type', Writing::class)->select('likeable_id');
+    }
+
+    /**
      * @return HasMany<Writing, $this>
      */
     public function awards(): HasMany

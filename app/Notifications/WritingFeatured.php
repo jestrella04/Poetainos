@@ -17,7 +17,7 @@ class WritingFeatured extends PoetainosNotification implements ShouldQueue
 
     public function __construct(protected Writing $writing)
     {
-        $this->notification = [
+        $this->content = [
             'title' => __('Your writing has been awarded with a Golden Flower'),
             'greeting' => __('Hello!'),
             'body' => __('Congratulations, your writing ":title" has been awarded with a Golden Flower at :site', [
@@ -52,19 +52,19 @@ class WritingFeatured extends PoetainosNotification implements ShouldQueue
 
     public function toTwitter(mixed $notifiable): TwitterStatusUpdate
     {
-        $msg = implode(' ', $this->notification['body_social']);
+        $msg = implode(' ', $this->content['body_social']);
         $msg = str_replace(':author', $this->writing->author?->twitterHandleOrName() ?? '', $msg);
-        $msg = $msg.' '.$this->notification['url'];
+        $msg = $msg.' '.$this->content['url'];
 
         return new TwitterStatusUpdate($msg);
     }
 
     public function toFacebookPoster(mixed $notifiable): FacebookPosterPost
     {
-        $msg = implode(' ', $this->notification['body_social']);
+        $msg = implode(' ', $this->content['body_social']);
         $msg = str_replace(':author', $this->writing->author?->getName() ?? '', $msg);
 
-        return (new FacebookPosterPost($msg))->withLink($this->notification['url']);
+        return (new FacebookPosterPost($msg))->withLink($this->content['url']);
     }
 
     /**

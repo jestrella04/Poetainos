@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es'
+import { isEmpty as lodashIsEmpty, isNil as lodashIsNil, isNull as lodashIsNull } from 'lodash-es'
 
 /**
  * Generic null/empty checks shared across components and other
@@ -6,19 +6,19 @@ import * as _ from 'lodash-es'
  */
 export function useTypeGuards() {
   function isNil(obj: unknown): obj is null | undefined {
-    return _.isNil(obj)
+    return lodashIsNil(obj)
   }
 
   function isNull(obj: unknown): obj is null {
-    return _.isNull(obj)
+    return lodashIsNull(obj)
   }
 
   function isEmpty(obj: unknown): boolean {
-    return _.isEmpty(obj)
+    return lodashIsEmpty(obj)
   }
 
   function strNullOrEmpty(str: string | null | undefined): boolean {
-    return _.isNil(str) || '' === str.trim()
+    return lodashIsNil(str) || '' === str.trim()
   }
 
   return { isNil, isNull, isEmpty, strNullOrEmpty }

@@ -10,7 +10,7 @@ const page = computed(() => usePage())
 export function useAuth() {
   const { strNullOrEmpty } = useTypeGuards()
 
-  function auth(): boolean {
+  function isAuthenticated(): boolean {
     const authProps = page.value.props.auth
     return authProps.user !== null && !strNullOrEmpty(authProps.user.username)
   }
@@ -19,7 +19,7 @@ export function useAuth() {
     return page.value.props.auth.user
   }
 
-  function admin(): boolean {
+  function isAdmin(): boolean {
     return page.value.props.auth.admin === true
   }
 
@@ -30,8 +30,8 @@ export function useAuth() {
       return false
     }
 
-    return user.username === author.username || admin()
+    return user.username === author.username || isAdmin()
   }
 
-  return { auth, authUser, admin, canEdit }
+  return { isAuthenticated, authUser, isAdmin, canEdit }
 }
