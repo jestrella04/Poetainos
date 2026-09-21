@@ -66,27 +66,29 @@ describe('useInertiaVisit', () => {
 
   it('prevents the native navigation and visits when inertia is enabled', () => {
     // Given
-    const event = { preventDefault: vi.fn() } as unknown as MouseEvent
+    const preventDefault = vi.fn()
+    const event = { preventDefault } as unknown as MouseEvent
     const { handleClick } = useInertiaVisit({ href: '/writings/1', inertia: true })
 
     // When
     handleClick(event)
 
     // Then
-    expect(event.preventDefault).toHaveBeenCalledOnce()
+    expect(preventDefault).toHaveBeenCalledOnce()
     expect(visitMock).toHaveBeenCalledWith('/writings/1', { method: 'get' })
   })
 
   it('leaves native navigation untouched when inertia is disabled', () => {
     // Given
-    const event = { preventDefault: vi.fn() } as unknown as MouseEvent
+    const preventDefault = vi.fn()
+    const event = { preventDefault } as unknown as MouseEvent
     const { handleClick } = useInertiaVisit({ href: '/writings/1' })
 
     // When
     handleClick(event)
 
     // Then
-    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(preventDefault).not.toHaveBeenCalled()
     expect(visitMock).not.toHaveBeenCalled()
   })
 })

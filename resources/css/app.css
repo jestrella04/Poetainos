@@ -35,11 +35,9 @@
   }
 }
 
-
 ::selection {
   background: rgba(var(--v-theme-primary), 0.2);
 }
-
 
 /* Vuetify's height:100% isn't applied to html/body/root container by default; needed for full-height layouts. */
 html,
