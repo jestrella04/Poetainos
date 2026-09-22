@@ -30,4 +30,18 @@ describe('registration', function (): void {
         $response->assertOk();
         expect(User::where('username', 'testuser')->firstOrFail()->role?->name)->toBe('user');
     });
+
+    it('is throttled so it cannot be used for mass account creation', function (): void {
+        // When
+        // An always-invalid payload keeps every attempt a guest request (a
+        // successful one would authenticate and trip the `guest` middleware
+        // instead of the throttle being tested here).
+        foreach (range(1, 5) as $attempt) {
+            post('/register', []);
+        }
+        $response = post('/register', []);
+
+        // Then
+        $response->assertTooManyRequests();
+    });
 });

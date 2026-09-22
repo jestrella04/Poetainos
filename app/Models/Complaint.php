@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
+ * Complaints are intentionally anonymous: there is no reporter/user_id
+ * column, and the store endpoint doesn't require authentication. Don't add
+ * reporter attribution here without checking with product first.
+ *
  * @mixin IdeHelperComplaint
  */
 class Complaint extends Model

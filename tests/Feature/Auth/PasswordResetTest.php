@@ -61,4 +61,15 @@ describe('resetting a password', function (): void {
             return true;
         });
     });
+
+    it('is throttled so it cannot be used to mail-bomb arbitrary addresses', function (): void {
+        // When
+        foreach (range(1, 5) as $attempt) {
+            post('/forgot-password', ['email' => "attempt{$attempt}@example.com"]);
+        }
+        $response = post('/forgot-password', ['email' => 'attempt6@example.com']);
+
+        // Then
+        $response->assertTooManyRequests();
+    });
 });
