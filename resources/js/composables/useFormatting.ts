@@ -11,6 +11,10 @@ const markdownRenderer = new MarkdownIt()
 
 const EXCERPT_LENGTH = 400
 
+// Matches config/app.php. Without a pinned zone, the SSR server (UTC) and the browser
+// format the same timestamp to different calendar days, which breaks hydration.
+const DISPLAY_TIME_ZONE = 'UTC'
+
 const KARMA_MEDALS = new Map([
   ['A', 'amber-accent-4'],
   ['B', 'blue-grey-lighten-3'],
@@ -58,12 +62,17 @@ export function useFormatting() {
     return new Date(date).toLocaleDateString('es-DO', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: DISPLAY_TIME_ZONE
     })
   }
 
   function toLocaleMonthYear(date: string | number | Date): string {
-    return new Date(date).toLocaleDateString('es-DO', { year: 'numeric', month: 'long' })
+    return new Date(date).toLocaleDateString('es-DO', {
+      year: 'numeric',
+      month: 'long',
+      timeZone: DISPLAY_TIME_ZONE
+    })
   }
 
   function relativeDate(date: string | number | Date): string {

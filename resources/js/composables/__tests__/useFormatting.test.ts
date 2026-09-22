@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { useFormatting } from '../useFormatting'
 
 const {
@@ -8,6 +8,7 @@ const {
   karmaMedal,
   linkify,
   formatCount,
+  toLocaleDate,
   toLocaleMonthYear
 } = useFormatting()
 
@@ -113,5 +114,21 @@ describe('formatCount', () => {
 describe('toLocaleMonthYear', () => {
   it('formats a date as the full month name and year', () => {
     expect(toLocaleMonthYear('2019-03-15T12:00:00Z')).toBe('marzo de 2019')
+  })
+})
+
+describe('toLocaleDate', () => {
+  it('formats in a fixed timezone so SSR and the browser render the same day', () => {
+    // Given
+    const formatSpy = vi.spyOn(Date.prototype, 'toLocaleDateString')
+
+    // When
+    const result = toLocaleDate('2026-09-20T01:00:00Z')
+
+    // Then
+    expect(formatSpy).toHaveBeenCalledWith('es-DO', expect.objectContaining({ timeZone: 'UTC' }))
+    expect(result).toContain('20')
+
+    formatSpy.mockRestore()
   })
 })

@@ -14,34 +14,35 @@ const { userDisplayName } = useFormatting()
   <aside>
     <div v-if="authors.length > 0" class="mb-10">
       <p class="text-uppercase text-eyebrow mb-4">
-        {{ $t('main.authors-to-follow') }}
+        {{ $t('main.featured-voices') }}
       </p>
 
-      <div class="d-flex flex-column ga-4">
-        <div v-for="author in authors" :key="author.id" class="d-flex align-center ga-3">
-          <po-link :href="route('users.show', author.username)" inertia>
+      <div v-for="author in authors" :key="author.id">
+        <div class="d-flex align-center ga-3 position-relative">
+          <po-link :href="route('users.show', author.username)" class="stretched" inertia>
             <po-avatar-award :user="author" avatar-size="32" avatar-color="primary" />
           </po-link>
 
           <div class="flex-grow-1">
             <po-link :href="route('users.show', author.username)" class="d-block" inertia>
-              {{ userDisplayName(author) }}
+              <span class="text-title-large po-prose"> {{ userDisplayName(author) }}</span>
             </po-link>
 
-            <span class=" ">
-              {{ $t('main.count-writings', { count: author.writings_count ?? 0 }) }}
-            </span>
+            <span> @{{ author.username }} </span>
           </div>
 
-          <!-- Not wired up yet: following authors has no backend support. -->
-          <span class="text-primary">{{ $t('main.follow') }}</span>
+          <po-chip class="text-primary">
+            {{ $t('main.count-writings', { count: author.writings_count ?? 0 }) }}
+          </po-chip>
         </div>
+
+        <v-divider class="my-4" />
       </div>
     </div>
 
     <div v-if="tags.length > 0">
       <p class="text-uppercase text-eyebrow mb-4">
-        {{ $t('main.trending-topics') }}
+        {{ $t('main.recurring-motifs') }}
       </p>
 
       <div class="d-inline-flex flex-wrap ga-2">

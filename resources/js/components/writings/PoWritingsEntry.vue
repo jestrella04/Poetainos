@@ -106,9 +106,9 @@ provide(writingKey, props.data)
               </po-link>
 
               <div class="d-inline-flex align-center ga-3 text-medium-emphasis">
-                <span>{{
-                  $t('main.count-views', { count: readable(data.views) }, data.views)
-                }}</span>
+                <span>
+                  {{ $t('main.count-views', { count: readable(data.views) }, data.views) }}
+                </span>
 
                 <span>
                   {{
