@@ -19,7 +19,7 @@ const { strNullOrEmpty } = useTypeGuards()
     height="100%"
     inertia
   >
-    <v-card-text class="d-flex flex-column h-100">
+    <v-card-text class="d-flex flex-column pa-6 h-100">
       <div class="d-flex align-center ga-4 mb-4">
         <po-avatar-award :user="data" avatar-size="64" avatar-color="secondary" />
 
@@ -39,11 +39,12 @@ const { strNullOrEmpty } = useTypeGuards()
         {{ data.bio }}
       </p>
 
-      <p class="text-medium-emphasis mt-auto mb-0">
-        {{ $t('main.count-writings', { count: data.writings_count }, data.writings_count) }}
-        ·
-        {{ $t('main.count-likes', { count: data.likes_count }, data.likes_count) }}
-      </p>
+      <div class="d-inline-flex align-center text-medium-emphasis ga-3 mt-auto">
+        <span>
+          {{ $t('main.count-writings', { count: data.writings_count }, data.writings_count) }}
+        </span>
+        <span>{{ $t('main.count-likes', { count: data.likes_count }, data.likes_count) }}</span>
+      </div>
     </v-card-text>
   </po-card>
 </template>

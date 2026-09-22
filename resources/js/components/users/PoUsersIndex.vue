@@ -34,7 +34,7 @@ useSwipeTabs({ tabOrder: ['featured', 'latest', 'popular'], currentTab: () => pa
     </p>
 
     <div class="sticky-tabs">
-      <v-tabs :model-value="page.props.sort" color="primary" fixed-tabs>
+      <v-tabs :model-value="page.props.sort" color="primary" class="mb-8" fixed-tabs>
         <po-tab href="?sort=featured" value="featured" :aria-label="$t('main.featured')" inertia>
           <v-icon icon="fas fa-fan" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.featured') }}</span>
@@ -57,7 +57,7 @@ useSwipeTabs({ tabOrder: ['featured', 'latest', 'popular'], currentTab: () => pa
     </template>
 
     <template v-else-if="!isEmpty(users)">
-      <v-row class="mt-8">
+      <v-row :gap="[12, 0]">
         <v-col v-for="user in users" :key="user.id" cols="12" sm="6">
           <po-users-card :data="user" />
         </v-col>

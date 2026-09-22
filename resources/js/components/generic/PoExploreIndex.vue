@@ -45,7 +45,7 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
     {{ $t('categories.category') }}
   </p>
 
-  <v-row class="mb-12">
+  <v-row :gap="[12, 0]" class="mb-12">
     <v-col v-for="cat in categories" :key="cat.id" cols="12" sm="6" lg="4">
       <po-card
         variant="text"

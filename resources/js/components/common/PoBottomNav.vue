@@ -28,7 +28,7 @@ const unreadCount = injectStrict(unreadCountKey)
     </po-button>
 
     <po-button value="publish" :href="route('writings.create')" :title="$t('main.publish')" inertia>
-      <v-icon icon="fas fa-circle-plus" />
+      <v-icon icon="fas fa-plus" />
     </po-button>
 
     <template v-if="!isAuthenticated()">
