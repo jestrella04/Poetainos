@@ -47,6 +47,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ziggy-js is aliased to vendor/tightenco/ziggy, so Composer deps are required to build.
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24

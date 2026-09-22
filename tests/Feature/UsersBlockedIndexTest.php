@@ -4,7 +4,6 @@ use App\Models\BlockedUser;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
-use function Pest\Laravel\getJson;
 
 beforeEach(function (): void {
     // Components live under resources/js/components, not Inertia's default Pages directory.
