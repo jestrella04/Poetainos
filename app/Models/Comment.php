@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\CommentFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,5 +50,21 @@ class Comment extends Model
     public function likes(): MorphMany
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Exclude comments authored by any of the given blocked user ids.
+     *
+     * @param  Builder<Comment>  $query
+     * @param  array<int>  $blockedUserIds
+     * @return Builder<Comment>
+     */
+    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
+    {
+        if ($blockedUserIds === []) {
+            return $query;
+        }
+
+        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
     }
 }

@@ -123,8 +123,7 @@ function togglePushNotifications(value: boolean | null): void {
           />
 
           <po-users-account-row
-            href="#"
-            disabled
+            :href="route('users.blocked.index')"
             :title="$t('accounts.manage-blocked-users')"
             :subtitle="
               account.blocked_authors_count > 0

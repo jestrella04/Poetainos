@@ -70,6 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('/users/block/{user}', [UsersController::class, 'blockUser'])->name('users.block');
     Route::delete('/users/block/{user}', [UsersController::class, 'unblockUser'])->name('users.unblock');
     Route::get('/account', [UsersController::class, 'account'])->name('users.account');
+    Route::get('/account/blocked', [UsersController::class, 'blockedUsers'])->name('users.blocked.index');
 
     // Comments
     Route::post('/comments/create', [CommentsController::class, 'store'])->middleware('throttle:20,1')->name('comments.store');

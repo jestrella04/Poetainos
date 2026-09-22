@@ -25,17 +25,7 @@ const page = usePage<InertiaPageProps<WritingsShowProps>>()
   <po-wrapper>
     <po-head />
 
-    <template v-if="page.props.isAuthorBlocked">
-      <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px">
-        <po-msg-block
-          :msg-title="$t('users.user-is-blocked')"
-          :msg-body="$t('main.author-blocked')"
-          icon="fas fa-ban"
-        >
-          <po-unblocker :user="page.props.writing.author" />
-        </po-msg-block>
-      </div>
-    </template>
+    <po-blocked-author-notice v-if="page.props.isAuthorBlocked" :user="page.props.writing.author" />
     <template v-else>
       <v-row>
         <v-col cols="12" md="8">

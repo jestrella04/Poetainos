@@ -24,7 +24,7 @@ class CommentsController extends Controller
     public function index(string $writingId): Paginator
     {
         $comments = Comment::where('writing_id', $writingId)
-            ->whereNotIn('user_id', $this->blockedAuthorIds())
+            ->visibleTo($this->blockedAuthorIds())
             ->with([
                 'author' => function ($query): void {
                     $query->forAuthorSummary();

@@ -293,6 +293,30 @@ class UsersController extends Controller
     }
 
     /**
+     * The authenticated user's blocked authors.
+     *
+     * @return Response|Paginator<int, User>
+     */
+    public function blockedUsers(): Response|Paginator
+    {
+        $authUser = $this->requireAuthUser();
+
+        $blockedUsers = User::forAuthorSummary()
+            ->whereIn('id', $authUser->blockedAuthors()->select('blocked_user_id'));
+
+        return $this->paginatedPage(
+            fn (): Paginator => $blockedUsers->simplePaginate($this->perPage)->withQueryString(),
+            'users/PoUsersBlockedIndex',
+            [
+                'meta' => [
+                    'title' => getPageTitle([__('Blocked authors'), __('My account')]),
+                ],
+            ],
+            'blockedUsers',
+        );
+    }
+
+    /**
      * Display the specified resource.
      */
     public function account(): Response

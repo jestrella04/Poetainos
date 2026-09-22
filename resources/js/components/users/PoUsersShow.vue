@@ -41,17 +41,7 @@ const {
   <po-wrapper>
     <po-head />
 
-    <template v-if="page.props.isAuthorBlocked">
-      <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px">
-        <po-msg-block
-          :msg-title="$t('users.user-is-blocked')"
-          :msg-body="$t('main.author-blocked')"
-          icon="fas fa-ban"
-        >
-          <po-unblocker :user="page.props.user" />
-        </po-msg-block>
-      </div>
-    </template>
+    <po-blocked-author-notice v-if="page.props.isAuthorBlocked" :user="page.props.user" />
     <template v-else>
       <po-users-entry :data="page.props.user" />
 
