@@ -16,17 +16,18 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->beforeEach(fn () => seedSiteConfig())
+    ->beforeEach(fn () => prepareTestEnvironment())
     ->in('Feature');
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->beforeEach(fn () => seedSiteConfig())
+    ->beforeEach(fn () => prepareTestEnvironment())
     ->in('Browser');
 
 /*
@@ -50,6 +51,16 @@ pest()->extend(TestCase::class)
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+/**
+ * Factories copy demo avatars and covers onto the local disk, so fake it to
+ * keep test runs from filling the real storage folders.
+ */
+function prepareTestEnvironment(): void
+{
+    Storage::fake('local');
+    seedSiteConfig();
+}
 
 /**
  * EnsureSiteIsConfigured loads the `poetainos` config from the `settings`

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use Database\Factories\Concerns\StoresDemoImages;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class UserFactory extends Factory
 {
+    use StoresDemoImages;
+
     /**
      * The name of the factory's corresponding model.
      *
@@ -30,8 +33,28 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail,
             'password' => '$2y$10$Qh9yxR9v6OfLQU5Lw61hQOLVvdegUt7WxG9/HXGVvxZB2Wd.Si.aK', // password
             'email_verified_at' => now(),
-            'extra_info' => $this->faker->boolean() ? ['bio' => $this->randomBio()] : null,
+            'extra_info' => fn (): ?array => $this->randomExtraInfo(),
         ];
+    }
+
+    /**
+     * Half of the users get a bio and, independently, half get an avatar.
+     *
+     * @return array{bio?: string, avatar?: string}|null
+     */
+    private function randomExtraInfo(): ?array
+    {
+        $extraInfo = [];
+
+        if ($this->faker->boolean()) {
+            $extraInfo['bio'] = $this->randomBio();
+        }
+
+        if ($this->faker->boolean()) {
+            $extraInfo['avatar'] = $this->storeDemoImage('images/logo-maskable.png', 'avatars');
+        }
+
+        return $extraInfo === [] ? null : $extraInfo;
     }
 
     /**

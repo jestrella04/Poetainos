@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Writing;
+use Database\Factories\Concerns\StoresDemoImages;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class WritingFactory extends Factory
 {
-    public const string DEMO_COVER_PATH = 'covers/demo-cover.jpg';
+    use StoresDemoImages;
 
     /**
      * The name of the factory's corresponding model.
@@ -30,7 +31,7 @@ class WritingFactory extends Factory
             'title' => $this->faker->text(45),
             'slug' => $this->faker->unique()->slug(3),
             'text' => implode("\n\n", $this->faker->paragraphs($this->faker->numberBetween(2, 10))),
-            'extra_info' => $this->faker->boolean() ? ['cover' => self::DEMO_COVER_PATH] : null,
+            'extra_info' => fn (): ?array => $this->faker->boolean() ? ['cover' => $this->storeDemoImage('images/cover.jpg', 'covers')] : null,
         ];
     }
 }

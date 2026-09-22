@@ -9,10 +9,8 @@ use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
-use Database\Factories\WritingFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -34,7 +32,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(CategorySeeder::class);
-        $this->seedDemoCover();
 
         $users = User::factory(self::USERS_COUNT)->create();
         $tags = Tag::factory(self::TAGS_COUNT)->create();
@@ -43,15 +40,6 @@ class DatabaseSeeder extends Seeder
 
         $this->seedComments($writings, $users);
         $this->seedEngagement($writings, $users);
-    }
-
-    /**
-     * Uploaded images live outside version control, so the cover the writing
-     * factory points at has to be put on disk for seeded writings to display it.
-     */
-    private function seedDemoCover(): void
-    {
-        Storage::disk('local')->put(WritingFactory::DEMO_COVER_PATH, file_get_contents(public_path('images/cover.jpg')));
     }
 
     /**
