@@ -32,7 +32,7 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
     {{ $t('main.explore') }}
   </p>
 
-  <p class="text-headline-small text-medium-emphasis po-prose ma-0 mb-8">
+  <p class="text-headline-small text-medium-emphasis po-prose ma-0 mb-12">
     {{
       $t('main.explore-subtitle', {
         writings: formatCount(page.props.totals.writings),
@@ -45,7 +45,7 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
     {{ $t('categories.category') }}
   </p>
 
-  <v-row class="mb-8">
+  <v-row class="mb-12">
     <v-col v-for="cat in categories" :key="cat.id" cols="12" sm="6" lg="4">
       <po-card
         variant="text"
@@ -73,10 +73,10 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
   </v-row>
 
   <p class="text-uppercase text-eyebrow mb-3">
-    {{ $t('tags.tags') }}
+    {{ $t('main.recurring-motifs') }}
   </p>
 
-  <div class="d-inline-flex flex-wrap ga-2 mb-8">
+  <div class="d-inline-flex flex-wrap ga-2 mb-12">
     <template v-for="tag in page.props.tags" :key="tag.id">
       <po-chip
         :href="route('tags.show', tag.slug)"
@@ -94,7 +94,7 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
   </div>
 
   <p class="text-uppercase text-eyebrow mb-3">
-    {{ $t('main.featured-authors') }}
+    {{ $t('main.featured-voices') }}
   </p>
 
   <po-avatar-stack :users="page.props.authors" :size="96" color="primary" />
