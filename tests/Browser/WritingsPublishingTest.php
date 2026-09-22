@@ -23,32 +23,34 @@ describe('publishing a writing', function () {
     // Re-enable once both upstream gaps are fixed.
     it('creates, edits, and deletes a writing end-to-end', function () {
         $author = createUser();
-        $parentCategory = Category::factory()->create(['parent_id' => null, 'name' => 'Poetry']);
-        $childCategory = Category::factory()->create(['parent_id' => $parentCategory->id, 'name' => 'Sonnets']);
+        $parentCategory = Category::factory()->create(['parent_id' => null]);
+        $childCategory = Category::factory()->create(['parent_id' => $parentCategory->id]);
+        $title = fakeTitle();
+        $editedTitle = fakeTitle();
 
         actingAs($author);
 
         WritingFormPage::openCreate()
-            ->fillTitle('My Browser-Tested Poem')
+            ->fillTitle($title)
             ->selectMainCategory($parentCategory)
             ->selectAltCategory($childCategory)
-            ->fillText('This is a writing created end-to-end by a real browser test.')
+            ->fillText(fakeText(10))
             ->acceptAgreements()
             ->submit()
             ->browser()
             ->assertVisible(WritingFormPage::SUCCESS_ALERT)
             ->assertNoJavaScriptErrors();
 
-        $writing = Writing::where('title', 'My Browser-Tested Poem')->firstOrFail();
+        $writing = Writing::where('title', $title)->firstOrFail();
 
         WritingFormPage::openEdit($writing)
-            ->fillTitle('My Edited Browser-Tested Poem')
+            ->fillTitle($editedTitle)
             ->submit()
             ->browser()
             ->assertVisible(WritingFormPage::SUCCESS_ALERT)
             ->assertNoJavaScriptErrors();
 
-        expect($writing->refresh()->title)->toBe('My Edited Browser-Tested Poem');
+        expect($writing->refresh()->title)->toBe($editedTitle);
 
         WritingFormPage::openEdit($writing)
             ->deleteWriting()

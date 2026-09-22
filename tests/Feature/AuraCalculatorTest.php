@@ -2,61 +2,64 @@
 
 use App\Services\AuraCalculator;
 
+/**
+ * @param  list<string>  $keys
+ * @return array<string, int>
+ */
+function fakeCountables(array $keys): array
+{
+    return collect($keys)->mapWithKeys(fn (string $key): array => [$key => fake()->numberBetween(0, 500)])->all();
+}
+
+/**
+ * @param  list<string>  $keys
+ * @return array<string, int>
+ */
+function fakeWeights(array $keys): array
+{
+    return collect($keys)->mapWithKeys(fn (string $key): array => [$key => fake()->numberBetween(1, 20)])->all();
+}
+
 describe('weightedScore', function (): void {
-    it('matches the writing aura formula for a fixed set of countables', function (): void {
+    it('matches the writing aura formula for any set of countables', function (): void {
         // Given
-        $countables = [
-            'likes' => 5,
-            'comments' => 2,
-            'shelf' => 1,
-            'views' => 20,
-        ];
-        $weights = [
-            'likes' => 2,
-            'comments' => 3,
-            'shelf' => 4,
-            'views' => 1,
-        ];
+        $countables = fakeCountables(['likes', 'comments', 'shelf', 'views']);
+        $weights = fakeWeights(['likes', 'comments', 'shelf', 'views']);
 
         // When
         $points = app(AuraCalculator::class)->weightedScore($countables, $weights);
 
         // Then
-        $basePoints = 2 + 3 + 4 + 1;
-        $totalPoints = (2 * 5) + (3 * 2) + (4 * 1) + (1 * 20);
-        $expectedScore = (float) number_format($totalPoints / (4 * $basePoints), 2);
+        $basePoints = $weights['likes'] + $weights['comments'] + $weights['shelf'] + $weights['views'];
+        $totalPoints = ($weights['likes'] * $countables['likes'])
+            + ($weights['comments'] * $countables['comments'])
+            + ($weights['shelf'] * $countables['shelf'])
+            + ($weights['views'] * $countables['views']);
+        $expectedScore = (float) number_format($totalPoints / (4 * $basePoints), 2, '.', '');
 
         expect($points['base'])->toBe($basePoints);
         expect($points['total'])->toBe($totalPoints);
         expect($points['score'])->toBe($expectedScore);
     });
 
-    it('matches the user aura formula for a fixed set of countables', function (): void {
+    it('matches the user aura formula for any set of countables', function (): void {
         // Given
-        $countables = [
-            'writings' => 3,
-            'likes' => 5,
-            'comments' => 2,
-            'shelf' => 1,
-            'views' => 20,
-            'awards' => 1,
-        ];
-        $weights = [
-            'writings' => 10,
-            'likes' => 2,
-            'comments' => 3,
-            'shelf' => 4,
-            'views' => 1,
-            'awards' => 20,
-        ];
+        $countables = fakeCountables(['writings', 'likes', 'comments', 'shelf', 'views', 'awards']);
+        $weights = fakeWeights(['writings', 'likes', 'comments', 'shelf', 'views', 'awards']);
 
         // When
         $points = app(AuraCalculator::class)->weightedScore($countables, $weights);
 
         // Then
-        $basePoints = 10 + 2 + 3 + 4 + 1 + 20;
-        $totalPoints = (10 * 3) + (2 * 5) + (3 * 2) + (4 * 1) + (1 * 20) + (20 * 1);
-        $expectedScore = (float) number_format($totalPoints / (6 * $basePoints), 2);
+        $basePoints = $weights['writings'] + $weights['likes'] + $weights['comments']
+            + $weights['shelf'] + $weights['views'] + $weights['awards'];
+        $totalPoints = ($weights['writings'] * $countables['writings'])
+            + ($weights['likes'] * $countables['likes'])
+            + ($weights['comments'] * $countables['comments'])
+            + ($weights['shelf'] * $countables['shelf'])
+            + ($weights['views'] * $countables['views'])
+            + ($weights['awards'] * $countables['awards']);
+        $expectedScore = (float) number_format($totalPoints / (6 * $basePoints), 2, '.', '');
 
         expect($points['base'])->toBe($basePoints);
         expect($points['total'])->toBe($totalPoints);
@@ -65,13 +68,14 @@ describe('weightedScore', function (): void {
 
     it('derives the divisor from the countable count automatically', function (): void {
         // Given
-        $countables = ['a' => 10, 'b' => 10];
+        $count = fake()->numberBetween(1, 1000);
+        $countables = ['a' => $count, 'b' => $count];
         $weights = ['a' => 1, 'b' => 1];
 
         // When
         $twoCountables = app(AuraCalculator::class)->weightedScore($countables, $weights);
 
-        $countables['c'] = 10;
+        $countables['c'] = $count;
         $weights['c'] = 1;
         $threeCountables = app(AuraCalculator::class)->weightedScore($countables, $weights);
 
@@ -79,13 +83,13 @@ describe('weightedScore', function (): void {
         // Adding a countable changes the divisor (count($countables) * base)
         // without any manual literal to update.
         expect($twoCountables['score'])->not->toBe($threeCountables['score']);
-        expect($twoCountables['score'])->toBe(round(20 / (2 * 2), 2));
-        expect($threeCountables['score'])->toBe(round(30 / (3 * 3), 2));
+        expect($twoCountables['score'])->toBe(round(2 * $count / (2 * 2), 2));
+        expect($threeCountables['score'])->toBe(round(3 * $count / (3 * 3), 2));
     });
 
     it('returns a zero score when the base is zero', function (): void {
         // When
-        $points = app(AuraCalculator::class)->weightedScore(['likes' => 5], ['likes' => 0]);
+        $points = app(AuraCalculator::class)->weightedScore(['likes' => fake()->numberBetween(1, 1000)], ['likes' => 0]);
 
         // Then
         expect($points['base'])->toBe(0);

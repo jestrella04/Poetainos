@@ -24,6 +24,15 @@ function sendVerificationCode(User $user): string
     return $code;
 }
 
+function wrongCodeFor(string $code): string
+{
+    do {
+        $wrongCode = fake()->numerify('######');
+    } while ($wrongCode === $code);
+
+    return $wrongCode;
+}
+
 describe('verifying an email', function (): void {
     it('can render the email verification screen', function (): void {
         // Given
@@ -66,7 +75,7 @@ describe('verifying an email', function (): void {
         // Given
         $user = createUser(['email_verified_at' => null]);
         $code = sendVerificationCode($user);
-        $wrongCode = $code === '000000' ? '111111' : '000000';
+        $wrongCode = wrongCodeFor($code);
 
         // When
         $response = actingAs($user)->postJson(route('verification.verify'), ['code' => $wrongCode]);
@@ -81,7 +90,7 @@ describe('verifying an email', function (): void {
         $user = createUser(['email_verified_at' => null]);
 
         // When
-        $response = actingAs($user)->postJson(route('verification.verify'), ['code' => 'abc']);
+        $response = actingAs($user)->postJson(route('verification.verify'), ['code' => fake()->lexify('???')]);
 
         // Then
         $response->assertJsonValidationErrors('code');
@@ -91,7 +100,7 @@ describe('verifying an email', function (): void {
         // Given
         $user = createUser(['email_verified_at' => null]);
         $code = sendVerificationCode($user);
-        $wrongCode = $code === '000000' ? '111111' : '000000';
+        $wrongCode = wrongCodeFor($code);
         // The route throttle shares its budget with the resend route; isolate the per-code attempt cap.
         $this->withoutMiddleware(ThrottleRequests::class);
 
@@ -110,7 +119,7 @@ describe('verifying an email', function (): void {
         // Given
         $user = createUser(['email_verified_at' => null]);
         $code = sendVerificationCode($user);
-        $user->forceFill(['email' => 'changed@example.com'])->save();
+        $user->forceFill(['email' => fake()->unique()->safeEmail()])->save();
 
         // When
         $response = actingAs($user)->postJson(route('verification.verify'), ['code' => $code]);
@@ -140,7 +149,7 @@ describe('the lifetime of a code', function (): void {
         // Given
         $user = createUser(['email_verified_at' => null]);
         $code = sendVerificationCode($user);
-        $wrongCode = $code === '000000' ? '111111' : '000000';
+        $wrongCode = wrongCodeFor($code);
         $this->withoutMiddleware(ThrottleRequests::class);
 
         // When

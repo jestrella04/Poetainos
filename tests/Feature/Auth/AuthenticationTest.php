@@ -20,12 +20,13 @@ describe('the login screen', function (): void {
 describe('authenticating', function (): void {
     it('allows users to authenticate using the login screen', function (): void {
         // Given
-        $user = createUser();
+        $password = fake()->password();
+        $user = createUserWithPassword($password);
 
         // When
         $response = post('/login', [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => $password,
         ]);
 
         // Then
@@ -38,13 +39,14 @@ describe('authenticating', function (): void {
 
     it('honors a safe, same-site redirect target after login', function (): void {
         // Given
-        $user = createUser();
+        $password = fake()->password();
+        $user = createUserWithPassword($password);
         get('/login?redirect=/writings/create');
 
         // When
         $response = post('/login', [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => $password,
         ]);
 
         // Then
@@ -53,13 +55,14 @@ describe('authenticating', function (): void {
 
     it('ignores an external redirect target to prevent an open redirect', function (): void {
         // Given
-        $user = createUser();
+        $password = fake()->password();
+        $user = createUserWithPassword($password);
         get('/login?redirect=https://evil.example/phish');
 
         // When
         $response = post('/login', [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => $password,
         ]);
 
         // Then
@@ -68,12 +71,13 @@ describe('authenticating', function (): void {
 
     it('does not authenticate with an invalid password', function (): void {
         // Given
-        $user = createUser();
+        $password = fake()->password();
+        $user = createUserWithPassword($password);
 
         // When
         post('/login', [
             'email' => $user->email,
-            'password' => 'wrong-password',
+            'password' => strrev($password).fake()->password(),
         ]);
 
         // Then
@@ -102,7 +106,7 @@ describe('checking whether an email has an account', function (): void {
 
         // When
         $known = postJson(route('email.check'), ['email' => $user->email]);
-        $unknown = postJson(route('email.check'), ['email' => 'nobody@example.com']);
+        $unknown = postJson(route('email.check'), ['email' => fake()->unique()->safeEmail()]);
 
         // Then
         $known->assertOk()->assertJson(['exists' => true]);
@@ -112,9 +116,9 @@ describe('checking whether an email has an account', function (): void {
     it('is throttled so it cannot be used to enumerate accounts', function (): void {
         // When
         foreach (range(1, 10) as $attempt) {
-            postJson(route('email.check'), ['email' => "guess{$attempt}@example.com"]);
+            postJson(route('email.check'), ['email' => fake()->unique()->safeEmail()]);
         }
-        $response = postJson(route('email.check'), ['email' => 'one-more@example.com']);
+        $response = postJson(route('email.check'), ['email' => fake()->unique()->safeEmail()]);
 
         // Then
         $response->assertTooManyRequests();

@@ -11,7 +11,7 @@ use Tests\Browser\Pages\WritingPage;
 
 describe('browsing main sections', function () {
     it('shows the home page with published writings', function () {
-        $writings = Writing::factory()->count(3)->create();
+        $writings = Writing::factory()->count(fake()->numberBetween(1, 5))->create();
 
         $browser = HomePage::open()->browser();
 
@@ -34,23 +34,25 @@ describe('browsing main sections', function () {
     });
 
     it('shows a single writing page with its title and author', function () {
-        $author = User::factory()->create(['name' => 'Ada Lovelace']);
+        $name = fake()->firstName().' '.fake()->lastName();
+        $author = User::factory()->create(['name' => $name]);
         $writing = Writing::factory()->for($author, 'author')->create();
         $entry = new WritingEntry($writing);
 
         WritingPage::open($writing)
             ->browser()
             ->assertSeeIn($entry->title(), $writing->title)
-            ->assertSeeIn($entry->author(), 'Ada Lovelace')
+            ->assertSeeIn($entry->author(), $name)
             ->assertNoJavaScriptErrors();
     });
 
     it('shows a user profile page', function () {
-        $user = User::factory()->create(['name' => 'Grace Hopper']);
+        $name = fake()->firstName().' '.fake()->lastName();
+        $user = User::factory()->create(['name' => $name]);
 
         UserProfilePage::open($user)
             ->browser()
-            ->assertSeeIn(UserProfilePage::NAME, 'Grace Hopper')
+            ->assertSeeIn(UserProfilePage::NAME, $name)
             ->assertNoJavaScriptErrors();
     });
 });

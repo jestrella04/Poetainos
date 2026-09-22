@@ -15,7 +15,8 @@ describe('the account page', function (): void {
     it('summarises the account with counts and the registration date', function (): void {
         // Given
         $user = createUser();
-        Writing::factory()->count(2)->for($user, 'author')->create();
+        $writingsCount = fake()->numberBetween(1, 5);
+        Writing::factory()->count($writingsCount)->for($user, 'author')->create();
         $user->shelf()->attach(Writing::factory()->create());
         BlockedUser::factory()->create(['user_id' => $user->id]);
 
@@ -26,7 +27,7 @@ describe('the account page', function (): void {
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('users/PoUsersAccount')
-                ->where('account.writings_count', 2)
+                ->where('account.writings_count', $writingsCount)
                 ->where('account.shelf_count', 1)
                 ->where('account.likes_count', 0)
                 ->where('account.blocked_authors_count', 1)

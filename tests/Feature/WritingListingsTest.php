@@ -11,8 +11,9 @@ use function Pest\Laravel\getJson;
 describe('sorting ties', function (): void {
     it('breaks popular and likes ties by aura descending', function (): void {
         // Given
-        $lowerAura = Writing::factory()->create(['views' => 10, 'aura' => 1.0]);
-        $higherAura = Writing::factory()->create(['views' => 10, 'aura' => 5.0]);
+        $views = fake()->numberBetween(0, 1000);
+        $lowerAura = Writing::factory()->create(['views' => $views, 'aura' => fake()->randomFloat(2, 0, 50)]);
+        $higherAura = Writing::factory()->create(['views' => $views, 'aura' => $lowerAura->aura + fake()->randomFloat(2, 0.01, 50)]);
 
         // When
         $popularIds = Writing::sorted('popular')->pluck('id')->all();
@@ -30,8 +31,9 @@ describe('sorting ties', function (): void {
     it('breaks popular ties on a user\'s writings listing the same way the homepage does', function (): void {
         // Given
         $author = createUser();
-        $lowerAura = Writing::factory()->for($author, 'author')->create(['views' => 10, 'aura' => 1.0]);
-        $higherAura = Writing::factory()->for($author, 'author')->create(['views' => 10, 'aura' => 5.0]);
+        $views = fake()->numberBetween(0, 1000);
+        $lowerAura = Writing::factory()->for($author, 'author')->create(['views' => $views, 'aura' => fake()->randomFloat(2, 0, 50)]);
+        $higherAura = Writing::factory()->for($author, 'author')->create(['views' => $views, 'aura' => $lowerAura->aura + fake()->randomFloat(2, 0.01, 50)]);
 
         // When
         $response = getJson(route('users.writings.index', $author->username).'?sort=popular');
@@ -51,14 +53,15 @@ describe('sorting ties', function (): void {
 describe('listing fields', function (): void {
     it('includes the author karma alongside the other author fields', function (): void {
         // Given
-        $author = createUser(['karma' => 'A']);
+        $karma = fake()->randomElement(['A', 'B', 'C', 'D', 'F']);
+        $author = createUser(['karma' => $karma]);
         Writing::factory()->for($author, 'author')->create();
 
         // When
         $response = getJson('/?sort=latest');
 
         // Then
-        expect($response->json('data.0.author.karma'))->toBe('A');
+        expect($response->json('data.0.author.karma'))->toBe($karma);
     });
 });
 
@@ -110,10 +113,12 @@ describe('the canonical link of a listing', function (): void {
 describe('ranking authors', function (): void {
     it('puts the best karma first and treats missing karma as the lowest grade', function (): void {
         // Given
-        $missingKarma = createUser(['karma' => null, 'aura' => 9]);
-        $gradeF = createUser(['karma' => 'F', 'aura' => 5]);
-        $gradeC = createUser(['karma' => 'C', 'aura' => 1]);
-        $gradeA = createUser(['karma' => 'A', 'aura' => 0]);
+        // Missing karma ties with F, so the higher aura puts it ahead.
+        $gradeFAura = fake()->randomFloat(2, 0, 50);
+        $missingKarma = createUser(['karma' => null, 'aura' => $gradeFAura + fake()->randomFloat(2, 0.01, 50)]);
+        $gradeF = createUser(['karma' => 'F', 'aura' => $gradeFAura]);
+        $gradeC = createUser(['karma' => 'C', 'aura' => fake()->randomFloat(2, 0, 100)]);
+        $gradeA = createUser(['karma' => 'A', 'aura' => fake()->randomFloat(2, 0, 100)]);
 
         // When
         $ranked = User::ranked()->pluck('id')->all();

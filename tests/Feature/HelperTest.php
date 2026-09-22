@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Writing;
+use Illuminate\Support\Str;
 
 describe('resolveSort', function (): void {
     it('returns the requested sort when it is in the whitelist', function (): void {
@@ -13,11 +14,12 @@ describe('resolveSort', function (): void {
 
     it('falls back to the default when the sort is not whitelisted', function (): void {
         // Given
-        request()->merge(['sort' => 'not-a-real-sort']);
+        request()->merge(['sort' => fake()->lexify('sort-????')]);
+        $default = fake()->word();
 
         // Then
         expect(resolveSort(['latest', 'popular']))->toBe('latest');
-        expect(resolveSort(['latest', 'popular'], 'featured'))->toBe('featured');
+        expect(resolveSort(['latest', 'popular'], $default))->toBe($default);
     });
 });
 
@@ -36,28 +38,33 @@ describe('escapeLike', function (): void {
 describe('slugify', function (): void {
     it('appends the first free number when the slug is taken', function (): void {
         // Given
-        Writing::factory()->create(['slug' => 'my-poem']);
-        Writing::factory()->create(['slug' => 'my-poem-1']);
+        $title = fakeTitle();
+        $takenSlug = Str::slug($title);
+        Writing::factory()->create(['slug' => $takenSlug]);
+        Writing::factory()->create(['slug' => "{$takenSlug}-1"]);
 
         // When
-        $slug = slugify('writings', 'My Poem');
+        $slug = slugify('writings', $title);
 
         // Then
-        expect($slug)->toBe('my-poem-2');
+        expect($slug)->toBe("{$takenSlug}-2");
     });
 
     it('keeps finding a free slug beyond ten duplicates', function (): void {
         // Given
-        Writing::factory()->create(['slug' => 'twin']);
-        foreach (range(1, 12) as $number) {
-            Writing::factory()->create(['slug' => "twin-{$number}"]);
+        $title = fakeTitle();
+        $takenSlug = Str::slug($title);
+        $duplicates = fake()->numberBetween(11, 20);
+        Writing::factory()->create(['slug' => $takenSlug]);
+        foreach (range(1, $duplicates) as $number) {
+            Writing::factory()->create(['slug' => "{$takenSlug}-{$number}"]);
         }
 
         // When
-        $slug = slugify('writings', 'Twin');
+        $slug = slugify('writings', $title);
 
         // Then
-        expect($slug)->toBe('twin-13');
+        expect($slug)->toBe($takenSlug.'-'.($duplicates + 1));
     });
 
     it('never returns a slug that a static route would swallow', function (string $title, string $expected): void {

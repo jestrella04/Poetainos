@@ -9,16 +9,20 @@ use function Pest\Laravel\getJson;
 describe('the query endpoint', function (): void {
     it('returns matching tags', function (): void {
         // Given
-        Tag::factory()->create(['name' => 'poetry']);
-        Tag::factory()->create(['name' => 'prose']);
+        $matching = Tag::factory()->create();
+        $query = mb_substr($matching->name, 0, 3);
+        do {
+            $otherName = fake()->unique()->word();
+        } while (str_contains($otherName, $query));
+        Tag::factory()->create(['name' => $otherName]);
 
         // When
-        $response = getJson('/tags/query?query=poe');
+        $response = getJson('/tags/query?query='.urlencode($query));
 
         // Then
         $response->assertOk();
-        $response->assertJsonFragment(['value' => 'poetry', 'label' => 'poetry']);
-        $response->assertJsonMissing(['value' => 'prose']);
+        $response->assertJsonFragment(['value' => $matching->name, 'label' => $matching->name]);
+        $response->assertJsonMissing(['value' => $otherName]);
     });
 });
 

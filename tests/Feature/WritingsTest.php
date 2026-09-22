@@ -42,7 +42,7 @@ describe('the daily post limit', function (): void {
         Writing::factory()->for($user, 'author')->create();
 
         // When
-        $response = actingAs($user)->post(route('writings.store'), ['title' => 'One too many']);
+        $response = actingAs($user)->post(route('writings.store'), ['title' => fakeTitle()]);
 
         // Then
         $response->assertSessionHasErrors('title');
@@ -85,18 +85,19 @@ describe('creating a writing', function (): void {
         $user = createUser();
         $mainCategory = Category::factory()->create(['parent_id' => null]);
         $subCategory = Category::factory()->create(['parent_id' => $mainCategory->id]);
+        $title = fakeTitle();
 
         // When
         $response = actingAs($user)->post('/writings/create', [
-            'title' => 'My new poem',
+            'title' => $title,
             'main_category' => $mainCategory->id,
             'categories' => [$subCategory->id],
-            'text' => 'A sufficiently long body of text for validation purposes.',
+            'text' => fakeText(10),
         ]);
 
         // Then
         $response->assertOk();
-        $writing = Writing::where('title', 'My new poem')->firstOrFail();
+        $writing = Writing::where('title', $title)->firstOrFail();
         expect($writing->categories()->pluck('categories.id')->all())
             ->toContain($mainCategory->id, $subCategory->id);
         Notification::assertSentTo($user, WritingPublished::class);
@@ -108,20 +109,18 @@ describe('creating a writing', function (): void {
         $user = createUser();
         $user->acceptAgreements();
         $mainCategory = Category::factory()->create(['parent_id' => null]);
+        $title = fakeTitle();
 
         // When
-        $response = actingAs($user)->post('/writings/create', [
-            'title' => 'Already agreed',
-            'main_category' => $mainCategory->id,
-            'categories' => [$mainCategory->id],
-            'text' => 'A sufficiently long body of text for validation purposes.',
+        $response = actingAs($user)->post('/writings/create', writingPayload($mainCategory, [
+            'title' => $title,
             'service_agreement' => 'false',
             'privacy_agreement' => 'false',
-        ]);
+        ]));
 
         // Then
         $response->assertOk();
-        expect(Writing::where('title', 'Already agreed')->exists())->toBeTrue();
+        expect(Writing::where('title', $title)->exists())->toBeTrue();
     });
 
     it('rejects publishing when a user who has not agreed submits the agreements unchecked', function (): void {
@@ -130,14 +129,10 @@ describe('creating a writing', function (): void {
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
         // When
-        $response = actingAs($user)->post('/writings/create', [
-            'title' => 'Not agreed',
-            'main_category' => $mainCategory->id,
-            'categories' => [$mainCategory->id],
-            'text' => 'A sufficiently long body of text for validation purposes.',
+        $response = actingAs($user)->post('/writings/create', writingPayload($mainCategory, [
             'service_agreement' => 'false',
             'privacy_agreement' => 'false',
-        ]);
+        ]));
 
         // Then
         $response->assertSessionHasErrors(['service_agreement', 'privacy_agreement']);
@@ -150,12 +145,7 @@ describe('creating a writing', function (): void {
         Writing::factory()->for($user, 'author')->count(3)->create(['created_at' => now()]);
 
         // When
-        $response = actingAs($user)->post('/writings/create', [
-            'title' => 'One too many',
-            'main_category' => $mainCategory->id,
-            'categories' => [$mainCategory->id],
-            'text' => 'A sufficiently long body of text for validation purposes.',
-        ]);
+        $response = actingAs($user)->post('/writings/create', writingPayload($mainCategory));
 
         // Then
         $response->assertSessionHasErrors('title');
@@ -241,10 +231,10 @@ describe('editing and deleting a writing', function (): void {
 function writingPayload(Category $mainCategory, array $overrides = []): array
 {
     return array_merge([
-        'title' => 'A fresh title',
+        'title' => fakeTitle(),
         'main_category' => $mainCategory->id,
         'categories' => [$mainCategory->id],
-        'text' => 'A sufficiently long body of text for validation purposes.',
+        'text' => fakeText(10),
     ], $overrides);
 }
 
@@ -255,31 +245,34 @@ describe('updating a writing', function (): void {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create(['created_at' => now()]);
         $mainCategory = Category::factory()->create(['parent_id' => null]);
+        $title = fakeTitle();
 
         // When
         $response = actingAs($author)->put(route('writings.update', $writing), writingPayload($mainCategory, [
-            'title' => 'Edited title',
+            'title' => $title,
         ]));
 
         // Then
         $response->assertOk();
-        expect($writing->refresh()->title)->toBe('Edited title');
+        expect($writing->refresh()->title)->toBe($title);
     });
 
     it('keeps the slug and the other stored details when editing', function (): void {
         // Given
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['slug' => 'original-slug']);
+        $writing = Writing::factory()->for($author, 'author')->create();
+        $originalSlug = $writing->slug;
         $mainCategory = Category::factory()->create(['parent_id' => null]);
+        $link = fake()->url();
 
         // When
         actingAs($author)->put(route('writings.update', $writing), writingPayload($mainCategory, [
-            'link' => 'https://example.com/poem',
+            'link' => $link,
         ]))->assertOk();
 
         // Then
-        expect($writing->refresh()->slug)->toBe('original-slug');
-        expect($writing->extra_info['link'])->toBe('https://example.com/poem');
+        expect($writing->refresh()->slug)->toBe($originalSlug);
+        expect($writing->extra_info['link'])->toBe($link);
     });
 
     it('does not reuse a slug that a static route owns', function (): void {
@@ -320,8 +313,8 @@ describe('updating a writing', function (): void {
         $response->assertUnprocessable();
         expect(Writing::count())->toBe(0);
     })->with([
-        'too many tags' => [array_map(fn (int $n): string => "tag{$n}", range(1, 11))],
-        'a tag that is too long' => [[str_repeat('a', 41)]],
+        'too many tags' => [fn (): array => array_map(fn (): string => fake()->unique()->word(), range(1, 11))],
+        'a tag that is too long' => [fn (): array => [fake()->lexify(str_repeat('?', 41))]],
         'a blank tag' => [['   ']],
     ]);
 
@@ -331,14 +324,18 @@ describe('updating a writing', function (): void {
         $author = createUser();
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
+        [$firstWord, $secondWord, $otherTag] = array_map(fn (): string => fake()->unique()->word(), range(1, 3));
+        $spacedTag = "{$firstWord} {$secondWord}";
+
         // When
         actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, [
-            'tags' => ['free   verse', 'free verse', 'haiku'],
+            'tags' => ["{$firstWord}   {$secondWord}", $spacedTag, $otherTag],
         ]))->assertOk();
 
         // Then
         $writing = Writing::firstOrFail();
-        expect($writing->tags()->pluck('name')->sort()->values()->all())->toBe(['free verse', 'haiku']);
+        expect($writing->tags()->pluck('name')->sort()->values()->all())
+            ->toBe(collect([$spacedTag, $otherTag])->sort()->values()->all());
     });
 
     it('does not leave a half saved writing behind when syncing fails', function (): void {
@@ -346,10 +343,10 @@ describe('updating a writing', function (): void {
         Notification::fake();
         $author = createUser();
         $mainCategory = Category::factory()->create(['parent_id' => null]);
-        Tag::creating(fn () => throw new RuntimeException('tag failure'));
+        Tag::creating(fn () => throw new RuntimeException(fake()->sentence()));
 
         // When
-        $response = actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['tags' => ['boom']]));
+        $response = actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['tags' => [fake()->word()]]));
 
         // Then
         $response->assertServerError();
@@ -364,35 +361,37 @@ describe('a writing cover', function (): void {
 
     it('is cropped to 16:9 and replaces the previous cover', function (): void {
         // Given
-        Storage::disk('local')->put('covers/old.png', 'old');
+        $oldCover = 'covers/'.fake()->uuid().'.png';
+        Storage::disk('local')->put($oldCover, fake()->sentence());
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => 'covers/old.png']]);
+        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => $oldCover]]);
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
         // When
         actingAs($author)->post(route('writings.update', $writing), writingPayload($mainCategory, [
             '_method' => 'PUT',
-            'cover' => UploadedFile::fake()->image('cover.jpg', 2000, 1000),
+            'cover' => UploadedFile::fake()->image(fake()->word().'.jpg', fake()->numberBetween(1400, 2400), fake()->numberBetween(800, 1400)),
         ]))->assertOk();
 
         // Then
         $cover = $writing->refresh()->extra_info['cover'];
-        expect($cover)->toStartWith('covers/')->not->toBe('covers/old.png');
+        expect($cover)->toStartWith('covers/')->not->toBe($oldCover);
         expect(getimagesize(Storage::disk('local')->path($cover))[0])->toBe(1280);
-        Storage::disk('local')->assertMissing('covers/old.png');
+        Storage::disk('local')->assertMissing($oldCover);
     });
 
     it('is deleted together with the writing', function (): void {
         // Given
-        Storage::disk('local')->put('covers/mine.png', 'x');
+        $cover = 'covers/'.fake()->uuid().'.png';
+        Storage::disk('local')->put($cover, fake()->sentence());
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => 'covers/mine.png']]);
+        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => $cover]]);
 
         // When
         actingAs($author)->delete(route('writings.destroy', $writing))->assertOk();
 
         // Then
-        Storage::disk('local')->assertMissing('covers/mine.png');
+        Storage::disk('local')->assertMissing($cover);
     });
 });
 

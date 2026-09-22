@@ -15,10 +15,12 @@ afterEach(function (): void {
 describe('the generate:assetlinks command', function (): void {
     it('writes the configured Android app identity to .well-known/assetlinks.json', function (): void {
         // Given
+        $packageName = 'com.'.fake()->domainWord().'.'.fake()->domainWord();
+        $fingerprint = implode(':', str_split(strtoupper(fake()->sha256()), 2));
         config(['services.google.android.assetlinks' => [
             'namespace' => 'android_app',
-            'package_name' => 'com.example.poetainos',
-            'fingerprint' => 'AA:BB:CC',
+            'package_name' => $packageName,
+            'fingerprint' => $fingerprint,
         ]]);
 
         // When
@@ -30,8 +32,8 @@ describe('the generate:assetlinks command', function (): void {
             'relation' => ['delegate_permission/common.handle_all_urls'],
             'target' => [
                 'namespace' => 'android_app',
-                'package_name' => 'com.example.poetainos',
-                'sha256_cert_fingerprints' => ['AA:BB:CC'],
+                'package_name' => $packageName,
+                'sha256_cert_fingerprints' => [$fingerprint],
             ],
         ]]);
     });

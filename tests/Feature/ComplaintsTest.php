@@ -15,12 +15,7 @@ describe('the reasons endpoint', function (): void {
         $response = getJson('/complaints/reasons');
 
         // Then
-        $response->assertOk()->assertJson([
-            'reasons' => [
-                ['value' => 'spam', 'label' => 'Spam or advertising'],
-                ['value' => 'abuse', 'label' => 'Harassment or abuse'],
-            ],
-        ]);
+        $response->assertOk()->assertJson(['reasons' => getSiteConfig('complaints')]);
     });
 });
 
@@ -69,7 +64,7 @@ describe('submitting a complaint', function (): void {
         // When
         $response = postJson('/complaints/store', [
             'complainable_type' => 'writings',
-            'complainable_id' => 999999,
+            'complainable_id' => fake()->numberBetween(100000, 999999),
             'reasons' => ['spam'],
         ]);
 
@@ -87,7 +82,7 @@ describe('validating a complaint', function (): void {
         $response = postJson('/complaints/store', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
-            'reasons' => ['not-a-reason'],
+            'reasons' => [fake()->lexify('reason-????')],
         ]);
 
         // Then
@@ -97,14 +92,15 @@ describe('validating a complaint', function (): void {
     it('accepts reasons configured as plain strings', function (): void {
         // Given
         Notification::fake();
-        config(['poetainos.complaints' => ['Spam', 'Abuse']]);
+        $reasons = [fake()->unique()->word(), fake()->unique()->word()];
+        config(['poetainos.complaints' => $reasons]);
         $writing = Writing::factory()->create();
 
         // When
         $response = postJson('/complaints/store', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
-            'reasons' => ['Spam'],
+            'reasons' => [$reasons[0]],
         ]);
 
         // Then
@@ -130,16 +126,17 @@ describe('validating a complaint', function (): void {
         // Given
         Notification::fake();
         $writing = Writing::factory()->create();
+        $comment = fake()->sentence();
 
         // When
         postJson('/complaints/store', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
             'reasons' => ['spam'],
-            'comment' => 'It advertises a casino.',
+            'comment' => $comment,
         ])->assertOk();
 
         // Then
-        assertDatabaseHas('complaints', ['comment' => 'It advertises a casino.']);
+        assertDatabaseHas('complaints', ['comment' => $comment]);
     });
 });

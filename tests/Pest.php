@@ -16,6 +16,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -70,17 +71,17 @@ function prepareTestEnvironment(): void
 function seedSiteConfig(): void
 {
     config(['poetainos' => [
-        'name' => 'Poetainos',
-        'slogan' => 'A place for writers',
+        'name' => fakeTitle(),
+        'slogan' => fake()->sentence(),
         'pagination' => 10,
         'uploads_max_file_size' => 2048,
         'social' => [],
         'stores' => [],
         'complaints' => [
-            ['value' => 'spam', 'label' => 'Spam or advertising'],
-            ['value' => 'abuse', 'label' => 'Harassment or abuse'],
+            ['value' => 'spam', 'label' => fake()->sentence(3)],
+            ['value' => 'abuse', 'label' => fake()->sentence(3)],
         ],
-        'emails' => ['admin' => 'admin@example.com'],
+        'emails' => ['admin' => fake()->safeEmail()],
         'aura' => [
             'min_at_home' => 90,
             'points' => [
@@ -109,6 +110,55 @@ function seedSiteConfig(): void
 function createUser(array $attributes = []): User
 {
     return User::factory()->create($attributes);
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createUserWithPassword(string $password, array $attributes = []): User
+{
+    return createUser(array_merge($attributes, ['password' => Hash::make($password)]));
+}
+
+/**
+ * Faker's userName() may contain dots, which neither the registration rule nor
+ * the @mention parser accept, so build one from the characters both allow.
+ */
+function fakeUsername(): string
+{
+    return fake()->unique()->regexify('[a-z][a-z0-9_]{7,14}');
+}
+
+/**
+ * Satisfies the registration password rule: 8+ characters with an upper case
+ * letter, a lower case letter and a digit.
+ */
+function fakeStrongPassword(): string
+{
+    return fake()->regexify('[A-Z][a-z]{6,10}[0-9]{2,4}');
+}
+
+/**
+ * A short, punctuation-free title, so it survives slugging, HTML escaping and
+ * the 3 to 40 character rules of titles and names unchanged.
+ */
+function fakeTitle(): string
+{
+    return Str::title(fake()->unique()->words(2, true));
+}
+
+/**
+ * Prose that clears a minimum length rule while staying well below any maximum.
+ */
+function fakeText(int $minLength): string
+{
+    $text = fake()->paragraph();
+
+    while (mb_strlen($text) < $minLength) {
+        $text .= ' '.fake()->paragraph();
+    }
+
+    return $text;
 }
 
 /**

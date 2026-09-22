@@ -7,11 +7,12 @@ describe('confirming a password', function (): void {
     // only POST /confirm-password (named password.confirmer) exists in this app.
     it('can be confirmed', function (): void {
         // Given
-        $user = createUser();
+        $password = fake()->password();
+        $user = createUserWithPassword($password);
 
         // When
         $response = actingAs($user)->post('/confirm-password', [
-            'password' => 'password',
+            'password' => $password,
         ]);
 
         // Then
@@ -23,11 +24,12 @@ describe('confirming a password', function (): void {
 
     it('is not confirmed with an invalid password', function (): void {
         // Given
-        $user = createUser();
+        $password = fake()->password();
+        $user = createUserWithPassword($password);
 
         // When
         $response = actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
+            'password' => strrev($password).fake()->password(),
         ]);
 
         // Then

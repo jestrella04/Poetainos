@@ -53,7 +53,9 @@ describe('notification emails', function (): void {
 describe('the content of "someone did something on your writing" notifications', function (): void {
     it('names who did it, the site, and links to the writing', function (string $class, string $expectedAction): void {
         // Given
-        $actor = createUser(['name' => 'Emily Dickinson']);
+        $actorName = fake()->firstName().' '.fake()->lastName();
+        $site = getSiteConfig('name');
+        $actor = createUser(['name' => $actorName]);
         $recipient = createUser();
         $writing = Writing::factory()->for($recipient, 'author')->create();
         $target = $class === CommentLiked::class ? Comment::factory()->for($writing)->create() : $writing;
@@ -64,8 +66,8 @@ describe('the content of "someone did something on your writing" notifications',
         $mail = $notification->toMail($recipient);
 
         // Then
-        expect($message['title'])->toContain('Emily Dickinson')->toContain('Poetainos');
-        expect($message['body'])->toContain('Emily Dickinson')->toContain('Poetainos');
+        expect($message['title'])->toContain($actorName)->toContain($site);
+        expect($message['body'])->toContain($actorName)->toContain($site);
         expect($mail->actionText)->toBe(__($expectedAction));
         expect($mail->actionUrl)->toBe($writing->path());
         expect($mail->greeting)->toBe(__('Hello!'));
@@ -92,8 +94,11 @@ describe('the content of "someone did something on your writing" notifications',
 describe('social media posts about a writing', function (): void {
     it('mention the author by handle on X and by name on Facebook, with a link to the writing', function (Closure $makeNotification): void {
         // Given
-        $author = createUser(['name' => 'Emily Dickinson', 'extra_info' => ['social' => ['twitter' => '@emily']]]);
-        $writing = Writing::factory()->for($author, 'author')->create(['title' => 'Hope']);
+        $authorName = fake()->firstName().' '.fake()->lastName();
+        $handle = '@'.fakeUsername();
+        $title = fakeTitle();
+        $author = createUser(['name' => $authorName, 'extra_info' => ['social' => ['twitter' => $handle]]]);
+        $writing = Writing::factory()->for($author, 'author')->create(['title' => $title]);
         $notification = $makeNotification($writing);
 
         // When
@@ -101,11 +106,11 @@ describe('social media posts about a writing', function (): void {
         $facebookPost = $notification->toFacebookPoster($author)->getBody();
 
         // Then
-        expect($tweet)->toContain('"Hope"')->toContain('@emily');
+        expect($tweet)->toContain("\"{$title}\"")->toContain($handle);
         expect(str_ends_with($tweet, $writing->path()))->toBeTrue();
         expect(str_contains($tweet, ':author'))->toBeFalse();
-        expect($facebookPost['message'])->toContain('"Hope"')->toContain('Emily Dickinson');
-        expect(str_contains($facebookPost['message'], '@emily') || str_contains($facebookPost['message'], ':author'))->toBeFalse();
+        expect($facebookPost['message'])->toContain("\"{$title}\"")->toContain($authorName);
+        expect(str_contains($facebookPost['message'], $handle) || str_contains($facebookPost['message'], ':author'))->toBeFalse();
         expect($facebookPost['link'])->toBe($writing->path());
     })->with([
         'the pick of the day' => [fn (Writing $writing): SocialPostNotification => new WritingOfTheDayPosted($writing)],

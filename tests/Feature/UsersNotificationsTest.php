@@ -42,17 +42,17 @@ describe('the notifications index', function (): void {
         $queryCountForOneNotification = count((array) DB::getQueryLog());
         DB::flushQueryLog();
 
-        for ($i = 0; $i < 9; $i++) {
+        foreach (range(1, fake()->numberBetween(5, 15)) as $notification) {
             createDatabaseNotification($recipient, ['user_id' => $notifier->id, 'writing_id' => $writing->id]);
         }
 
         DB::flushQueryLog();
         actingAs($recipient)->getJson(route('notifications.index', ['tab' => 'all']))->assertOk();
-        $queryCountForTenNotifications = count((array) DB::getQueryLog());
+        $queryCountForManyNotifications = count((array) DB::getQueryLog());
         DB::disableQueryLog();
 
         // Then
-        expect($queryCountForTenNotifications)->toBe($queryCountForOneNotification);
+        expect($queryCountForManyNotifications)->toBe($queryCountForOneNotification);
     });
 });
 
@@ -100,7 +100,7 @@ describe('the notification tabs', function (): void {
     it('copes with notifications that carry no user or writing', function (): void {
         // Given
         $recipient = createUser();
-        createDatabaseNotification($recipient, ['url' => 'https://example.com']);
+        createDatabaseNotification($recipient, ['url' => fake()->url()]);
 
         // When
         $response = actingAs($recipient)->getJson(route('notifications.index'));
@@ -129,24 +129,25 @@ describe('opening a notification', function (): void {
     it('goes to the url the notification carries when it has one', function (): void {
         // Given
         $recipient = createUser();
-        createDatabaseNotification($recipient, ['url' => 'https://example.com/somewhere']);
+        $url = fake()->url();
+        createDatabaseNotification($recipient, ['url' => $url]);
 
         // When
         $response = actingAs($recipient)->get(route('notifications.show', $recipient->notifications()->firstOrFail()->id));
 
         // Then
-        $response->assertRedirect('https://example.com/somewhere');
+        $response->assertRedirect($url);
     });
 
     it('is a 404 for a notification that does not exist or belongs to someone else', function (): void {
         // Given
         $owner = createUser();
-        createDatabaseNotification($owner, ['url' => 'https://example.com']);
+        createDatabaseNotification($owner, ['url' => fake()->url()]);
         $notificationId = $owner->notifications()->firstOrFail()->id;
 
         // When
         $forOtherUser = actingAs(createUser())->get(route('notifications.show', $notificationId));
-        $missing = actingAs(createUser())->get(route('notifications.show', 'no-such-id'));
+        $missing = actingAs(createUser())->get(route('notifications.show', fake()->uuid()));
 
         // Then
         $forOtherUser->assertNotFound();
@@ -156,7 +157,7 @@ describe('opening a notification', function (): void {
     it('is a 404 when the writing it points to is gone', function (): void {
         // Given
         $recipient = createUser();
-        createDatabaseNotification($recipient, ['writing_id' => 999999]);
+        createDatabaseNotification($recipient, ['writing_id' => fake()->numberBetween(100000, 999999)]);
 
         // When
         $response = actingAs($recipient)->get(route('notifications.show', $recipient->notifications()->firstOrFail()->id));
@@ -170,8 +171,9 @@ describe('marking everything as read', function (): void {
     it('reads every unread notification and returns to the list', function (): void {
         // Given
         $recipient = createUser();
-        createDatabaseNotification($recipient, ['url' => 'https://example.com/1']);
-        createDatabaseNotification($recipient, ['url' => 'https://example.com/2']);
+        foreach (range(1, fake()->numberBetween(2, 5)) as $notification) {
+            createDatabaseNotification($recipient, ['url' => fake()->url()]);
+        }
 
         // When
         $response = actingAs($recipient)->post(route('notifications.clear'));

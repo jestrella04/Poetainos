@@ -13,7 +13,7 @@ use function Pest\Laravel\actingAs;
 describe('a user\'s aura', function (): void {
     it('drops back to zero once they have no activity left', function (): void {
         // Given
-        $user = createUser(['aura' => 5.0]);
+        $user = createUser(['aura' => fake()->randomFloat(2, 1, 100)]);
 
         // When
         $user->updateAura();
@@ -25,7 +25,7 @@ describe('a user\'s aura', function (): void {
     it('counts the views the profile has right now', function (): void {
         // Given
         $user = createUser();
-        DB::table('users')->where('id', $user->id)->update(['profile_views' => 100]);
+        DB::table('users')->where('id', $user->id)->update(['profile_views' => fake()->numberBetween(1, 1000)]);
 
         // When
         $user->updateAura();
@@ -37,13 +37,14 @@ describe('a user\'s aura', function (): void {
     it('is left alone when no point weights are configured', function (): void {
         // Given
         config(['poetainos.aura.points.user' => ['writing' => 0, 'like' => 0, 'comment' => 0, 'shelf' => 0, 'views' => 0, 'award' => 0]]);
-        $user = createUser(['aura' => 5.0]);
+        $aura = fake()->randomFloat(2, 1, 100);
+        $user = createUser(['aura' => $aura]);
 
         // When
         $user->updateAura();
 
         // Then
-        expect((float) $user->refresh()->aura)->toBe(5.0);
+        expect((float) $user->refresh()->aura)->toBe($aura);
     });
 });
 
@@ -74,7 +75,7 @@ describe('a user\'s karma grade', function (): void {
         $user = createUser();
         $writing = Writing::factory()->create();
         $like = $writing->likes()->create(['user_id' => $user->id, 'vote' => 1]);
-        DB::table('likes')->where('id', $like->id)->update(['created_at' => now()->subDays(91)]);
+        DB::table('likes')->where('id', $like->id)->update(['created_at' => now()->subDays(fake()->numberBetween(91, 365))]);
 
         // When
         $user->updateKarma();
@@ -133,13 +134,14 @@ describe('a writing\'s aura', function (): void {
     it('is left alone when no point weights are configured', function (): void {
         // Given
         config(['poetainos.aura.points.writing' => ['like' => 0, 'comment' => 0, 'shelf' => 0, 'views' => 0]]);
-        $writing = Writing::factory()->create(['aura' => 1.23]);
+        $aura = fake()->randomFloat(2, 1, 100);
+        $writing = Writing::factory()->create(['aura' => $aura]);
 
         // When
         $writing->updateAura();
 
         // Then
-        expect((float) $writing->refresh()->aura)->toBe(1.23);
+        expect((float) $writing->refresh()->aura)->toBe($aura);
     });
 });
 
@@ -152,7 +154,7 @@ describe('featuring a writing on the home page', function (): void {
         // Given
         Notification::fake();
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['views' => 50]);
+        $writing = Writing::factory()->for($author, 'author')->create(['views' => fake()->numberBetween(1, 1000)]);
 
         // When
         $writing->updateAura();
@@ -169,7 +171,7 @@ describe('featuring a writing on the home page', function (): void {
     it('does not happen for a writing older than a month', function (): void {
         // Given
         Notification::fake();
-        $writing = Writing::factory()->create(['views' => 50, 'created_at' => now()->subDays(40)]);
+        $writing = Writing::factory()->create(['views' => fake()->numberBetween(1, 1000), 'created_at' => now()->subDays(fake()->numberBetween(32, 365))]);
 
         // When
         $writing->updateAura();
@@ -182,7 +184,7 @@ describe('featuring a writing on the home page', function (): void {
     it('does not happen when the aura stays below the minimum', function (): void {
         // Given
         config(['poetainos.aura.min_at_home' => 1000]);
-        $writing = Writing::factory()->create(['views' => 50]);
+        $writing = Writing::factory()->create(['views' => fake()->numberBetween(1, 1000)]);
 
         // When
         $writing->updateAura();
@@ -244,7 +246,7 @@ describe('recalculating aura after an interaction', function (): void {
         $commenter = createUser();
 
         // When
-        actingAs($commenter)->post('/comments/create', ['writing_id' => $writing->id, 'comment' => 'Lovely.']);
+        actingAs($commenter)->post('/comments/create', ['writing_id' => $writing->id, 'comment' => fake()->sentence()]);
         $comment = Comment::firstOrFail();
         actingAs($commenter)->delete("/comments/delete/{$comment->id}");
 

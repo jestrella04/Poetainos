@@ -56,13 +56,14 @@ describe('counting views', function (): void {
 
     it('shows the view that was just counted', function (): void {
         // Given
-        $writing = Writing::factory()->create(['views' => 4]);
+        $views = fake()->numberBetween(0, 1000);
+        $writing = Writing::factory()->create(['views' => $views]);
 
         // When
         $response = get($writing->path());
 
         // Then
-        $response->assertInertia(fn ($page) => $page->where('writing.views', 5));
+        $response->assertInertia(fn ($page) => $page->where('writing.views', $views + 1));
     });
 
     it('counts a profile once per visitor', function (): void {
@@ -98,9 +99,9 @@ describe('viewing a page', function (): void {
 describe('the aura:update command', function (): void {
     it('recalculates the aura of writings and users from their views', function (): void {
         // Given
-        $writing = Writing::factory()->create(['views' => 40, 'aura' => 0]);
+        $writing = Writing::factory()->create(['views' => fake()->numberBetween(1, 1000), 'aura' => 0]);
         $author = $writing->author;
-        DB::table('users')->where('id', $author->id)->update(['profile_views' => 40, 'aura' => 0]);
+        DB::table('users')->where('id', $author->id)->update(['profile_views' => fake()->numberBetween(1, 1000), 'aura' => 0]);
 
         // When
         $this->artisan('aura:update')->assertSuccessful();
@@ -182,7 +183,7 @@ describe('the related writings', function (): void {
     it('show at most five likers', function (): void {
         // Given
         $writing = Writing::factory()->create();
-        User::factory()->count(8)->create()
+        User::factory()->count(fake()->numberBetween(6, 10))->create()
             ->each(fn (User $liker) => $writing->likes()->create(['user_id' => $liker->id, 'vote' => 1]));
 
         // When

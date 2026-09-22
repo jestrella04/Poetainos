@@ -53,15 +53,16 @@ beforeEach(function (): void {
 
 describe('the admin tables', function (): void {
     $tables = [
-        'categories' => ['admin.categories', 'admin/PoAdminCategories', fn () => Category::factory()->count(3)->create()],
-        'tags' => ['admin.tags', 'admin/PoAdminTags', fn () => Tag::factory()->count(3)->create()],
-        'writings' => ['admin.writings', 'admin/PoAdminWritings', fn () => Writing::factory()->count(3)->create()],
-        'complaints' => ['admin.complaints', 'admin/PoAdminComplaints', fn () => Complaint::factory()->for(Writing::factory(), 'complainable')->count(3)->create()],
+        'categories' => ['admin.categories', 'admin/PoAdminCategories', fn (int $count) => Category::factory()->count($count)->create()],
+        'tags' => ['admin.tags', 'admin/PoAdminTags', fn (int $count) => Tag::factory()->count($count)->create()],
+        'writings' => ['admin.writings', 'admin/PoAdminWritings', fn (int $count) => Writing::factory()->count($count)->create()],
+        'complaints' => ['admin.complaints', 'admin/PoAdminComplaints', fn (int $count) => Complaint::factory()->for(Writing::factory(), 'complainable')->count($count)->create()],
     ];
 
     it('render the table page with the total row count', function (string $route, string $component, Closure $seed): void {
         // Given
-        $seed();
+        $count = fake()->numberBetween(2, 5);
+        $seed($count);
         $admin = actingAsAdmin();
 
         // When
@@ -70,20 +71,21 @@ describe('the admin tables', function (): void {
         // Then
         $response->assertOk()->assertInertia(fn ($page) => $page
             ->component($component)
-            ->where('total', 3)
+            ->where('total', $count)
             ->has('meta.title'));
     })->with($tables);
 
     it('answer JSON requests with a page of rows', function (string $route, string $component, Closure $seed): void {
         // Given
-        $seed();
+        $count = fake()->numberBetween(2, 5);
+        $seed($count);
         $admin = actingAsAdmin();
 
         // When
         $response = actingAs($admin)->getJson(route($route));
 
         // Then
-        $response->assertOk()->assertJsonCount(3, 'data');
+        $response->assertOk()->assertJsonCount($count, 'data');
     })->with($tables);
 
     it('list the users, including the admin', function (): void {
@@ -143,14 +145,16 @@ describe('the admin pages', function (): void {
 
     it('link the analytics dashboard with the configured counter credentials', function (): void {
         // Given
-        config(['services.counter.user_id' => 'writer', 'services.counter.access_token' => 'secret']);
+        $counterUser = fakeUsername();
+        $counterToken = fake()->sha1();
+        config(['services.counter.user_id' => $counterUser, 'services.counter.access_token' => $counterToken]);
         $admin = actingAsAdmin();
 
         // When
         $response = actingAs($admin)->get(route('admin.analytics'));
 
         // Then
-        $response->assertInertia(fn ($page) => $page->where('counter', 'https://counter.dev/dashboard.html?user=writer&token=secret'));
+        $response->assertInertia(fn ($page) => $page->where('counter', "https://counter.dev/dashboard.html?user={$counterUser}&token={$counterToken}"));
     });
 });
 
@@ -197,13 +201,14 @@ describe('the admin log download', function (): void {
     it('sends the whole application log as a file', function (): void {
         // Given
         $admin = actingAsAdmin();
+        $log = implode("\n", fake()->sentences(fake()->numberBetween(2, 5)))."\n";
 
         // When
-        $response = withApplicationLog("first line\nlast line\n", fn (): TestResponse => downloadLog($admin));
+        $response = withApplicationLog($log, fn (): TestResponse => downloadLog($admin));
 
         // Then
         $response->assertOk()->assertDownload('laravel.log');
-        expect($response->streamedContent())->toBe("first line\nlast line\n");
+        expect($response->streamedContent())->toBe($log);
     });
 
     it('sends an empty log instead of failing when there is no log file', function (): void {

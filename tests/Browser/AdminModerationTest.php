@@ -28,17 +28,19 @@ describe('admin moderation of another user\'s writing', function () {
 
         actingAs($admin);
 
+        $title = fakeTitle();
+
         $form = WritingPage::open($writing)->goToEditForm();
 
         $form->browser()->assertPathIs('/writings/edit/'.$writing->slug);
 
-        $form->fillTitle('Retitled By Admin')
+        $form->fillTitle($title)
             ->submit()
             ->browser()
             ->assertVisible(WritingFormPage::SUCCESS_ALERT)
             ->assertNoJavaScriptErrors();
 
-        expect($writing->refresh()->title)->toBe('Retitled By Admin');
+        expect($writing->refresh()->title)->toBe($title);
     })->skip('pest-plugin-browser does not parse multipart form bodies yet, so the writing form\'s PUT submit is received as a 405');
 
     it('lets an admin delete another user\'s writing', function () {

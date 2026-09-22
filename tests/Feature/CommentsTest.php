@@ -43,7 +43,7 @@ describe('commenting', function (): void {
 
         // When
         $response = actingAs($commenter)->post('/comments/create', [
-            'comment' => 'Lovely piece!',
+            'comment' => fake()->sentence(),
             'writing_id' => $writing->id,
         ]);
 
@@ -56,7 +56,7 @@ describe('commenting', function (): void {
 
         // When
         actingAs($author)->post('/comments/create', [
-            'comment' => 'Thanks everyone!',
+            'comment' => fake()->sentence(),
             'writing_id' => $writing->id,
         ]);
 
@@ -70,11 +70,11 @@ describe('commenting', function (): void {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create();
         $commenter = createUser();
-        $mentioned = createUser(['username' => 'mentioned_user']);
+        $mentioned = createUser(['username' => fakeUsername()]);
 
         // When
         actingAs($commenter)->post('/comments/create', [
-            'comment' => 'Great work @mentioned_user!',
+            'comment' => fake()->sentence()." @{$mentioned->username}!",
             'writing_id' => $writing->id,
         ]);
 
@@ -122,7 +122,7 @@ describe('mentions in a comment', function (): void {
         Notification::fake();
         $writing = Writing::factory()->create();
         $commenter = createUser();
-        $mentioned = User::factory()->count(8)->sequence(fn ($sequence) => ['username' => 'writer'.$sequence->index])->create();
+        $mentioned = User::factory()->count(8)->sequence(fn (): array => ['username' => fakeUsername()])->create();
         $message = $mentioned->map(fn (User $user): string => '@'.$user->username)->implode(' ');
 
         // When
@@ -139,11 +139,11 @@ describe('mentions in a comment', function (): void {
         // Given
         Notification::fake();
         $writing = Writing::factory()->create();
-        $mentioned = createUser(['username' => 'mentioned_user']);
+        $mentioned = createUser(['username' => fakeUsername()]);
 
         // When
         actingAs(createUser())->post('/comments/create', [
-            'comment' => '@mentioned_user @mentioned_user thanks',
+            'comment' => "@{$mentioned->username} @{$mentioned->username} ".fake()->sentence(),
             'writing_id' => $writing->id,
         ])->assertOk();
 
@@ -158,7 +158,7 @@ describe('mentions in a comment', function (): void {
 
         // When
         actingAs(createUser())->post('/comments/create', [
-            'comment' => '@nobody-here hello',
+            'comment' => '@'.fakeUsername().' '.fake()->sentence(),
             'writing_id' => $writing->id,
         ])->assertOk();
 

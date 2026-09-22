@@ -12,13 +12,15 @@ describe('registration', function (): void {
         // Given
         // RegisteredUserController requires a seeded "user" role and a password
         // matching a custom complexity regex (upper + lower + digit/symbol, 8+ chars).
+        $username = fakeUsername();
+        $password = fakeStrongPassword();
 
         // When
         $response = post('/register', [
-            'username' => 'testuser',
-            'email' => 'test@example.com',
-            'password' => 'Password1',
-            'password_confirmation' => 'Password1',
+            'username' => $username,
+            'email' => fake()->unique()->safeEmail(),
+            'password' => $password,
+            'password_confirmation' => $password,
             'service_agreement' => true,
             'privacy_agreement' => true,
         ]);
@@ -28,7 +30,7 @@ describe('registration', function (): void {
         // RegisteredUserController::store() renders the verify-email prompt directly
         // rather than redirecting.
         $response->assertOk();
-        expect(User::where('username', 'testuser')->firstOrFail()->role?->name)->toBe('user');
+        expect(User::where('username', $username)->firstOrFail()->role?->name)->toBe('user');
     });
 
     it('is throttled so it cannot be used for mass account creation', function (): void {

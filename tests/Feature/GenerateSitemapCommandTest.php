@@ -6,6 +6,7 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 beforeEach(function (): void {
     $this->publicPath = sys_get_temp_dir().'/sitemap-test-'.uniqid();
@@ -24,7 +25,8 @@ describe('the sitemap:generate command', function (): void {
         $category = Category::factory()->create();
         $tag = Tag::factory()->create();
         $writing->tags()->attach($tag);
-        $page = (new Page)->forceFill(['title' => 'About', 'slug' => 'about', 'text' => str_repeat('Text. ', 30)]);
+        $title = fakeTitle();
+        $page = (new Page)->forceFill(['title' => $title, 'slug' => Str::slug($title), 'text' => fakeText(100)]);
         $page->save();
 
         // When
@@ -43,14 +45,15 @@ describe('the sitemap:generate command', function (): void {
 
     it('does not count the pages it lists as views', function (): void {
         // Given
-        $writing = Writing::factory()->create(['views' => 7]);
+        $views = fake()->numberBetween(0, 1000);
+        $writing = Writing::factory()->create(['views' => $views]);
         $author = $writing->author;
 
         // When
         $this->artisan('sitemap:generate')->assertSuccessful();
 
         // Then
-        expect($writing->refresh()->views)->toBe(7);
+        expect($writing->refresh()->views)->toBe($views);
         expect(User::find($author->id)->profile_views)->toBe($author->profile_views);
     });
 

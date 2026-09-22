@@ -95,7 +95,7 @@ describe('isAllowed', function (): void {
     it('returns false when the role has permissions but none match the requested task', function (): void {
         // Given
         $role = Role::factory()->create([
-            'extra_info' => ['permissions' => [['name' => 'moderate', 'enabled' => true]]],
+            'extra_info' => ['permissions' => [['name' => fake()->lexify('task-????'), 'enabled' => true]]],
         ]);
         $user = createUser(['role_id' => $role->id]);
 

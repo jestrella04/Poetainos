@@ -13,12 +13,12 @@ use function Pest\Laravel\postJson;
 function contactPayload(array $overrides = []): array
 {
     return array_merge([
-        'name' => 'Ada Lovelace',
-        'email' => 'ada@example.com',
-        'subject' => 'Hello there',
-        'message' => str_repeat('A thoughtful message. ', 6),
-        'key' => 'captcha-key',
-        'captcha' => '42',
+        'name' => fake()->firstName().' '.fake()->lastName(),
+        'email' => fake()->safeEmail(),
+        'subject' => fakeTitle(),
+        'message' => fakeText(100),
+        'key' => fake()->lexify('????????'),
+        'captcha' => (string) fake()->numberBetween(0, 99),
     ], $overrides);
 }
 
@@ -45,7 +45,7 @@ describe('the contact form', function (): void {
         Notification::fake();
 
         // When
-        $response = postJson(route('contact.store'), contactPayload(['message' => str_repeat('a', 2001)]));
+        $response = postJson(route('contact.store'), contactPayload(['message' => fake()->lexify(str_repeat('?', 2001))]));
 
         // Then
         $response->assertUnprocessable()->assertJsonValidationErrors('message');
@@ -55,6 +55,8 @@ describe('the contact form', function (): void {
     it('cannot smuggle extra rules through the captcha key', function (): void {
         // Given
         $parameters = null;
+        $keyStart = fake()->lexify('????');
+        $keyEnd = fake()->lexify('????');
         Validator::extend('captcha_api', function (string $attribute, mixed $value, array $ruleParameters) use (&$parameters): bool {
             $parameters = $ruleParameters;
 
@@ -62,10 +64,10 @@ describe('the contact form', function (): void {
         });
 
         // When
-        postJson(route('contact.store'), contactPayload(['key' => 'abc,other|required']));
+        postJson(route('contact.store'), contactPayload(['key' => "{$keyStart},{$keyEnd}|required"]));
 
         // Then
-        expect($parameters)->toBe(['abcotherrequired', 'math']);
+        expect($parameters)->toBe(["{$keyStart}{$keyEnd}required", 'math']);
     });
 
     it('is throttled', function (): void {

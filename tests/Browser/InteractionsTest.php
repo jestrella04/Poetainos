@@ -50,12 +50,13 @@ describe('interacting with a writing', function () {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create();
         $reader = createUser();
+        $message = fake()->sentence();
 
         actingAs($reader);
 
         // The comment form clears its input once the server accepts the comment.
         $browser = WritingPage::open($writing)
-            ->postComment('What a lovely piece of writing!')
+            ->postComment($message)
             ->browser()
             ->assertValue(WritingPage::COMMENT_INPUT, '')
             ->assertNoJavaScriptErrors();
@@ -63,9 +64,9 @@ describe('interacting with a writing', function () {
         $comment = Comment::query()
             ->where('writing_id', $writing->id)
             ->where('user_id', $reader->id)
-            ->where('message', 'What a lovely piece of writing!')
+            ->where('message', $message)
             ->firstOrFail();
 
-        $browser->assertSeeIn(WritingPage::commentMessage($comment), 'What a lovely piece of writing!');
+        $browser->assertSeeIn(WritingPage::commentMessage($comment), $message);
     });
 });

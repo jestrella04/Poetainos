@@ -29,6 +29,6 @@ describe('appearance', function (): void {
         expect(View::shared('appearance'))->toBe($expected);
     })->with([
         'a valid value' => ['dark', 'dark'],
-        'an unknown value' => ['neon', 'system'],
+        'an unknown value' => [fn (): string => fake()->lexify('appearance-????'), 'system'],
     ]);
 });

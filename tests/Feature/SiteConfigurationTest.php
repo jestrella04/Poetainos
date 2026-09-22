@@ -31,15 +31,17 @@ describe('site configuration guard', function (): void {
 
     it('loads the site settings into config when they exist', function (): void {
         // Given
-        Setting::create(['name' => 'site', 'data' => ['name' => 'My Site', 'slogan' => 'Hello']]);
+        $name = fakeTitle();
+        $slogan = fake()->sentence();
+        Setting::create(['name' => 'site', 'data' => ['name' => $name, 'slogan' => $slogan]]);
 
         // When
         $response = getJson('/manifest.json');
 
         // Then
         $response->assertOk();
-        $response->assertJsonPath('name', 'My Site');
-        expect(getSiteConfig('slogan'))->toBe('Hello');
+        $response->assertJsonPath('name', $name);
+        expect(getSiteConfig('slogan'))->toBe($slogan);
     });
 });
 
@@ -50,20 +52,21 @@ describe('the site settings service', function (): void {
 
     it('loads the settings outside of an HTTP request', function (): void {
         // Given
-        Setting::create(['name' => 'site', 'data' => ['name' => 'My Site']]);
+        $name = fakeTitle();
+        Setting::create(['name' => 'site', 'data' => ['name' => $name]]);
 
         // When
         $loaded = app(SiteSettings::class)->load();
 
         // Then
         expect($loaded)->toBeTrue();
-        expect(getSiteConfig('name'))->toBe('My Site');
+        expect(getSiteConfig('name'))->toBe($name);
     });
 
     it('does not remember that the settings were missing', function (): void {
         // Given
         expect(app(SiteSettings::class)->load())->toBeFalse();
-        Setting::create(['name' => 'site', 'data' => ['name' => 'My Site']]);
+        Setting::create(['name' => 'site', 'data' => ['name' => fakeTitle()]]);
 
         // When
         $loaded = app(SiteSettings::class)->load();
@@ -74,7 +77,8 @@ describe('the site settings service', function (): void {
 
     it('serves the cached settings without querying the database again', function (): void {
         // Given
-        Setting::create(['name' => 'site', 'data' => ['name' => 'Cached']]);
+        $name = fakeTitle();
+        Setting::create(['name' => 'site', 'data' => ['name' => $name]]);
         app(SiteSettings::class)->load();
         config(['poetainos' => null]);
         Setting::query()->delete();
@@ -84,19 +88,20 @@ describe('the site settings service', function (): void {
 
         // Then
         expect($loaded)->toBeTrue();
-        expect(getSiteConfig('name'))->toBe('Cached');
+        expect(getSiteConfig('name'))->toBe($name);
     });
 
     it('picks up changed settings when refreshed', function (): void {
         // Given
-        $setting = Setting::create(['name' => 'site', 'data' => ['name' => 'Before']]);
+        $setting = Setting::create(['name' => 'site', 'data' => ['name' => fakeTitle()]]);
         app(SiteSettings::class)->load();
-        $setting->update(['data' => ['name' => 'After']]);
+        $changedName = fakeTitle();
+        $setting->update(['data' => ['name' => $changedName]]);
 
         // When
         app(SiteSettings::class)->refresh();
 
         // Then
-        expect(getSiteConfig('name'))->toBe('After');
+        expect(getSiteConfig('name'))->toBe($changedName);
     });
 });

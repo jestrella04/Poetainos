@@ -13,19 +13,25 @@ use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\assertGuest;
 use function Pest\Laravel\get;
 
+function fakeAvatarPath(): string
+{
+    return 'avatars/'.fake()->uuid().'.png';
+}
+
 describe('social login', function (): void {
     it('verifies the email once and does not re-verify on a later login', function (): void {
         // Given
-        $verifiedAt = Carbon::parse('2020-01-01 00:00:00');
+        $verifiedAt = Carbon::instance(fake()->dateTimeBetween('-5 years', '-1 day'));
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
+            'email' => $email,
             // Already has an avatar and a linked Google provider, so the callback's
             // avatar-download and confirm-a-new-provider branches are both skipped —
             // this test targets the email-verification branch only.
-            'extra_info' => ['avatar' => 'avatars/existing.png', 'linked_providers' => ['google']],
+            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
             'email_verified_at' => $verifiedAt,
         ]);
-        $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
+        $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
         // When
@@ -38,12 +44,13 @@ describe('social login', function (): void {
 
     it('verifies a not-yet-verified email on first login', function (): void {
         // Given
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
-            'extra_info' => ['avatar' => 'avatars/existing.png', 'linked_providers' => ['google']],
+            'email' => $email,
+            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
             'email_verified_at' => null,
         ]);
-        $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
+        $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
         // When
@@ -56,11 +63,12 @@ describe('social login', function (): void {
 
     it('ignores an external redirect target to prevent an open redirect', function (): void {
         // Given
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
-            'extra_info' => ['avatar' => 'avatars/existing.png', 'linked_providers' => ['google']],
+            'email' => $email,
+            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
         ]);
-        $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
+        $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
         // When
@@ -74,11 +82,12 @@ describe('social login', function (): void {
     it('requires emailed confirmation before an existing account trusts a new provider', function (): void {
         // Given
         Notification::fake();
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
-            'extra_info' => ['avatar' => 'avatars/existing.png'],
+            'email' => $email,
+            'extra_info' => ['avatar' => fakeAvatarPath()],
         ]);
-        $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
+        $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
         // When
@@ -93,11 +102,12 @@ describe('social login', function (): void {
     it('logs the user in once they follow the emailed confirmation link', function (): void {
         // Given
         Notification::fake();
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
-            'extra_info' => ['avatar' => 'avatars/existing.png'],
+            'email' => $email,
+            'extra_info' => ['avatar' => fakeAvatarPath()],
         ]);
-        $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
+        $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
         get('/login/google/callback');
 
@@ -113,11 +123,12 @@ describe('social login', function (): void {
 
     it('does not require reconfirmation once a provider has been linked', function (): void {
         // Given
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
-            'extra_info' => ['avatar' => 'avatars/existing.png', 'linked_providers' => ['google']],
+            'email' => $email,
+            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
         ]);
-        $socialUser = SocialiteUser::fake(['email' => 'writer@example.com']);
+        $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
         // When
@@ -130,9 +141,10 @@ describe('social login', function (): void {
 
     it('does not crash when the provider avatar cannot be fetched', function (): void {
         // Given
+        $email = fake()->unique()->safeEmail();
         $socialUser = SocialiteUser::fake([
-            'email' => 'new-writer@example.com',
-            'avatar' => 'https://avatars.example.invalid/does-not-exist.png',
+            'email' => $email,
+            'avatar' => 'https://avatars.example.invalid/'.fake()->uuid().'.png',
         ]);
         Socialite::fake('google', $socialUser);
 
@@ -141,7 +153,7 @@ describe('social login', function (): void {
 
         // Then
         $response->assertRedirect();
-        $user = User::where('email', 'new-writer@example.com')->firstOrFail();
+        $user = User::where('email', $email)->firstOrFail();
         expect($user->extra_info['avatar'] ?? null)->toBeNull();
     });
 
@@ -166,18 +178,20 @@ describe('social login', function (): void {
         imagepng(imagecreatetruecolor(800, 600));
         $png = (string) ob_get_clean();
         Http::fake(['avatars.example/*' => Http::response($png)]);
+        $bio = fake()->sentence();
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
+            'email' => $email,
             'extra_info' => [
-                'bio' => 'Kept',
+                'bio' => $bio,
                 'avatar' => '',
                 'notifications' => ['email' => 'off'],
                 'linked_providers' => ['google'],
             ],
         ]);
         Socialite::fake('google', SocialiteUser::fake([
-            'email' => 'writer@example.com',
-            'avatar' => 'https://avatars.example/me.png',
+            'email' => $email,
+            'avatar' => 'https://avatars.example/'.fake()->uuid().'.png',
         ]));
 
         // When
@@ -185,7 +199,7 @@ describe('social login', function (): void {
 
         // Then
         $info = $user->refresh()->extra_info;
-        expect($info['bio'])->toBe('Kept');
+        expect($info['bio'])->toBe($bio);
         expect($info['notifications']['email'])->toBe('off');
         expect($info['avatar'])->toStartWith('avatars/')->toEndWith('.png');
         Storage::disk('local')->assertExists($info['avatar']);
@@ -196,13 +210,15 @@ describe('social login', function (): void {
         // Given
         Storage::fake('local');
         Http::fake(['avatars.example/*' => Http::response($body)]);
+        $bio = fake()->sentence();
+        $email = fake()->unique()->safeEmail();
         $user = createUser([
-            'email' => 'writer@example.com',
-            'extra_info' => ['bio' => 'Kept', 'linked_providers' => ['google']],
+            'email' => $email,
+            'extra_info' => ['bio' => $bio, 'linked_providers' => ['google']],
         ]);
         Socialite::fake('google', SocialiteUser::fake([
-            'email' => 'writer@example.com',
-            'avatar' => 'https://avatars.example/me.png',
+            'email' => $email,
+            'avatar' => 'https://avatars.example/'.fake()->uuid().'.png',
         ]));
 
         // When
@@ -210,10 +226,10 @@ describe('social login', function (): void {
 
         // Then
         expect($user->refresh()->extra_info['avatar'] ?? null)->toBeNull();
-        expect($user->extra_info['bio'])->toBe('Kept');
+        expect($user->extra_info['bio'])->toBe($bio);
         expect(Storage::disk('local')->allFiles())->toBe([]);
     })->with([
-        'a web page' => ['<html>not an image</html>'],
+        'a web page' => [fn (): string => '<html>'.fake()->sentence().'</html>'],
         'a gif' => ['GIF89a'.str_repeat("\0", 32)],
     ]);
 });

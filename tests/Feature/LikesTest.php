@@ -65,7 +65,7 @@ describe('liking a writing', function (): void {
         $liker = createUser();
 
         // When
-        $response = actingAs($liker)->post('/likes/writing/999999/store');
+        $response = actingAs($liker)->post('/likes/writing/'.fake()->numberBetween(100000, 999999).'/store');
 
         // Then
         $response->assertNotFound();
@@ -77,7 +77,7 @@ describe('liking a writing', function (): void {
         $liker = createUser();
 
         // When
-        $response = actingAs($liker)->post("/likes/bogus/{$writing->id}/store");
+        $response = actingAs($liker)->post('/likes/'.fake()->lexify('type-????')."/{$writing->id}/store");
 
         // Then
         $response->assertNotFound();

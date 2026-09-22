@@ -13,21 +13,23 @@ describe('viewing and updating a profile', function (): void {
     it('allows a user to view and update their own profile', function (): void {
         // Given
         $user = createUser();
+        $name = fake()->name();
+        $bio = fake()->sentence();
 
         // When
         $viewResponse = actingAs($user)->get('/users/edit/'.$user->username);
         $updateResponse = actingAs($user)->put('/users/edit/'.$user->username, [
-            'name' => 'Updated Name',
-            'email' => 'updated@example.com',
-            'bio' => 'A short bio.',
+            'name' => $name,
+            'email' => fake()->unique()->safeEmail(),
+            'bio' => $bio,
         ]);
 
         // Then
         $viewResponse->assertOk();
         $updateResponse->assertOk();
         $user->refresh();
-        expect($user->name)->toBe('Updated Name');
-        expect($user->extra_info['bio'] ?? null)->toBe('A short bio.');
+        expect($user->name)->toBe($name);
+        expect($user->extra_info['bio'] ?? null)->toBe($bio);
     });
 
     it('requires re-verification when a user changes their email address', function (): void {
@@ -36,8 +38,8 @@ describe('viewing and updating a profile', function (): void {
 
         // When
         $response = actingAs($user)->put('/users/edit/'.$user->username, [
-            'name' => 'Updated Name',
-            'email' => 'new-address@example.com',
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
         ]);
 
         // Then
@@ -51,7 +53,7 @@ describe('viewing and updating a profile', function (): void {
 
         // When
         $response = actingAs($user)->put('/users/edit/'.$user->username, [
-            'name' => 'Updated Name',
+            'name' => fake()->name(),
             'email' => $user->email,
         ]);
 
@@ -68,8 +70,8 @@ describe('viewing and updating a profile', function (): void {
         // When
         $viewResponse = actingAs($other)->get('/users/edit/'.$user->username);
         $updateResponse = actingAs($other)->put('/users/edit/'.$user->username, [
-            'name' => 'Someone else',
-            'email' => 'someone-else@example.com',
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
         ]);
 
         // Then
@@ -81,18 +83,19 @@ describe('viewing and updating a profile', function (): void {
         // Given
         $user = createUser();
         $admin = actingAsAdmin();
+        $name = fake()->name();
 
         // When
         $viewResponse = actingAs($admin)->get('/users/edit/'.$user->username);
         $updateResponse = actingAs($admin)->put('/users/edit/'.$user->username, [
-            'name' => 'Admin Edited',
+            'name' => $name,
             'email' => $user->email,
         ]);
 
         // Then
         $viewResponse->assertOk();
         $updateResponse->assertOk();
-        expect($user->refresh()->name)->toBe('Admin Edited');
+        expect($user->refresh()->name)->toBe($name);
     });
 });
 
@@ -104,7 +107,7 @@ describe('changing a user\'s role', function (): void {
 
         // When
         $response = actingAs($user)->put('/users/edit/'.$user->username, [
-            'name' => 'Just a user',
+            'name' => fake()->name(),
             'email' => $user->email,
             'role' => $adminRole->id,
         ]);
@@ -122,7 +125,7 @@ describe('changing a user\'s role', function (): void {
 
         // When
         $response = actingAs($admin)->put('/users/edit/'.$user->username, [
-            'name' => 'Just a user',
+            'name' => fake()->name(),
             'email' => $user->email,
             'role' => $adminRole->id,
         ]);
@@ -151,8 +154,9 @@ describe('deleting an account', function (): void {
     it('deletes the account, logs the user out and clears their avatar once they confirm their password', function (): void {
         // Given
         Storage::fake('local');
-        Storage::disk('local')->put('avatars/mine.png', 'x');
-        $user = createUser(['extra_info' => ['avatar' => 'avatars/mine.png']]);
+        $avatar = 'avatars/'.fake()->uuid().'.png';
+        Storage::disk('local')->put($avatar, fake()->sentence());
+        $user = createUser(['extra_info' => ['avatar' => $avatar]]);
 
         // When
         $response = actingAs($user)
@@ -164,7 +168,7 @@ describe('deleting an account', function (): void {
         $response->assertSessionHas('message', 'accounts.account-deleted');
         expect(User::find($user->id))->toBeNull();
         assertGuest();
-        Storage::disk('local')->assertMissing('avatars/mine.png');
+        Storage::disk('local')->assertMissing($avatar);
     });
 });
 
@@ -216,9 +220,10 @@ describe('what a profile update keeps and rejects', function (): void {
 
     it('keeps the stored settings the form does not own', function (): void {
         // Given
+        $newBio = fake()->sentence();
         $user = createUser([
             'extra_info' => [
-                'bio' => 'Old bio',
+                'bio' => fake()->sentence(),
                 'notifications' => ['email' => 'off'],
                 'linked_providers' => ['google'],
                 'agreement' => ['terms_of_use' => 'on', 'privacy_policy' => 'on'],
@@ -227,15 +232,15 @@ describe('what a profile update keeps and rejects', function (): void {
 
         // When
         $response = actingAs($user)->put('/users/edit/'.$user->username, [
-            'name' => 'Updated Name',
+            'name' => fake()->name(),
             'email' => $user->email,
-            'bio' => 'New bio',
+            'bio' => $newBio,
         ]);
 
         // Then
         $response->assertOk();
         $info = $user->refresh()->extra_info;
-        expect($info['bio'])->toBe('New bio');
+        expect($info['bio'])->toBe($newBio);
         expect($info['notifications']['email'])->toBe('off');
         expect($info['linked_providers'])->toBe(['google']);
         expect($user->isInAgreement())->toBeTrue();
@@ -248,7 +253,7 @@ describe('what a profile update keeps and rejects', function (): void {
 
         // When
         $response = actingAs($user)->putJson('/users/edit/'.$user->username, [
-            'name' => 'Updated Name',
+            'name' => fake()->name(),
             'email' => $taken->email,
         ]);
 
@@ -262,7 +267,7 @@ describe('what a profile update keeps and rejects', function (): void {
 
         // When
         $response = actingAs($user)->putJson('/users/edit/'.$user->username, [
-            'name' => 'Updated Name',
+            'name' => fake()->name(),
             'email' => $user->email,
         ]);
 
@@ -292,34 +297,36 @@ describe('a profile avatar', function (): void {
 
     it('is stored, replacing and deleting the previous file', function (): void {
         // Given
-        Storage::disk('local')->put('avatars/old.png', 'old');
-        $user = createUser(['extra_info' => ['avatar' => 'avatars/old.png', 'bio' => 'Kept']]);
+        $oldAvatar = 'avatars/'.fake()->uuid().'.png';
+        Storage::disk('local')->put($oldAvatar, fake()->sentence());
+        $user = createUser(['extra_info' => ['avatar' => $oldAvatar, 'bio' => fake()->sentence()]]);
 
         // When
         $response = actingAs($user)->post('/users/edit/'.$user->username, [
             '_method' => 'PUT',
-            'name' => 'Updated Name',
+            'name' => fake()->name(),
             'email' => $user->email,
-            'avatar' => UploadedFile::fake()->image('me.png', 800, 600),
+            'avatar' => UploadedFile::fake()->image(fake()->word().'.png', fake()->numberBetween(600, 1200), fake()->numberBetween(600, 1200)),
         ]);
 
         // Then
         $response->assertOk();
         $avatar = $user->refresh()->extra_info['avatar'];
-        expect($avatar)->toStartWith('avatars/')->not->toBe('avatars/old.png');
+        expect($avatar)->toStartWith('avatars/')->not->toBe($oldAvatar);
         Storage::disk('local')->assertExists($avatar);
-        Storage::disk('local')->assertMissing('avatars/old.png');
+        Storage::disk('local')->assertMissing($oldAvatar);
         expect(getimagesize(Storage::disk('local')->path($avatar))[0])->toBe(512);
     });
 
     it('is removed on request', function (): void {
         // Given
-        Storage::disk('local')->put('avatars/old.png', 'old');
-        $user = createUser(['extra_info' => ['avatar' => 'avatars/old.png']]);
+        $oldAvatar = 'avatars/'.fake()->uuid().'.png';
+        Storage::disk('local')->put($oldAvatar, fake()->sentence());
+        $user = createUser(['extra_info' => ['avatar' => $oldAvatar]]);
 
         // When
         $response = actingAs($user)->put('/users/edit/'.$user->username, [
-            'name' => 'Updated Name',
+            'name' => fake()->name(),
             'email' => $user->email,
             'avatar-remove' => 1,
         ]);
@@ -327,7 +334,7 @@ describe('a profile avatar', function (): void {
         // Then
         $response->assertOk();
         expect($user->refresh()->extra_info['avatar'])->toBe('');
-        Storage::disk('local')->assertMissing('avatars/old.png');
+        Storage::disk('local')->assertMissing($oldAvatar);
     });
 });
 

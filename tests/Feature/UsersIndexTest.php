@@ -9,8 +9,10 @@ use function Pest\Laravel\getJson;
 describe('the authors directory', function (): void {
     it('reports the total of authors that have published writings', function (): void {
         // Given
-        Writing::factory()->count(2)->for(createUser(), 'author')->create();
-        Writing::factory()->for(createUser(), 'author')->create();
+        $authorsCount = fake()->numberBetween(1, 5);
+        foreach (range(1, $authorsCount) as $author) {
+            Writing::factory()->count(fake()->numberBetween(1, 3))->for(createUser(), 'author')->create();
+        }
         createUser();
 
         // When
@@ -20,13 +22,14 @@ describe('the authors directory', function (): void {
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('users/PoUsersIndex', false)
-                ->where('totalAuthors', 2));
+                ->where('totalAuthors', $authorsCount));
     });
 
     it('lists the location of each author', function (): void {
         // Given
         $author = createUser();
-        $author->forceFill(['extra_info' => ['location' => 'Monterrey, México']])->save();
+        $location = fake()->city().', '.fake()->country();
+        $author->forceFill(['extra_info' => ['location' => $location]])->save();
         Writing::factory()->for($author, 'author')->create();
 
         // When
@@ -35,7 +38,7 @@ describe('the authors directory', function (): void {
         // Then
         $response->assertOk()
             ->assertJsonPath('data.0.username', $author->username)
-            ->assertJsonPath('data.0.location', 'Monterrey, México');
+            ->assertJsonPath('data.0.location', $location);
     });
 
     it('does not query the authors on the first page load', function (): void {

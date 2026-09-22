@@ -39,36 +39,39 @@ describe('admin category management', function (): void {
     it('creates and updates a category', function (): void {
         // Given
         $admin = actingAsAdmin();
+        $name = fakeTitle();
+        $updatedDescription = fake()->sentence();
 
         // When
         $createResponse = actingAs($admin)->put('/admin/categories/edit', [
             'id' => 0,
-            'name' => 'New Category',
-            'description' => 'A description long enough.',
+            'name' => $name,
+            'description' => fake()->sentence(),
         ]);
 
         // Then
         $createResponse->assertOk();
-        $category = Category::where('name', 'New Category')->firstOrFail();
+        $category = Category::where('name', $name)->firstOrFail();
 
         // When
         $updateResponse = actingAs($admin)->put('/admin/categories/edit', [
             'id' => $category->id,
-            'name' => 'New Category',
-            'description' => 'An updated description.',
+            'name' => $name,
+            'description' => $updatedDescription,
         ]);
 
         // Then
         $updateResponse->assertOk();
-        expect($category->refresh()->description)->toBe('An updated description.');
+        expect($category->refresh()->description)->toBe($updatedDescription);
     });
 
     it('does not let a category become its own parent or move under a descendant', function (string $newParent): void {
         // Given
         $admin = actingAsAdmin();
-        $root = Category::factory()->create(['parent_id' => null, 'name' => 'Poetry']);
-        $child = Category::factory()->create(['parent_id' => $root->id, 'name' => 'Haiku']);
-        $grandchild = Category::factory()->create(['parent_id' => $child->id, 'name' => 'Senryu']);
+        // The name is sent back through validation, which a short factory word could fail.
+        $root = Category::factory()->create(['parent_id' => null, 'name' => fakeTitle()]);
+        $child = Category::factory()->create(['parent_id' => $root->id]);
+        $grandchild = Category::factory()->create(['parent_id' => $child->id]);
         $target = ['root' => $root, 'child' => $child, 'grandchild' => $grandchild][$newParent];
 
         // When
@@ -76,7 +79,7 @@ describe('admin category management', function (): void {
             'id' => $root->id,
             'name' => $root->name,
             'parent' => $target->id,
-            'description' => 'A description long enough.',
+            'description' => fake()->sentence(),
         ]);
 
         // Then
@@ -87,15 +90,16 @@ describe('admin category management', function (): void {
     it('lets a category move under an unrelated category', function (): void {
         // Given
         $admin = actingAsAdmin();
-        $root = Category::factory()->create(['parent_id' => null, 'name' => 'Poetry']);
-        $other = Category::factory()->create(['parent_id' => null, 'name' => 'Prose']);
+        // The name is sent back through validation, which a short factory word could fail.
+        $root = Category::factory()->create(['parent_id' => null, 'name' => fakeTitle()]);
+        $other = Category::factory()->create(['parent_id' => null]);
 
         // When
         $response = actingAs($admin)->putJson('/admin/categories/edit', [
             'id' => $root->id,
             'name' => $root->name,
             'parent' => $other->id,
-            'description' => 'A description long enough.',
+            'description' => fake()->sentence(),
         ]);
 
         // Then

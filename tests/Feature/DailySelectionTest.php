@@ -36,7 +36,7 @@ describe('picking the writing of the day', function (): void {
         $fresh = Writing::factory()->create();
         DailySelection::factory()->create([
             'writing_id' => $recentlyFeatured->id,
-            'selected_on' => Carbon::today()->subDays(5),
+            'selected_on' => Carbon::today()->subDays(fake()->numberBetween(1, 29)),
         ]);
 
         // When
@@ -51,7 +51,7 @@ describe('picking the writing of the day', function (): void {
         $writing = Writing::factory()->create();
         DailySelection::factory()->create([
             'writing_id' => $writing->id,
-            'selected_on' => Carbon::today()->subDays(45),
+            'selected_on' => Carbon::today()->subDays(fake()->numberBetween(31, 365)),
         ]);
 
         // When
@@ -80,7 +80,7 @@ describe('picking the writing of the day', function (): void {
 describe('the current pick', function (): void {
     it('is the most recent pick up to today', function (): void {
         // Given
-        DailySelection::factory()->create(['selected_on' => Carbon::today()->subDays(3)]);
+        DailySelection::factory()->create(['selected_on' => Carbon::today()->subDays(fake()->numberBetween(2, 30))]);
         $latest = DailySelection::factory()->create(['selected_on' => Carbon::today()->subDay()]);
 
         // When

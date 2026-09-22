@@ -90,20 +90,22 @@ describe('the author profile', function (): void {
     it('exposes the occupation of the author', function (): void {
         // Given
         $author = createUser();
-        $author->forceFill(['extra_info' => ['occupation' => 'Traductora']])->save();
+        $occupation = fake()->jobTitle();
+        $author->forceFill(['extra_info' => ['occupation' => $occupation]])->save();
 
         // When
         $response = get(route('users.show', $author->username));
 
         // Then
         $response->assertOk()
-            ->assertInertia(fn ($page) => $page->where('user.occupation', 'Traductora'));
+            ->assertInertia(fn ($page) => $page->where('user.occupation', $occupation));
     });
 
     it('exposes the social links of the author as a JSON object', function (): void {
         // Given
         $author = createUser();
-        $author->forceFill(['extra_info' => ['social' => ['twitter' => 'marisol', 'instagram' => '']]])->save();
+        $twitter = fakeUsername();
+        $author->forceFill(['extra_info' => ['social' => ['twitter' => $twitter, 'instagram' => '']]])->save();
 
         // When
         $response = get(route('users.show', $author->username));
@@ -112,7 +114,7 @@ describe('the author profile', function (): void {
         $response->assertOk()
             ->assertInertia(fn ($page) => $page->where(
                 'user.social',
-                fn ($social) => json_decode($social, true) === ['twitter' => 'marisol', 'instagram' => ''],
+                fn ($social) => json_decode($social, true) === ['twitter' => $twitter, 'instagram' => ''],
             ));
     });
 

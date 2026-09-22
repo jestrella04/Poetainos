@@ -5,18 +5,24 @@ use App\Models\User;
 describe('user initials', function (): void {
     it('uses the first letters of the first and last words of the name', function (): void {
         // Given
-        $user = User::factory()->make(['name' => 'jane  Mary Doe', 'username' => 'janed']);
+        $firstName = fake()->firstName();
+        $lastName = fake()->lastName();
+        $user = User::factory()->make([
+            'name' => mb_strtolower($firstName).'  '.fake()->firstName().' '.$lastName,
+            'username' => fakeUsername(),
+        ]);
 
         // When
         $initials = $user->initials();
 
         // Then
-        expect($initials)->toBe('JD');
+        expect($initials)->toBe(mb_strtoupper(mb_substr($firstName, 0, 1).mb_substr($lastName, 0, 1)));
     });
 
     it('uses the first letter of the name when it is a single word', function (): void {
         // Given
-        $user = User::factory()->make(['name' => 'ángel', 'username' => 'janed']);
+        // A lower case accented first letter checks the upper-casing is multibyte safe.
+        $user = User::factory()->make(['name' => 'á'.fake()->lexify('????'), 'username' => fakeUsername()]);
 
         // When
         $initials = $user->initials();
@@ -27,27 +33,31 @@ describe('user initials', function (): void {
 
     it('falls back to the username when the name is empty', function (?string $name): void {
         // Given
-        $user = User::factory()->make(['name' => $name, 'username' => 'janed']);
+        $username = fakeUsername();
+        $user = User::factory()->make(['name' => $name, 'username' => $username]);
 
         // When
         $initials = $user->initials();
 
         // Then
-        expect($initials)->toBe('J');
+        expect($initials)->toBe(mb_strtoupper(mb_substr($username, 0, 1)));
     })->with([null, ' ']);
 });
 
 describe('the X (Twitter) handle', function (): void {
-    it('is the stored handle with a single @, or the display name without one', function (?string $stored, string $expected): void {
+    it('is the stored handle with a single @, or the display name without one', function (Closure $stored, Closure $expected): void {
         // Given
-        $user = createUser(['name' => 'Emily Dickinson', 'extra_info' => $stored === null ? null : ['social' => ['twitter' => $stored]]]);
+        $handle = fakeUsername();
+        $name = fake()->firstName().' '.fake()->lastName();
+        $storedHandle = $stored($handle);
+        $user = createUser(['name' => $name, 'extra_info' => $storedHandle === null ? null : ['social' => ['twitter' => $storedHandle]]]);
 
         // Then
-        expect($user->twitterHandleOrName())->toBe($expected);
+        expect($user->twitterHandleOrName())->toBe($expected($handle, $name));
     })->with([
-        'a bare handle' => ['emily', '@emily'],
-        'a handle typed with an @' => ['@emily', '@emily'],
-        'an empty handle' => ['', 'Emily Dickinson'],
-        'no social links' => [null, 'Emily Dickinson'],
+        'a bare handle' => [fn (string $handle): string => $handle, fn (string $handle): string => '@'.$handle],
+        'a handle typed with an @' => [fn (string $handle): string => '@'.$handle, fn (string $handle): string => '@'.$handle],
+        'an empty handle' => [fn (): string => '', fn (string $handle, string $name): string => $name],
+        'no social links' => [fn (): ?string => null, fn (string $handle, string $name): string => $name],
     ]);
 });

@@ -44,15 +44,16 @@ describe('resetting a password', function (): void {
         Notification::fake();
         $user = createUser();
         post('/forgot-password', ['email' => $user->email]);
+        $newPassword = fakeStrongPassword();
 
         // Then
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user, $newPassword) {
             // When
             $response = post('/reset-password', [
                 'token' => $notification->token,
                 'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => $newPassword,
+                'password_confirmation' => $newPassword,
             ]);
 
             // Then
@@ -65,9 +66,9 @@ describe('resetting a password', function (): void {
     it('is throttled so it cannot be used to mail-bomb arbitrary addresses', function (): void {
         // When
         foreach (range(1, 5) as $attempt) {
-            post('/forgot-password', ['email' => "attempt{$attempt}@example.com"]);
+            post('/forgot-password', ['email' => fake()->unique()->safeEmail()]);
         }
-        $response = post('/forgot-password', ['email' => 'attempt6@example.com']);
+        $response = post('/forgot-password', ['email' => fake()->unique()->safeEmail()]);
 
         // Then
         $response->assertTooManyRequests();
