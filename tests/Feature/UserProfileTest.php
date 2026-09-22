@@ -29,7 +29,7 @@ describe('viewing and updating a profile', function (): void {
         $updateResponse->assertOk();
         $user->refresh();
         expect($user->name)->toBe($name);
-        expect($user->extra_info['bio'] ?? null)->toBe($bio);
+        expect(data_get($user->extra_info, 'bio'))->toBe($bio);
     });
 
     it('requires re-verification when a user changes their email address', function (): void {
@@ -240,9 +240,9 @@ describe('what a profile update keeps and rejects', function (): void {
         // Then
         $response->assertOk();
         $info = $user->refresh()->extra_info;
-        expect($info['bio'])->toBe($newBio);
-        expect($info['notifications']['email'])->toBe('off');
-        expect($info['linked_providers'])->toBe(['google']);
+        expect(data_get($info, 'bio'))->toBe($newBio);
+        expect(data_get($info, 'notifications.email'))->toBe('off');
+        expect(data_get($info, 'linked_providers'))->toBe(['google']);
         expect($user->isInAgreement())->toBeTrue();
     });
 
@@ -311,11 +311,11 @@ describe('a profile avatar', function (): void {
 
         // Then
         $response->assertOk();
-        $avatar = $user->refresh()->extra_info['avatar'];
+        $avatar = data_get($user->refresh()->extra_info, 'avatar');
         expect($avatar)->toStartWith('avatars/')->not->toBe($oldAvatar);
         Storage::disk('local')->assertExists($avatar);
         Storage::disk('local')->assertMissing($oldAvatar);
-        expect(getimagesize(Storage::disk('local')->path($avatar))[0])->toBe(512);
+        expect(storedImageWidth($avatar))->toBe(512);
     });
 
     it('is removed on request', function (): void {
@@ -333,7 +333,7 @@ describe('a profile avatar', function (): void {
 
         // Then
         $response->assertOk();
-        expect($user->refresh()->extra_info['avatar'])->toBe('');
+        expect(data_get($user->refresh()->extra_info, 'avatar'))->toBe('');
         Storage::disk('local')->assertMissing($oldAvatar);
     });
 });

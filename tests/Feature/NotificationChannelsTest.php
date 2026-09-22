@@ -58,8 +58,12 @@ describe('the content of "someone did something on your writing" notifications',
         $actor = createUser(['name' => $actorName]);
         $recipient = createUser();
         $writing = Writing::factory()->for($recipient, 'author')->create();
-        $target = $class === CommentLiked::class ? Comment::factory()->for($writing)->create() : $writing;
-        $notification = new $class($target, $actor);
+        $notification = match ($class) {
+            WritingLiked::class => new WritingLiked($writing, $actor),
+            CommentLiked::class => new CommentLiked(Comment::factory()->for($writing)->create(), $actor),
+            WritingCommented::class => new WritingCommented($writing, $actor),
+            default => throw new InvalidArgumentException("Unexpected notification {$class}."),
+        };
 
         // When
         $message = $notification->toWebPush($recipient, null)->toArray();

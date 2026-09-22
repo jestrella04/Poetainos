@@ -12,7 +12,7 @@ describe('site installation command', function (): void {
         $password = fakeStrongPassword();
 
         // When
-        $this->artisan('site:install', [
+        pendingArtisan('site:install', [
             '--username' => $username,
             '--email' => $email,
             '--password' => $password,
@@ -33,7 +33,7 @@ describe('site installation command', function (): void {
         $username = fakeUsername();
 
         // When
-        $this->artisan('site:install')
+        pendingArtisan('site:install')
             ->expectsQuestion('Username', $username)
             ->expectsQuestion('Email', fake()->safeEmail())
             ->expectsQuestion('Password', fakeStrongPassword())
@@ -49,7 +49,7 @@ describe('site installation command', function (): void {
         $passwordUnderEightCharacters = fake()->lexify(str_repeat('?', 7));
 
         // When
-        $this->artisan('site:install', [
+        pendingArtisan('site:install', [
             '--username' => fakeUsername(),
             '--email' => $emailWithoutDomain,
             '--password' => $passwordUnderEightCharacters,
@@ -65,7 +65,7 @@ describe('site installation command', function (): void {
         Setting::create(['name' => 'site', 'data' => []]);
 
         // When
-        $this->artisan('site:install', [
+        pendingArtisan('site:install', [
             '--username' => fakeUsername(),
             '--email' => fake()->safeEmail(),
             '--password' => fakeStrongPassword(),

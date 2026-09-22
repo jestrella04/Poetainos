@@ -154,7 +154,7 @@ describe('social login', function (): void {
         // Then
         $response->assertRedirect();
         $user = User::where('email', $email)->firstOrFail();
-        expect($user->extra_info['avatar'] ?? null)->toBeNull();
+        expect(data_get($user->extra_info, 'avatar'))->toBeNull();
     });
 
     it('refuses a login when the provider shares no email address', function (): void {
@@ -199,11 +199,12 @@ describe('social login', function (): void {
 
         // Then
         $info = $user->refresh()->extra_info;
-        expect($info['bio'])->toBe($bio);
-        expect($info['notifications']['email'])->toBe('off');
-        expect($info['avatar'])->toStartWith('avatars/')->toEndWith('.png');
-        Storage::disk('local')->assertExists($info['avatar']);
-        expect(getimagesize(Storage::disk('local')->path($info['avatar']))[0])->toBe(512);
+        expect(data_get($info, 'bio'))->toBe($bio);
+        expect(data_get($info, 'notifications.email'))->toBe('off');
+        $avatar = data_get($info, 'avatar');
+        expect($avatar)->toStartWith('avatars/')->toEndWith('.png');
+        Storage::disk('local')->assertExists($avatar);
+        expect(storedImageWidth($avatar))->toBe(512);
     });
 
     it('ignores a provider avatar that is not a supported image', function (string $body): void {
@@ -225,8 +226,8 @@ describe('social login', function (): void {
         get('/login/google/callback')->assertRedirect();
 
         // Then
-        expect($user->refresh()->extra_info['avatar'] ?? null)->toBeNull();
-        expect($user->extra_info['bio'])->toBe($bio);
+        expect(data_get($user->refresh()->extra_info, 'avatar'))->toBeNull();
+        expect(data_get($user->extra_info, 'bio'))->toBe($bio);
         expect(Storage::disk('local')->allFiles())->toBe([]);
     })->with([
         'a web page' => [fn (): string => '<html>'.fake()->sentence().'</html>'],

@@ -30,7 +30,7 @@ class WritingFactory extends Factory
             'user_id' => User::factory(),
             'title' => $this->faker->text(45),
             'slug' => $this->faker->unique()->slug(3),
-            'text' => implode("\n\n", $this->faker->paragraphs($this->faker->numberBetween(2, 10))),
+            'text' => $this->faker->paragraphs($this->faker->numberBetween(2, 10), true),
             'extra_info' => fn (): ?array => $this->faker->boolean() ? ['cover' => $this->storeDemoImage('images/cover.jpg', 'covers')] : null,
         ];
     }

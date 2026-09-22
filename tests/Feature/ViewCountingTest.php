@@ -6,6 +6,7 @@ use App\Models\Writing;
 use Illuminate\Console\Scheduling\Schedule;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\flushSession;
 use function Pest\Laravel\get;
 
 beforeEach(function (): void {
@@ -33,7 +34,7 @@ describe('counting views', function (): void {
 
         // When
         get($writing->path());
-        $this->flushSession();
+        flushSession();
         get($writing->path());
 
         // Then
@@ -83,8 +84,8 @@ describe('counting views', function (): void {
 describe('viewing a page', function (): void {
     it('does not recalculate any aura', function (): void {
         // Given
-        $writing = Writing::factory()->create(['views' => 0, 'aura' => 0]);
-        $author = $writing->author;
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['views' => 0, 'aura' => 0]);
 
         // When
         get($writing->path());
@@ -99,12 +100,12 @@ describe('viewing a page', function (): void {
 describe('the aura:update command', function (): void {
     it('recalculates the aura of writings and users from their views', function (): void {
         // Given
-        $writing = Writing::factory()->create(['views' => fake()->numberBetween(1, 1000), 'aura' => 0]);
-        $author = $writing->author;
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['views' => fake()->numberBetween(1, 1000), 'aura' => 0]);
         DB::table('users')->where('id', $author->id)->update(['profile_views' => fake()->numberBetween(1, 1000), 'aura' => 0]);
 
         // When
-        $this->artisan('aura:update')->assertSuccessful();
+        pendingArtisan('aura:update')->assertSuccessful();
 
         // Then
         expect((float) $writing->refresh()->aura)->toBeGreaterThan(0.0);

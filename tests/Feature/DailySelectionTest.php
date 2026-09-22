@@ -97,10 +97,11 @@ describe('the current pick', function (): void {
     it('falls back to the previous pick when the featured writing is deleted', function (): void {
         // Given
         $previous = DailySelection::factory()->create(['selected_on' => Carbon::today()->subDay()]);
-        $today = DailySelection::factory()->create(['selected_on' => Carbon::today()]);
+        $featured = Writing::factory()->create();
+        DailySelection::factory()->for($featured)->create(['selected_on' => Carbon::today()]);
 
         // When
-        $today->writing->delete();
+        $featured->delete();
 
         // Then
         expect(DailySelection::current()?->is($previous))->toBeTrue();
@@ -114,7 +115,7 @@ describe('the midnight command', function (): void {
         Writing::factory()->create();
 
         // When
-        $this->artisan('writing:pick-of-the-day')->assertSuccessful();
+        pendingArtisan('writing:pick-of-the-day')->assertSuccessful();
 
         // Then
         expect(DailySelection::whereDate('selected_on', Carbon::today())->count())->toBe(1);
@@ -127,14 +128,14 @@ describe('the notification command', function (): void {
         // Given
         Notification::fake();
         Writing::factory()->count(2)->create();
-        $selection = DailySelection::pickForToday();
+        $featuredAuthor = DailySelection::pickForToday()->writing()->firstOrFail()->author()->firstOrFail();
 
         // When
-        $this->artisan('writing:post-of-the-day')->assertSuccessful();
+        pendingArtisan('writing:post-of-the-day')->assertSuccessful();
 
         // Then
         expect(DailySelection::count())->toBe(1);
-        Notification::assertSentTo($selection->writing->author, WritingOfTheDayPosted::class);
+        Notification::assertSentTo($featuredAuthor, WritingOfTheDayPosted::class);
         Notification::assertSentTimes(WritingOfTheDayPosted::class, 1);
     });
 
@@ -144,7 +145,7 @@ describe('the notification command', function (): void {
         $writing = Writing::factory()->create();
 
         // When
-        $this->artisan('writing:post-of-the-day')->assertSuccessful();
+        pendingArtisan('writing:post-of-the-day')->assertSuccessful();
 
         // Then
         expect(DailySelection::current()?->writing_id)->toBe($writing->id);
@@ -168,11 +169,14 @@ describe('the homepage hero', function (): void {
 
     it('hides the featured writing when the viewer blocked its author', function (): void {
         // Given
-        $selection = DailySelection::factory()->create(['selected_on' => Carbon::today()]);
+        $author = createUser();
+        $selection = DailySelection::factory()
+            ->for(Writing::factory()->for($author, 'author'))
+            ->create(['selected_on' => Carbon::today()]);
         $viewer = createUser();
         BlockedUser::factory()->create([
             'user_id' => $viewer->id,
-            'blocked_user_id' => $selection->writing->user_id,
+            'blocked_user_id' => $author->id,
         ]);
 
         // When

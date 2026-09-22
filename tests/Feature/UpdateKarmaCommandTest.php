@@ -10,10 +10,10 @@ describe('the karma:update command', function (): void {
         $users = User::factory()->count(3)->create();
 
         // When
-        $this->artisan('karma:update')->assertSuccessful();
+        pendingArtisan('karma:update')->assertSuccessful();
 
         // Then
-        $users->each(fn (User $user) => expect($user->fresh()->karma)->toBe('F'));
+        $users->each(fn (User $user) => expect($user->refresh()->karma)->toBe('F'));
         Http::assertNothingSent();
     });
 
@@ -22,6 +22,6 @@ describe('the karma:update command', function (): void {
         $events = collect(app(Schedule::class)->events());
 
         // Then
-        expect($events->contains(fn ($event) => str_contains($event->command, 'karma:update')))->toBeTrue();
+        expect($events->contains(fn ($event) => $event->command !== null && str_contains($event->command, 'karma:update')))->toBeTrue();
     });
 });

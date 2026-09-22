@@ -21,8 +21,7 @@ function validSiteSettings(): array
 
 describe('updating the site settings', function (): void {
     beforeEach(function (): void {
-        $this->storedSettings = ['name' => ['value' => fakeTitle()]];
-        Setting::create(['name' => 'site', 'data' => $this->storedSettings]);
+        Setting::create(['name' => 'site', 'data' => ['name' => ['value' => fakeTitle()]]]);
     });
 
     it('saves valid settings and reloads them into config', function (): void {
@@ -45,6 +44,7 @@ describe('updating the site settings', function (): void {
     it('rejects values that would break the site', function (string $path, mixed $value): void {
         // Given
         $admin = actingAsAdmin();
+        $storedSettings = Setting::where('name', 'site')->value('data');
         $settings = validSiteSettings();
         data_set($settings, $path, $value);
 
@@ -55,7 +55,7 @@ describe('updating the site settings', function (): void {
 
         // Then
         $response->assertUnprocessable()->assertJsonValidationErrors('json');
-        expect(Setting::where('name', 'site')->value('data'))->toBe($this->storedSettings);
+        expect(Setting::where('name', 'site')->value('data'))->toBe($storedSettings);
     })->with([
         'a text pagination' => ['pagination.value', 'abc'],
         'a zero pagination' => ['pagination.value', 0],

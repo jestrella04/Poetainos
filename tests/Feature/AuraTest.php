@@ -104,12 +104,13 @@ describe('a writing\'s aura', function (): void {
     it('goes back down when a comment is deleted', function (): void {
         // Given
         $writing = Writing::factory()->create(['views' => 0]);
-        $comment = Comment::factory()->for($writing)->create();
+        $commenter = createUser();
+        $comment = Comment::factory()->for($writing)->for($commenter, 'author')->create();
         $writing->updateAura();
         $withComment = (float) $writing->refresh()->aura;
 
         // When
-        actingAs($comment->author)->delete("/comments/delete/{$comment->id}")->assertOk();
+        actingAs($commenter)->delete("/comments/delete/{$comment->id}")->assertOk();
 
         // Then
         expect($withComment)->toBeGreaterThan(0.0);

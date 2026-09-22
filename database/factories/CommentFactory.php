@@ -27,7 +27,7 @@ class CommentFactory extends Factory
         return [
             'user_id' => User::factory(),
             'writing_id' => Writing::factory(),
-            'message' => implode("\n\n", $this->faker->paragraphs($this->faker->numberBetween(1, 4))),
+            'message' => $this->faker->paragraphs($this->faker->numberBetween(1, 4), true),
         ];
     }
 }

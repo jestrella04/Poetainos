@@ -7,12 +7,15 @@ use App\Models\User;
 use App\Models\Writing;
 use Illuminate\Support\Facades\File;
 use Illuminate\Testing\TestResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Laravel\actingAs;
 
 /**
  * Run a request against a throwaway storage path whose laravel.log holds the
  * given contents (or does not exist when null), so the real log stays untouched.
+ *
+ * @return TestResponse<Response>
  */
 function withApplicationLog(?string $contents, Closure $request): TestResponse
 {
@@ -37,6 +40,8 @@ function withApplicationLog(?string $contents, Closure $request): TestResponse
 /**
  * The download streams the log lazily, so read it while the throwaway log still exists;
  * TestResponse keeps the streamed content for the assertions that follow.
+ *
+ * @return TestResponse<Response>
  */
 function downloadLog(User $admin): TestResponse
 {
@@ -201,7 +206,7 @@ describe('the admin log download', function (): void {
     it('sends the whole application log as a file', function (): void {
         // Given
         $admin = actingAsAdmin();
-        $log = implode("\n", fake()->sentences(fake()->numberBetween(2, 5)))."\n";
+        $log = implode("\n", array_map(fn (): string => fake()->sentence(), range(1, fake()->numberBetween(2, 5))))."\n";
 
         // When
         $response = withApplicationLog($log, fn (): TestResponse => downloadLog($admin));

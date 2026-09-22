@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\travel;
+use function Pest\Laravel\withoutMiddleware;
 
 function sendVerificationCode(User $user): string
 {
@@ -102,7 +104,7 @@ describe('verifying an email', function (): void {
         $code = sendVerificationCode($user);
         $wrongCode = wrongCodeFor($code);
         // The route throttle shares its budget with the resend route; isolate the per-code attempt cap.
-        $this->withoutMiddleware(ThrottleRequests::class);
+        withoutMiddleware(ThrottleRequests::class);
 
         // When
         foreach (range(1, 5) as $attempt) {
@@ -150,12 +152,12 @@ describe('the lifetime of a code', function (): void {
         $user = createUser(['email_verified_at' => null]);
         $code = sendVerificationCode($user);
         $wrongCode = wrongCodeFor($code);
-        $this->withoutMiddleware(ThrottleRequests::class);
+        withoutMiddleware(ThrottleRequests::class);
 
         // When
-        $this->travel(10)->minutes();
+        travel(10)->minutes();
         actingAs($user)->postJson(route('verification.verify'), ['code' => $wrongCode]);
-        $this->travel(6)->minutes();
+        travel(6)->minutes();
         $response = actingAs($user)->postJson(route('verification.verify'), ['code' => $code]);
 
         // Then

@@ -16,10 +16,14 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Testing\PendingCommand;
 use Tests\TestCase;
+
+use function Pest\Laravel\artisan;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
@@ -144,7 +148,7 @@ function fakeStrongPassword(): string
  */
 function fakeTitle(): string
 {
-    return Str::title(fake()->unique()->words(2, true));
+    return Str::title(fake()->unique()->word().' '.fake()->word());
 }
 
 /**
@@ -190,4 +194,57 @@ function createDatabaseNotification(User $recipient, array $data, ?Carbon $creat
         'created_at' => $createdAt,
         'updated_at' => $createdAt,
     ]);
+}
+
+/**
+ * The pixel width of an image stored on the local disk.
+ */
+function storedImageWidth(string $path): int
+{
+    $size = getimagesize(Storage::disk('local')->path($path));
+
+    if ($size === false) {
+        throw new RuntimeException("{$path} is not a readable image.");
+    }
+
+    return $size[0];
+}
+
+/**
+ * Point public_path() at a throwaway directory, so commands that write public
+ * files leave the real public directory untouched.
+ */
+function useTemporaryPublicPath(): void
+{
+    $publicPath = sys_get_temp_dir().'/poetainos-public-'.uniqid();
+    File::ensureDirectoryExists($publicPath);
+    app()->usePublicPath($publicPath);
+}
+
+/**
+ * Delete the directory set up by useTemporaryPublicPath(), refusing to touch
+ * anything outside the system temp directory.
+ */
+function deleteTemporaryPublicPath(): void
+{
+    if (str_starts_with(public_path(), sys_get_temp_dir().'/poetainos-public-')) {
+        File::deleteDirectory(public_path());
+    }
+}
+
+/**
+ * Artisan test commands always come back pending while console output is mocked,
+ * which is Laravel's default; narrowing here keeps the assertion API typed.
+ *
+ * @param  array<string, mixed>  $parameters
+ */
+function pendingArtisan(string $command, array $parameters = []): PendingCommand
+{
+    $pendingCommand = artisan($command, $parameters);
+
+    if ($pendingCommand instanceof PendingCommand) {
+        return $pendingCommand;
+    }
+
+    throw new LogicException('Console output must be mocked to assert on artisan commands.');
 }

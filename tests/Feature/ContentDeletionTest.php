@@ -36,12 +36,15 @@ describe('deleting a writing', function (): void {
 describe('deleting a comment', function (): void {
     it('also deletes its likes and the notifications about it', function (): void {
         // Given
-        $comment = Comment::factory()->create();
+        $writingAuthor = createUser();
+        $commenter = createUser();
+        $writing = Writing::factory()->for($writingAuthor, 'author')->create();
+        $comment = Comment::factory()->for($writing)->for($commenter, 'author')->create();
         $comment->likes()->create(['user_id' => createUser()->id, 'vote' => 1]);
-        createDatabaseNotification($comment->writing->author, ['writing_id' => $comment->writing->id, 'comment_id' => $comment->id]);
+        createDatabaseNotification($writingAuthor, ['writing_id' => $writing->id, 'comment_id' => $comment->id]);
 
         // When
-        $response = actingAs($comment->author)->delete("/comments/delete/{$comment->id}");
+        $response = actingAs($commenter)->delete("/comments/delete/{$comment->id}");
 
         // Then
         $response->assertOk();

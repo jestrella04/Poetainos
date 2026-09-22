@@ -1,15 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\File;
-
 beforeEach(function (): void {
-    $this->publicPath = sys_get_temp_dir().'/assetlinks-test-'.uniqid();
-    File::ensureDirectoryExists($this->publicPath);
-    app()->usePublicPath($this->publicPath);
+    useTemporaryPublicPath();
 });
 
 afterEach(function (): void {
-    File::deleteDirectory($this->publicPath);
+    deleteTemporaryPublicPath();
 });
 
 describe('the generate:assetlinks command', function (): void {
@@ -24,10 +20,10 @@ describe('the generate:assetlinks command', function (): void {
         ]]);
 
         // When
-        $this->artisan('generate:assetlinks')->assertSuccessful();
+        pendingArtisan('generate:assetlinks')->assertSuccessful();
 
         // Then
-        $assetLinks = json_decode((string) file_get_contents($this->publicPath.'/.well-known/assetlinks.json'), true);
+        $assetLinks = json_decode((string) file_get_contents(public_path('.well-known/assetlinks.json')), true);
         expect($assetLinks)->toBe([[
             'relation' => ['delegate_permission/common.handle_all_urls'],
             'target' => [

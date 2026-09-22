@@ -272,7 +272,7 @@ describe('updating a writing', function (): void {
 
         // Then
         expect($writing->refresh()->slug)->toBe($originalSlug);
-        expect($writing->extra_info['link'])->toBe($link);
+        expect(data_get($writing->extra_info, 'link'))->toBe($link);
     });
 
     it('does not reuse a slug that a static route owns', function (): void {
@@ -374,9 +374,9 @@ describe('a writing cover', function (): void {
         ]))->assertOk();
 
         // Then
-        $cover = $writing->refresh()->extra_info['cover'];
+        $cover = data_get($writing->refresh()->extra_info, 'cover');
         expect($cover)->toStartWith('covers/')->not->toBe($oldCover);
-        expect(getimagesize(Storage::disk('local')->path($cover))[0])->toBe(1280);
+        expect(storedImageWidth($cover))->toBe(1280);
         Storage::disk('local')->assertMissing($oldCover);
     });
 

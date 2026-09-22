@@ -83,7 +83,7 @@ describe('the notification tabs', function (): void {
         $recipient = createUser();
         createDatabaseNotification($recipient, ['user_id' => createUser()->id]);
         createDatabaseNotification($recipient, ['user_id' => createUser()->id]);
-        $recipient->notifications()->first()->markAsRead();
+        $recipient->notifications()->firstOrFail()->markAsRead();
 
         // When
         $response = actingAs($recipient)->getJson(route('notifications.index').$query);

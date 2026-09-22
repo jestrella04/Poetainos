@@ -64,7 +64,7 @@ describe('the shared auth props', function (): void {
         // Given
         $user = createUser();
         $writings = Writing::factory()->count(30)->create();
-        $writings->first()->likes()->create(['user_id' => $user->id, 'vote' => 1]);
+        $writings->firstOrFail()->likes()->create(['user_id' => $user->id, 'vote' => 1]);
         $withOneLike = count(queriesDuring(fn () => actingAs($user)->get(route('explore'))));
 
         // When
