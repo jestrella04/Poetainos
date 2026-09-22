@@ -27,7 +27,7 @@ export const themes: Record<string, ThemeDefinition> = {
     },
     variables: {
       'border-color': '#bec8c9',
-      'border-opacity': 0.15
+      'border-opacity': 0.2
     }
   },
 
@@ -57,7 +57,7 @@ export const themes: Record<string, ThemeDefinition> = {
     },
     variables: {
       'border-color': '#3f484a',
-      'border-opacity': 0.15
+      'border-opacity': 0.2
     }
   }
 }

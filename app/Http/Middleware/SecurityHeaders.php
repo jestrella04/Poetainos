@@ -33,12 +33,12 @@ class SecurityHeaders
                 'Content-Security-Policy',
                 implode('; ', [
                     "default-src 'self'",
-                    "script-src 'self' 'nonce-{$nonce}' https://connect.facebook.net",
+                    "script-src 'self' 'nonce-{$nonce}' https://connect.facebook.net https://cdn.counter.dev",
                     "style-src 'self' 'nonce-{$nonce}'",
                     "img-src 'self' data: blob: https:",
                     "font-src 'self'",
-                    "connect-src 'self' https://graph.facebook.com",
-                    'frame-src https://www.openstreetmap.org',
+                    "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev",
+                    'frame-src https://counter.dev',
                     "frame-ancestors 'none'",
                     "form-action 'self'",
                     "object-src 'none'",
@@ -50,9 +50,9 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
         } else {
             $viteUrl = $this->viteDevServerUrl();
-            $scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval'".($viteUrl ? " {$viteUrl}" : '');
+            $scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.counter.dev".($viteUrl ? " {$viteUrl}" : '');
             $styleSrc = "style-src 'self' 'unsafe-inline'".($viteUrl ? " {$viteUrl}" : '');
-            $connectSrc = "connect-src 'self'".($viteUrl ? " {$viteUrl} ".preg_replace('/^http/', 'ws', $viteUrl) : '');
+            $connectSrc = "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev".($viteUrl ? " {$viteUrl} ".preg_replace('/^http/', 'ws', $viteUrl) : '');
             $fontSrc = "font-src 'self' data:".($viteUrl ? " {$viteUrl}" : '');
 
             $response->headers->set(
@@ -64,7 +64,7 @@ class SecurityHeaders
                     "img-src 'self' data: blob: https:",
                     $fontSrc,
                     $connectSrc,
-                    'frame-src https://www.openstreetmap.org',
+                    'frame-src https://counter.dev',
                     "frame-ancestors 'none'",
                     "form-action 'self'",
                     "object-src 'none'",
