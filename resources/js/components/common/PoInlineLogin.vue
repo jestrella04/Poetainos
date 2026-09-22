@@ -24,32 +24,21 @@ const { asset } = useFormatting()
         <po-button
           icon
           color="primary"
-          :href="route('social.login', { service: 'facebook', redirect: asset($page.url) })"
-          :title="$t('accounts.continue-with-facebook')"
-        >
-          <v-icon icon="fab fa-facebook-f" />
-        </po-button>
-      </div>
-
-      <div>
-        <po-button
-          icon
-          color="primary"
-          :href="route('social.login', { service: 'twitter', redirect: asset($page.url) })"
-          :title="$t('accounts.continue-with-x-twitter')"
-        >
-          <v-icon icon="fab fa-x-twitter" />
-        </po-button>
-      </div>
-
-      <div>
-        <po-button
-          icon
-          color="primary"
           :href="route('social.login', { service: 'google', redirect: asset($page.url) })"
           :title="$t('accounts.continue-with-google')"
         >
           <v-icon icon="fab fa-google" />
+        </po-button>
+      </div>
+
+      <div>
+        <po-button
+          icon
+          color="primary"
+          :href="route('social.login', { service: 'facebook', redirect: asset($page.url) })"
+          :title="$t('accounts.continue-with-facebook')"
+        >
+          <v-icon icon="fab fa-facebook-f" />
         </po-button>
       </div>
 
