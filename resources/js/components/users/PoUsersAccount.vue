@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref, provide, reactive } from 'vue'
+import { ref, provide, reactive, computed } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
 import PoUsersAccountRow from './partials/PoUsersAccountRow.vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import { isDeleteKey, pushKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useFormatting } from '@/composables/useFormatting'
+import { useMembership } from '@/composables/useMembership'
 import type { InertiaPageProps } from '@/types/inertia'
 
 interface AccountSummary {
@@ -22,7 +24,9 @@ interface AccountSummary {
 const page =
   usePage<InertiaPageProps<{ notifications?: { email: boolean }; account: AccountSummary }>>()
 const { authUser } = useAuth()
-const { userDisplayName, toLocaleMonthYear, formatCount } = useFormatting()
+const { userDisplayName, formatCount } = useFormatting()
+const { membershipDuration, membershipMessage } = useMembership()
+const { t } = useI18n()
 const push = injectStrict(pushKey)
 const { mdAndUp } = useDisplay()
 
@@ -31,6 +35,13 @@ const { mdAndUp } = useDisplay()
 const username = authUser()!.username
 const account = page.props.account
 const isDelete = ref(false)
+const memberSince = computed(() =>
+  t('accounts.member-since', {
+    site_name: page.props.site.name,
+    duration: membershipDuration(account.created_at, t)
+  })
+)
+const memberSinceMessage = computed(() => membershipMessage(account.created_at, t))
 const notifications = reactive({
   email: page.props.notifications?.email ?? true,
   push: false
@@ -69,20 +80,16 @@ function togglePushNotifications(value: boolean | null): void {
   <po-wrapper>
     <po-head />
 
-    <div class="d-flex flex-wrap align-center ga-5 pb-8">
+    <div class="d-flex flex-wrap align-center position-relative ga-5 pb-4">
       <po-avatar size="96" color="secondary" :user="authUser()!" />
 
       <div class="flex-grow-1">
         <p class="text-display-medium po-prose ma-0 mb-2">{{ userDisplayName(authUser()!) }}</p>
-        <div class="d-inline-flex ga-6 text-medium-emphasis">
-          <span>@{{ username }}</span>
-          <span>
-            {{ $t('accounts.member-since', { date: toLocaleMonthYear(account.created_at) }) }}</span
-          >
-        </div>
+        <p class="text-medium-emphasis ma-0 mb-2">@{{ username }}</p>
+        <p class="text-title-medium ma-0">{{ memberSince }} {{ memberSinceMessage }}</p>
       </div>
 
-      <po-link :href="route('users.show', username)" class="text-primary" inertia>
+      <po-link :href="route('users.show', username)" class="text-primary stretched" inertia>
         {{ $t('accounts.view-public-profile') }}
       </po-link>
     </div>

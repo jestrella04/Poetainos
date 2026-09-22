@@ -15,8 +15,8 @@ const { items: blockedUsers, fetched, loadMore } = useInfiniteList<User>('blocke
   <po-wrapper>
     <po-head />
 
-    <p class="text-display-large po-prose ma-0 mb-8">
-      {{ $t('accounts.manage-blocked-users') }}
+    <p class="text-uppercase text-eyebrow ma-0 mb-8">
+      {{ $t('accounts.blocked-users') }}
     </p>
 
     <template v-if="!fetched">
