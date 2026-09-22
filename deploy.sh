@@ -42,8 +42,9 @@ php artisan config:cache
 php artisan view:clear
 php artisan view:cache
 
-# Restart service worker
+# Restart service worker and SSR server
 php artisan queue:restart
+php artisan inertia:stop-ssr
 
 # Generate assetlinks
 php artisan generate:assetlinks
