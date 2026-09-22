@@ -35,7 +35,7 @@ describe('weightedScore', function (): void {
             + ($weights['comments'] * $countables['comments'])
             + ($weights['shelf'] * $countables['shelf'])
             + ($weights['views'] * $countables['views']);
-        $expectedScore = (float) number_format($totalPoints / (4 * $basePoints), 2, '.', '');
+        $expectedScore = round($totalPoints / (4 * $basePoints), 2);
 
         expect($points['base'])->toBe($basePoints);
         expect($points['total'])->toBe($totalPoints);
@@ -59,7 +59,7 @@ describe('weightedScore', function (): void {
             + ($weights['shelf'] * $countables['shelf'])
             + ($weights['views'] * $countables['views'])
             + ($weights['awards'] * $countables['awards']);
-        $expectedScore = (float) number_format($totalPoints / (6 * $basePoints), 2, '.', '');
+        $expectedScore = round($totalPoints / (6 * $basePoints), 2);
 
         expect($points['base'])->toBe($basePoints);
         expect($points['total'])->toBe($totalPoints);
@@ -85,6 +85,17 @@ describe('weightedScore', function (): void {
         expect($twoCountables['score'])->not->toBe($threeCountables['score']);
         expect($twoCountables['score'])->toBe(round(2 * $count / (2 * 2), 2));
         expect($threeCountables['score'])->toBe(round(3 * $count / (3 * 3), 2));
+    });
+
+    it('keeps scores of a thousand or more intact', function (): void {
+        // Given
+        $views = fake()->numberBetween(4000, 1000000);
+
+        // When
+        $points = app(AuraCalculator::class)->weightedScore(['views' => $views], ['views' => 1]);
+
+        // Then
+        expect($points['score'])->toBe((float) $views);
     });
 
     it('returns a zero score when the base is zero', function (): void {

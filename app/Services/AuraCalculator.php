@@ -175,7 +175,7 @@ class AuraCalculator
         }
 
         $divisor = count($countables) * $base;
-        $score = $divisor > 0 ? (float) number_format($total / $divisor, 2) : 0.0;
+        $score = $divisor > 0 ? round($total / $divisor, 2) : 0.0;
 
         return [
             'base' => $base,
