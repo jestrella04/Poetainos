@@ -25,10 +25,10 @@ const { userDisplayName } = useFormatting()
 
           <div class="flex-grow-1">
             <po-link :href="route('users.show', author.username)" class="d-block" inertia>
-              <span class="text-title-large po-prose"> {{ userDisplayName(author) }}</span>
+              <span class="text-title-large po-prose">{{ userDisplayName(author) }}</span>
             </po-link>
 
-            <span> @{{ author.username }} </span>
+            <span>@{{ author.username }}</span>
           </div>
 
           <po-chip class="text-primary">
