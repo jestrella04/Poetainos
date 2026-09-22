@@ -13,49 +13,21 @@
 
 use App\Models\Role;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->beforeEach(function (): void {
-        // EnsureSiteIsConfigured loads the `poetainos` config from the `settings`
-        // table only when it isn't already set. Seed the values controllers/models
-        // read via getSiteConfig() directly so requests don't need a `site` row.
-        config(['poetainos' => [
-            'name' => 'Poetainos',
-            'slogan' => 'A place for writers',
-            'pagination' => 10,
-            'uploads_max_file_size' => 2048,
-            'social' => [],
-            'stores' => [],
-            'complaints' => [
-                ['value' => 'spam', 'label' => 'Spam or advertising'],
-                ['value' => 'abuse', 'label' => 'Harassment or abuse'],
-            ],
-            'emails' => ['admin' => 'admin@example.com'],
-            'aura' => [
-                'min_at_home' => 90,
-                'points' => [
-                    'user' => [
-                        'writing' => 10,
-                        'like' => 2,
-                        'comment' => 3,
-                        'shelf' => 4,
-                        'views' => 1,
-                        'award' => 20,
-                    ],
-                    'writing' => [
-                        'like' => 2,
-                        'comment' => 3,
-                        'shelf' => 4,
-                        'views' => 1,
-                    ],
-                ],
-            ],
-        ]]);
-    })
+    ->beforeEach(fn () => seedSiteConfig())
     ->in('Feature');
+
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->beforeEach(fn () => seedSiteConfig())
+    ->in('Browser');
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +52,47 @@ pest()->extend(TestCase::class)
 */
 
 /**
+ * EnsureSiteIsConfigured loads the `poetainos` config from the `settings`
+ * table only when it isn't already set. Seed the values controllers/models
+ * read via getSiteConfig() directly so requests don't need a `site` row.
+ */
+function seedSiteConfig(): void
+{
+    config(['poetainos' => [
+        'name' => 'Poetainos',
+        'slogan' => 'A place for writers',
+        'pagination' => 10,
+        'uploads_max_file_size' => 2048,
+        'social' => [],
+        'stores' => [],
+        'complaints' => [
+            ['value' => 'spam', 'label' => 'Spam or advertising'],
+            ['value' => 'abuse', 'label' => 'Harassment or abuse'],
+        ],
+        'emails' => ['admin' => 'admin@example.com'],
+        'aura' => [
+            'min_at_home' => 90,
+            'points' => [
+                'user' => [
+                    'writing' => 10,
+                    'like' => 2,
+                    'comment' => 3,
+                    'shelf' => 4,
+                    'views' => 1,
+                    'award' => 20,
+                ],
+                'writing' => [
+                    'like' => 2,
+                    'comment' => 3,
+                    'shelf' => 4,
+                    'views' => 1,
+                ],
+            ],
+        ],
+    ]]);
+}
+
+/**
  * @param  array<string, mixed>  $attributes
  */
 function createUser(array $attributes = []): User
@@ -97,4 +110,23 @@ function actingAsAdmin(array $attributes = []): User
     return User::factory()->create(
         fn (array $factoryAttributes): array => array_merge($factoryAttributes, ['role_id' => $role->id], $attributes)
     );
+}
+
+/**
+ * @param  array<string, mixed>  $data
+ */
+function createDatabaseNotification(User $recipient, array $data, ?Carbon $createdAt = null): void
+{
+    $createdAt ??= now();
+
+    DB::table('notifications')->insert([
+        'id' => (string) Str::uuid(),
+        'type' => 'App\Notifications\WritingLiked',
+        'notifiable_type' => User::class,
+        'notifiable_id' => $recipient->id,
+        'data' => json_encode($data),
+        'read_at' => null,
+        'created_at' => $createdAt,
+        'updated_at' => $createdAt,
+    ]);
 }

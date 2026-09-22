@@ -39,6 +39,10 @@ const canReactToWriting = computed(() => authUser()?.username !== props.data.aut
 const hasSideCover = computed(() => hasCover.value && !props.alone)
 const isProminent = computed(() => props.alone || props.hero)
 const listSpacingClass = computed(() => (props.hero ? 'pb-16' : 'py-12 border-b'))
+// The hero writing may also be listed below it, so its DOM id needs its own prefix to stay unique
+const domId = computed(() =>
+  props.hero ? `hero-writing-${props.data.id}` : `writing-${props.data.id}`
+)
 
 provide(loadingCommentsKey, loadingComments)
 provide(writingKey, props.data)
@@ -46,7 +50,7 @@ provide(writingKey, props.data)
 
 <template>
   <po-wrapper>
-    <article :class="{ [listSpacingClass]: !alone }" class="pe-md-8">
+    <article :id="domId" :class="{ [listSpacingClass]: !alone }" class="pe-md-8">
       <v-img
         v-if="hasCover && alone"
         height="320"
@@ -80,6 +84,7 @@ provide(writingKey, props.data)
 
           <div class="position-relative">
             <p
+              :id="`${domId}-title`"
               :class="isProminent ? 'text-display-large' : 'text-display-small'"
               class="po-prose ma-0 mb-2"
             >
@@ -95,7 +100,12 @@ provide(writingKey, props.data)
             </p>
 
             <div class="d-flex align-center flex-wrap mb-4 ga-6">
-              <po-link v-if="!hideAuthor" :href="route('users.show', data.author.username)" inertia>
+              <po-link
+                v-if="!hideAuthor"
+                :id="`${domId}-author`"
+                :href="route('users.show', data.author.username)"
+                inertia
+              >
                 <po-avatar-award
                   :user="data.author"
                   avatar-size="28"
@@ -137,6 +147,7 @@ provide(writingKey, props.data)
 
           <div class="d-flex ga-2">
             <po-reaction-button
+              :id="`${domId}-like`"
               icon="fa-heart"
               :count="data.likes_count"
               :is-active="isLiked"
@@ -147,6 +158,7 @@ provide(writingKey, props.data)
             />
 
             <po-reaction-button
+              :id="`${domId}-shelve`"
               icon="fa-bookmark"
               :count="data.shelf_count"
               :is-active="isShelved"
@@ -156,7 +168,7 @@ provide(writingKey, props.data)
               :deactivate-title="$t('writings.unshelve-writing')"
             />
 
-            <po-writing-dropdown />
+            <po-writing-dropdown :id-prefix="domId" />
           </div>
         </v-col>
       </v-row>

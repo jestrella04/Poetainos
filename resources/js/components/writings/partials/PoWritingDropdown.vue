@@ -5,6 +5,10 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useNativeShare } from '@/composables/useNativeShare'
 
+defineProps<{
+  idPrefix: string
+}>()
+
 const { isAuthenticated, authUser, canEdit } = useAuth()
 const { share: nativeShare } = useNativeShare()
 const writing = injectStrict(writingKey)
@@ -36,6 +40,7 @@ function share(): void {
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
+        :id="`${idPrefix}-more`"
         prepend-icon="fas fa-angle-down"
         color="primary"
         variant="tonal"
@@ -53,6 +58,7 @@ function share(): void {
 
       <template v-if="canEdit(writing.author)">
         <po-list-item
+          :id="`${idPrefix}-edit`"
           :href="route('writings.edit', [writing.slug])"
           prepend-icon="fas fa-pen-to-square"
           inertia

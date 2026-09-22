@@ -11,6 +11,7 @@ const { termsPath, privacyPath } = useStaticPages()
   <div class="d-flex align-center">
     <div class="flex-shrink-1">
       <v-switch
+        id="agreement-terms"
         v-model="formData.serviceAgreement"
         :label="$t('accounts.i-accept-terms')"
         color="primary"
@@ -29,6 +30,7 @@ const { termsPath, privacyPath } = useStaticPages()
   <div class="d-flex align-center mb-4">
     <div class="flex-shrink-1">
       <v-switch
+        id="agreement-privacy"
         v-model="formData.privacyAgreement"
         :label="$t('accounts.i-accept-privacy')"
         color="primary"

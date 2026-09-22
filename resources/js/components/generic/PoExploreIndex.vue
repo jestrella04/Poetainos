@@ -28,7 +28,7 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
 <template>
   <po-head />
 
-  <p class="text-display-large po-prose ma-0 mb-2">
+  <p id="explore-title" class="text-display-large po-prose ma-0 mb-2">
     {{ $t('main.explore') }}
   </p>
 
@@ -55,7 +55,9 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
         inertia
       >
         <v-card-text class="d-flex flex-column h-100">
-          <p class="text-headline-large po-prose ma-0 mb-2">{{ cat.name }}</p>
+          <p :id="`category-${cat.id}-name`" class="text-headline-large po-prose ma-0 mb-2">
+            {{ cat.name }}
+          </p>
 
           <p
             v-if="!strNullOrEmpty(cat.description)"

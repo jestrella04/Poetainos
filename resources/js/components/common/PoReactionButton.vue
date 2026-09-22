@@ -4,6 +4,9 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useReactionToggle } from '@/composables/useReactionToggle'
 
+// v-hover renders its slot as a fragment, so attrs (e.g. id) must be forwarded to the button explicitly
+defineOptions({ inheritAttrs: false })
+
 const props = defineProps<{
   icon: string
   count: number
@@ -27,7 +30,7 @@ const { count, isActive, isSubmitting, toggle } = useReactionToggle(props, {
 <template>
   <v-hover v-slot="{ isHovering, props: hoverProps }">
     <po-button
-      v-bind="hoverProps"
+      v-bind="{ ...hoverProps, ...$attrs }"
       color="primary"
       variant="tonal"
       :title="isActive ? deactivateTitle : activateTitle"

@@ -3,9 +3,48 @@
 use App\Models\Category;
 use App\Models\Complaint;
 use App\Models\Tag;
+use App\Models\User;
 use App\Models\Writing;
+use Illuminate\Support\Facades\File;
+use Illuminate\Testing\TestResponse;
 
 use function Pest\Laravel\actingAs;
+
+/**
+ * Run a request against a throwaway storage path whose laravel.log holds the
+ * given contents (or does not exist when null), so the real log stays untouched.
+ */
+function withApplicationLog(?string $contents, Closure $request): TestResponse
+{
+    $originalStoragePath = storage_path();
+    $storagePath = sys_get_temp_dir().'/poetainos-log-'.uniqid();
+    File::ensureDirectoryExists($storagePath.'/logs');
+
+    if ($contents !== null) {
+        File::put($storagePath.'/logs/laravel.log', $contents);
+    }
+
+    app()->useStoragePath($storagePath);
+
+    try {
+        return $request();
+    } finally {
+        app()->useStoragePath($originalStoragePath);
+        File::deleteDirectory($storagePath);
+    }
+}
+
+/**
+ * The download streams the log lazily, so read it while the throwaway log still exists;
+ * TestResponse keeps the streamed content for the assertions that follow.
+ */
+function downloadLog(User $admin): TestResponse
+{
+    $response = actingAs($admin)->get(route('admin.log'));
+    $response->streamedContent();
+
+    return $response;
+}
 
 beforeEach(function (): void {
     // Components live under resources/js/components, not Inertia's default Pages directory.
@@ -85,28 +124,56 @@ describe('the admin tables', function (): void {
     });
 });
 
+describe('the admin pages', function (): void {
+    it('render their component', function (string $route, string $component): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->get(route($route));
+
+        // Then
+        $response->assertOk()->assertInertia(fn ($page) => $page->component($component)->has('meta.title'));
+    })->with([
+        'dashboard' => ['admin.index', 'admin/PoAdminIndex'],
+        'settings' => ['admin.settings', 'admin/PoAdminSettings'],
+        'websockets' => ['admin.websockets', 'admin/PoAdminWebsockets'],
+        'analytics' => ['admin.analytics', 'admin/PoAdminAnalytics'],
+    ]);
+
+    it('link the analytics dashboard with the configured counter credentials', function (): void {
+        // Given
+        config(['services.counter.user_id' => 'writer', 'services.counter.access_token' => 'secret']);
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->get(route('admin.analytics'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('counter', 'https://counter.dev/dashboard.html?user=writer&token=secret'));
+    });
+});
+
 describe('the admin tools page', function (): void {
+    it('exposes structured server info', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->get(route('admin.tools'));
+
+        // Then
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page->where('info.PHP version', PHP_VERSION));
+    });
+
     it('shows only the last lines of the application log', function (): void {
         // Given
-        $originalStoragePath = storage_path();
-        $storagePath = sys_get_temp_dir().'/poetainos-log-'.uniqid();
-        mkdir($storagePath.'/logs', 0777, true);
-        file_put_contents(
-            $storagePath.'/logs/laravel.log',
-            implode("\n", array_map(fn (int $number): string => sprintf('entry-%03d', $number), range(1, 150)))."\n",
-        );
         $admin = actingAsAdmin();
-        app()->useStoragePath($storagePath);
+        $log = implode("\n", array_map(fn (int $number): string => sprintf('entry-%03d', $number), range(1, 150)))."\n";
 
-        try {
-            // When
-            $response = actingAs($admin)->get(route('admin.tools'));
-        } finally {
-            app()->useStoragePath($originalStoragePath);
-            unlink($storagePath.'/logs/laravel.log');
-            rmdir($storagePath.'/logs');
-            rmdir($storagePath);
-        }
+        // When
+        $response = withApplicationLog($log, fn (): TestResponse => actingAs($admin)->get(route('admin.tools')));
 
         // Then
         $response->assertInertia(fn ($page) => $page->where('log', fn ($log): bool => str_contains((string) $log, 'entry-150')
@@ -116,21 +183,38 @@ describe('the admin tools page', function (): void {
 
     it('shows an empty log when there is no log file', function (): void {
         // Given
-        $originalStoragePath = storage_path();
-        $storagePath = sys_get_temp_dir().'/poetainos-nolog-'.uniqid();
-        mkdir($storagePath, 0777, true);
         $admin = actingAsAdmin();
-        app()->useStoragePath($storagePath);
 
-        try {
-            // When
-            $response = actingAs($admin)->get(route('admin.tools'));
-        } finally {
-            app()->useStoragePath($originalStoragePath);
-            rmdir($storagePath);
-        }
+        // When
+        $response = withApplicationLog(null, fn (): TestResponse => actingAs($admin)->get(route('admin.tools')));
 
         // Then
         $response->assertInertia(fn ($page) => $page->where('log', ''));
+    });
+});
+
+describe('the admin log download', function (): void {
+    it('sends the whole application log as a file', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = withApplicationLog("first line\nlast line\n", fn (): TestResponse => downloadLog($admin));
+
+        // Then
+        $response->assertOk()->assertDownload('laravel.log');
+        expect($response->streamedContent())->toBe("first line\nlast line\n");
+    });
+
+    it('sends an empty log instead of failing when there is no log file', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = withApplicationLog(null, fn (): TestResponse => downloadLog($admin));
+
+        // Then
+        $response->assertOk()->assertDownload('laravel.log');
+        expect($response->streamedContent())->toBe('');
     });
 });

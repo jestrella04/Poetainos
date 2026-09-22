@@ -42,6 +42,7 @@ async function submitForm() {
     @submit.prevent="submitForm"
   >
     <v-textarea
+      :id="`${formId}-message`"
       v-model="message"
       :label="$t('comments.comment')"
       :placeholder="$t('comments.comment-mention', { at: '@' })"
@@ -55,8 +56,15 @@ async function submitForm() {
       required
     />
 
-    <po-button color="primary" variant="tonal" class="mt-1" type="submit" block>{{
-      $t('comments.post-comment')
-    }}</po-button>
+    <po-button
+      :id="`${formId}-submit`"
+      color="primary"
+      variant="tonal"
+      class="mt-1"
+      type="submit"
+      block
+    >
+      {{ $t('comments.post-comment') }}
+    </po-button>
   </v-form>
 </template>

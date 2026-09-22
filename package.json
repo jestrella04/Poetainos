@@ -54,6 +54,7 @@
     "lodash-es": "^4.17.21",
     "markdown-it": "^15.0.1",
     "millify": "^6.1.0",
+    "playwright": "^1.63.0",
     "prettier": "^3.3.3",
     "pusher-js": "^8.4.0",
     "typescript": "^6.0.3",

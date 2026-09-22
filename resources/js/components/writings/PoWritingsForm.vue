@@ -143,6 +143,10 @@ function resetForm() {
     clearInputs()
   }
 }
+
+function categoryOptionProps(idPrefix: string): (category: CategoryOption) => { id: string } {
+  return (category) => ({ id: `${idPrefix}-${category.id}` })
+}
 </script>
 
 <template>
@@ -166,6 +170,7 @@ function resetForm() {
         </p>
 
         <v-text-field
+          id="writing-title"
           v-model="formData.title"
           :label="requiredLabel('main.title')"
           hide-details="auto"
@@ -179,6 +184,7 @@ function resetForm() {
         />
 
         <v-select
+          id="writing-main-category"
           v-model="formData.main_category"
           :label="requiredLabel('categories.main-category')"
           hide-details="auto"
@@ -188,12 +194,14 @@ function resetForm() {
           :items="mainCategories"
           item-title="name"
           item-value="id"
+          :item-props="categoryOptionProps('main-category-option')"
           clearable
           required
           chips
         />
 
         <v-select
+          id="writing-alt-categories"
           v-model="formData.alt_categories"
           :label="requiredLabel('categories.alt-categories')"
           hide-details="auto"
@@ -203,6 +211,7 @@ function resetForm() {
           :items="altCategories"
           item-title="name"
           item-value="id"
+          :item-props="categoryOptionProps('alt-category-option')"
           multiple
           clearable
           required
@@ -211,6 +220,7 @@ function resetForm() {
         />
 
         <v-combobox
+          id="writing-tags"
           v-model="formData.tags"
           :label="$t('tags.tags')"
           hide-details="auto"
@@ -226,6 +236,7 @@ function resetForm() {
         />
 
         <v-textarea
+          id="writing-text"
           v-model="formData.text"
           :label="requiredLabel('main.text')"
           hide-details="auto"
@@ -239,6 +250,7 @@ function resetForm() {
         />
 
         <v-text-field
+          id="writing-link"
           v-model="formData.link"
           type="url"
           :label="$t('main.link')"
@@ -252,6 +264,7 @@ function resetForm() {
         />
 
         <v-file-input
+          id="writing-cover"
           v-model="formData.cover"
           :label="$t('main.cover')"
           hide-details="auto"
@@ -268,6 +281,7 @@ function resetForm() {
 
         <po-button
           v-if="isUpdate"
+          id="writing-delete"
           color="error"
           variant="tonal"
           class="mb-2"
@@ -279,7 +293,14 @@ function resetForm() {
 
         <po-writing-delete v-if="isUpdate" v-model="isDelete" :slug="writing.data.slug ?? ''" />
 
-        <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
+        <po-button
+          id="writing-submit"
+          type="submit"
+          color="primary"
+          size="large"
+          block
+          :disabled="isPosting"
+        >
           <template v-if="isPosting"><v-progress-circular indeterminate /></template>
           <template v-else>{{ isUpdate ? $t('main.save') : $t('main.send') }}</template>
         </po-button>

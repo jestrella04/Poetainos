@@ -43,7 +43,9 @@ const socialLinks = computed<Record<string, string>>(() =>
           {{ data.location }}
         </p>
 
-        <p class="text-display-large po-prose ma-0 mb-1">{{ userDisplayName(data) }}</p>
+        <p id="user-name" class="text-display-large po-prose ma-0 mb-1">
+          {{ userDisplayName(data) }}
+        </p>
         <p class="ma-0 mb-4">@{{ data.username }}</p>
 
         <p v-if="!strNullOrEmpty(data.bio)" class="text-title-large po-prose ma-0 mb-4">

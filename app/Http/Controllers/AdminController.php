@@ -18,7 +18,7 @@ use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Inertia\Response;
 use SplFileObject;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminController extends Controller
 {
@@ -159,9 +159,16 @@ class AdminController extends Controller
         ]);
     }
 
-    public function log(): BinaryFileResponse
+    /**
+     * Download the full application log; an empty file when nothing has been logged yet.
+     */
+    public function log(): StreamedResponse
     {
-        return response()->download($this->log);
+        return response()->streamDownload(function (): void {
+            if (is_readable($this->log) === true) {
+                readfile($this->log);
+            }
+        }, 'laravel.log', ['Content-Type' => 'text/plain']);
     }
 
     /**

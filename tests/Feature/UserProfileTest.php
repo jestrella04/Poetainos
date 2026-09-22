@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertAuthenticatedAs;
 use function Pest\Laravel\assertGuest;
 
 describe('viewing and updating a profile', function (): void {
@@ -133,21 +134,7 @@ describe('changing a user\'s role', function (): void {
 });
 
 describe('deleting an account', function (): void {
-    it('allows a user to delete their own account after confirming their password', function (): void {
-        // Given
-        $user = createUser();
-
-        // When
-        $response = actingAs($user)
-            ->withSession(['auth.password_confirmed_at' => time()])
-            ->delete('/users/delete/'.$user->username);
-
-        // Then
-        $response->assertRedirect(route('home'));
-        expect(User::find($user->id))->toBeNull();
-    });
-
-    it('allows an admin to delete a different user without confirming a password', function (): void {
+    it('allows an admin to delete a different user without confirming a password and stay logged in', function (): void {
         // Given
         $user = createUser();
         $admin = actingAsAdmin();
@@ -158,6 +145,26 @@ describe('deleting an account', function (): void {
         // Then
         $response->assertOk();
         expect(User::find($user->id))->toBeNull();
+        assertAuthenticatedAs($admin);
+    });
+
+    it('deletes the account, logs the user out and clears their avatar once they confirm their password', function (): void {
+        // Given
+        Storage::fake('local');
+        Storage::disk('local')->put('avatars/mine.png', 'x');
+        $user = createUser(['extra_info' => ['avatar' => 'avatars/mine.png']]);
+
+        // When
+        $response = actingAs($user)
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->delete('/users/delete/'.$user->username);
+
+        // Then
+        $response->assertRedirect(route('home'));
+        $response->assertSessionHas('message', 'accounts.account-deleted');
+        expect(User::find($user->id))->toBeNull();
+        assertGuest();
+        Storage::disk('local')->assertMissing('avatars/mine.png');
     });
 });
 
@@ -173,6 +180,32 @@ describe('blocking a user', function (): void {
         // Then
         $response->assertOk();
         expect($user->refresh()->isAuthorBlocked($author))->toBeTrue();
+    });
+
+    it('does not let a user block themselves', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->post('/users/block/'.$user->username);
+
+        // Then
+        $response->assertUnprocessable();
+        expect($user->blockedAuthors()->count())->toBe(0);
+    });
+
+    it('lets a user unblock someone they blocked', function (): void {
+        // Given
+        $user = createUser();
+        $author = createUser();
+        $user->block($author);
+
+        // When
+        $response = actingAs($user)->delete('/users/block/'.$author->username);
+
+        // Then
+        $response->assertOk();
+        expect($user->isAuthorBlocked($author))->toBeFalse();
     });
 });
 
@@ -295,66 +328,6 @@ describe('a profile avatar', function (): void {
         $response->assertOk();
         expect($user->refresh()->extra_info['avatar'])->toBe('');
         Storage::disk('local')->assertMissing('avatars/old.png');
-    });
-});
-
-describe('deleting an account, in more detail', function (): void {
-    it('logs the user out and clears their avatar when they delete themselves', function (): void {
-        // Given
-        Storage::fake('local');
-        Storage::disk('local')->put('avatars/mine.png', 'x');
-        $user = createUser(['extra_info' => ['avatar' => 'avatars/mine.png']]);
-
-        // When
-        $response = actingAs($user)
-            ->withSession(['auth.password_confirmed_at' => time()])
-            ->delete('/users/delete/'.$user->username);
-
-        // Then
-        $response->assertRedirect(route('home'));
-        $response->assertSessionHas('message', 'accounts.account-deleted');
-        assertGuest();
-        Storage::disk('local')->assertMissing('avatars/mine.png');
-    });
-
-    it('keeps an admin logged in when they delete someone else', function (): void {
-        // Given
-        $user = createUser();
-        $admin = actingAsAdmin();
-
-        // When
-        actingAs($admin)->delete('/admin/users/delete/'.$user->username)->assertOk();
-
-        // Then
-        expect(auth()->id())->toBe($admin->id);
-    });
-});
-
-describe('blocking, in more detail', function (): void {
-    it('does not let a user block themselves', function (): void {
-        // Given
-        $user = createUser();
-
-        // When
-        $response = actingAs($user)->post('/users/block/'.$user->username);
-
-        // Then
-        $response->assertUnprocessable();
-        expect($user->blockedAuthors()->count())->toBe(0);
-    });
-
-    it('lets a user unblock someone they blocked', function (): void {
-        // Given
-        $user = createUser();
-        $author = createUser();
-        $user->block($author);
-
-        // When
-        $response = actingAs($user)->delete('/users/block/'.$author->username);
-
-        // Then
-        $response->assertOk();
-        expect($user->isAuthorBlocked($author))->toBeFalse();
     });
 });
 

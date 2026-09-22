@@ -37,27 +37,33 @@ describe.each(Object.entries(themes))('%s theme', (_name, theme) => {
   const colors = theme.colors as Record<string, string>
   const colorOf = (token: string): string => colors[token] ?? ''
 
-  it.each(COLOR_PAIRS)('%s text meets AA contrast on its fill', (role) => {
-    // When
-    const ratio = toContrastRatio(colorOf(`on-${role}`), colorOf(role))
+  describe.each(COLOR_PAIRS)('on-%s', (role) => {
+    it('meets AA contrast on its fill', () => {
+      // When
+      const ratio = toContrastRatio(colorOf(`on-${role}`), colorOf(role))
 
-    // Then
-    expect(ratio).toBeGreaterThanOrEqual(MINIMUM_TEXT_CONTRAST)
+      // Then
+      expect(ratio).toBeGreaterThanOrEqual(MINIMUM_TEXT_CONTRAST)
+    })
   })
 
-  it('on-surface-variant meets AA contrast on surface', () => {
-    // When
-    const ratio = toContrastRatio(colorOf('on-surface-variant'), colorOf('surface'))
+  describe('on-surface-variant', () => {
+    it('meets AA contrast on surface', () => {
+      // When
+      const ratio = toContrastRatio(colorOf('on-surface-variant'), colorOf('surface'))
 
-    // Then
-    expect(ratio).toBeGreaterThanOrEqual(MINIMUM_TEXT_CONTRAST)
+      // Then
+      expect(ratio).toBeGreaterThanOrEqual(MINIMUM_TEXT_CONTRAST)
+    })
   })
 
-  it('primary meets AA contrast on surface so it works as link/text color', () => {
-    // When
-    const ratio = toContrastRatio(colorOf('primary'), colorOf('surface'))
+  describe('primary', () => {
+    it('meets AA contrast on surface so it works as link/text color', () => {
+      // When
+      const ratio = toContrastRatio(colorOf('primary'), colorOf('surface'))
 
-    // Then
-    expect(ratio).toBeGreaterThanOrEqual(MINIMUM_TEXT_CONTRAST)
+      // Then
+      expect(ratio).toBeGreaterThanOrEqual(MINIMUM_TEXT_CONTRAST)
+    })
   })
 })

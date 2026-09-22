@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { themeStylesheetHead, vuetify } from '../vuetify'
 
 describe('themeStylesheetHead', () => {
+  afterEach(async () => {
+    await vuetify.theme.change('light')
+  })
+
   it("renders Vuetify's theme CSS as a single style element under Vuetify's stylesheet id", () => {
     // When
     const elements = themeStylesheetHead()
@@ -23,7 +27,5 @@ describe('themeStylesheetHead', () => {
 
     // Then
     expect(stylesheet).toContain('color-scheme: dark')
-
-    await vuetify.theme.change('light')
   })
 })

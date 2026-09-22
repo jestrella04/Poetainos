@@ -202,6 +202,7 @@ async function resetPassword(): Promise<void> {
         @reset.prevent="resetForm()"
       >
         <v-text-field
+          id="login-email"
           v-model="formData.email"
           type="email"
           :label="$t('main.email')"
@@ -216,6 +217,7 @@ async function resetPassword(): Promise<void> {
 
         <template v-if="step === 'register'">
           <v-text-field
+            id="register-username"
             v-model="formData.username"
             type="text"
             :label="$t('users.user')"
@@ -229,6 +231,7 @@ async function resetPassword(): Promise<void> {
           />
 
           <v-text-field
+            id="register-password"
             v-model="formData.password"
             type="password"
             :label="$t('main.password')"
@@ -242,6 +245,7 @@ async function resetPassword(): Promise<void> {
           />
 
           <v-text-field
+            id="register-password-confirmation"
             v-model="formData.confirmPassword"
             type="password"
             :label="$t('accounts.confirm-password')"
@@ -259,6 +263,7 @@ async function resetPassword(): Promise<void> {
 
         <template v-if="step === 'login'">
           <v-text-field
+            id="login-password"
             v-model="formData.password"
             type="password"
             :label="$t('main.password')"
@@ -271,7 +276,14 @@ async function resetPassword(): Promise<void> {
           />
         </template>
 
-        <po-button type="submit" color="primary" size="large" block :disabled="isLoading">
+        <po-button
+          id="login-submit"
+          type="submit"
+          color="primary"
+          size="large"
+          block
+          :disabled="isLoading"
+        >
           <span v-if="!isLoading">{{ $t('main.continue') }}</span>
           <v-progress-circular v-else indeterminate />
         </po-button>
@@ -320,6 +332,7 @@ async function resetPassword(): Promise<void> {
 
         <div>
           <po-button
+            id="login-with-email"
             block
             color="primary"
             prepend-icon="fas fa-at"

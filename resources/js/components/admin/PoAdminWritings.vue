@@ -49,6 +49,7 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>
       :items="items"
       :loading="isLoading"
       item-value="id"
+      :row-props="({ item }) => ({ id: `admin-writing-${item.id}` })"
       @update:options="loadItems"
     >
       <template v-slot:item.author="{ item }">

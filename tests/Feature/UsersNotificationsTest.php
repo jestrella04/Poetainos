@@ -1,31 +1,9 @@
 <?php
 
-use App\Models\User;
 use App\Models\Writing;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 use function Pest\Laravel\actingAs;
-
-/**
- * @param  array<string, mixed>  $data
- */
-function createDatabaseNotification(User $recipient, array $data, ?Carbon $createdAt = null): void
-{
-    $createdAt ??= now();
-
-    DB::table('notifications')->insert([
-        'id' => (string) Str::uuid(),
-        'type' => 'App\Notifications\WritingLiked',
-        'notifiable_type' => User::class,
-        'notifiable_id' => $recipient->id,
-        'data' => json_encode($data),
-        'read_at' => null,
-        'created_at' => $createdAt,
-        'updated_at' => $createdAt,
-    ]);
-}
 
 describe('the notifications index', function (): void {
     it('attaches the notifier user and writing without querying per notification', function (): void {

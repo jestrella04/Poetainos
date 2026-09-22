@@ -34,41 +34,6 @@ describe('the awards page', function (): void {
     });
 });
 
-describe('showing a writing', function (): void {
-    it('increments views and calculates a finite aura', function (): void {
-        // Given
-        $writing = Writing::factory()->create();
-
-        // When
-        $response = get($writing->path());
-
-        // Then
-        $response->assertOk();
-        $writing->refresh();
-        expect($writing->views)->toBe(1);
-        expect(is_finite($writing->aura))->toBeTrue();
-    });
-});
-
-describe('aura calculation', function (): void {
-    it('does not throw when all writing aura points are zeroed', function (): void {
-        // Given
-        config(['poetainos.aura.points.writing' => [
-            'like' => 0,
-            'comment' => 0,
-            'shelf' => 0,
-            'views' => 0,
-        ]]);
-        $writing = Writing::factory()->create(['aura' => '1.23']);
-
-        // When
-        $writing->updateAura();
-
-        // Then
-        expect((float) $writing->refresh()->aura)->toBe(1.23);
-    });
-});
-
 describe('the daily post limit', function (): void {
     it('is configurable via site settings', function (): void {
         // Given
@@ -240,6 +205,32 @@ describe('editing and deleting a writing', function (): void {
         $editResponse->assertOk();
         $deleteResponse->assertOk();
         expect(Writing::find($writing->id))->toBeNull();
+    });
+
+    it('lets an admin delete a writing from the admin area', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->deleteJson(route('admin.writings.destroy', $writing));
+
+        // Then
+        $response->assertOk();
+        expect(Writing::find($writing->id))->toBeNull();
+    });
+
+    it('keeps the admin area delete route closed to the author', function (): void {
+        // Given
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+
+        // When
+        $response = actingAs($author)->deleteJson(route('admin.writings.destroy', $writing));
+
+        // Then
+        $response->assertForbidden();
+        expect(Writing::find($writing->id))->not->toBeNull();
     });
 });
 

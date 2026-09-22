@@ -129,6 +129,18 @@ describe('a writing\'s aura', function (): void {
         expect($onShelf)->toBeGreaterThan(0.0);
         expect((float) $writing->refresh()->aura)->toBe(0.0);
     });
+
+    it('is left alone when no point weights are configured', function (): void {
+        // Given
+        config(['poetainos.aura.points.writing' => ['like' => 0, 'comment' => 0, 'shelf' => 0, 'views' => 0]]);
+        $writing = Writing::factory()->create(['aura' => 1.23]);
+
+        // When
+        $writing->updateAura();
+
+        // Then
+        expect((float) $writing->refresh()->aura)->toBe(1.23);
+    });
 });
 
 describe('featuring a writing on the home page', function (): void {

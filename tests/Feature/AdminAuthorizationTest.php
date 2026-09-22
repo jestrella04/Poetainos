@@ -25,7 +25,7 @@ describe('the admin area', function (): void {
         $response->assertForbidden();
     });
 
-    it('is accessible to admins', function (): void {
+    it('is accessible to admins and flags them so the admin menu entry is rendered', function (): void {
         // Given
         $admin = actingAsAdmin();
 
@@ -33,22 +33,12 @@ describe('the admin area', function (): void {
         $response = actingAs($admin)->get('/admin');
 
         // Then
-        $response->assertOk();
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page->where('auth.admin', true));
     });
 });
 
 describe('the shared auth props', function (): void {
-    it('flag admins so the admin menu entry is rendered', function (): void {
-        // Given
-        $admin = actingAsAdmin();
-
-        // When
-        $response = actingAs($admin)->get('/admin');
-
-        // Then
-        $response->assertInertia(fn ($page) => $page->where('auth.admin', true));
-    });
-
     it('do not flag regular users as admins', function (): void {
         // Given
         $user = createUser();
@@ -68,23 +58,6 @@ describe('the shared ziggy props', function (): void {
 
         // Then
         $response->assertInertia(fn ($page) => $page->where('ziggy.url', rtrim(url('/'), '/')));
-    });
-});
-
-describe('the tools page', function (): void {
-    it('exposes structured server info and a log tail', function (): void {
-        // Given
-        $admin = actingAsAdmin();
-
-        // When
-        $response = actingAs($admin)->get(route('admin.tools'));
-
-        // Then
-        $response->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->has('info')
-                ->where('info.PHP version', PHP_VERSION)
-                ->has('log'));
     });
 });
 

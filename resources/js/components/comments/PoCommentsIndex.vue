@@ -88,7 +88,11 @@ function reply(comment: Comment) {
             <span class="text-medium-emphasis">{{ toLocaleDate(comment.created_at) }}</span>
           </div>
 
-          <div class="po-prose text-title-large mb-6" v-html="linkify(comment.message)" />
+          <div
+            :id="`comment-${comment.id}-message`"
+            class="po-prose text-title-large mb-6"
+            v-html="linkify(comment.message)"
+          />
 
           <div class="d-flex ga-2">
             <po-reaction-button

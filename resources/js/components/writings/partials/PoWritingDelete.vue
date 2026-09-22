@@ -56,7 +56,7 @@ async function submit(): Promise<void> {
           :action="route('writings.destroy', slug)"
           @submit.prevent="submit"
         >
-          <po-button color="primary" type="submit" block>
+          <po-button id="writing-delete-submit" color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
             <v-progress-circular v-else indeterminate />
           </po-button>
