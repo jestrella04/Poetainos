@@ -18,6 +18,31 @@ describe('security headers', function (): void {
             ->assertHeaderMissing('Strict-Transport-Security')
             ->assertHeader('Content-Security-Policy-Report-Only');
     });
+
+    it('lets the Ziggy routes script run under the production policy', function (): void {
+        // Given
+        app()->detectEnvironment(fn (): string => 'production');
+
+        // When
+        $response = get('/offline');
+
+        // Then
+        preg_match("/script-src 'self' 'nonce-([^']+)'/", $response->headers->get('Content-Security-Policy'), $matches);
+        expect($matches)->toHaveKey(1);
+        // Ziggy emits the full script on its first render per process and a merge script after that
+        expect($response->getContent())->toMatch('/<script type="text\/javascript" nonce="'.preg_quote($matches[1], '/').'">(const Ziggy=|Object\.assign\(Ziggy\.routes)/');
+    });
+
+    it('allows runtime-injected inline styles under the production policy', function (): void {
+        // Given
+        app()->detectEnvironment(fn (): string => 'production');
+
+        // When
+        $response = get('/offline');
+
+        // Then
+        expect($response->headers->get('Content-Security-Policy'))->toContain("style-src 'self' 'unsafe-inline';");
+    });
 });
 
 describe('appearance', function (): void {

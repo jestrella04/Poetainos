@@ -34,17 +34,18 @@ class SecurityHeaders
                 implode('; ', [
                     "default-src 'self'",
                     "script-src 'self' 'nonce-{$nonce}' https://connect.facebook.net https://cdn.counter.dev",
-                    "style-src 'self' 'nonce-{$nonce}'",
+                    // Vuetify, FontAwesome and Inertia inject <style> tags and style="" attributes at runtime,
+                    // which a nonce can't cover (browsers ignore 'unsafe-inline' once a nonce is present)
+                    "style-src 'self' 'unsafe-inline'",
                     "img-src 'self' data: blob: https:",
                     "font-src 'self'",
-                    "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev",
+                    "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev https://t.counter.dev",
                     'frame-src https://counter.dev',
                     "frame-ancestors 'none'",
                     "form-action 'self'",
                     "object-src 'none'",
                     "base-uri 'self'",
                     'upgrade-insecure-requests',
-                    'report-uri /csp-report',
                 ]),
             );
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
@@ -52,7 +53,7 @@ class SecurityHeaders
             $viteUrl = $this->viteDevServerUrl();
             $scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.counter.dev".($viteUrl ? " {$viteUrl}" : '');
             $styleSrc = "style-src 'self' 'unsafe-inline'".($viteUrl ? " {$viteUrl}" : '');
-            $connectSrc = "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev".($viteUrl ? " {$viteUrl} ".preg_replace('/^http/', 'ws', $viteUrl) : '');
+            $connectSrc = "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev https://t.counter.dev".($viteUrl ? " {$viteUrl} ".preg_replace('/^http/', 'ws', $viteUrl) : '');
             $fontSrc = "font-src 'self' data:".($viteUrl ? " {$viteUrl}" : '');
 
             $response->headers->set(

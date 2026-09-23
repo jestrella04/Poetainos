@@ -23,7 +23,7 @@
     @inertiaHead
 
     <!-- Ziggy/Laravel Routes -->
-    @routes
+    @routes(nonce: Vite::cspNonce())
 
     <!-- Vite -->
     @vite('resources/js/app.ts')
