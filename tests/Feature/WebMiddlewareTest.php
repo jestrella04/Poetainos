@@ -52,8 +52,10 @@ describe('document head', function (): void {
         $response = get('/offline');
 
         // Then
-        $firstStylesheet = Str::match('/<style[^>]*>.*?<\/style>|<link[^>]*rel="stylesheet"[^>]*>/s', $response->getContent());
-        expect($firstStylesheet)->toBe('<style>@layer vuetify-core, vuetify-components, vuetify-overrides, vuetify-utilities, vuetify-final;</style>');
+        // Nothing that can open a cascade layer (a <style> or stylesheet <link>) may precede the declaration
+        expect($response->getContent())->toMatch(
+            '/^(?:(?!<style|<link[^>]*rel="stylesheet").)*<style>@layer vuetify-core, vuetify-components, vuetify-overrides, vuetify-utilities, vuetify-final;<\/style>/s'
+        );
     });
 });
 
