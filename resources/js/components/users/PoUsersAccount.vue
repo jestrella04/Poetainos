@@ -1,66 +1,74 @@
-<script setup>
-import { inject, ref, provide, reactive } from 'vue'
+<script setup lang="ts">
+import { ref, provide, reactive, computed } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
+import PoUsersAccountRow from './partials/PoUsersAccountRow.vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
+import { isDeleteKey, pushKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
+import { useFormatting } from '@/composables/useFormatting'
+import { useMembership } from '@/composables/useMembership'
+import type { InertiaPageProps } from '@/types/inertia'
 
-const page = usePage()
-const helper = inject('helper')
-const push = inject('push')
-
-if (!helper) {
-  throw new Error('helper plugin not provided')
+interface AccountSummary {
+  created_at: string
+  writings_count: number
+  shelf_count: number
+  likes_count: number
+  blocked_authors_count: number
 }
 
-const username = helper.authUser().username
+const page =
+  usePage<InertiaPageProps<{ notifications?: { email: boolean }; account: AccountSummary }>>()
+const { authUser } = useAuth()
+const { userDisplayName, formatCount } = useFormatting()
+const { membershipDuration, membershipMessage } = useMembership()
+const { t } = useI18n()
+const push = injectStrict(pushKey)
+const { mdAndUp } = useDisplay()
+
+// This page is behind the `verified` auth middleware (routes/web.php), so
+// the authenticated user is always present here.
+const username = authUser()!.username
+const account = page.props.account
 const isDelete = ref(false)
+const memberSince = computed(() =>
+  t('accounts.member-since', {
+    site_name: page.props.site.name,
+    duration: membershipDuration(account.created_at, t)
+  })
+)
+const memberSinceMessage = computed(() => membershipMessage(account.created_at, t))
 const notifications = reactive({
   email: page.props.notifications?.email ?? true,
   push: false
 })
 
-provide('isDelete', isDelete)
+provide(isDeleteKey, isDelete)
 
-if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.ready
-    .then((registration) => {
-      registration.pushManager
-        .getSubscription()
-        .then((subscription) => {
-          // Keep subscription in sync with server
-          if (subscription) {
-            push.subscribe()
-            notifications.push = true
-          }
+void push.isSubscribed().then((isSubscribed) => {
+  if (isSubscribed === true) {
+    // Keep subscription in sync with server
+    push.subscribe()
+    notifications.push = true
+  } else {
+    notifications.push = false
+  }
+})
 
-          // Uncheck the push switcher
-          if (!subscription) {
-            notifications.push = false
-          }
-        })
-        .catch((e) => {
-          console.log('Error thrown checking subscription status.', e)
-        })
-    })
-    .catch((e) => {
-      console.log('Service worker not available:', e)
-    })
+function toggleEmailNotifications(value: boolean | null): void {
+  notifications.email = value === true
+
+  void axios.post(route('notifications.email', [String(notifications.email)]))
 }
 
-function email() {
-  notifications.email = !notifications.email
+function togglePushNotifications(value: boolean | null): void {
+  notifications.push = value === true
 
-  axios
-    .post(route('notifications.email', [notifications.email]))
-    .then()
-    .catch()
-    .finally()
-}
-
-function pusher() {
-  notifications.push = !notifications.push
-
-  if (notifications.push) {
+  if (notifications.push === true) {
     push.subscribe()
   } else {
     push.unsubscribe()
@@ -70,103 +78,124 @@ function pusher() {
 
 <template>
   <po-wrapper>
-    <po-head></po-head>
+    <po-head />
 
-    <v-card>
-      <v-card-text style="max-width: 400px">
-        <div class="d-flex mb-5 pos-relative">
-          <div class="d-flex ga-4 mb-2">
-            <div>
-              <po-avatar size="48" color="secondary" :user="$helper.authUser()" />
-            </div>
+    <div class="d-flex flex-wrap align-center position-relative ga-5 pb-4">
+      <po-avatar size="96" color="secondary" :user="authUser()!" />
 
-            <div>
-              <p class="font-weight-bold">
-                <po-link
-                  :href="route('users.show', $helper.authUser().username)"
-                  class="stretched"
-                  inertia
-                >
-                  {{ $helper.userDisplayName($helper.authUser()) }}
-                </po-link>
-              </p>
-              <p class="text-medium-emphasis">@{{ $helper.authUser().username }}</p>
-            </div>
-          </div>
+      <div class="flex-grow-1">
+        <p class="text-display-medium po-prose ma-0 mb-2">{{ userDisplayName(authUser()!) }}</p>
+        <p class="text-medium-emphasis ma-0 mb-2">@{{ username }}</p>
+        <p class="text-title-medium ma-0">{{ memberSince }} {{ memberSinceMessage }}</p>
+      </div>
+
+      <po-link :href="route('users.show', username)" class="text-primary stretched" inertia>
+        {{ $t('accounts.view-public-profile') }}
+      </po-link>
+    </div>
+
+    <v-divider />
+
+    <v-row :gap="mdAndUp ? 60 : undefined">
+      <v-col cols="12" md="6">
+        <p class="text-uppercase text-eyebrow text-primary mt-12">
+          {{ $t('accounts.my-account') }}
+        </p>
+
+        <div class="d-flex flex-column">
+          <po-users-account-row
+            :href="route('users.edit', username)"
+            :title="$t('accounts.update-profile')"
+            :subtitle="$t('accounts.update-profile-hint')"
+          />
+
+          <po-users-account-row
+            :href="route('users.writings.index', username)"
+            :title="$t('users.view-self-writings')"
+            :subtitle="
+              $t('accounts.writings-count', { count: formatCount(account.writings_count) })
+            "
+          />
+
+          <po-users-account-row
+            :href="route('users.shelf.index', username)"
+            :title="$t('users.view-self-shelf')"
+            :subtitle="$t('accounts.shelf-count', { count: formatCount(account.shelf_count) })"
+          />
+
+          <po-users-account-row
+            :href="route('users.likes.index', username)"
+            :title="$t('users.view-self-likes')"
+            :subtitle="$t('accounts.likes-count', { count: formatCount(account.likes_count) })"
+          />
+
+          <po-users-account-row
+            :href="route('users.blocked.index')"
+            :title="$t('accounts.manage-blocked-users')"
+            :subtitle="
+              account.blocked_authors_count > 0
+                ? $t('accounts.blocked-count', {
+                    count: formatCount(account.blocked_authors_count)
+                  })
+                : $t('accounts.no-blocked-users')
+            "
+          />
         </div>
-        <div class="mb-5">
-          <p class="text-caption text-uppercase text-disabled">
-            {{ $t('accounts.my-account') }}
-          </p>
+      </v-col>
 
-          <v-list>
-            <po-list-item :href="route('users.edit', username)" inertia>
-              {{ $t('accounts.update-profile') }}
-            </po-list-item>
+      <v-col cols="12" md="6">
+        <p class="text-uppercase text-eyebrow text-primary mt-md-12">
+          {{ $t('accounts.notifications') }}
+        </p>
 
-            <po-list-item :href="route('users.writings.index', username)" inertia>
-              {{ $t('users.view-self-writings') }}
-            </po-list-item>
-
-            <po-list-item :href="route('users.shelf.index', username)" inertia>
-              {{ $t('users.view-self-shelf') }}
-            </po-list-item>
-
-            <po-list-item :href="route('users.likes.index', username)" inertia>
-              {{ $t('users.view-self-likes') }}
-            </po-list-item>
-
-            <po-list-item href="#" inertia disabled>
-              {{ $t('accounts.manage-blocked-users') }}
-            </po-list-item>
-          </v-list>
-        </div>
-        <div class="mb-5">
-          <p class="text-caption text-uppercase text-disabled mb-3">
-            {{ $t('accounts.notifications') }}
-          </p>
-
-          <v-switch
-            v-model="notifications.email"
-            :label="$t('main.email')"
-            class="mb-0"
-            hide-details="auto"
-            color="primary"
-            @click.prevent="email"
-          ></v-switch>
-
-          <v-switch
-            v-model="notifications.push"
-            :label="$t('main.push')"
-            class="mb-0"
-            hide-details="auto"
-            color="primary"
-            @click.prevent="pusher"
-          ></v-switch>
-        </div>
-        <div class="mb-5">
-          <p class="text-caption text-uppercase text-disabled mb-3">
-            {{ $t('accounts.danger-zone') }}
-          </p>
-
-          <po-button
-            class="w-100 mb-1"
-            color="secondary"
-            size="small"
-            :href="route('logout')"
-            method="post"
-            inertia
+        <div class="d-flex flex-column">
+          <po-users-account-row
+            :title="$t('main.email')"
+            :subtitle="$t('accounts.email-notifications-hint')"
           >
+            <v-switch
+              :model-value="notifications.email"
+              :aria-label="$t('main.email')"
+              hide-details
+              color="primary"
+              @update:model-value="toggleEmailNotifications"
+            />
+          </po-users-account-row>
+
+          <po-users-account-row
+            :title="$t('main.push')"
+            :subtitle="$t('accounts.push-notifications-hint')"
+          >
+            <v-switch
+              :model-value="notifications.push"
+              :aria-label="$t('main.push')"
+              hide-details
+              color="primary"
+              @update:model-value="togglePushNotifications"
+            />
+          </po-users-account-row>
+        </div>
+
+        <p class="text-uppercase text-eyebrow text-primary mt-12">
+          {{ $t('accounts.danger-zone') }}
+        </p>
+
+        <p class="text-title-medium text-medium-emphasis" style="max-width: 52ch">
+          {{ $t('accounts.delete-account-summary') }}
+        </p>
+
+        <div class="d-flex ga-3">
+          <po-button color="primary" variant="tonal" :href="route('logout')" method="post" inertia>
             {{ $t('accounts.logout') }}
           </po-button>
 
-          <po-button class="w-100 mb-1" color="error" size="small" @click.prevent="isDelete = true">
+          <po-button color="error" variant="tonal" @click.prevent="isDelete = true">
             {{ $t('accounts.delete-account') }}
           </po-button>
-
-          <po-user-delete v-model="isDelete" :username="username"></po-user-delete>
         </div>
-      </v-card-text>
-    </v-card>
+      </v-col>
+    </v-row>
+
+    <po-user-delete v-model="isDelete" :username="username" />
   </po-wrapper>
 </template>

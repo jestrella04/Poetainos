@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Writing;
+use Database\Factories\Concerns\StoresDemoImages;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,17 +12,17 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class WritingFactory extends Factory
 {
+    use StoresDemoImages;
+
     /**
      * The name of the factory's corresponding model.
      *
-     * @var string
+     * @var class-string<Writing>
      */
     protected $model = Writing::class;
 
     /**
      * Define the model's default state.
-     *
-     * @return array<string, mixed>
      */
     public function definition(): array
     {
@@ -29,7 +30,8 @@ class WritingFactory extends Factory
             'user_id' => User::factory(),
             'title' => $this->faker->text(45),
             'slug' => $this->faker->unique()->slug(3),
-            'text' => $this->faker->paragraph,
+            'text' => $this->faker->paragraphs($this->faker->numberBetween(2, 10), true),
+            'extra_info' => fn (): ?array => $this->faker->boolean() ? ['cover' => $this->storeDemoImage('images/cover.jpg', 'covers')] : null,
         ];
     }
 }

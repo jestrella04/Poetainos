@@ -1,0 +1,123 @@
+<?php
+
+use App\Models\Comment;
+use App\Models\User;
+use App\Models\Writing;
+use App\Notifications\CommentLiked;
+use App\Notifications\SocialPostNotification;
+use App\Notifications\WritingCommented;
+use App\Notifications\WritingCommentMentioned;
+use App\Notifications\WritingFeatured;
+use App\Notifications\WritingLiked;
+use App\Notifications\WritingOfTheDayPosted;
+use App\Notifications\WritingPublished;
+
+describe('notification emails', function (): void {
+    /**
+     * @return array<string, array{0: Closure(User, Writing): object}>
+     */
+    $notifications = [
+        'a new comment' => [fn (User $commenter, Writing $writing) => new WritingCommented($writing, $commenter)],
+        'a mention' => [fn (User $commenter, Writing $writing) => new WritingCommentMentioned(Comment::factory()->for($writing)->create(), $commenter)],
+        'a featured writing' => [fn (User $commenter, Writing $writing) => new WritingFeatured($writing)],
+    ];
+
+    it('are sent to users who never chose', function (Closure $makeNotification): void {
+        // Given
+        $recipient = createUser(['extra_info' => null]);
+        $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
+
+        // Then
+        expect($notification->via($recipient))->toContain('mail');
+    })->with($notifications);
+
+    it('are sent to users who opted in', function (Closure $makeNotification): void {
+        // Given
+        $recipient = createUser(['extra_info' => ['notifications' => ['email' => 'on']]]);
+        $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
+
+        // Then
+        expect($notification->via($recipient))->toContain('mail');
+    })->with($notifications);
+
+    it('are not sent to users who opted out, but the in-app notification still is', function (Closure $makeNotification): void {
+        // Given
+        $recipient = createUser(['extra_info' => ['notifications' => ['email' => 'off']]]);
+        $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
+
+        // Then
+        expect($notification->via($recipient))->not->toContain('mail')->toContain('database');
+    })->with($notifications);
+});
+
+describe('the content of "someone did something on your writing" notifications', function (): void {
+    it('names who did it, the site, and links to the writing', function (string $class, string $expectedAction): void {
+        // Given
+        $actorName = fake()->firstName().' '.fake()->lastName();
+        $site = getSiteConfig('name');
+        $actor = createUser(['name' => $actorName]);
+        $recipient = createUser();
+        $writing = Writing::factory()->for($recipient, 'author')->create();
+        $notification = match ($class) {
+            WritingLiked::class => new WritingLiked($writing, $actor),
+            CommentLiked::class => new CommentLiked(Comment::factory()->for($writing)->create(), $actor),
+            WritingCommented::class => new WritingCommented($writing, $actor),
+            default => throw new InvalidArgumentException("Unexpected notification {$class}."),
+        };
+
+        // When
+        $message = $notification->toWebPush($recipient, null)->toArray();
+        $mail = $notification->toMail($recipient);
+
+        // Then
+        expect($message['title'])->toContain($actorName)->toContain($site);
+        expect($message['body'])->toContain($actorName)->toContain($site);
+        expect($mail->actionText)->toBe(__($expectedAction));
+        expect($mail->actionUrl)->toBe($writing->path());
+        expect($mail->greeting)->toBe(__('Hello!'));
+    })->with([
+        'a like on a writing' => [WritingLiked::class, 'View writing'],
+        'a like on a comment' => [CommentLiked::class, 'View comment'],
+        'a new comment' => [WritingCommented::class, 'View writing'],
+    ]);
+
+    it('links a mention to the comment itself', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        $comment = Comment::factory()->for($writing)->create();
+        $notification = new WritingCommentMentioned($comment, createUser());
+
+        // When
+        $mail = $notification->toMail(createUser());
+
+        // Then
+        expect($mail->actionUrl)->toBe($writing->path().'#comment-'.$comment->id);
+    });
+});
+
+describe('social media posts about a writing', function (): void {
+    it('mention the author by handle on X and by name on Facebook, with a link to the writing', function (Closure $makeNotification): void {
+        // Given
+        $authorName = fake()->firstName().' '.fake()->lastName();
+        $handle = '@'.fakeUsername();
+        $title = fakeTitle();
+        $author = createUser(['name' => $authorName, 'extra_info' => ['social' => ['twitter' => $handle]]]);
+        $writing = Writing::factory()->for($author, 'author')->create(['title' => $title]);
+        $notification = $makeNotification($writing);
+
+        // When
+        $tweet = $notification->toTwitter($author)->getContent();
+        $facebookPost = $notification->toFacebookPoster($author)->getBody();
+
+        // Then
+        expect($tweet)->toContain("\"{$title}\"")->toContain($handle);
+        expect(str_ends_with($tweet, $writing->path()))->toBeTrue();
+        expect(str_contains($tweet, ':author'))->toBeFalse();
+        expect($facebookPost['message'])->toContain("\"{$title}\"")->toContain($authorName);
+        expect(str_contains($facebookPost['message'], $handle) || str_contains($facebookPost['message'], ':author'))->toBeFalse();
+        expect($facebookPost['link'])->toBe($writing->path());
+    })->with([
+        'the pick of the day' => [fn (Writing $writing): SocialPostNotification => new WritingOfTheDayPosted($writing)],
+        'a new writing' => [fn (Writing $writing): SocialPostNotification => new WritingPublished($writing)],
+    ]);
+});

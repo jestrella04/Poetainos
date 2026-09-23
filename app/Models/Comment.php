@@ -2,17 +2,25 @@
 
 namespace App\Models;
 
+use Database\Factories\CommentFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @mixin IdeHelperComment
+ */
 class Comment extends Model
 {
+    /** @use HasFactory<CommentFactory> */
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -20,18 +28,43 @@ class Comment extends Model
         'message',
     ];
 
-    public function writing()
+    /**
+     * @return BelongsTo<Writing, $this>
+     */
+    public function writing(): BelongsTo
     {
         return $this->belongsTo(Writing::class);
     }
 
-    public function author()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function likes()
+    /**
+     * @return MorphMany<Like, $this>
+     */
+    public function likes(): MorphMany
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Exclude comments authored by any of the given blocked user ids.
+     *
+     * @param  Builder<Comment>  $query
+     * @param  array<int>  $blockedUserIds
+     * @return Builder<Comment>
+     */
+    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
+    {
+        if ($blockedUserIds === []) {
+            return $query;
+        }
+
+        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
     }
 }

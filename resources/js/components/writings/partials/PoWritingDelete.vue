@@ -1,31 +1,26 @@
-<script setup>
-import { ref, inject } from 'vue'
-import axios from 'axios'
+<script setup lang="ts">
 import { router } from '@inertiajs/vue3'
+import { forceSnackBarKey, isDeleteKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
 
-defineProps({
-  slug: { type: String, required: true }
-})
+defineProps<{
+  slug: string
+}>()
 
-const helper = inject('helper')
-const isDelete = inject('isDelete')
-const isPosting = ref(false)
-const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
+const { setSnackBar } = useSnackbar()
+const isDelete = injectStrict(isDeleteKey)
+const forceSnackBar = injectStrict(forceSnackBarKey)
+const { isPosting, submitForm } = useFormSubmit(false)
 
-async function submit() {
-  const form = document.querySelector('#writing-delete-form')
-
-  isPosting.value = true
-  errors.value = false
-
-  await axios
-    .post(form.action, {
-      _method: 'DELETE'
-    })
-    .then(() => {
+async function submit(): Promise<void> {
+  await submitForm({
+    formSelector: '#writing-delete-form',
+    payload: { _method: 'DELETE' },
+    onSuccess: () => {
       router.visit(route('home'))
-      helper.setSnackBar({
+      setSnackBar({
         message: 'writings.writing-deleted',
         color: 'success',
         active: true
@@ -33,20 +28,16 @@ async function submit() {
 
       forceSnackBar.value = true
       isDelete.value = false
-    })
-    .catch(() => {
-      errors.value = true
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+    },
+    onError: () => true
+  })
 }
 </script>
 
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('main.proceed-with-caution')">
-      <po-modal-close @click.prevent="isDelete = false"></po-modal-close>
+      <po-modal-close @click.prevent="isDelete = false" />
 
       <v-card-text>
         <p class="mb-2">
@@ -58,16 +49,16 @@ async function submit() {
           <p>{{ $t('writings.delete-writing-warning') }}</p>
         </v-alert>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form
           id="writing-delete-form"
           :action="route('writings.destroy', slug)"
           @submit.prevent="submit"
         >
-          <po-button color="primary" type="submit" block>
+          <po-button id="writing-delete-submit" color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

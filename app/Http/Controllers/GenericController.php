@@ -6,210 +6,129 @@ use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class GenericController extends Controller
 {
-    public function writings(User $user)
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function writings(User $user): Response|Paginator
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $writings = $user->writings()->whereNotIn('user_id', $this->getBlockedUsers())
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with([
-                'author' => function ($query): void {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                },
-            ]);
+        $sort = resolveSort(['latest', 'popular', 'likes']);
 
-        if ($sort === 'latest') {
-            $writings = $writings->latest();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc');
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc');
-        }
-
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Writings'), $user->getName()]),
-                'canonical' => route('home'),
-            ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-        ]);
+        return $this->writingsIndex(
+            $user->writings()->visibleTo($this->blockedAuthorIds())->withListingRelations()->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([__('Writings'), $user->getName()]), 'canonical' => $user->writingsPath()],
+        );
     }
 
-    public function shelf(User $user)
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function shelf(User $user): Response|Paginator
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $writings = Writing::whereIn('id', $user->shelf()->pluck('id'))
-            ->whereNotIn('user_id', $this->getBlockedUsers())
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with([
-                'author' => function ($query): void {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                },
-            ]);
+        $sort = resolveSort(['latest', 'popular', 'likes']);
 
-        if ($sort === 'latest') {
-            $writings = $writings->latest();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc');
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc');
-        }
-
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Shelf'), $user->getName()]),
-                'canonical' => route('home'),
-            ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-        ]);
+        return $this->writingsIndex(
+            Writing::whereIn('id', $user->shelf()->select('writings.id'))
+                ->visibleTo($this->blockedAuthorIds())
+                ->withListingRelations()
+                ->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([__('Shelf'), $user->getName()]), 'canonical' => route('users.shelf.index', $user)],
+        );
     }
 
-    public function likes(User $user)
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function likes(User $user): Response|Paginator
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $writings = Writing::whereIn('id', $user->likes()->where('likeable_type', Writing::class)->pluck('likeable_id'))
-            ->whereNotIn('user_id', $this->getBlockedUsers())
-            ->whereNot('user_id', $user->id)
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with([
-                'author' => function ($query): void {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                },
-            ]);
+        $sort = resolveSort(['latest', 'popular', 'likes']);
 
-        if ($sort === 'latest') {
-            $writings = $writings->latest();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc');
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc');
-        }
-
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([__('Likes'), $user->getName()]),
-                'canonical' => route('home'),
-            ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-        ]);
+        return $this->writingsIndex(
+            Writing::whereIn('id', $user->likedWritingIds())
+                ->visibleTo($this->blockedAuthorIds())
+                ->whereNot('user_id', $user->id)
+                ->withListingRelations()
+                ->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([__('Likes'), $user->getName()]), 'canonical' => route('users.likes.index', $user)],
+        );
     }
 
-    public function explore()
+    public function explore(): Response
     {
         return Inertia::render('generic/PoExploreIndex', [
             'meta' => [
                 'title' => getPageTitle([__('Explore')]),
             ],
+            'totals' => [
+                'writings' => Writing::count(),
+                'authors' => User::has('writings')->count(),
+            ],
             'categories' => [
                 'main' => Category::withCount('writings')
                     ->whereNull('parent_id')
                     ->orderByDesc('writings_count')
-                    ->having('writings_count', '>', 0)
+                    ->has('writings')
                     ->get(),
                 'alt' => Category::withCount('writings')
                     ->whereNotNull('parent_id')
                     ->orderByDesc('writings_count')
-                    ->having('writings_count', '>', 0)
+                    ->has('writings')
                     ->get(),
             ],
             'tags' => Tag::withCount('writings')
                 ->orderByDesc('writings_count')
-                ->having('writings_count', '>', 0)->get()
-                ->take(20),
-            'authors' => User::select(
-                'id',
-                'username',
-                'name',
-                'karma',
-                'extra_info->avatar AS avatar',
-            )->orderByRaw('(CASE WHEN `karma` IS NULL THEN \'F\' ELSE `karma` END) ASC')
-                ->orderBy('aura', 'desc')
+                ->has('writings')
+                ->take(20)
+                ->get(),
+            'authors' => User::forAuthorSummary(withKarma: true)
+                ->ranked()
                 ->take(20)
                 ->get(),
         ]);
     }
 
-    public function manifest()
+    public function manifest(): \stdClass
     {
-        $json = json_decode(file_get_contents(base_path('resources/json/manifest.json')));
+        $json = json_decode((string) file_get_contents(base_path('resources/json/manifest.json')));
 
         $json->name = getSiteConfig('name');
         $json->gcm_sender_id = config('webpush.gcm.sender_id');
         $json->short_name = getSiteConfig('name');
         $json->description = getSiteConfig('slogan');
 
+        $shortcuts = [
+            'account' => [__('My account'), route('users.account')],
+            'publish' => [__('Publish'), route('writings.create')],
+            'featured' => [__('Golden Flowers'), route('writings.awards')],
+            'random' => [__('Random'), route('writings.random')],
+            'authors' => [__('Writers'), route('users.index')],
+        ];
+
         foreach ($json->shortcuts as $shortcut) {
-            if ($shortcut->name === 'account') {
-                $shortcut->name = __('My account');
-                $shortcut->short_name = __('My account');
-                $shortcut->url = route('users.account');
-
+            if (! isset($shortcuts[$shortcut->name])) {
                 continue;
             }
 
-            if ($shortcut->name === 'publish') {
-                $shortcut->name = __('Publish');
-                $shortcut->short_name = __('Publish');
-                $shortcut->url = route('writings.create');
-
-                continue;
-            }
-
-            if ($shortcut->name === 'featured') {
-                $shortcut->name = __('Golden Flowers');
-                $shortcut->short_name = __('Golden Flowers');
-                $shortcut->url = route('writings.awards');
-
-                continue;
-            }
-
-            if ($shortcut->name === 'random') {
-                $shortcut->name = __('Random');
-                $shortcut->short_name = __('Random');
-                $shortcut->url = route('writings.random');
-
-                continue;
-            }
-
-            if ($shortcut->name === 'authors') {
-                $shortcut->name = __('Writers');
-                $shortcut->short_name = __('Writers');
-                $shortcut->url = route('users.index');
-
-                continue;
-            }
+            [$label, $url] = $shortcuts[$shortcut->name];
+            $shortcut->name = $label;
+            $shortcut->short_name = $label;
+            $shortcut->url = $url;
         }
 
         foreach ($json->related_applications as $app) {
             if ($app->platform === 'webapp') {
                 $app->url = route('pwa.manifest');
-
-                continue;
-            }
-
-            if ($app->platform === 'play') {
+            } elseif ($app->platform === 'play') {
                 $app->url = config('services.google.play_store.url');
                 $app->id = config('services.google.play_store.id');
-
-                continue;
             }
         }
 
@@ -218,10 +137,12 @@ class GenericController extends Controller
         return $json;
     }
 
-    public function offline()
+    public function offline(): Response
     {
-        Inertia::render('generic/PoOffline', [
-            'meta' => [],
+        return Inertia::render('generic/PoOffline', [
+            'meta' => [
+                'title' => getPageTitle([__('Offline')]),
+            ],
         ]);
     }
 }

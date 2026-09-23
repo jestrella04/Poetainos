@@ -13,50 +13,27 @@
 
 use App\Models\Role;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Testing\PendingCommand;
 use Tests\TestCase;
+
+use function Pest\Laravel\artisan;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->beforeEach(function (): void {
-        // AppServiceProvider only loads the `writerhood` config from the `settings`
-        // table when NOT running in console, which is always true for artisan test/pest
-        // (even inside a simulated HTTP request), so it never loads here. Seed the
-        // values controllers/models read via getSiteConfig() directly instead.
-        config(['writerhood' => [
-            'name' => 'Poetainos',
-            'slogan' => 'A place for writers',
-            'pagination' => 10,
-            'uploads_max_file_size' => 2048,
-            'social' => [],
-            'stores' => [],
-            'complaints' => [
-                ['value' => 'spam', 'label' => 'Spam or advertising'],
-                ['value' => 'abuse', 'label' => 'Harassment or abuse'],
-            ],
-            'emails' => ['admin' => 'admin@example.com'],
-            'aura' => [
-                'min_at_home' => 90,
-                'points' => [
-                    'user' => [
-                        'writing' => 10,
-                        'like' => 2,
-                        'comment' => 3,
-                        'shelf' => 4,
-                        'views' => 1,
-                        'award' => 20,
-                    ],
-                    'writing' => [
-                        'like' => 2,
-                        'comment' => 3,
-                        'shelf' => 4,
-                        'views' => 1,
-                    ],
-                ],
-            ],
-        ]]);
-    })
+    ->beforeEach(fn () => prepareTestEnvironment())
     ->in('Feature');
+
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->beforeEach(fn () => prepareTestEnvironment())
+    ->in('Browser');
 
 /*
 |--------------------------------------------------------------------------
@@ -80,9 +57,194 @@ pest()->extend(TestCase::class)
 |
 */
 
+/**
+ * Factories copy demo avatars and covers onto the local disk, so fake it to
+ * keep test runs from filling the real storage folders.
+ */
+function prepareTestEnvironment(): void
+{
+    Storage::fake('local');
+    seedSiteConfig();
+}
+
+/**
+ * EnsureSiteIsConfigured loads the `poetainos` config from the `settings`
+ * table only when it isn't already set. Seed the values controllers/models
+ * read via getSiteConfig() directly so requests don't need a `site` row.
+ */
+function seedSiteConfig(): void
+{
+    config(['poetainos' => [
+        'name' => fakeTitle(),
+        'slogan' => fake()->sentence(),
+        'pagination' => 10,
+        'uploads_max_file_size' => 2048,
+        'social' => [],
+        'stores' => [],
+        'complaints' => [
+            ['value' => 'spam', 'label' => fake()->sentence(3)],
+            ['value' => 'abuse', 'label' => fake()->sentence(3)],
+        ],
+        'emails' => ['admin' => fake()->safeEmail()],
+        'aura' => [
+            'min_at_home' => 90,
+            'points' => [
+                'user' => [
+                    'writing' => 10,
+                    'like' => 2,
+                    'comment' => 3,
+                    'shelf' => 4,
+                    'views' => 1,
+                    'award' => 20,
+                ],
+                'writing' => [
+                    'like' => 2,
+                    'comment' => 3,
+                    'shelf' => 4,
+                    'views' => 1,
+                ],
+            ],
+        ],
+    ]]);
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createUser(array $attributes = []): User
+{
+    return User::factory()->create($attributes);
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createUserWithPassword(string $password, array $attributes = []): User
+{
+    return createUser(array_merge($attributes, ['password' => Hash::make($password)]));
+}
+
+/**
+ * Faker's userName() may contain dots, which neither the registration rule nor
+ * the @mention parser accept, so build one from the characters both allow.
+ */
+function fakeUsername(): string
+{
+    return fake()->unique()->regexify('[a-z][a-z0-9_]{7,14}');
+}
+
+/**
+ * Satisfies the registration password rule: 8+ characters with an upper case
+ * letter, a lower case letter and a digit.
+ */
+function fakeStrongPassword(): string
+{
+    return fake()->regexify('[A-Z][a-z]{6,10}[0-9]{2,4}');
+}
+
+/**
+ * A short, punctuation-free title, so it survives slugging, HTML escaping and
+ * the 3 to 40 character rules of titles and names unchanged.
+ */
+function fakeTitle(): string
+{
+    return Str::title(fake()->unique()->word().' '.fake()->word());
+}
+
+/**
+ * Prose that clears a minimum length rule while staying well below any maximum.
+ */
+function fakeText(int $minLength): string
+{
+    $text = fake()->paragraph();
+
+    while (mb_strlen($text) < $minLength) {
+        $text .= ' '.fake()->paragraph();
+    }
+
+    return $text;
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
 function actingAsAdmin(array $attributes = []): User
 {
     $role = Role::factory()->admin()->create();
 
-    return User::factory()->create(array_merge(['role_id' => $role->id], $attributes));
+    return User::factory()->create(
+        fn (array $factoryAttributes): array => array_merge($factoryAttributes, ['role_id' => $role->id], $attributes)
+    );
+}
+
+/**
+ * @param  array<string, mixed>  $data
+ */
+function createDatabaseNotification(User $recipient, array $data, ?Carbon $createdAt = null): void
+{
+    $createdAt ??= now();
+
+    DB::table('notifications')->insert([
+        'id' => (string) Str::uuid(),
+        'type' => 'App\Notifications\WritingLiked',
+        'notifiable_type' => User::class,
+        'notifiable_id' => $recipient->id,
+        'data' => json_encode($data),
+        'read_at' => null,
+        'created_at' => $createdAt,
+        'updated_at' => $createdAt,
+    ]);
+}
+
+/**
+ * The pixel width of an image stored on the local disk.
+ */
+function storedImageWidth(string $path): int
+{
+    $size = getimagesize(Storage::disk('local')->path($path));
+
+    if ($size === false) {
+        throw new RuntimeException("{$path} is not a readable image.");
+    }
+
+    return $size[0];
+}
+
+/**
+ * Point public_path() at a throwaway directory, so commands that write public
+ * files leave the real public directory untouched.
+ */
+function useTemporaryPublicPath(): void
+{
+    $publicPath = sys_get_temp_dir().'/poetainos-public-'.uniqid();
+    File::ensureDirectoryExists($publicPath);
+    app()->usePublicPath($publicPath);
+}
+
+/**
+ * Delete the directory set up by useTemporaryPublicPath(), refusing to touch
+ * anything outside the system temp directory.
+ */
+function deleteTemporaryPublicPath(): void
+{
+    if (str_starts_with(public_path(), sys_get_temp_dir().'/poetainos-public-')) {
+        File::deleteDirectory(public_path());
+    }
+}
+
+/**
+ * Artisan test commands always come back pending while console output is mocked,
+ * which is Laravel's default; narrowing here keeps the assertion API typed.
+ *
+ * @param  array<string, mixed>  $parameters
+ */
+function pendingArtisan(string $command, array $parameters = []): PendingCommand
+{
+    $pendingCommand = artisan($command, $parameters);
+
+    if ($pendingCommand instanceof PendingCommand) {
+        return $pendingCommand;
+    }
+
+    throw new LogicException('Console output must be mocked to assert on artisan commands.');
 }

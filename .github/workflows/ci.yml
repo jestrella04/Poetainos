@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: '8.3'
+  PHP_EXTENSIONS: bcmath, ctype, curl, fileinfo, gd, gmp, intl, mbstring, pdo_sqlite, sodium, xml, zip
+
+jobs:
+  php-quality:
+    name: PHP lint & static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Pint
+        run: vendor/bin/pint --parallel --test
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress --error-format=github
+
+  frontend-quality:
+    name: Frontend lint, types & Vitest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ziggy-js is aliased to vendor/tightenco/ziggy, so Composer deps are required to build.
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Generates resources/js/components.d.ts (gitignored), which vue-tsc needs.
+      - name: Build
+        run: npm run build
+
+      - name: ESLint
+        run: npm run lint:check
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: Type check
+        run: npm run types:check
+
+      - name: Vitest
+        run: npm run test
+
+  php-tests:
+    name: Pest (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Unit & Feature
+            suite: Unit,Feature
+            browser: false
+          - name: Browser
+            suite: Browser
+            browser: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Inertia pages render @vite tags, so the manifest must exist.
+      - name: Build assets
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        if: matrix.browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run tests
+        run: php artisan test --testsuite=${{ matrix.suite }}
+
+      - name: Upload browser screenshots
+        if: failure() && matrix.browser
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-screenshots
+          path: tests/Browser/Screenshots
+          if-no-files-found: ignore

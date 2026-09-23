@@ -1,16 +1,9 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { snackBarKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
 
-const snackBar = inject('snackBar')
+const snackBar = injectStrict(snackBarKey)
 </script>
-
-<style scoped>
-.v-snackbar {
-  width: 100%;
-  max-width: 400px;
-  margin: 1rem auto;
-}
-</style>
 
 <template>
   <v-snackbar
@@ -20,8 +13,11 @@ const snackBar = inject('snackBar')
     elevation="5"
     location="top"
     min-height="68"
+    width="100%"
+    max-width="400"
     rounded
-    timer="blue-grey-lighten-1"
+    timer
+    timer-color="blue-grey-lighten-1"
   >
     <div class="d-flex ga-4">
       <div>
@@ -29,7 +25,7 @@ const snackBar = inject('snackBar')
       </div>
 
       <div class="flex-grow-1">
-        <p class="text-caption">{{ $t(snackBar.message) }}</p>
+        <p>{{ $t(snackBar.message) }}</p>
       </div>
     </div>
   </v-snackbar>

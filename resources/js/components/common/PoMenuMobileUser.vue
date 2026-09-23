@@ -1,8 +1,11 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { mobileUserMenuKey, unreadCountKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
 
-const unreadCount = inject('unreadCount')
-const mobileUserMenu = inject('mobileUserMenu', false)
+const { isAdmin } = useAuth()
+const unreadCount = injectStrict(unreadCountKey)
+const mobileUserMenu = injectStrict(mobileUserMenuKey)
 </script>
 
 <template>
@@ -13,19 +16,19 @@ const mobileUserMenu = inject('mobileUserMenu', false)
           <po-list-item :href="route('users.account')" prepend-icon="fas fa-user" inertia>
             <span>{{ $t('accounts.my-account') }}</span>
           </po-list-item>
-          <v-divider class="my-0"></v-divider>
+          <v-divider class="my-0" />
 
           <po-list-item :href="route('notifications.index')" prepend-icon="fas fa-bell" inertia>
             <span>{{ $t('accounts.notifications') }}</span>
-            <po-badge :count="unreadCount" inline></po-badge>
+            <po-badge :count="unreadCount" inline />
           </po-list-item>
-          <v-divider class="my-0"></v-divider>
+          <v-divider class="my-0" />
 
-          <template v-if="$helper.admin()">
+          <template v-if="isAdmin()">
             <po-list-item :href="route('admin.index')" prepend-icon="fas fa-user-tie" inertia>
               <span>{{ $t('main.administration') }}</span>
             </po-list-item>
-            <v-divider class="my-0"></v-divider>
+            <v-divider class="my-0" />
           </template>
 
           <po-list-item

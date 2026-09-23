@@ -21,26 +21,16 @@ class PostRandomFeaturedCategory extends Command
      *
      * @var string
      */
-    protected $description = 'Post a random featured category to Twitter';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Post a random featured category on social media';
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $category = Category::has('writings', '>', 0)->inRandomOrder()->firstOrFail();
         Notification::route('twitter', '')->notify(new CategoryFeaturedRandom($category));
+
+        return self::SUCCESS;
     }
 }

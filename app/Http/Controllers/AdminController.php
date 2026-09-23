@@ -12,48 +12,58 @@ use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
+use Inertia\Response;
+use SplFileObject;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminController extends Controller
 {
-    private $log;
+    private const LOG_LINES_SHOWN = 100;
+
+    private string $log;
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->log = storage_path('logs/laravel.log');
     }
 
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('admin/PoAdminIndex', [
             'counters' => [
                 'users' => [
                     'title' => __('Users'),
-                    'count' => User::all()->count(),
+                    'count' => User::count(),
                 ],
                 'writings' => [
                     'title' => __('Writings'),
-                    'count' => Writing::all()->count(),
+                    'count' => Writing::count(),
                 ],
                 'comments' => [
                     'title' => __('Comments'),
-                    'count' => Comment::all()->count(),
+                    'count' => Comment::count(),
                 ],
                 'categories' => [
                     'title' => __('Categories'),
-                    'count' => Category::all()->count(),
+                    'count' => Category::count(),
                 ],
                 'tags' => [
                     'title' => __('Tags'),
-                    'count' => Tag::all()->count(),
+                    'count' => Tag::count(),
                 ],
                 'likes' => [
                     'title' => __('Likes'),
-                    'count' => Like::all()->count(),
+                    'count' => Like::count(),
                 ],
                 'shelves' => [
                     'title' => __('Bookmarks'),
-                    'count' => Shelf::all()->count(),
+                    'count' => Shelf::count(),
                 ],
             ],
             'meta' => [
@@ -64,10 +74,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function settings()
+    public function settings(): Response
     {
         return Inertia::render('admin/PoAdminSettings', [
-            'settings' => json_encode(Setting::where('name', 'site')->first()->pluck('data')[0], JSON_PRETTY_PRINT),
+            'settings' => json_encode(Setting::where('name', 'site')->value('data'), JSON_PRETTY_PRINT),
             'meta' => [
                 'title' => getPageTitle([
                     __('Settings'),
@@ -77,107 +87,57 @@ class AdminController extends Controller
         ]);
     }
 
-    public function categories()
+    /**
+     * @return Response|Paginator<int, Category>
+     */
+    public function categories(): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return Category::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminCategories', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Categories'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Category::all()->count(),
-        ]);
+        return $this->listing('admin/PoAdminCategories', __('Categories'), Category::query());
     }
 
-    public function tags()
+    /**
+     * @return Response|Paginator<int, Tag>
+     */
+    public function tags(): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return Tag::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminTags', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Tags'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Tag::all()->count(),
-        ]);
+        return $this->listing('admin/PoAdminTags', __('Tags'), Tag::query());
     }
 
-    public function users()
+    /**
+     * @return Response|Paginator<int, User>
+     */
+    public function users(): Response|Paginator
     {
-        $users = User::select('id', 'username', 'name', 'email', 'created_at', 'aura', 'karma');
-
-        if (request()->expectsJson()) {
-            return $users->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminUsers', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Users'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => User::all()->count(),
-        ]);
+        return $this->listing(
+            'admin/PoAdminUsers',
+            __('Users'),
+            User::select('id', 'username', 'name', 'email', 'created_at', 'aura', 'karma'),
+        );
     }
 
-    public function writings()
+    /**
+     * @return Response|Paginator<int, Writing>
+     */
+    public function writings(): Response|Paginator
     {
-        $writings = Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
-            ->with([
-                'author' => function ($query): void {
-                    $query->select('id', 'username', 'name');
-                },
-            ]);
-
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminWritings', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Writings'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Writing::all()->count(),
-        ]);
+        return $this->listing(
+            'admin/PoAdminWritings',
+            __('Writings'),
+            Writing::select('id', 'user_id', 'title', 'slug', 'aura', 'created_at')
+                ->with(['author' => fn ($query) => $query->select('id', 'username', 'name')]),
+        );
     }
 
-    public function pages()
+    /**
+     * @return Response|Paginator<int, Page>
+     */
+    public function pages(): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return Page::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminPages', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Pages'),
-                    __('Administration'),
-                ]),
-            ],
-            'total' => Page::all()->count(),
-        ]);
+        return $this->listing('admin/PoAdminPages', __('Pages'), Page::query());
     }
 
-    public function tools()
+    public function tools(): Response
     {
-        ob_start();
-        phpinfo();
-        $pinfo = ob_get_contents();
-        ob_end_clean();
-
         return Inertia::render('admin/PoAdminTools', [
             'meta' => [
                 'title' => getPageTitle([
@@ -185,42 +145,41 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'log' => shell_exec('tail -n 100 '.$this->log),
-            'info' => $pinfo,
-        ]);
-    }
-
-    public function log()
-    {
-        header('Content-Description: Log download');
-        header('Content-Type: text/plain');
-        header('Content-Disposition: attachment; filename="'.basename($this->log).'"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: '.filesize($this->log));
-        readfile($this->log);
-        exit;
-    }
-
-    public function complaints()
-    {
-        if (request()->expectsJson()) {
-            return Complaint::simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('admin/PoAdminComplaints', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Complaints'),
-                    __('Administration'),
-                ]),
+            'log' => $this->tailLog(),
+            'info' => [
+                __('PHP version') => PHP_VERSION,
+                __('Laravel version') => app()->version(),
+                __('Memory limit') => ini_get('memory_limit'),
+                __('Upload max filesize') => ini_get('upload_max_filesize'),
+                __('Post max size') => ini_get('post_max_size'),
+                __('Max execution time') => ini_get('max_execution_time').'s',
+                __('OPcache enabled') => function_exists('opcache_get_status') && opcache_get_status() !== false ? __('Yes') : __('No'),
+                __('Loaded extensions') => implode(', ', get_loaded_extensions()),
             ],
-            'total' => Complaint::all()->count(),
         ]);
     }
 
-    public function websockets()
+    /**
+     * Download the full application log; an empty file when nothing has been logged yet.
+     */
+    public function log(): StreamedResponse
+    {
+        return response()->streamDownload(function (): void {
+            if (is_readable($this->log) === true) {
+                readfile($this->log);
+            }
+        }, 'laravel.log', ['Content-Type' => 'text/plain']);
+    }
+
+    /**
+     * @return Response|Paginator<int, Complaint>
+     */
+    public function complaints(): Response|Paginator
+    {
+        return $this->listing('admin/PoAdminComplaints', __('Complaints'), Complaint::query());
+    }
+
+    public function websockets(): Response
     {
         return Inertia::render('admin/PoAdminWebsockets', [
             'meta' => [
@@ -232,7 +191,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function analytics()
+    public function analytics(): Response
     {
         $user = config('services.counter.user_id');
         $token = config('services.counter.access_token');
@@ -244,7 +203,57 @@ class AdminController extends Controller
                     __('Administration'),
                 ]),
             ],
-            'counter' => "https://counter.dev/dashboard.html?user=$user&token=$token%3D",
+            'counter' => 'https://counter.dev/dashboard.html?'.http_build_query([
+                'user' => $user,
+                'token' => $token,
+            ]),
         ]);
+    }
+
+    /**
+     * An admin table: one page of rows for JSON requests, the table's page otherwise.
+     *
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $rows
+     * @return Response|Paginator<int, TModel>
+     */
+    private function listing(string $component, string $title, Builder $rows): Response|Paginator
+    {
+        if (request()->expectsJson()) {
+            return $rows->simplePaginate($this->perPage)->withQueryString();
+        }
+
+        return Inertia::render($component, [
+            'meta' => [
+                'title' => getPageTitle([$title, __('Administration')]),
+            ],
+            'total' => $rows->count(),
+        ]);
+    }
+
+    /**
+     * The last lines of the application log, or nothing when it can't be read.
+     */
+    private function tailLog(): string
+    {
+        if (! is_readable($this->log)) {
+            return '';
+        }
+
+        $file = new SplFileObject($this->log, 'r');
+        $file->seek(PHP_INT_MAX);
+        $lastLine = $file->key();
+
+        $file->seek(max(0, $lastLine - self::LOG_LINES_SHOWN));
+
+        $tail = [];
+
+        while (! $file->eof()) {
+            $tail[] = $file->fgets();
+            $file->next();
+        }
+
+        return implode('', $tail);
     }
 }

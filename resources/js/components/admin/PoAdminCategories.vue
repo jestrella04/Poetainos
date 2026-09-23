@@ -1,39 +1,38 @@
-<script setup>
-import { computed, ref, onMounted } from 'vue'
+<script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
+import { useServerTable } from '@/composables/useServerTable'
+import { useFormatting } from '@/composables/useFormatting'
+import type { DataTableHeader } from 'vuetify'
+import type { InertiaPageProps } from '@/types/inertia'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const page = computed(() => usePage())
-const headers = [
-  { title: 'Id', align: 'start', sortable: false, key: 'id' },
-  { title: 'Name', align: 'start', sortable: false, key: 'name' },
-  { title: 'Parent', align: 'start', sortable: false, key: 'parent' },
-  { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
-]
-const items = ref([])
-const totalItems = ref(page.value.props.total)
-const isLoading = ref(true)
-
-onMounted(() => {
-  loadItems({ page: 1 })
-})
-
-async function loadItems(event) {
-  await axios
-    .get(route('admin.categories', { page: event.page }))
-    .then((response) => {
-      items.value = response.data.data
-      isLoading.value = false
-    })
-    .catch()
-    .finally()
+interface CategoryAdmin {
+  id: number
+  name: string
+  slug: string
+  parent_id: number | null
+  created_at: string
 }
+
+const { t } = useI18n()
+const { toLocaleDate } = useFormatting()
+const page = usePage<InertiaPageProps<{ total: number }>>()
+const headers: DataTableHeader[] = [
+  { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
+  { title: t('main.name'), align: 'start', sortable: false, key: 'name' },
+  { title: t('main.parent'), align: 'start', sortable: false, key: 'parent' },
+  { title: t('main.created-at'), align: 'start', sortable: false, key: 'created_at' },
+  { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
+]
+const { items, totalItems, isLoading, loadItems } = useServerTable<CategoryAdmin>(
+  'admin.categories',
+  page.props.total
+)
 </script>
 
 <template>
@@ -58,7 +57,7 @@ async function loadItems(event) {
       </template>
 
       <template v-slot:item.created_at="{ item }">
-        {{ $helper.toLocaleDate(item.created_at) }}
+        {{ toLocaleDate(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -70,15 +69,15 @@ async function loadItems(event) {
             icon
             inertia
           >
-            <v-icon icon="fas fa-eye"></v-icon>
+            <v-icon icon="fas fa-eye" />
           </po-button>
 
           <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-edit"></v-icon>
+            <v-icon icon="fas fa-edit" />
           </po-button>
 
           <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-trash"></v-icon>
+            <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>

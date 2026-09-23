@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import laravel from 'laravel-vite-plugin'
+import inertia from '@inertiajs/vite'
 import Components from 'unplugin-vue-components/vite'
 import { VuetifyResolver } from 'unplugin-vue-components/resolvers'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -38,7 +39,7 @@ function manualChunks(id) {
   }
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, isSsrBuild }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
@@ -51,15 +52,19 @@ export default defineConfig(({ mode }) => {
     },
   resolve: {
     alias: {
-      'ziggy-js': path.resolve('/vendor/tightenco/ziggy')
+      'ziggy-js': path.resolve(import.meta.dirname, 'vendor/tightenco/ziggy'),
+      '@': path.resolve(import.meta.dirname, 'resources/js')
     }
   },
   optimizeDeps: {
     include: ['vuetify']
   },
   ssr: {
-    // avoid bundling vuetify for server build, helps with ESM resolution
-    external: ['vuetify']
+    // Vuetify ships raw .css imports that Node can't load, so it must be bundled.
+    // FontAwesome must be bundled too: externalized, Node loads vue-fontawesome and
+    // the app's `library.add()` against two different svg-core copies, so the
+    // icon library looks empty and every icon renders as an empty comment.
+    noExternal: ['vuetify', /^@fortawesome\//]
   },
   build: {
     sourcemap: true,
@@ -70,25 +75,27 @@ export default defineConfig(({ mode }) => {
     }
   },
   plugins: [
-    nodePolyfills(),
+    // Browser shims for Node built-ins; the SSR bundle runs on real Node.
+    !isSsrBuild && nodePolyfills(),
     laravel({
-      input: ['resources/js/app.js'],
-      ssr: ['resources/js/ssr.js'],
+      input: ['resources/js/app.ts'],
       refresh: true
     }),
+    inertia(),
     vue(),
     vuetify({ autoImport: true }),
     Components({
       dirs: ['resources/js/components/common'],
       resolvers: [VuetifyResolver()],
-      include: [/\.vue$/, /\.vue\?vue/, /\.vue\.[tj]sx?\?vue/, /\.md$/]
+      include: [/\.vue$/, /\.vue\?vue/, /\.vue\.[tj]sx?\?vue/, /\.md$/],
+      dts: 'resources/js/components.d.ts'
     }),
     VitePWA({
       scope: '/',
       base: '/',
       srcDir: 'resources/js',
       outDir: 'public',
-      filename: 'worker.js',
+      filename: 'worker.ts',
       strategies: 'injectManifest',
       injectRegister: false,
       includeManifestIcons: false,
@@ -103,6 +110,9 @@ export default defineConfig(({ mode }) => {
         cleanupOutdatedCaches: true
       },
       injectManifest: {
+        // Default glob only covers js/css/html; the self-hosted EB Garamond/Karla
+        // woff2 files need to be included explicitly to be precached offline.
+        globPatterns: ['**/*.{js,css,html,woff2}'],
         maximumFileSizeToCacheInBytes: 3000000
       }
     })

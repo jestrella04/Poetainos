@@ -3,33 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tag;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Models\Writing;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Inertia\Response;
 
 class TagsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tags whose name matches the query, as select options.
      *
-     * @return \Illuminate\Http\Response
+     * @return Collection<int, array{value: mixed, label: mixed}>
      */
-    public function index()
+    public function search(): Collection
     {
-        //
-    }
-
-    /**
-     * Query list of matching resources.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function query()
-    {
-        $wildcard = '%'.request('query').'%';
+        $wildcard = '%'.escapeLike((string) request('query')).'%';
 
         return Tag::where('name', 'like', $wildcard)
-            ->take($this->pagination)
+            ->take($this->perPage)
             ->get()
             ->map(function ($tag, $key) {
                 return [
@@ -40,95 +31,28 @@ class TagsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return Response|Paginator<int, Writing>
      */
-    public function show(Tag $tag)
+    public function show(Tag $tag): Response|Paginator
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $params = [
-            'head_msg' => __('You are browsing the library of writings tagged with ":tag".', ['tag' => $tag->name]),
+        $sort = resolveSort(['latest', 'popular', 'likes']);
 
-        ];
-        $writings = $tag->writings()
-            ->whereNotIn('user_id', $this->getBlockedUsers())
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query): void {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }]);
-
-        if ($sort === 'latest') {
-            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        if (request()->expectsJson()) {
-            return $writings;
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([
-                    $tag->name,
-                    __('Tags'),
-                ]),
-                'canonical' => route('home'),
-            ],
-            'writings' => $writings,
-            'sort' => $sort,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Tag $tag)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Tag $tag)
-    {
-        //
+        return $this->writingsIndex(
+            $tag->writings()->visibleTo($this->blockedAuthorIds())->withListingRelations()->sorted($sort),
+            $sort,
+            ['title' => getPageTitle([$tag->name, __('Tags')]), 'canonical' => $tag->path()],
+            isDeferred: false,
+        );
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return array<string, string>
      */
-    public function destroy(Tag $tag)
+    public function destroy(Tag $tag): array
     {
         $tag->delete();
 

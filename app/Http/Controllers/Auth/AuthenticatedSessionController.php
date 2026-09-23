@@ -5,12 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,7 +19,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        if (! empty(request('redirect'))) {
+        if (isSafeRedirectPath(request('redirect'))) {
             Redirect::setIntendedUrl(request('redirect'));
         }
 
@@ -29,33 +27,36 @@ class AuthenticatedSessionController extends Controller
             'meta' => [
                 'canonical' => route('login'),
             ],
-            'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
         ]);
     }
 
     /**
      * Check if an email exist.
+     *
+     * @return array<string, bool>
      */
-    public function check()
+    public function check(): array
     {
         // Validate user input
         request()->validate([
             'email' => 'required|email',
         ]);
 
-        return ['exists' => User::where('email', request('email'))->count() > 0];
+        return ['exists' => User::where('email', request('email'))->exists()];
     }
 
     /**
      * Handle an incoming authentication request.
+     *
+     * @return array<string, string>
      */
     public function store(LoginRequest $request): array
     {
         $request->authenticate();
         $request->session()->regenerate();
 
-        return ['redirect' => Redirect::intended(RouteServiceProvider::HOME)->getTargetUrl()];
+        return ['redirect' => Redirect::intended(route('home'))->getTargetUrl()];
     }
 
     /**
@@ -63,7 +64,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         $request->session()->flash('message', 'accounts.logged-out-goodbye');

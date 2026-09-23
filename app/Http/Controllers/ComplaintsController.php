@@ -8,27 +8,17 @@ use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\Rule;
 
 class ComplaintsController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return array<string, mixed>
      */
-    public function reasons()
+    public function reasons(): array
     {
         return [
             'reasons' => getSiteConfig('complaints'),
@@ -38,32 +28,36 @@ class ComplaintsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
-     * @return Response
+     * @return array<int, mixed>
      */
-    public function store(Complaint $complaint)
+    public function store(Request $request): array
     {
         // Validate user input
-        request()->validate([
+        $request->validate([
             'complainable_type' => 'required|string|in:writings,comments,users',
             'complainable_id' => 'required|integer',
-            'reasons' => 'required|array|min:1',
+            'reasons' => 'required|array|min:1|max:10',
+            'reasons.*' => ['string', Rule::in($this->allowedReasons())],
             'comment' => 'nullable|string|max:255',
         ]);
 
-        $id = request('complainable_id');
+        // Resolve the reported resource
+        $id = (int) $request->input('complainable_id');
+        $complainable = match ((string) $request->input('complainable_type')) {
+            'writings' => Writing::find($id),
+            'comments' => Comment::find($id),
+            'users' => User::find($id),
+            default => null,
+        };
 
-        // Update accordingly
-        if (request('complainable_type') == 'writings') {
-            $complaint->complainable()->associate(Writing::find($id));
-        } elseif (request('complainable_type') == 'comments') {
-            $complaint->complainable()->associate(Comment::find($id));
-        } elseif (request('complainable_type') == 'users') {
-            $complaint->complainable()->associate(User::find($id));
+        if ($complainable === null) {
+            abort(404);
         }
 
-        $complaint->reasons = request('reasons');
-        $complaint->comment = request('comment');
+        $complaint = new Complaint;
+        $complaint->complainable()->associate($complainable);
+        $complaint->reasons = $request->input('reasons');
+        $complaint->comment = $request->input('comment');
         $complaint->save();
 
         // Schedule email notification
@@ -74,47 +68,17 @@ class ComplaintsController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * The reasons a user may pick, whether they are configured as plain
+     * strings or as value/label pairs.
      *
-     * @param  int  $id
-     * @return Response
+     * @return array<int, string>
      */
-    public function show($id)
+    private function allowedReasons(): array
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function edit(Complaint $complaint)
-    {
-        // Ensure user has the proper permission
-        $this->authorize('update', $complaint);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
+        return collect((array) getSiteConfig('complaints'))
+            ->map(fn (mixed $reason): mixed => is_array($reason) ? ($reason['value'] ?? null) : $reason)
+            ->filter(fn (mixed $reason): bool => is_string($reason))
+            ->values()
+            ->all();
     }
 }

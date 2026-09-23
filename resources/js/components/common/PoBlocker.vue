@@ -1,29 +1,27 @@
-<script setup>
-import { ref, inject } from 'vue'
-import axios from 'axios'
+<script setup lang="ts">
+import { blockerKey, forceSnackBarKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useFormatting } from '@/composables/useFormatting'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { UserLike } from '@/types/models'
 
-const props = defineProps({
-  user: { type: Object, required: true }
-})
+const props = defineProps<{
+  user: UserLike
+}>()
 
-const helper = inject('helper')
-const blocker = inject('blocker')
-const isPosting = ref(false)
-const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
+const { userDisplayName } = useFormatting()
+const { setSnackBar } = useSnackbar()
+const blocker = injectStrict(blockerKey)
+const forceSnackBar = injectStrict(forceSnackBarKey)
+const { isPosting, submitForm } = useFormSubmit(false)
 
-async function submit() {
-  const form = document.querySelector('#blocking-form')
-
-  isPosting.value = true
-  errors.value = false
-
-  await axios
-    .post(form.action, {
-      user: props.user.username
-    })
-    .then(() => {
-      helper.setSnackBar({
+async function submit(): Promise<void> {
+  await submitForm({
+    formSelector: '#blocking-form',
+    payload: { user: props.user.username },
+    onSuccess: () => {
+      setSnackBar({
         message: 'users.user-blocked',
         color: 'success',
         active: true
@@ -31,28 +29,24 @@ async function submit() {
 
       forceSnackBar.value = true
       blocker.value = false
-    })
-    .catch(() => {
-      errors.value = true
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+    },
+    onError: () => true
+  })
 }
 </script>
 
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('main.block-user')">
-      <po-modal-close @click.prevent="blocker = false"></po-modal-close>
+      <po-modal-close @click.prevent="blocker = false" />
 
       <v-card-text>
         <p>
           {{ $t('accounts.block-user-warning') }}
-          {{ $t('users.block-user-ask', { name: $helper.userDisplayName(user) }) }}
+          {{ $t('users.block-user-ask', { name: userDisplayName(user) }) }}
         </p>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form
           id="blocking-form"
@@ -61,7 +55,7 @@ async function submit() {
         >
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.block') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

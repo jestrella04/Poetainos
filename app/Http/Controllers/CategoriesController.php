@@ -3,137 +3,79 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Writing;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Validation\Rule;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class CategoriesController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return Response|Paginator<int, Writing>
      */
-    public function show(Category $category)
+    public function show(Category $category): Response|Paginator
     {
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $params = [
-            'head_msg' => __('You are browsing the library of writings under the ":category" category.', ['category' => $category->name]).' '.$category->description,
-        ];
+        $sort = resolveSort(['latest', 'popular', 'likes']);
 
-        $writings = $category->writingsRecursive()
-            ->whereNotIn('user_id', $this->getBlockedUsers())
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with(['author' => function ($query): void {
-                $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-            }]);
-
-        if ($sort === 'latest') {
-            $writings = $writings->orderBy('created_at', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc')->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        if (request()->expectsJson()) {
-            return $writings;
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => getPageTitle([
-                    $category->name,
-                    __('Categories'),
-                ]),
-                'canonical' => route('home'),
+        return $this->writingsIndex(
+            $category->writingsRecursive()
+                ->visibleTo($this->blockedAuthorIds())
+                ->withListingRelations()
+                ->sorted($sort),
+            $sort,
+            [
+                'title' => getPageTitle([$category->name, __('Categories')]),
+                'canonical' => $category->path(),
                 'description' => $category->description,
             ],
-            'writings' => $writings,
-            'sort' => $sort,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Category $category)
-    {
-        //
+            isDeferred: false,
+        );
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return array<string, mixed>
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request): array
     {
         // Get category model
         $category = Category::where('id', request('id'))->firstOrNew();
+
+        // A category can't be moved under itself or one of its own descendants
+        $invalidParentIds = $category->exists ? $category->descendantsAndSelf()->pluck('id')->all() : [];
 
         // Validate user input
         request()->validate([
             'id' => 'required|integer',
             'name' => ['required', 'string', Rule::unique('App\Models\Category')->ignore($category), 'min:3', 'max:40'],
-            'parent' => 'nullable|integer|exists:categories,id',
+            'parent' => ['nullable', 'integer', 'exists:categories,id', Rule::notIn($invalidParentIds)],
             'description' => 'required|string|min:3|max:255',
         ]);
+
+        $action = $category->exists ? 'update' : 'create';
 
         // Update accordingly
         $category->name = request('name');
         $category->parent_id = request('parent');
         $category->description = request('description');
 
-        if (! $category->exists) {
-            $action = 'create';
+        if ($action === 'create') {
             $category->slug = slugify($category->getTable(), request('name'));
         }
 
         $category->save();
 
-        if (isset($action) && $action === 'create') {
-            $message = __('Category created successfully');
-        } else {
-            $message = __('Category updated successfully');
-        }
+        $message = $action === 'create'
+            ? __('Category created successfully')
+            : __('Category updated successfully');
 
         return [
             'message' => $message,
-            'action' => $action ?? 'update',
+            'action' => $action,
             'id' => $category->id,
         ];
     }
@@ -141,9 +83,9 @@ class CategoriesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return array<string, string>
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category): array
     {
         $category->delete();
 

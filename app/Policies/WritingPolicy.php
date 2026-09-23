@@ -4,33 +4,22 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Writing;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class WritingPolicy
 {
-    use HandlesAuthorization;
-
     /**
-     * Determine whether the user can update the model.
-     *
-     * @return mixed
+     * Writings can be edited by their author and by admins.
      */
-    public function update(User $user, Writing $writing)
+    public function update(User $user, Writing $writing): bool
     {
-        if ($writing->author->is($user) || $user->isAllowed('admin')) {
-            return true;
-        }
+        return $writing->author?->is($user) === true || $user->isAllowed('admin');
     }
 
     /**
-     * Determine whether the user can delete the model.
-     *
-     * @return mixed
+     * Writings can be deleted by whoever can edit them.
      */
-    public function delete(User $user, Writing $writing)
+    public function delete(User $user, Writing $writing): bool
     {
-        if ($writing->author->is($user) || $user->isAllowed('admin')) {
-            return true;
-        }
+        return $this->update($user, $writing);
     }
 }

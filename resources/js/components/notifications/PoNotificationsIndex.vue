@@ -1,77 +1,31 @@
-<script setup>
-import { computed, inject, ref, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
-import axios from 'axios'
-import { useSwipe } from '@vueuse/core'
+<script setup lang="ts">
+import { usePage } from '@inertiajs/vue3'
+import { unreadCountKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
+import { useNotificationMessage } from '@/composables/useNotificationMessage'
+import { useInfiniteList } from '@/composables/useInfiniteList'
+import { useSwipeTabs } from '@/composables/useSwipeTabs'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { AppNotification } from '@/types/models'
 
-const page = computed(() => usePage())
-const helper = inject('helper')
-const notifications = ref([])
-const next = ref('')
-const unreadCount = inject('unreadCount')
-const fetched = ref(false)
-const target = document.body
+const page = usePage<InertiaPageProps<{ tab: string }>>()
+const { isEmpty } = useTypeGuards()
+const { relativeDate } = useFormatting()
+const { notificationMessage } = useNotificationMessage()
+const unreadCount = injectStrict(unreadCountKey)
 
-useSwipe(target, {
-  passive: true,
-  onSwipe() {
-    //
-  },
-  onSwipeEnd(e, direction) {
-    if (direction === 'left') {
-      swipeRight()
-    } else if (direction === 'right') {
-      swipeLeft()
-    }
-  }
-})
-
-async function loadMore({ done }) {
-  if (!helper.strNullOrEmpty(next.value)) {
-    await axios
-      .get(next.value)
-      .then((response) => {
-        notifications.value.push(...response.data.data)
-        next.value = response.data.next_page_url
-        done('ok')
-      })
-      .catch(() => {
-        done('error')
-      })
-  } else {
-    done('empty')
-  }
-}
-
-function swipeRight() {
-  if ('unread' === page.value.props.tab) {
-    document.querySelector('.v-tab[value="all"]').click()
-  }
-}
-
-function swipeLeft() {
-  if ('all' === page.value.props.tab) {
-    document.querySelector('.v-tab[value="unread"]').click()
-  }
-}
-
-onMounted(async () => {
-  await router.reload({
-    only: ['notifications'],
-    onSuccess: (page) => {
-      update(page.props.notifications.data, page.props.notifications.next_page_url)
-    }
-  })
-})
-
-function update(notificationsData, nextPage) {
-  notifications.value.push(...notificationsData)
-  next.value = nextPage
-  fetched.value = true
-}
+const {
+  items: notifications,
+  fetched,
+  loadMore
+} = useInfiniteList<AppNotification>('notifications')
+useSwipeTabs({ tabOrder: ['unread', 'all'], currentTab: () => page.props.tab })
 </script>
 
 <style scoped>
+/* Caps the list to a comfortable reading width; Vuetify's v-container has no such preset. */
 .column-full {
   width: 100%;
   max-width: 620px;
@@ -99,16 +53,10 @@ function update(notificationsData, nextPage) {
 
   <div class="mx-auto column-full">
     <template v-if="!fetched">
-      <po-loading
-        type="avatar, paragraph, button"
-        cols="12"
-        md="12"
-        lg="12"
-        class="mx-auto"
-      ></po-loading>
+      <po-loading type="avatar, paragraph, button" cols="12" md="12" lg="12" class="mx-auto" />
     </template>
 
-    <template v-else-if="!$helper.isEmpty(notifications)">
+    <template v-else-if="!isEmpty(notifications)">
       <template v-if="'unread' === page.props.tab">
         <div class="mb-3 text-right">
           <po-button
@@ -118,7 +66,7 @@ function update(notificationsData, nextPage) {
             inertia
             @click="unreadCount = 0"
           >
-            <v-icon icon="fas fa-check-double" class="me-2"></v-icon>
+            <v-icon icon="fas fa-check-double" class="me-2" />
             {{ $t('main.mark-all-read') }}
           </po-button>
         </div>
@@ -129,7 +77,7 @@ function update(notificationsData, nextPage) {
           <v-card-text>
             <div class="d-flex ga-5">
               <div>
-                <template v-if="!$helper.isEmpty(notification.notifier_user)">
+                <template v-if="notification.notifier_user !== null">
                   <po-avatar size="48" color="secondary" :user="notification.notifier_user" />
                 </template>
                 <template v-else>
@@ -137,13 +85,13 @@ function update(notificationsData, nextPage) {
                 </template>
               </div>
               <div class="w-100">
-                <p class="text-caption font-weight-medium">
-                  {{ $helper.relativeDate(notification.created_at) }}
+                <p class="font-weight-medium">
+                  {{ relativeDate(notification.created_at) }}
                 </p>
                 <div class="d-flex w-100 justify-space-between">
                   <div>
-                    <p>{{ $helper.notificationMessage(notification, $t) }}.</p>
-                    <p class="text-caption text-disabled">
+                    <p>{{ notificationMessage(notification, $t) }}.</p>
+                    <p v-if="notification.notifier_writing !== null" class="text-disabled">
                       {{ $t('main.title') }}: {{ notification.notifier_writing.title }}
                     </p>
                   </div>
@@ -155,8 +103,7 @@ function update(notificationsData, nextPage) {
                       :href="route('notifications.show', notification.id)"
                       class="stretched"
                       inertia
-                    >
-                    </po-link>
+                    />
                   </div>
                 </div>
               </div>
@@ -165,7 +112,7 @@ function update(notificationsData, nextPage) {
         </v-card>
       </template>
 
-      <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
+      <po-infinite-scroll @load="loadMore" />
     </template>
 
     <template v-else>
@@ -174,7 +121,7 @@ function update(notificationsData, nextPage) {
         msg-title=""
         :msg-body="$t('accounts.notifications-empty')"
         icon="fas fa-bell-slash"
-      ></po-msg-block>
+      />
     </template>
   </div>
 </template>

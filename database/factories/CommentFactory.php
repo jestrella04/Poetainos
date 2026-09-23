@@ -15,21 +15,19 @@ class CommentFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var string
+     * @var class-string<Comment>
      */
     protected $model = Comment::class;
 
     /**
      * Define the model's default state.
-     *
-     * @return array<string, mixed>
      */
     public function definition(): array
     {
         return [
             'user_id' => User::factory(),
             'writing_id' => Writing::factory(),
-            'message' => $this->faker->paragraph,
+            'message' => $this->faker->paragraphs($this->faker->numberBetween(1, 4), true),
         ];
     }
 }

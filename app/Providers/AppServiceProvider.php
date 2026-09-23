@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
-use App\Models\Setting;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Schema;
+use App\Services\SiteSettings;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,42 +24,17 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        // Check the app is not running in CLI mode
-        if (! App::runningInConsole()) {
-            // Getting App settings from database
-            try {
-                if (Schema::hasTable('settings')) {
-                    $settings = Setting::where('name', 'site')->first()->pluck('data');
+        // Console commands and queue workers never pass through EnsureSiteIsConfigured
+        $this->app->make(SiteSettings::class)->load();
 
-                    config([
-                        'writerhood' => $settings[0],
-                    ]);
-                }
-            } catch (\Throwable $th) {
-                $route = $this->app->request->getRequestUri();
+        $this->configureRateLimiting();
 
-                if (substr($route, 0, 5) !== '/init') {
-                    abort(503, 'App not configured');
-                }
-            }
-        }
-
-        // Debugging SQL queries
-        /* if (env('APP_DEBUG')) {
-            DB::listen(function($sql) {
-                Log::info($sql->sql);
-                Log::info($sql->bindings);
-                Log::info($sql->time);
-            });
-        } */
-
-        // Use Bootstrap for pagination
-        Paginator::useBootstrap();
+        Gate::define('viewWebSocketsDashboard', function ($user = null) {
+            return auth()->user()?->isAllowed('admin') ?? false;
+        });
     }
 
     /**
@@ -68,5 +44,15 @@ class AppServiceProvider extends ServiceProvider
     {
         // Loading project's custom language strings
         $this->loadJSONTranslationsFrom(base_path('lang/poetainos'));
+    }
+
+    /**
+     * Configure the rate limiters for the application.
+     */
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
     }
 }

@@ -1,32 +1,28 @@
-<script setup>
-import { ref, inject } from 'vue'
+<script setup lang="ts">
 import { router } from '@inertiajs/vue3'
-import axios from 'axios'
+import { forceSnackBarKey, isDeleteKey, writingKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { Comment } from '@/types/models'
 
-defineProps({
-  comment: { type: Object, required: true }
-})
+defineProps<{
+  comment: Comment
+}>()
 
-const helper = inject('helper')
-const isDelete = inject('isDelete')
-const isPosting = ref(false)
-const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
-const writing = inject('writing')
+const { setSnackBar } = useSnackbar()
+const isDelete = injectStrict(isDeleteKey)
+const forceSnackBar = injectStrict(forceSnackBarKey)
+const writing = injectStrict(writingKey)
+const { isPosting, submitForm } = useFormSubmit(false)
 
-async function submit() {
-  const form = document.querySelector('#comment-delete-form')
-
-  isPosting.value = true
-  errors.value = false
-
-  await axios
-    .post(form.action, {
-      _method: 'DELETE'
-    })
-    .then(() => {
+async function submit(): Promise<void> {
+  await submitForm({
+    formSelector: '#comment-delete-form',
+    payload: { _method: 'DELETE' },
+    onSuccess: () => {
       router.visit(route('writings.show', writing.slug))
-      helper.setSnackBar({
+      setSnackBar({
         message: 'comments.comment-deleted',
         color: 'success',
         active: true
@@ -34,27 +30,23 @@ async function submit() {
 
       forceSnackBar.value = true
       isDelete.value = false
-    })
-    .catch(() => {
-      errors.value = true
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+    },
+    onError: () => true
+  })
 }
 </script>
 
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('main.proceed-with-caution')">
-      <po-modal-close @click.prevent="isDelete = false"></po-modal-close>
+      <po-modal-close @click.prevent="isDelete = false" />
       <v-card-text>
         <p class="mb-2">
           {{ $t('main.permanent-delete-ask') }}
           {{ $t('main.action-irreversible') }}
         </p>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form
           id="comment-delete-form"
@@ -63,7 +55,7 @@ async function submit() {
         >
           <po-button color="primary" type="submit" block>
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

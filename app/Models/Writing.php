@@ -2,210 +2,205 @@
 
 namespace App\Models;
 
-use App\Notifications\WritingFeatured;
-use Carbon\Carbon;
+use App\Services\AuraCalculator;
+use Database\Factories\WritingFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @mixin IdeHelperWriting
+ */
 class Writing extends Model
 {
+    /** @use HasFactory<WritingFactory> */
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
-        'category_id',
-        'type_id',
         'title',
         'slug',
         'text',
         'extra_info',
-        'aura',
-        'aura_updated_at',
     ];
 
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @return array<string, string>
      */
-    protected $casts = [
-        'extra_info' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'extra_info' => 'array',
+        ];
+    }
 
     public function getRouteKeyName()
     {
         return 'slug';
     }
 
-    public function path()
+    public function path(): string
     {
         return route('writings.show', $this->slug);
     }
 
-    public function author()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function mainCategory()
+    /**
+     * @return BelongsToMany<Category, $this>
+     */
+    public function mainCategory(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->whereNull('parent_id');
     }
 
-    public function altCategories()
+    /**
+     * @return BelongsToMany<Category, $this>
+     */
+    public function altCategories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->whereNotNull('parent_id');
     }
 
-    public function categories()
+    /**
+     * @return BelongsToMany<Category, $this>
+     */
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
     }
 
-    public function excerpt()
-    {
-        $len = mb_strlen($this->text);
-
-        if ($len < 400) {
-            return $this->text;
-        }
-
-        return mb_substr($this->text, 0, 400).'...';
-    }
-
-    public function comments()
+    /**
+     * @return HasMany<Comment, $this>
+     */
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    public function likes()
+    /**
+     * @return MorphMany<Like, $this>
+     */
+    public function likes(): MorphMany
     {
         return $this->morphMany(Like::class, 'likeable');
     }
 
-    public function likers()
+    /**
+     * A random sample of the users who liked the writing.
+     *
+     * @return Collection<int, User>
+     */
+    public function likers(int $limit): Collection
     {
-        $likes = $this->likes()->pluck('user_id');
-
-        return User::select('id', 'username', 'name', 'extra_info->avatar AS avatar')->whereIn('id', $likes)->get();
+        return User::forAuthorSummary()
+            ->whereIn('id', $this->likes()->select('user_id'))
+            ->inRandomOrder()
+            ->limit($limit)
+            ->get();
     }
 
-    public function tags()
+    /**
+     * @return BelongsToMany<Tag, $this>
+     */
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
-    public function categoriesAsString($delimiter = ', ')
-    {
-        $array = $this->categories
-            ->map(function ($category) {
-                return $category->name;
-            })
-            ->toArray();
-
-        return implode($delimiter, $array);
-    }
-
-    public function tagsAsString($delimiter = ', ')
-    {
-        $array = $this->tags
-            ->map(function ($tag) {
-                return $tag->name;
-            })
-            ->toArray();
-
-        return implode($delimiter, $array);
-    }
-
-    public function shelf()
+    /**
+     * @return BelongsToMany<User, $this>
+     */
+    public function shelf(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'shelves');
     }
 
-    public function incrementViews()
+    public function incrementViews(): void
     {
-        DB::table($this->getTable())->whereId($this->id)->increment('views');
+        DB::table($this->getTable())->where('id', $this->id)->increment('views');
+
+        $this->views++;
+        $this->syncOriginalAttribute('views');
     }
 
-    public function updateAura()
+    public function updateAura(): void
     {
-        // What's the minimum to be featured at home?
-        $auraHome = getSiteConfig('aura.min_at_home');
-
-        // Count user content
-        $writing = Writing::whereId($this->id)->withCount(['likes', 'comments', 'shelf'])->firstOrFail();
-        $likes = $writing->likes_count;
-        $comments = $writing->comments_count;
-        $shelf = $writing->shelf_count;
-        $views = $this->views;
-
-        // Get points from settings
-        $pointsLikes = getSiteConfig('aura.points.writing.like');
-        $pointsComments = getSiteConfig('aura.points.writing.comment');
-        $pointsShelf = getSiteConfig('aura.points.writing.shelf');
-        $pointsViews = getSiteConfig('aura.points.writing.views');
-        $basePoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
-
-        // Calculate points as per settings
-        $pointsLikes = $pointsLikes * $likes;
-        $pointsComments = $pointsComments * $comments;
-        $pointsShelf = $pointsShelf * $shelf;
-        $pointsViews = $pointsViews * $views;
-        $totalPoints = $pointsLikes + $pointsComments + $pointsShelf + $pointsViews;
-
-        // Do the math
-        $auraNew = (($totalPoints / $basePoints) * ($basePoints / 4)) / $basePoints; // 4 is the count of countables (comments, likes, etc)
-        $auraNew = number_format($auraNew, 2);
-
-        // Check when writing was posted (in days)
-        $postedAt = Carbon::parse($this->created_at)->diffInDays();
-
-        // Check if writing is awarded
-        $awarded = isset($this->home_posted_at);
-
-        // Persist to the database
-        if ($auraNew >= $auraHome && $postedAt <= 31 && ! $awarded) {
-            DB::table($this->getTable())->whereId($this->id)->update([
-                'aura' => $auraNew,
-                'aura_updated_at' => Carbon::now(),
-                'home_posted_at' => Carbon::now(),
-            ]);
-
-            $this->author->notify(new WritingFeatured($this));
-        } else {
-            DB::table($this->getTable())->whereId($this->id)->update([
-                'aura' => $auraNew,
-                'aura_updated_at' => Carbon::now(),
-            ]);
-        }
+        app(AuraCalculator::class)->updateWritingAura($this);
     }
 
-    public function externalLink()
-    {
-        if (! empty($this->extra_info['link'])) {
-            return $this->extra_info['link'];
-        }
-    }
-
-    public function coverPath()
-    {
-        if (! empty($this->extra_info['cover'])) {
-            $path = '/storage/'.$this->extra_info['cover'];
-
-            if (is_file(public_path($path))) {
-                return $path;
-            }
-        }
-    }
-
-    public function complaints()
+    /**
+     * @return MorphMany<Complaint, $this>
+     */
+    public function complaints(): MorphMany
     {
         return $this->morphMany(Complaint::class, 'complainable');
+    }
+
+    /**
+     * Exclude writings authored by any of the given blocked user ids.
+     *
+     * @param  Builder<Writing>  $query
+     * @param  array<int>  $blockedUserIds
+     * @return Builder<Writing>
+     */
+    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
+    {
+        if ($blockedUserIds === []) {
+            return $query;
+        }
+
+        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
+    }
+
+    /**
+     * Shared sort used by every writings listing. 'popular' and 'likes'
+     * break ties by aura (desc) so that, among writings with an identical
+     * views/likes count, the higher-quality (higher-aura) one surfaces
+     * first.
+     *
+     * @param  Builder<Writing>  $query
+     * @return Builder<Writing>
+     */
+    public function scopeSorted(Builder $query, string $sort): Builder
+    {
+        return match ($sort) {
+            'popular' => $query->orderBy('views', 'desc')->orderBy('aura', 'desc'),
+            'likes' => $query->orderBy('likes_count', 'desc')->orderBy('aura', 'desc'),
+            default => $query->latest(),
+        };
+    }
+
+    /**
+     * Counts and author summary eager-loaded by every writings listing.
+     *
+     * @param  Builder<Writing>  $query
+     * @return Builder<Writing>
+     */
+    public function scopeWithListingRelations(Builder $query): Builder
+    {
+        return $query->withCount(['likes', 'comments', 'shelf'])
+            ->with(['author' => function ($query): void {
+                $query->forAuthorSummary(withKarma: true);
+            }]);
     }
 }

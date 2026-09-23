@@ -2,17 +2,22 @@
 
 namespace App\Models;
 
+use Database\Factories\BlockedUserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperBlockedUser
+ */
 class BlockedUser extends Model
 {
+    /** @use HasFactory<BlockedUserFactory> */
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',

@@ -5,33 +5,19 @@ namespace App\Notifications;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\DatabaseMessage;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use NotificationChannels\FacebookPoster\FacebookPosterChannel;
 use NotificationChannels\FacebookPoster\FacebookPosterPost;
 use NotificationChannels\Twitter\TwitterChannel;
 use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\WebPush\WebPushChannel;
-use NotificationChannels\WebPush\WebPushMessage;
 
-class WritingFeatured extends Notification implements ShouldQueue
+class WritingFeatured extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
-    protected $writing;
-
-    protected $notification;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct(Writing $writing)
+    public function __construct(protected Writing $writing)
     {
-        $this->writing = $writing;
-        $this->notification = [
+        $this->content = [
             'title' => __('Your writing has been awarded with a Golden Flower'),
             'greeting' => __('Hello!'),
             'body' => __('Congratulations, your writing ":title" has been awarded with a Golden Flower at :site', [
@@ -57,79 +43,37 @@ class WritingFeatured extends Notification implements ShouldQueue
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<int, string>
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
-        return ['mail', 'database', TwitterChannel::class, FacebookPosterChannel::class, WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), 'database', TwitterChannel::class, FacebookPosterChannel::class, WebPushChannel::class];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return MailMessage
-     */
-    public function toMail($notifiable)
+    public function toTwitter(mixed $notifiable): TwitterStatusUpdate
     {
-        return (new MailMessage)
-            ->subject($this->notification['title'])
-            ->greeting($this->notification['greeting'])
-            ->line($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->line($this->notification['footer']);
-    }
-
-    public function toTwitter($notifiable)
-    {
-        $msg = implode(' ', $this->notification['body_social']);
-        $msg = str_replace(':author', $this->writing->author->getTwitterUsername(), $msg);
-        $msg = $msg.' '.$this->notification['url'];
+        $msg = implode(' ', $this->content['body_social']);
+        $msg = str_replace(':author', $this->writing->author?->twitterHandleOrName() ?? '', $msg);
+        $msg = $msg.' '.$this->content['url'];
 
         return new TwitterStatusUpdate($msg);
     }
 
-    public function toFacebookPoster($notifiable)
+    public function toFacebookPoster(mixed $notifiable): FacebookPosterPost
     {
-        $msg = implode(' ', $this->notification['body_social']);
-        $msg = str_replace(':author', $this->writing->author->getName(), $msg);
+        $msg = implode(' ', $this->content['body_social']);
+        $msg = str_replace(':author', $this->writing->author?->getName() ?? '', $msg);
 
-        return (new FacebookPosterPost($msg))->withLink($this->notification['url']);
-    }
-
-    /**
-     * Get the web push representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
-     * @return DatabaseMessage
-     */
-    public function toWebPush($notifiable, $notification)
-    {
-        return (new WebPushMessage)
-            ->title($this->notification['title'])
-            ->icon($this->notification['icon'])
-            ->body($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->options(['TTL' => 1000])
-            ->renotify()
-            ->requireInteraction()
-            ->tag($this->notification['tag']);
-        // ->data(['id' => $notification->id])
-        // ->badge()
-        // ->dir()
-        // ->image()
-        // ->lang()
-        // ->vibrate()
+        return (new FacebookPosterPost($msg))->withLink($this->content['url']);
     }
 
     /**
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             'writing_id' => $this->writing->id,

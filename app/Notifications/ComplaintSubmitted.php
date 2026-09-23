@@ -11,21 +11,16 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $subject;
+    protected string $subject;
 
-    protected $greeting;
+    protected string $greeting;
 
-    protected $message;
+    protected string $message;
 
-    protected $link;
+    protected string $link;
 
-    protected $action;
+    protected string $action;
 
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->subject = __('[:site] Action required: content at your site received a complaint from a user.', ['site' => getSiteConfig('name')]);
@@ -41,9 +36,9 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<int, string>
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
@@ -52,9 +47,8 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject($this->subject)
@@ -67,9 +61,9 @@ class ComplaintSubmitted extends Notification implements ShouldQueue
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //

@@ -1,38 +1,105 @@
 <?php
 
 use App\Models\Role;
-use App\Models\User;
 
-test('guests are redirected away from the admin area', function (): void {
-    $this->get('/admin')->assertRedirect(route('login'));
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
+
+describe('the admin area', function (): void {
+    it('redirects guests away', function (): void {
+        // When
+        $response = get('/admin');
+
+        // Then
+        $response->assertRedirect(route('login'));
+    });
+
+    it('forbids authenticated non-admins', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->get('/admin');
+
+        // Then
+        $response->assertForbidden();
+    });
+
+    it('is accessible to admins and flags them so the admin menu entry is rendered', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->get('/admin');
+
+        // Then
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page->where('auth.admin', true));
+    });
 });
 
-test('authenticated non-admins are redirected to login from the admin area', function (): void {
-    $user = User::factory()->create();
+describe('the shared auth props', function (): void {
+    it('do not flag regular users as admins', function (): void {
+        // Given
+        $user = createUser();
 
-    $this->actingAs($user)->get('/admin')->assertRedirect(route('login'));
+        // When
+        $response = actingAs($user)->get(route('users.index'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('auth.admin', false));
+    });
 });
 
-test('admins can access the admin area', function (): void {
-    $admin = actingAsAdmin();
+describe('the shared ziggy props', function (): void {
+    it('use the site root as base url so generated links are not nested under the current page', function (): void {
+        // When
+        $response = get(route('users.index'));
 
-    $this->actingAs($admin)->get('/admin')->assertOk();
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('ziggy.url', rtrim(url('/'), '/')));
+    });
 });
 
-test('isAllowed reflects the role\'s admin permission', function (): void {
-    $noRole = User::factory()->create();
-    expect($noRole->isAllowed('admin'))->toBeFalse();
+describe('isAllowed', function (): void {
+    it('reflects the role\'s admin permission', function (): void {
+        // Given
+        $noRole = createUser();
 
-    $plainRole = Role::factory()->create();
-    $plainRoleUser = User::factory()->create(['role_id' => $plainRole->id]);
-    expect($plainRoleUser->isAllowed('admin'))->toBeFalse();
+        // Then
+        expect($noRole->isAllowed('admin'))->toBeFalse();
 
-    $disabledAdminRole = Role::factory()->create([
-        'extra_info' => ['permissions' => [['name' => 'admin', 'enabled' => false]]],
-    ]);
-    $disabledAdminUser = User::factory()->create(['role_id' => $disabledAdminRole->id]);
-    expect($disabledAdminUser->isAllowed('admin'))->toBeFalse();
+        // Given
+        $plainRole = Role::factory()->create();
+        $plainRoleUser = createUser(['role_id' => $plainRole->id]);
 
-    $admin = actingAsAdmin();
-    expect($admin->isAllowed('admin'))->toBeTrue();
+        // Then
+        expect($plainRoleUser->isAllowed('admin'))->toBeFalse();
+
+        // Given
+        $disabledAdminRole = Role::factory()->create([
+            'extra_info' => ['permissions' => [['name' => 'admin', 'enabled' => false]]],
+        ]);
+        $disabledAdminUser = createUser(['role_id' => $disabledAdminRole->id]);
+
+        // Then
+        expect($disabledAdminUser->isAllowed('admin'))->toBeFalse();
+
+        // Given
+        $admin = actingAsAdmin();
+
+        // Then
+        expect($admin->isAllowed('admin'))->toBeTrue();
+    });
+
+    it('returns false when the role has permissions but none match the requested task', function (): void {
+        // Given
+        $role = Role::factory()->create([
+            'extra_info' => ['permissions' => [['name' => fake()->lexify('task-????'), 'enabled' => true]]],
+        ]);
+        $user = createUser(['role_id' => $role->id]);
+
+        // Then
+        expect($user->isAllowed('admin'))->toBeFalse();
+    });
 });

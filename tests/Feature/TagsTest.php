@@ -1,39 +1,67 @@
 <?php
 
 use App\Models\Tag;
-use App\Models\User;
 
-test('query returns matching tags', function (): void {
-    Tag::factory()->create(['name' => 'poetry']);
-    Tag::factory()->create(['name' => 'prose']);
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
 
-    $response = $this->getJson('/tags/query?query=poe');
+describe('the query endpoint', function (): void {
+    it('returns matching tags', function (): void {
+        // Given
+        $matching = Tag::factory()->create();
+        $query = mb_substr($matching->name, 0, 3);
+        do {
+            $otherName = fake()->unique()->word();
+        } while (str_contains($otherName, $query));
+        Tag::factory()->create(['name' => $otherName]);
 
-    $response->assertOk();
-    $response->assertJsonFragment(['value' => 'poetry', 'label' => 'poetry']);
-    $response->assertJsonMissing(['value' => 'prose']);
+        // When
+        $response = getJson('/tags/query?query='.urlencode($query));
+
+        // Then
+        $response->assertOk();
+        $response->assertJsonFragment(['value' => $matching->name, 'label' => $matching->name]);
+        $response->assertJsonMissing(['value' => $otherName]);
+    });
 });
 
-test('show renders for each sort option', function (string $sort): void {
-    $tag = Tag::factory()->create();
+describe('the show page', function (): void {
+    it('renders for each sort option', function (string $sort): void {
+        // Given
+        $tag = Tag::factory()->create();
 
-    $this->get($tag->path().'?sort='.$sort)->assertOk();
-})->with(['latest', 'popular', 'likes']);
+        // When
+        $response = get($tag->path().'?sort='.$sort);
 
-test('admin can delete a tag', function (): void {
-    $admin = actingAsAdmin();
-    $tag = Tag::factory()->create();
-
-    $this->actingAs($admin)->delete('/admin/tags/delete/'.$tag->slug)->assertOk();
-
-    expect(Tag::find($tag->id))->toBeNull();
+        // Then
+        $response->assertOk();
+    })->with(['latest', 'popular', 'likes']);
 });
 
-test('non-admins are redirected to login for admin tag routes', function (): void {
-    $user = User::factory()->create();
-    $tag = Tag::factory()->create();
+describe('admin tag management', function (): void {
+    it('allows an admin to delete a tag', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+        $tag = Tag::factory()->create();
 
-    $this->actingAs($user)
-        ->delete('/admin/tags/delete/'.$tag->slug)
-        ->assertRedirect(route('login'));
+        // When
+        $response = actingAs($admin)->delete('/admin/tags/delete/'.$tag->slug);
+
+        // Then
+        $response->assertOk();
+        expect(Tag::find($tag->id))->toBeNull();
+    });
+
+    it('forbids non-admins', function (): void {
+        // Given
+        $user = createUser();
+        $tag = Tag::factory()->create();
+
+        // When
+        $response = actingAs($user)->delete('/admin/tags/delete/'.$tag->slug);
+
+        // Then
+        $response->assertForbidden();
+    });
 });

@@ -13,9 +13,10 @@ RUN apt-get update && apt-get install -y \
         libfreetype-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
+        libgmp-dev \
         && docker-php-ext-configure gd --with-jpeg --with-freetype \
-        && docker-php-ext-install -j$(nproc) pdo_mysql gd pcntl \
-        && docker-php-ext-enable pdo_mysql gd pcntl \
+        && docker-php-ext-install -j$(nproc) pdo_mysql gd pcntl sockets gmp bcmath \
+        && docker-php-ext-enable pdo_mysql gd pcntl sockets gmp bcmath \
         && apt-get purge -y --auto-remove build-essential \
         && rm -rf /var/lib/apt/lists/*
 
@@ -23,6 +24,18 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get update && apt-get install -y nodejs \
     && npm --version
+
+# Install Chromium's runtime libraries for Pest's browser (Playwright) testing plugin.
+# Delegated to Playwright's own installer rather than a hand-picked apt list: it
+# detects the base image's distro/codename and resolves the correct package names
+# (which differ across Debian releases), instead of us hardcoding names that can
+# silently go stale.
+RUN npx --yes playwright@latest install-deps chromium
+
+# Install Inkscape CLI (used for SVG -> PNG/PDF conversion)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends inkscape \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \

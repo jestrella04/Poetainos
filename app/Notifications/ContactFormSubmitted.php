@@ -11,27 +11,10 @@ class ContactFormSubmitted extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $name;
+    protected mixed $site;
 
-    protected $email;
-
-    protected $subject;
-
-    protected $message;
-
-    protected $site;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($name, $email, $subject, $message)
+    public function __construct(protected string $name, protected string $email, protected string $subject, protected string $message)
     {
-        $this->name = $name;
-        $this->email = $email;
-        $this->subject = $subject;
-        $this->message = $message;
         $this->site = getSiteConfig('name');
     }
 
@@ -39,9 +22,9 @@ class ContactFormSubmitted extends Notification implements ShouldQueue
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<int, string>
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
@@ -50,9 +33,8 @@ class ContactFormSubmitted extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
             ->replyTo($this->email)
@@ -69,9 +51,9 @@ class ContactFormSubmitted extends Notification implements ShouldQueue
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //

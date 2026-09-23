@@ -1,85 +1,40 @@
-<script setup>
-import { computed, ref, inject, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+<script setup lang="ts">
+import { usePage } from '@inertiajs/vue3'
 import PoUsersCard from './partials/PoUsersCard.vue'
-import axios from 'axios'
-import { useSwipe } from '@vueuse/core'
+import { useFormatting } from '@/composables/useFormatting'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useInfiniteList } from '@/composables/useInfiniteList'
+import { useSwipeTabs } from '@/composables/useSwipeTabs'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { User } from '@/types/models'
 
-const page = computed(() => usePage())
-const helper = inject('helper')
-const users = ref([])
-const next = ref('')
-const fetched = ref(false)
-const target = document.body
+const page = usePage<InertiaPageProps<{ sort: string; totalAuthors: number }>>()
+const { isEmpty } = useTypeGuards()
+const { formatCount } = useFormatting()
 
-useSwipe(target, {
-  passive: true,
-  onSwipe() {
-    //
-  },
-  onSwipeEnd(e, direction) {
-    if (direction === 'left') {
-      swipeRight()
-    } else if (direction === 'right') {
-      swipeLeft()
-    }
-  }
-})
-
-async function loadMore({ done }) {
-  if (!helper.strNullOrEmpty(next.value)) {
-    await axios
-      .get(next.value)
-      .then((response) => {
-        update(response.data.data, response.data.next_page_url)
-        done('ok')
-      })
-      .catch(() => {
-        done('error')
-      })
-  } else {
-    done('empty')
-  }
-}
-
-function swipeRight() {
-  if ('featured' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="latest"]').click()
-  } else if ('latest' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="popular"]').click()
-  }
-}
-
-function swipeLeft() {
-  if ('popular' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="latest"]').click()
-  } else if ('latest' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="featured"]').click()
-  }
-}
-
-onMounted(async () => {
-  await router.reload({
-    only: ['users'],
-    onSuccess: (page) => {
-      update(page.props.users.data, page.props.users.next_page_url)
-    }
-  })
-})
-
-function update(usersData, nextPage) {
-  users.value.push(...usersData)
-  next.value = nextPage
-  fetched.value = true
-}
+const { items: users, fetched, loadMore } = useInfiniteList<User>('users')
+useSwipeTabs({ tabOrder: ['featured', 'latest', 'popular'], currentTab: () => page.props.sort })
 </script>
 
 <template>
-  <po-head />
+  <po-wrapper class="h-100">
+    <po-head />
 
-  <v-row class="sticky-tabs">
-    <v-col cols="12">
-      <v-tabs :model-value="page.props.sort" fixed-tabs>
+    <p class="text-display-large po-prose ma-0 mb-2">
+      {{ $t('users.authors') }}
+    </p>
+
+    <p class="text-headline-small text-medium-emphasis po-prose ma-0 mb-8">
+      {{
+        $t('main.authors-subtitle', {
+          site_name: page.props.site.name,
+          authors: formatCount(page.props.totalAuthors)
+        })
+      }}
+    </p>
+
+    <div class="sticky-tabs">
+      <v-tabs :model-value="page.props.sort" color="primary" class="mb-8" fixed-tabs>
         <po-tab href="?sort=featured" value="featured" :aria-label="$t('main.featured')" inertia>
           <v-icon icon="fas fa-fan" class="d-md-none" />
           <span class="d-none d-md-inline">{{ $t('main.featured') }}</span>
@@ -95,27 +50,29 @@ function update(usersData, nextPage) {
           <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
         </po-tab>
       </v-tabs>
-    </v-col>
-  </v-row>
+    </div>
 
-  <template v-if="!fetched">
-    <po-loading type="avatar, paragraph, divider, text"></po-loading>
-  </template>
-
-  <template v-else-if="!$helper.isEmpty(users)">
-    <template v-for="user in users" :key="user.id">
-      <po-users-card :alone="false" :data="user" />
+    <template v-if="!fetched">
+      <po-loading />
     </template>
 
-    <po-infinite-scroll @load="loadMore"></po-infinite-scroll>
-  </template>
+    <template v-else-if="!isEmpty(users)">
+      <v-row :gap="[12, 0]">
+        <v-col v-for="user in users" :key="user.id" cols="12" sm="6">
+          <po-users-card :data="user" />
+        </v-col>
+      </v-row>
 
-  <template v-else>
-    <po-msg-block
-      class="py-15"
-      msg-title=""
-      :msg-body="$t('main.nothing-to-display')"
-      icon="fas fa-sad-tear"
-    ></po-msg-block>
-  </template>
+      <po-infinite-scroll @load="loadMore" />
+    </template>
+
+    <template v-else>
+      <po-msg-block
+        class="py-15"
+        msg-title=""
+        :msg-body="$t('main.nothing-to-display')"
+        icon="fas fa-sad-tear"
+      />
+    </template>
+  </po-wrapper>
 </template>

@@ -1,19 +1,72 @@
-<script setup>
-import { inject, provide, reactive, ref } from 'vue'
+<script setup lang="ts">
+import { provide, reactive, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import axios from 'axios'
+import { formDataKey } from '@/composables/keys'
+import { useAuth } from '@/composables/useAuth'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { LaravelValidationErrors } from '@/types/http'
 
-const page = usePage()
-const helper = inject('helper')
-
-if (!helper) {
-  throw new Error('helper plugin not provided')
+// $user (the raw Eloquent model, not a select()) — a different shape from
+// types/models.ts's `User` (which reflects UsersController::show()'s
+// flattened extra_info->x AS x columns): here extra_info is still a
+// genuine nested object, cast by the model.
+interface EditableUser {
+  id: number
+  username: string
+  name?: string | null
+  email: string
+  role_id?: number | null
+  extra_info?: {
+    avatar?: string
+    bio?: string
+    location?: string
+    occupation?: string
+    interests?: string
+    website?: string
+    social?: Record<string, string>
+  } | null
 }
+
+interface Role {
+  id: number
+  name: string
+}
+
+interface PostedResult {
+  url: string
+}
+
+type SocialNetworkKey = 'twitter' | 'threads' | 'instagram' | 'facebook' | 'youtube' | 'goodreads'
+
+interface SocialLinkField {
+  key: SocialNetworkKey
+  label: string
+  maxlength: number
+}
+
+const socialLinkFields: SocialLinkField[] = [
+  { key: 'twitter', label: 'X (Twitter)', maxlength: 250 },
+  { key: 'threads', label: 'Threads', maxlength: 250 },
+  { key: 'instagram', label: 'Instagram', maxlength: 100 },
+  { key: 'facebook', label: 'Facebook', maxlength: 250 },
+  { key: 'youtube', label: 'Youtube', maxlength: 100 },
+  { key: 'goodreads', label: 'Goodreads', maxlength: 250 }
+]
+
+const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
+const { authUser, isAdmin } = useAuth()
+const { isEmpty } = useTypeGuards()
+const { validationErrors } = useFormErrors()
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 
 const user = page.props.user
 const formData = reactive({
-  avatar: [],
-  role: '',
+  avatar: [] as File[],
+  avatarRemove: false,
+  role: '' as string | number, // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion -- widens for the later `formData.role = user.role_id` numeric assignment
   name: '',
   username: '',
   email: '',
@@ -27,13 +80,13 @@ const formData = reactive({
   instagram: '',
   facebook: '',
   youtube: '',
-  goodreads: ''
+  goodreads: '',
+  serviceAgreement: false,
+  privacyAgreement: false
 })
-const errors = ref({})
-const isPosting = ref(false)
-const isPosted = ref({})
+const isPosted = ref<Partial<PostedResult>>({})
 
-provide('formData', formData)
+provide(formDataKey, formData)
 
 // Init form data
 formData.role = user.role_id ?? ''
@@ -41,14 +94,14 @@ formData.name = user.name ?? ''
 formData.username = user.username ?? ''
 formData.email = user.email ?? ''
 
-if (user.extra_info) {
+if (user.extra_info !== null && user.extra_info !== undefined) {
   formData.bio = user.extra_info.bio ?? ''
   formData.location = user.extra_info.location ?? ''
   formData.occupation = user.extra_info.occupation ?? ''
   formData.interests = user.extra_info.interests ?? ''
   formData.website = user.extra_info.website ?? ''
 
-  if (user.extra_info.social) {
+  if (user.extra_info.social !== undefined) {
     formData.twitter = user.extra_info.social.twitter ?? ''
     formData.threads = user.extra_info.social.threads ?? ''
     formData.instagram = user.extra_info.social.instagram ?? ''
@@ -58,26 +111,17 @@ if (user.extra_info) {
   }
 }
 
-function clearErrors() {
-  errors.value = {}
-}
-
 async function submitForm() {
-  const form = document.querySelector('#profile-form')
-
-  clearErrors()
-
-  if (!helper.checkFormValidity(form)) {
-    return
-  }
-
   isPosted.value = {}
-  isPosting.value = true
 
-  await axios
-    .postForm(form.action, {
+  await postForm<PostedResult>({
+    formSelector: '#profile-form',
+    multipart: true,
+    cooldown: true,
+    payload: {
       _method: 'PUT',
       avatar: formData.avatar,
+      'avatar-remove': formData.avatarRemove ? 1 : 0,
       role: formData.role,
       name: formData.name,
       email: formData.email,
@@ -94,30 +138,22 @@ async function submitForm() {
       goodreads: formData.goodreads,
       service_agreement: formData.serviceAgreement,
       privacy_agreement: formData.privacyAgreement
-    })
-    .then((response) => {
-      clearErrors()
-      isPosted.value = response.data
-    })
-    .catch((error) => {
-      errors.value = error.response.data.errors
-    })
-    .finally(
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    )
+    },
+    onSuccess: (data) => {
+      isPosted.value = data
+    },
+    onError: validationErrors
+  })
 }
 
-function file() {
-  const input = document.querySelector('#avatar-input')
-  input.click()
+function openAvatarPicker(): void {
+  document.querySelector<HTMLElement>('#avatar-input')?.click()
 }
 </script>
 
 <template>
   <po-wrapper class="w-100" style="max-width: 900px">
-    <po-head></po-head>
+    <po-head />
     <v-card :title="$t('accounts.update-profile').toUpperCase()">
       <v-form
         id="profile-form"
@@ -126,8 +162,8 @@ function file() {
         @submit.prevent="submitForm"
       >
         <div class="d-flex ga-3 mb-3 align-center">
-          <po-avatar :user="user" size="72" color="secondary"></po-avatar>
-          <po-button color="primary" variant="tonal" @click="file">{{
+          <po-avatar :user="user" size="72" color="secondary" />
+          <po-button color="primary" variant="tonal" @click="openAvatarPicker">{{
             $t('main.choose-image')
           }}</po-button>
 
@@ -135,12 +171,19 @@ function file() {
             id="avatar-input"
             class="d-none"
             v-model="formData.avatar"
-            label="avatar"
+            :label="$t('main.choose-image')"
             hide-details
-          ></v-file-input>
+          />
         </div>
 
-        <template v-if="$helper.admin()">
+        <v-checkbox
+          v-if="(user.extra_info?.avatar ?? '') !== ''"
+          v-model="formData.avatarRemove"
+          :label="$t('accounts.remove-current-avatar')"
+          hide-details
+        />
+
+        <template v-if="isAdmin()">
           <v-select
             v-model="formData.role"
             :label="$t('main.role')"
@@ -150,7 +193,7 @@ function file() {
             item-value="id"
             item-title="name"
             required
-          ></v-select>
+          />
         </template>
 
         <v-text-field
@@ -163,7 +206,7 @@ function file() {
           maxlength="250"
           required
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.username"
@@ -174,7 +217,7 @@ function file() {
           maxlength="100"
           required
           readonly
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.email"
@@ -186,7 +229,7 @@ function file() {
           maxlength="250"
           required
           clearable
-        ></v-text-field>
+        />
 
         <v-textarea
           v-model="formData.bio"
@@ -197,7 +240,7 @@ function file() {
           maxlength="300"
           clearable
           required
-        ></v-textarea>
+        />
 
         <v-text-field
           v-model="formData.location"
@@ -208,7 +251,7 @@ function file() {
           minlength="3"
           maxlength="250"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.occupation"
@@ -219,7 +262,7 @@ function file() {
           minlength="3"
           maxlength="100"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.interests"
@@ -230,7 +273,7 @@ function file() {
           minlength="3"
           maxlength="250"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="formData.website"
@@ -239,94 +282,38 @@ function file() {
           hide-details="auto"
           :error-messages="errors.website"
           minlength="3"
-          maxlength="100"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.twitter"
-          type="text"
-          label="X (Twitter)"
-          hide-details="auto"
-          :error-messages="errors.twitter"
-          minlength="3"
           maxlength="250"
           clearable
-        ></v-text-field>
+        />
 
         <v-text-field
-          v-model="formData.threads"
+          v-for="field in socialLinkFields"
+          :key="field.key"
+          v-model="formData[field.key]"
           type="text"
-          label="Threads"
+          :label="field.label"
           hide-details="auto"
-          :error-messages="errors.threads"
+          :error-messages="errors[field.key]"
           minlength="3"
-          maxlength="250"
+          :maxlength="field.maxlength"
           clearable
-        ></v-text-field>
+        />
 
-        <v-text-field
-          v-model="formData.instagram"
-          type="text"
-          label="Instagram"
-          hide-details="auto"
-          :error-messages="errors.instagram"
-          minlength="3"
-          maxlength="100"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.facebook"
-          type="text"
-          label="Facebook"
-          hide-details="auto"
-          :error-messages="errors.facebook"
-          minlength="3"
-          maxlength="250"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.youtube"
-          type="text"
-          label="Youtube"
-          hide-details="auto"
-          :error-messages="errors.youtube"
-          minlength="3"
-          maxlength="100"
-          clearable
-        ></v-text-field>
-
-        <v-text-field
-          v-model="formData.goodreads"
-          type="text"
-          label="Goodreads"
-          hide-details="auto"
-          :error-messages="errors.goodreads"
-          minlength="3"
-          maxlength="250"
-          clearable
-        ></v-text-field>
-
-        <po-agreement
-          v-if="!page.props.agreement && user.id === $helper.authUser().id"
-        ></po-agreement>
+        <po-agreement v-if="!page.props.agreement && user.id === authUser()!.id" />
 
         <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-          <template v-if="isPosting"
-            ><v-progress-circular indeterminate></v-progress-circular
-          ></template>
+          <template v-if="isPosting"><v-progress-circular indeterminate /></template>
           <template v-else>{{ $t('main.save') }}</template>
         </po-button>
       </v-form>
 
       <v-alert
-        v-if="!helper.isEmpty(isPosted)"
+        v-if="!isEmpty(isPosted)"
         type="success"
         variant="tonal"
         class="mb-5 mx-auto"
-        style="width: 85%; max-width: 600px"
+        width="85%"
+        max-width="600"
       >
         {{ $t('accounts.profile-updated') }}
         {{ $t('main.take-a-look') }}

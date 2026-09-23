@@ -1,141 +1,100 @@
-<script setup>
-import { computed, ref, inject, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
-import axios from 'axios'
-import { useSwipe } from '@vueuse/core'
+import PoWritingsSidebar from './partials/PoWritingsSidebar.vue'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useInfiniteList } from '@/composables/useInfiniteList'
+import { useSwipeTabs } from '@/composables/useSwipeTabs'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { TagLike, UserLike, Writing } from '@/types/models'
 
-const page = computed(() => usePage())
-const helper = inject('helper')
-const writings = ref([])
-const next = ref('')
-const fetched = ref(false)
-const target = document.body
-
-useSwipe(target, {
-  passive: true,
-  onSwipe() {
-    //
-  },
-  onSwipeEnd(e, direction) {
-    if (direction === 'left') {
-      swipeRight()
-    } else if (direction === 'right') {
-      swipeLeft()
-    }
-  }
-})
-
-async function loadMore({ done }) {
-  if (!helper.strNullOrEmpty(next.value)) {
-    await axios
-      .get(next.value)
-      .then((response) => {
-        update(response.data.data, response.data.next_page_url)
-        done('ok')
-      })
-      .catch(() => {
-        done('error')
-      })
-  } else {
-    done('empty')
-  }
+interface WritingsIndexProps {
+  sort: string
+  isHome: boolean
+  pickOfTheDay: Writing | null
+  authors: UserLike[] | null
+  tags: TagLike[] | null
 }
 
-function swipeRight() {
-  if ('latest' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="popular"]').click()
-  } else if ('popular' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="likes"]').click()
-  }
-}
+const page = usePage<InertiaPageProps<WritingsIndexProps>>()
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
 
-function swipeLeft() {
-  if ('likes' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="popular"]').click()
-  } else if ('popular' === page.value.props.sort) {
-    document.querySelector('.v-tab[value="latest"]').click()
-  }
-}
+const { items: writings, next, fetched, loadMore } = useInfiniteList<Writing>('writings')
+useSwipeTabs({ tabOrder: ['latest', 'popular', 'likes'], currentTab: () => page.props.sort })
 
-onMounted(async () => {
-  await router.reload({
-    only: ['writings'],
-    onSuccess: (page) => {
-      update(page.props.writings.data, page.props.writings.next_page_url)
-    }
-  })
-})
+const heroWriting = computed(() => page.props.pickOfTheDay ?? null)
 
-function update(writingsData, nextPage) {
-  writings.value.push(...writingsData)
-  next.value = nextPage
-  fetched.value = true
-}
-
-function liked(id, count) {
-  const liked = Object.values(writings.value).filter((writing) => {
-    if (writing.id === id) {
-      return
-    }
-  })
-
-  liked.likes_count.value = count
-}
+const restWritings = computed(() =>
+  heroWriting.value === null
+    ? writings.value
+    : writings.value.filter((writing) => writing.slug !== heroWriting.value?.slug)
+)
 </script>
 
 <template>
   <po-wrapper class="h-100">
-    <po-head></po-head>
+    <po-head />
 
-    <v-row class="sticky-tabs">
-      <v-col cols="12">
-        <v-tabs :model-value="page.props.sort" fixed-tabs>
-          <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
-            <v-icon icon="fas fa-clock" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
-          </po-tab>
+    <template v-if="page.props.isHome && heroWriting !== null">
+      <p class="text-uppercase text-primary mb-6">
+        {{ $t('main.pick-of-the-day') }}
+      </p>
 
-          <po-tab
-            href="?sort=popular"
-            value="popular"
-            :aria-label="$t('main.most-popular')"
-            inertia
-          >
-            <v-icon icon="fas fa-fire" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
-          </po-tab>
+      <po-writings-entry :alone="false" :data="heroWriting" hero />
+    </template>
 
-          <po-tab href="?sort=likes" value="likes" :aria-label="$t('main.most-liked')" inertia>
-            <v-icon icon="fas fa-heart" class="d-md-none" />
-            <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
-          </po-tab>
-        </v-tabs>
+    <v-row>
+      <v-col v-if="page.props.isHome" cols="12" md="3" order="1" order-md="2">
+        <po-writings-sidebar :authors="page.props.authors ?? []" :tags="page.props.tags ?? []" />
+      </v-col>
+
+      <v-col cols="12" :md="page.props.isHome ? 9 : 12" order="2" order-md="1" class="pe-md-12">
+        <div class="sticky-tabs">
+          <v-tabs :model-value="page.props.sort" color="primary" fixed-tabs>
+            <po-tab href="?sort=latest" value="latest" :aria-label="$t('main.most-recent')" inertia>
+              <v-icon icon="fas fa-clock" class="d-md-none" />
+              <span class="d-none d-md-inline">{{ $t('main.most-recent') }}</span>
+            </po-tab>
+
+            <po-tab
+              href="?sort=popular"
+              value="popular"
+              :aria-label="$t('main.most-popular')"
+              inertia
+            >
+              <v-icon icon="fas fa-fire" class="d-md-none" />
+              <span class="d-none d-md-inline">{{ $t('main.most-popular') }}</span>
+            </po-tab>
+
+            <po-tab href="?sort=likes" value="likes" :aria-label="$t('main.most-liked')" inertia>
+              <v-icon icon="fas fa-heart" class="d-md-none" />
+              <span class="d-none d-md-inline">{{ $t('main.most-liked') }}</span>
+            </po-tab>
+          </v-tabs>
+        </div>
+
+        <template v-if="!fetched">
+          <po-loading />
+        </template>
+
+        <template v-else-if="!isEmpty(writings)">
+          <template v-for="writing in restWritings" :key="writing.slug">
+            <po-writings-entry :alone="false" :data="writing" />
+          </template>
+
+          <po-infinite-scroll v-if="!strNullOrEmpty(next)" @load="loadMore" />
+        </template>
+
+        <template v-else>
+          <po-msg-block
+            class="py-15"
+            msg-title=""
+            :msg-body="$t('main.nothing-to-display')"
+            icon="fas fa-sad-tear"
+          />
+        </template>
       </v-col>
     </v-row>
-
-    <template v-if="!fetched">
-      <po-loading></po-loading>
-    </template>
-
-    <template v-else-if="!$helper.isEmpty(writings)">
-      <template v-for="writing in writings" :key="writing.slug">
-        <po-writings-entry @liked="liked" :alone="false" :data="writing" />
-      </template>
-
-      <po-infinite-scroll
-        v-if="!$helper.strNullOrEmpty(next)"
-        @load="loadMore"
-      ></po-infinite-scroll>
-    </template>
-
-    <template v-else>
-      <po-msg-block
-        class="py-15"
-        msg-title=""
-        :msg-body="$t('main.nothing-to-display')"
-        icon="fas fa-sad-tear"
-      ></po-msg-block>
-    </template>
   </po-wrapper>
 </template>

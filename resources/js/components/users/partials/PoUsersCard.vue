@@ -1,39 +1,50 @@
-<script setup>
-import PoUsersStats from './PoUsersStats.vue'
+<script setup lang="ts">
+import { useFormatting } from '@/composables/useFormatting'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import type { User } from '@/types/models'
 
-defineProps({
-  data: { type: Object, required: true }
-})
+defineProps<{
+  data: User
+}>()
+
+const { userDisplayName } = useFormatting()
+const { strNullOrEmpty } = useTypeGuards()
 </script>
 
 <template>
-  <v-card rounded elevation="2" class="user-container">
-    <v-card-text class="pos-relative">
-      <div class="d-flex ga-4 mb-2">
-        <po-avatar-award
-          v-if="data.karma && ['A', 'B', 'C'].includes(data.karma)"
-          :user="data"
-          avatar-size="48"
-          avatar-color="secondary"
-        />
-        <po-avatar v-else size="48" color="secondary" :user="data" />
+  <po-card
+    variant="text"
+    class="border-b-md"
+    :href="route('users.show', data.username)"
+    height="100%"
+    inertia
+  >
+    <v-card-text class="d-flex flex-column pa-6 h-100">
+      <div class="d-flex align-center ga-4 mb-4">
+        <po-avatar-award :user="data" avatar-size="64" avatar-color="secondary" />
 
         <div>
-          <p class="font-weight-bold">
-            <po-link :href="route('users.show', data.username)" class="stretched" inertia>
-              {{ $helper.userDisplayName(data) }}
-            </po-link>
+          <p class="text-headline-large po-prose ma-0">
+            {{ userDisplayName(data) }}
           </p>
-          <p class="text-medium-emphasis">@{{ data.username }}</p>
+
+          <p class="text-medium-emphasis ma-0">
+            @{{ data.username }}
+            <template v-if="!strNullOrEmpty(data.location)"> {{ data.location }}</template>
+          </p>
         </div>
       </div>
 
-      <p>{{ data.bio }}</p>
-    </v-card-text>
+      <p v-if="!strNullOrEmpty(data.bio)" class="text-title-large po-prose ma-0 mb-4">
+        {{ data.bio }}
+      </p>
 
-    <v-divider></v-divider>
-    <v-card-actions>
-      <po-users-stats :data="data" />
-    </v-card-actions>
-  </v-card>
+      <div class="d-inline-flex align-center text-medium-emphasis ga-3 mt-auto">
+        <span>
+          {{ $t('main.count-writings', { count: data.writings_count }, data.writings_count) }}
+        </span>
+        <span>{{ $t('main.count-likes', { count: data.likes_count }, data.likes_count) }}</span>
+      </div>
+    </v-card-text>
+  </po-card>
 </template>

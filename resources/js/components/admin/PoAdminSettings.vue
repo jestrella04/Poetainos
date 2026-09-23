@@ -1,45 +1,35 @@
-<script setup>
-import { computed, ref, inject } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { LaravelValidationErrors } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const helper = inject('helper')
-const page = computed(() => usePage())
-const settings = ref(page.value.props.settings)
-const isPosting = ref(false)
+const { validationErrors } = useFormErrors()
+const page = usePage<InertiaPageProps<{ settings: string }>>()
+const settings = ref(page.props.settings)
 const isPosted = ref(false)
-const errors = ref([])
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 
-function submitForm() {
-  const form = document.querySelector('#settings-form')
-
-  if (!helper.checkFormValidity(form)) {
-    return
-  }
-
-  isPosting.value = true
-
-  axios
-    .post(form.action, {
+async function submitForm() {
+  await postForm({
+    formSelector: '#settings-form',
+    payload: {
       _method: 'PUT',
       json: settings.value
-    })
-    .then(() => {
+    },
+    cooldown: true,
+    onSuccess: () => {
       isPosted.value = true
-    })
-    .catch((error) => {
-      errors.value = error.response.data.errors
-    })
-    .finally(
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    )
+    },
+    onError: validationErrors
+  })
 }
 </script>
 
@@ -62,12 +52,10 @@ function submitForm() {
         :error-messages="errors.json"
         persistent-hint
         required
-      ></v-textarea>
+      />
 
       <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-        <template v-if="isPosting"
-          ><v-progress-circular indeterminate></v-progress-circular
-        ></template>
+        <template v-if="isPosting"><v-progress-circular indeterminate /></template>
         <template v-else>{{ $t('main.save') }}</template>
       </po-button>
     </v-form>
@@ -77,7 +65,8 @@ function submitForm() {
       type="success"
       variant="tonal"
       class="mb-5 mx-auto"
-      style="width: 85%; max-width: 600px"
+      width="85%"
+      max-width="600"
     >
       {{ $t('admin.settings-saved') }}
     </v-alert>

@@ -1,55 +1,56 @@
-<script setup>
-import { ref, inject, provide } from 'vue'
+<script setup lang="ts">
+import { ref, provide } from 'vue'
+import { blockerKey, complainerKey, sharerKey, userKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useAuth } from '@/composables/useAuth'
+import { useFormatting } from '@/composables/useFormatting'
+import { useNativeShare } from '@/composables/useNativeShare'
 
-const user = inject('user')
+const user = injectStrict(userKey)
+const { isAuthenticated, authUser } = useAuth()
+const { userDisplayName } = useFormatting()
+const { share: nativeShare } = useNativeShare()
 const sharer = ref(false)
 const complainer = ref(false)
 const blocker = ref(false)
 
-provide('complainer', complainer)
-provide('blocker', blocker)
-provide('sharer', sharer)
+provide(complainerKey, complainer)
+provide(blockerKey, blocker)
+provide(sharerKey, sharer)
 
-function share() {
-  if (navigator.share) {
-    navigator.share({
-      title: user.title,
-      url: route('users.show', [user.username])
-    })
-  } else {
+function share(): void {
+  nativeShare(userDisplayName(user), route('users.show', [user.username]), () => {
     sharer.value = true
-  }
+  })
 }
 </script>
 
 <template>
   <po-sharer
     v-model="sharer"
-    :link-title="$helper.userDisplayName(user)"
+    :link-title="userDisplayName(user)"
     :link-url="route('users.show', [user.username])"
-  ></po-sharer>
-  <po-complainer v-model="complainer" comp-type="users" :comp-id="user.id"></po-complainer>
-  <po-blocker v-model="blocker" :user="user"></po-blocker>
+  />
+  <po-complainer v-model="complainer" comp-type="users" :comp-id="user.id" />
+  <po-blocker v-model="blocker" :user="user" />
 
-  <v-menu>
+  <v-menu open-on-hover>
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        icon="fas fa-ellipsis-vertical"
-        color="secondary"
+        icon="fas fa-angle-down"
+        color="primary"
         size="x-small"
-        variant="tonal"
         class="po-btn-more"
         :aria-label="$t('main.more-actions')"
-      >
-      </v-btn>
+      />
     </template>
 
     <v-list>
       <po-list-item prepend-icon="fas fa-share-nodes" @click="share">
         <span>{{ $t('main.share-profile') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <v-divider class="my-0" />
 
       <po-list-item
         :href="route('users.edit', [user.username])"
@@ -58,7 +59,7 @@ function share() {
       >
         <span>{{ $t('accounts.update-profile') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <v-divider class="my-0" />
 
       <po-list-item
         :href="route('users.writings.index', [user.username])"
@@ -67,7 +68,7 @@ function share() {
       >
         <span>{{ $t('users.view-writings') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <v-divider class="my-0" />
 
       <po-list-item
         :href="route('users.shelf.index', [user.username])"
@@ -76,7 +77,7 @@ function share() {
       >
         <span>{{ $t('users.view-shelf') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <v-divider class="my-0" />
 
       <po-list-item
         :href="route('users.likes.index', [user.username])"
@@ -85,14 +86,14 @@ function share() {
       >
         <span>{{ $t('users.view-liked') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <v-divider class="my-0" />
 
       <po-list-item prepend-icon="fas fa-flag" @click.prevent="complainer = true">
         <span>{{ $t('complaints.report-user') }}</span>
       </po-list-item>
-      <v-divider class="my-0"></v-divider>
+      <v-divider class="my-0" />
 
-      <template v-if="$helper.auth() && $helper.authUser().username !== user.username">
+      <template v-if="isAuthenticated() && authUser()!.username !== user.username">
         <po-list-item prepend-icon="fas fa-ban" @click.prevent="blocker = true">
           <span>{{ $t('main.block-user') }}</span>
         </po-list-item>

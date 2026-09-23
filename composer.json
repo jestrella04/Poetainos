@@ -31,8 +31,10 @@
     "tightenco/ziggy": "^2.1"
   },
   "require-dev": {
+    "barryvdh/laravel-ide-helper": "^3.7",
     "fakerphp/faker": "^1.9.1",
     "kkomelin/laravel-translatable-string-exporter": "^1.10",
+    "larastan/larastan": "^3.12",
     "laravel/boost": "^2.7",
     "laravel/breeze": "^2.0",
     "laravel/pail": "^1.2",
@@ -40,9 +42,10 @@
     "laravel/sail": "^1.0.1",
     "mockery/mockery": "^1.4.4",
     "nunomaduro/collision": "^8.1",
-    "pestphp/pest": "^3.0",
-    "pestphp/pest-plugin-laravel": "^3.0",
-    "phpunit/phpunit": "^11.0",
+    "pestphp/pest": "^4.4",
+    "pestphp/pest-plugin-browser": "^4.3",
+    "pestphp/pest-plugin-laravel": "^4.0",
+    "phpunit/phpunit": "^12.5",
     "rector/rector": "^2.6",
     "spatie/laravel-ignition": "^2.3"
   },
@@ -68,6 +71,7 @@
       "@php artisan key:generate",
       "@php artisan migrate --force",
       "npm install",
+      "npx playwright install chromium",
       "npm run build"
     ],
     "dev": [
@@ -90,7 +94,8 @@
       "@analyse",
       "npm run lint:check",
       "npm run format:check",
-      "npm run types:check"
+      "npm run types:check",
+      "npm run test"
     ],
     "analyse": [
       "phpstan analyse --memory-limit=1G"
@@ -110,6 +115,11 @@
       "@php artisan config:clear --ansi",
       "@php artisan test"
     ],
+    "test:browser": [
+      "Composer\\Config::disableProcessTimeout",
+      "@php artisan config:clear --ansi",
+      "@php artisan test --testsuite=Browser"
+    ],
     "test:db:up": [
       "docker compose -f docker-compose.testing.yml up -d --wait"
     ],
@@ -127,7 +137,10 @@
       "@php artisan package:discover --ansi"
     ],
     "post-update-cmd": [
-      "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+      "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+      "@php artisan ide-helper:generate --ansi",
+      "@php artisan ide-helper:meta --ansi",
+      "@php artisan ide-helper:models -M --ansi"
     ],
     "post-root-package-install": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

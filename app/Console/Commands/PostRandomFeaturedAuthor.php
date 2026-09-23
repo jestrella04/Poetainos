@@ -20,24 +20,12 @@ class PostRandomFeaturedAuthor extends Command
      *
      * @var string
      */
-    protected $description = 'Post a random featured author to Twitter';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Post a random featured author on social media';
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $user = User::whereHas('writings')
             ->orderByDesc('aura')
@@ -45,5 +33,7 @@ class PostRandomFeaturedAuthor extends Command
             ->get()
             ->random();
         $user->notify(new AuthorFeaturedRandom($user));
+
+        return self::SUCCESS;
     }
 }

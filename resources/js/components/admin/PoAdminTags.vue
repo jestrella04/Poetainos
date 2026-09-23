@@ -1,37 +1,32 @@
-<script setup>
-import { computed, ref, onMounted } from 'vue'
+<script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
+import { useServerTable } from '@/composables/useServerTable'
+import type { DataTableHeader } from 'vuetify'
+import type { InertiaPageProps } from '@/types/inertia'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const page = computed(() => usePage())
-const headers = [
-  { title: 'Id', align: 'start', sortable: false, key: 'id' },
-  { title: 'Name', align: 'start', sortable: false, key: 'name' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
-]
-const items = ref([])
-const totalItems = ref(page.value.props.total)
-const isLoading = ref(true)
-
-onMounted(() => {
-  loadItems({ page: 1 })
-})
-
-async function loadItems(event) {
-  await axios
-    .get(route('admin.tags', { page: event.page }))
-    .then((response) => {
-      items.value = response.data.data
-      isLoading.value = false
-    })
-    .catch()
-    .finally()
+interface TagAdmin {
+  id: number
+  name: string
+  slug: string
 }
+
+const { t } = useI18n()
+const page = usePage<InertiaPageProps<{ total: number }>>()
+const headers: DataTableHeader[] = [
+  { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
+  { title: t('main.name'), align: 'start', sortable: false, key: 'name' },
+  { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
+]
+const { items, totalItems, isLoading, loadItems } = useServerTable<TagAdmin>(
+  'admin.tags',
+  page.props.total
+)
 </script>
 
 <template>
@@ -60,15 +55,15 @@ async function loadItems(event) {
             icon
             inertia
           >
-            <v-icon icon="fas fa-eye"></v-icon>
+            <v-icon icon="fas fa-eye" />
           </po-button>
 
           <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-edit"></v-icon>
+            <v-icon icon="fas fa-edit" />
           </po-button>
 
           <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-trash"></v-icon>
+            <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>

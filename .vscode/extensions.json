@@ -12,6 +12,9 @@
     "streetsidesoftware.code-spell-checker-spanish",
     "gruntfuggly.todo-tree",
     "vue.volar",
-    "mskelton.npm-outdated"
+    "mskelton.npm-outdated",
+    "laravel.vscode-laravel",
+    "anthropic.claude-code",
+    "damms005.devdb"
   ]
 }

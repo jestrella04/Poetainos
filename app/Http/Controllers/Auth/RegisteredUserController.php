@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -17,14 +16,6 @@ use Inertia\Response;
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
-     */
-    public function create(): Response
-    {
-        return Inertia::render('Auth/Register');
-    }
-
-    /**
      * Handle an incoming registration request.
      *
      * @throws ValidationException
@@ -33,13 +24,13 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'username' => ['required', 'string', 'min:3', 'max:45', 'unique:users', 'regex:/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/'],
-            'email' => ['required', 'string', 'email', 'max:45', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:250', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'],
             'service_agreement' => ['required', 'accepted'],
             'privacy_agreement' => ['required', 'accepted'],
         ]);
 
-        $user = User::create([
+        $user = User::unguarded(fn (): User => User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -50,10 +41,8 @@ class RegisteredUserController extends Controller
                     'privacy_policy' => $request->privacy_agreement,
                 ],
             ],
-            'role_id' => Role::where('name', 'user')->first()->id,
-        ]);
-
-        // event(new Registered($user));
+            'role_id' => Role::where('name', 'user')->firstOrFail()->id,
+        ]));
 
         Auth::login($user);
         $user->sendEmailVerificationNotification();

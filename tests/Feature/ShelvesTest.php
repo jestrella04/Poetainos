@@ -1,45 +1,74 @@
 <?php
 
-use App\Models\User;
+use App\Models\Shelf;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Notification;
 
-test('a user can shelve and unshelve a writing', function (): void {
-    Notification::fake();
+use function Pest\Laravel\actingAs;
 
-    $author = User::factory()->create();
-    $writing = Writing::factory()->for($author, 'author')->create();
-    $reader = User::factory()->create();
+describe('shelving a writing', function (): void {
+    it('allows a user to shelve and unshelve a writing', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+        $reader = createUser();
 
-    $this->actingAs($reader)->post("/shelves/{$writing->slug}/store")
-        ->assertJson(['method' => 'store', 'count' => 1]);
+        // When
+        $shelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/store");
 
-    Notification::assertSentTo($author, WritingShelved::class);
+        // Then
+        $shelveResponse->assertJson(['method' => 'store', 'count' => 1]);
+        Notification::assertSentTo($author, WritingShelved::class);
 
-    $this->actingAs($reader)->post("/shelves/{$writing->slug}/store")
-        ->assertJson(['method' => 'destroy', 'count' => 0]);
+        // When
+        $unshelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/store");
+
+        // Then
+        $unshelveResponse->assertJson(['method' => 'destroy', 'count' => 0]);
+    });
+
+    it('does not notify the author when they shelve their own writing', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+
+        // When
+        actingAs($author)->post("/shelves/{$writing->slug}/store");
+
+        // Then
+        Notification::assertNothingSent();
+    });
+
+    it('only detaches the acting user when they take the writing off the shelf', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        $reader = createUser();
+        $otherReader = createUser();
+        actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        actingAs($otherReader)->post("/shelves/{$writing->slug}/store");
+
+        // When
+        $response = actingAs($reader)->post("/shelves/{$writing->slug}/store");
+
+        // Then
+        $response->assertJson(['method' => 'destroy', 'count' => 1]);
+    });
 });
 
-test('shelving your own writing does not notify you', function (): void {
-    Notification::fake();
+describe('a double click on the shelf button', function (): void {
+    it('reports the shelving instead of failing when it was already created', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        Shelf::creating(fn () => throw new UniqueConstraintViolationException('sqlite', 'insert', [], new Exception('duplicate')));
 
-    $author = User::factory()->create();
-    $writing = Writing::factory()->for($author, 'author')->create();
+        // When
+        $response = actingAs(createUser())->post("/shelves/{$writing->slug}/store");
 
-    $this->actingAs($author)->post("/shelves/{$writing->slug}/store");
-
-    Notification::assertNothingSent();
-});
-
-test('deleting a shelf entry only detaches the acting user', function (): void {
-    $writing = Writing::factory()->create();
-    $reader = User::factory()->create();
-    $otherReader = User::factory()->create();
-
-    $this->actingAs($reader)->post("/shelves/{$writing->slug}/store");
-    $this->actingAs($otherReader)->post("/shelves/{$writing->slug}/store");
-
-    $this->actingAs($reader)->delete("/shelves/{$writing->slug}/delete")
-        ->assertJson(['method' => 'destroy', 'count' => 1]);
+        // Then
+        $response->assertOk()->assertJson(['method' => 'store']);
+    });
 });

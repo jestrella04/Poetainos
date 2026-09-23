@@ -1,32 +1,26 @@
-<script setup>
-import { router } from '@inertiajs/vue3'
+<script setup lang="ts">
+import type { Method, RequestPayload } from '@inertiajs/core'
+import { useInertiaVisit } from '@/composables/useInertiaVisit'
 
-const props = defineProps({
-  href: String,
-  inertia: Boolean,
-  method: { type: String, default: 'get' },
-  data: Object
-})
-
-function visit() {
-  const visitOptions = { method: props.method }
-  if (props.data) {
-    visitOptions.data = props.data
+const props = withDefaults(
+  defineProps<{
+    href?: string
+    inertia?: boolean
+    method?: Method
+    data?: RequestPayload
+  }>(),
+  {
+    method: 'get'
   }
-  router.visit(props.href, visitOptions)
-}
+)
+
+const { handleClick } = useInertiaVisit(props)
 </script>
 
 <template>
-  <template v-if="!inertia">
-    <v-chip :href="href">
-      <slot />
-    </v-chip>
-  </template>
-
-  <template v-else>
-    <v-chip :href="href" @click.prevent="visit">
-      <slot />
-    </v-chip>
-  </template>
+  <v-chip :href="href" @click="handleClick">
+    <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
+  </v-chip>
 </template>

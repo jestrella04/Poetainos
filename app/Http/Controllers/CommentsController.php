@@ -2,150 +2,97 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RecalculateAura;
 use App\Models\Comment;
-use App\Models\Like;
 use App\Models\User;
+use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
+use App\Services\ContentDeleter;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Pagination\Paginator;
 
 class CommentsController extends Controller
 {
+    private const MAX_MENTIONS = 5;
+
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return Paginator<int, Comment>
      */
-    public function index($writing)
+    public function index(string $writingId): Paginator
     {
-        $filter = [0];
-
-        if (auth()->check()) {
-            $filter = User::find(auth()->user()->id)->blockedAuthors()->pluck('blocked_user_id');
-        }
-
-        $comments = Comment::where('writing_id', $writing)
-            ->whereNotIn('user_id', $filter)
+        $comments = Comment::where('writing_id', $writingId)
+            ->visibleTo($this->blockedAuthorIds())
             ->with([
                 'author' => function ($query): void {
-                    $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
+                    $query->forAuthorSummary();
                 },
             ])
             ->withCount(['likes'])
             ->orderBy('created_at', 'desc')
-            ->simplePaginate($this->pagination);
+            ->simplePaginate($this->perPage);
 
         return $comments;
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
-     *
-     * @return Response
      */
-    public function store(Request $request)
+    public function store(Request $request): void
     {
-        request()->validate([
-            'comment' => 'required|min:1|max:300',
+        $request->validate([
+            'comment' => 'required|string|max:300',
             'writing_id' => 'required|exists:writings,id',
         ]);
 
-        $message = request('comment');
-        $comment = Comment::create([
-            'user_id' => auth()->user()->id,
-            'writing_id' => request('writing_id'),
-            'message' => $message,
+        $user = $this->requireAuthUser();
+        $writing = Writing::findOrFail((int) $request->input('writing_id'));
+
+        $comment = $writing->comments()->create([
+            'user_id' => $user->id,
+            'message' => $request->input('comment'),
         ]);
 
-        // Update aura / karma
-        $comment->author->updateAura();
-        // $comment->author->updateKarma();
-        $comment->writing->updateAura();
+        RecalculateAura::dispatch($user, $writing);
 
         // Notify author
-        if (! $comment->writing->author->is(auth()->user())) {
-            $comment->writing->author->notify(new WritingCommented($comment->writing, auth()->user()));
+        if ($writing->author !== null && $writing->author->isNot($user)) {
+            $writing->author->notify(new WritingCommented($writing, $user));
         }
 
-        // Notify @mentions
-        $mentionPattern = '/\B@[a-zA-Z0-9_-]+/';
-        preg_match_all($mentionPattern, $comment->message, $mentions, PREG_PATTERN_ORDER);
-        $mentions = array_unique($mentions[0]);
-
-        foreach ($mentions as $mention) {
-            $mention = User::where('username', '=', substr($mention, 1))->first();
-
-            if (
-                $mention !== null
-                && ! $mention->is($comment->writing->author)
-                && ! $mention->is(auth()->user())
-            ) {
-                $mention->notify(new WritingCommentMentioned($comment, auth()->user()));
-            }
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @return Response
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return Response
-     */
-    public function edit(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @return Response
-     */
-    public function update(Request $request, Comment $comment)
-    {
-        //
+        $this->notifyMentions($comment, $writing, $user);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @return array
+     * @return array<int, mixed>
      */
-    public function destroy(Comment $comment)
+    public function destroy(Comment $comment, ContentDeleter $deleter): array
     {
         $this->authorize('delete', $comment);
-        $comment->deleteOrFail();
+        $deleter->deleteComment($comment);
 
-        // Delete related notifications
-        DatabaseNotification::where('data->comment_id', $comment->id)->delete();
-
-        // Delete related likes
-        Like::where([
-            ['likeable_type', 'App\Models\Comment'],
-            ['likeable_id', $comment->id],
-        ])->delete();
+        RecalculateAura::dispatch($comment->author, $comment->writing);
 
         return [];
+    }
+
+    /**
+     * Notify the users @mentioned in a comment, up to MAX_MENTIONS of them.
+     * The writing's author and the commenter are already covered elsewhere.
+     */
+    private function notifyMentions(Comment $comment, Writing $writing, User $commenter): void
+    {
+        preg_match_all('/\B@([a-zA-Z0-9_-]+)/', $comment->message, $matches);
+
+        $usernames = array_slice(array_unique($matches[1]), 0, self::MAX_MENTIONS);
+
+        User::whereIn('username', $usernames)
+            ->get()
+            ->reject(fn (User $mentioned): bool => $mentioned->is($commenter) || $mentioned->is($writing->author))
+            ->each(fn (User $mentioned) => $mentioned->notify(new WritingCommentMentioned($comment, $commenter)));
     }
 }

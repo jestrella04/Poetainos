@@ -1,12 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import axios from 'axios'
-import { inject, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { LaravelValidationErrors } from '@/types/http'
 
-const helper = inject('helper')
-const isPosting = ref(false)
+interface Captcha {
+  key: string
+  img: string
+}
+
+const { validationErrors } = useFormErrors()
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 const isPosted = ref(false)
-const captcha = ref({})
-const errors = ref({})
+const captcha = ref<Captcha>({ key: '', img: '' })
 const formData = reactive({
   name: '',
   email: '',
@@ -17,22 +24,14 @@ const formData = reactive({
 })
 
 onMounted(() => {
-  reloadCaptcha()
+  void reloadCaptcha()
 })
 
 async function reloadCaptcha() {
-  await axios
-    .get('/captcha/api/math')
-    .then((response) => {
-      captcha.value = response.data
-      formData.captcha = ''
-    })
-    .catch()
-    .finally()
-}
-
-function clearErrors() {
-  errors.value = {}
+  await axios.get<Captcha>('/captcha/api/math').then((response) => {
+    captcha.value = response.data
+    formData.captcha = ''
+  })
 }
 
 function clearInputs() {
@@ -42,51 +41,42 @@ function clearInputs() {
   formData.message = ''
   formData.key = ''
   formData.captcha = ''
-  reloadCaptcha()
+  void reloadCaptcha()
 }
 
 function resetForm() {
   isPosted.value = false
   clearInputs()
-  clearErrors()
+  errors.value = {}
 }
 
 async function submitForm() {
-  const form = document.querySelector('#contact-form')
-
-  if (!helper.checkFormValidity(form)) {
-    return
-  }
-
-  isPosting.value = true
-
-  await axios
-    .post(form.action, {
+  await postForm({
+    formSelector: '#contact-form',
+    payload: {
       name: formData.name,
       email: formData.email,
       subject: formData.subject,
       message: formData.message,
       key: captcha.value.key,
       captcha: formData.captcha
-    })
-    .then(() => {
+    },
+    cooldown: true,
+    onSuccess: () => {
       resetForm()
       isPosted.value = true
-    })
-    .catch((error) => {
-      errors.value = error.response.data.errors
-      reloadCaptcha()
-    })
-    .finally(
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    )
+    },
+    onError: (error) => {
+      void reloadCaptcha()
+
+      return validationErrors(error)
+    }
+  })
 }
 </script>
 
 <template>
-  <po-head></po-head>
+  <po-head />
   <v-card :title="$t('main.contact-form').toUpperCase()">
     <v-form
       id="contact-form"
@@ -105,7 +95,7 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <v-text-field
         v-model="formData.email"
@@ -118,7 +108,7 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <v-text-field
         v-model="formData.subject"
@@ -131,7 +121,7 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <v-textarea
         v-model="formData.message"
@@ -143,16 +133,24 @@ async function submitForm() {
         persistent-placeholder
         clearable
         required
-      ></v-textarea>
+      />
 
-      <div class="d-flex">
+      <div class="d-flex mb-4">
         <div>
           <img :src="captcha.img" alt="" />
         </div>
 
         <div>
-          <po-button :title="$t('main.reload-captcha')" class="ms-3" @click.prevent="reloadCaptcha">
-            <v-icon icon="fas fa-rotate-right"></v-icon>
+          <po-button
+            :title="$t('main.reload-captcha')"
+            class="ms-3"
+            color="primary"
+            variant="tonal"
+            size="small"
+            @click.prevent="reloadCaptcha"
+            icon
+          >
+            <v-icon icon="fas fa-rotate-right" />
             <span class="d-sr-only">{{ $t('main.reload-captcha') }}</span>
           </po-button>
         </div>
@@ -160,19 +158,17 @@ async function submitForm() {
 
       <v-text-field
         v-model="formData.captcha"
-        label="Captcha"
+        :label="$t('main.captcha')"
         :placeholder="$t('main.validate-not-robot')"
         hide-details="auto"
         :error-messages="errors.captcha"
         persistent-placeholder
         clearable
         required
-      ></v-text-field>
+      />
 
       <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-        <template v-if="isPosting"
-          ><v-progress-circular indeterminate></v-progress-circular
-        ></template>
+        <template v-if="isPosting"><v-progress-circular indeterminate /></template>
         <template v-else>{{ $t('main.send') }}</template>
       </po-button>
     </v-form>
@@ -182,7 +178,8 @@ async function submitForm() {
       type="success"
       variant="tonal"
       class="mb-5 mx-auto"
-      style="width: 85%; max-width: 600px"
+      width="85%"
+      max-width="600"
     >
       {{ $t('main.message-scheduled') }}
     </v-alert>

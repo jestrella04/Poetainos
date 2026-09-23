@@ -1,69 +1,54 @@
-<script setup>
-import { ref, inject } from 'vue'
+<script setup lang="ts">
+import { reactive } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
-import { reactive } from 'vue'
+import { forceSnackBarKey, isDeleteKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { LaravelValidationErrors } from '@/types/http'
 
-defineProps({
-  username: { type: String, required: true }
-})
+defineProps<{
+  username: string
+}>()
 
-const helper = inject('helper')
-const isDelete = inject('isDelete')
-const isPosting = ref(false)
-const errors = ref(false)
-const forceSnackBar = inject('forceSnackBar')
+const { validationErrors } = useFormErrors()
+const { setSnackBar } = useSnackbar()
+const isDelete = injectStrict(isDeleteKey)
+const forceSnackBar = injectStrict(forceSnackBarKey)
 const formData = reactive({
   password: ''
 })
+const { isPosting, errors, submitForm } = useFormSubmit<LaravelValidationErrors>({})
 
-async function submit() {
-  const form = document.querySelector('#user-delete-form')
+async function submit(): Promise<void> {
+  await submitForm({
+    formSelector: '#user-delete-form',
+    payload: { _method: 'DELETE' },
+    preSubmit: async () => {
+      await axios.post(route('password.confirmer'), { password: formData.password })
+    },
+    onSuccess: () => {
+      router.visit(route('home'))
+      setSnackBar({
+        message: 'accounts.account-deleted',
+        color: 'success',
+        active: true
+      })
 
-  if (!helper.checkFormValidity(form)) {
-    return
-  }
-
-  isPosting.value = true
-  errors.value = false
-
-  await axios
-    .post(route('password.confirmer'), {
-      //'_method': 'DELETE',
-      password: formData.password
-    })
-    .then(() => {
-      axios
-        .post(form.action, {
-          _method: 'DELETE'
-        })
-        .then(() => {
-          router.visit(route('home'))
-          helper.setSnackBar({
-            message: 'accounts.account-deleted',
-            color: 'success',
-            active: true
-          })
-
-          forceSnackBar.value = true
-          isDelete.value = false
-        })
-        .catch()
-        .finally()
-    })
-    .catch((error) => {
-      errors.value = error.response.data.errors
-    })
-    .finally(() => {
-      isPosting.value = false
-    })
+      forceSnackBar.value = true
+      isDelete.value = false
+    },
+    onError: validationErrors
+  })
 }
 </script>
 
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('accounts.delete-account')">
-      <po-modal-close @click.prevent="isDelete = false"></po-modal-close>
+      <po-modal-close @click.prevent="isDelete = false" />
       <v-card-text>
         <p class="mb-2">
           {{ $t('accounts.sorry-see-you-go') }}
@@ -75,7 +60,7 @@ async function submit() {
           <p>{{ $t('accounts.delete-account-warning') }}</p>
         </v-alert>
 
-        <v-divider class="mt-3"></v-divider>
+        <v-divider class="mt-3" />
 
         <v-form
           id="user-delete-form"
@@ -92,12 +77,11 @@ async function submit() {
             clearable
             required
             hide-details="auto"
-          >
-          </v-text-field>
+          />
 
           <po-button color="primary" type="submit" block :disabled="isPosting">
             <span v-if="!isPosting">{{ $t('main.delete') }}</span>
-            <v-progress-circular v-else indeterminate></v-progress-circular>
+            <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>
       </v-card-text>

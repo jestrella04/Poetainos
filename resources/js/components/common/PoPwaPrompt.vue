@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 // replaced dynamically
@@ -9,24 +9,19 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
   onRegisteredSW(swUrl, r) {
     console.log(`Service Worker at: ${swUrl}`)
 
-    if (reloadSW === 'true') {
-      r &&
-        setInterval(async () => {
+    if ((reloadSW as string) === 'true') {
+      if (r !== undefined) {
+        setInterval(() => {
           console.log('Checking for sw update')
-          await r.update()
+          void r.update()
         }, intervalMS)
+      }
     } else {
-      console.log(`SW Registered: ${r}`)
+      console.log('SW Registered:', r)
     }
   }
 })
 </script>
-
-<style scoped>
-.v-snackbar {
-  margin: 0 auto;
-}
-</style>
 
 <template>
   <div v-if="needRefresh" class="d-flex w-100 justify-center">
@@ -42,7 +37,7 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
       <div class="w-100 d-flex align-center ga-5">
         <div>
           <v-avatar size="48">
-            <v-img src="/images/logo.svg" alt=""></v-img>
+            <v-img src="/images/logo.svg" alt="" />
           </v-avatar>
         </div>
 

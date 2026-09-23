@@ -14,8 +14,8 @@ Read input via the global `request('field')` helper (or `$request->input()`), no
 ## Multi-method resource-shaped controllers
 Group related actions (index/show/create/edit/store/update/destroy plus custom actions) into one controller class. Reserve `__invoke` for framework-scaffolded single-purpose controllers.
 
-## Fat controllers, no Actions/Services/Repository layer
-Controllers own validation, Eloquent queries (with inline `->with()` eager-loading), and business rules directly in the method. There is no Actions/Services/Repository/Query-object layer to delegate to. Put reusable procedural logic in `app/Helpers/Helper.php` as a global function instead.
+## Multi-step logic lives in app/Services
+Controllers validate, authorize, call, and respond. Eloquent queries with inline `->with()` eager-loading stay in the controller. Multi-step business logic (image processing, aura/karma calculation, verification codes) goes in a plain class under `app/Services`. Small stateless utilities still go in `app/Helpers/Helper.php` as global functions. There is no Actions/Repository/Query-object layer.
 
 ## Implicit route model binding
 Type-hint models directly in controller method signatures for route model binding rather than manual `findOrFail()` lookups.

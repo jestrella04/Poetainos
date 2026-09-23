@@ -102,9 +102,9 @@
   <div class="d-flex align-center h-100">
     <div class="w-100">
       <div class="loader book">
-        <figure class="page"></figure>
-        <figure class="page"></figure>
-        <figure class="page"></figure>
+        <figure class="page" />
+        <figure class="page" />
+        <figure class="page" />
       </div>
 
       <p class="text-h6 text-uppercase">{{ $t('main.reading') }}</p>

@@ -1,4 +1,5 @@
 {
+  "You cannot block yourself.": "No puedes bloquearte a ti mismo.",
   "You have reached your maximum number of posts for today. Please try again tomorrow.": "Alcanzaste el número máximo de publicaciones para hoy. Por favor, inténtalo de nuevo mañana.",
   "\":title\" by :author has been awarded with a #GoldenFlower.": "\":title\" por :author ha sido condecorado con una #FlorDeOro.",
   "\":title\" by :author has just been published on our site.": "\":title\" por :author acaba de ser publicado en nuestro sitio.",
@@ -143,8 +144,8 @@
   "including but not limited to: writings, comments and replies, likes, shelved items, etc.": "incluyendo, entre otros, tus textos, comentarios y respuestas, me gusta, textos agregados a tu estante, etc.",
   "Instagram": "Instagram",
   "Interests": "Intereses",
-  "Isn't it amazing?, :name likes your comment at :site.": "¿Acaso no es maravilloso?, a :name le gusta tu comentario en :site.",
-  "Isn't it amazing?, :name likes your writing at :site.": "¿Acaso no es maravilloso?, a :name le gusta tu texto en :site.",
+  "Isn't it amazing, :name likes your comment at :site.": "¿Acaso no es maravilloso?, a :name le gusta tu comentario en :site.",
+  "Isn't it amazing, :name likes your writing at :site.": "¿Acaso no es maravilloso?, a :name le gusta tu texto en :site.",
   "It's a shame, we can't show more content at the moment.": "Es una pena, en este momento no podemos mostrate más contenido.",
   "It's a shame, we have no more content to show.": "Es una pena, no tenemos más contenido que mostarte.",
   "Latest": "Más recientes",
@@ -345,5 +346,11 @@
   "Your writing has been awarded with a Golden Flower": "Tu texto ha sido condecorado con una Flor de Oro",
   "Your writing was successfully posted.": "Tu texto ha sido publicado con éxito.",
   "Your writing was successfully updated.": "Tu texto ha sido actualizado con éxito.",
-  "Youtube": "Youtube"
+  "Youtube": "Youtube",
+  "The settings must be a JSON object.": "Los ajustes deben ser un objeto JSON.",
+  "The site has not been configured yet.": "El sitio aún no ha sido configurado.",
+  "[:site] Your verification code": "[:site] Tu código de verificación",
+  "Use the following code to verify your email address at :site. It expires in :minutes minutes.": "Usa el siguiente código para verificar tu correo en :site. Expira en :minutes minutos.",
+  "If you did not create an account, you can safely ignore this email.": "Si no creaste una cuenta, puedes ignorar este correo.",
+  "The verification code is invalid or has expired.": "El código de verificación es inválido o ha expirado."
 }

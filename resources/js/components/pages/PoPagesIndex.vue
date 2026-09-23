@@ -1,12 +1,17 @@
-<script setup>
-import { computed } from 'vue'
+<script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
+import type { InertiaPageProps } from '@/types/inertia'
 
-const page = computed(() => usePage())
+interface PageSummary {
+  title: string
+  slug: string
+}
+
+const page = usePage<InertiaPageProps<{ pages: PageSummary[] }>>()
 </script>
 
 <template>
-  <v-card title="Pages List">
+  <v-card :title="$t('pages.pages-list')">
     <v-card-text>
       <v-list>
         <template v-for="data in page.props.pages" :key="data.slug">

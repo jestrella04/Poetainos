@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Writing;
-use Inertia\Inertia;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Response;
 
 class UsersNotificationsController extends Controller
@@ -12,100 +15,79 @@ class UsersNotificationsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return Response|LengthAwarePaginator<int, DatabaseNotification>
      */
-    public function index()
+    public function index(): Response|LengthAwarePaginator
     {
-        $user = auth()->user();
-        $tab = in_array(request('tab'), ['unread', 'all']) ? request('tab') : 'unread';
-        $notifications = [];
+        $user = $this->requireAuthUser();
 
-        if ($tab === 'unread') {
-            $notifications = User::find($user->id)->unreadNotifications()->paginate($this->pagination)->withQueryString();
-        } else {
-            $notifications = User::find($user->id)->notifications()->paginate($this->pagination)->withQueryString();
-        }
+        $tab = in_array(request('tab'), ['unread', 'all'], true) ? request('tab') : 'unread';
 
-        $notifications->map(function ($notification): void {
-            $notification['notifier_user'] =
-                isset($notification->data['user_id'])
-                ? User::select(
-                    'id',
-                    'name',
-                    'username',
-                    'extra_info->avatar AS avatar'
-                )->whereId($notification->data['user_id'])->first()
-                : null;
+        $query = $tab === 'unread' ? $user->unreadNotifications() : $user->notifications();
 
-            $notification['notifier_writing'] =
-                isset($notification->data['writing_id'])
-                ? Writing::select(
-                    'id',
-                    'title',
-                    'slug',
-                )->whereId($notification->data['writing_id'])->first()
-                : null;
-        });
-
-        if (request()->expectsJson()) {
-            return $notifications;
-        }
-
-        return Inertia::render('notifications/PoNotificationsIndex', [
-            'meta' => [],
-            'tab' => $tab,
-            'notifications' => Inertia::optional(fn () => $notifications),
-        ]);
+        return $this->paginatedPage(
+            fn (): LengthAwarePaginator => $this->withNotifiers($query->paginate($this->perPage)->withQueryString()),
+            'notifications/PoNotificationsIndex',
+            [
+                'meta' => [
+                    'title' => getPageTitle([__('Notifications')]),
+                ],
+                'tab' => $tab,
+            ],
+            'notifications',
+        );
     }
 
-    public function clear()
+    public function clear(): RedirectResponse
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        $this->requireAuthUser()->unreadNotifications->markAsRead();
 
-        return redirect(route('notifications.index'));
+        return to_route('notifications.index');
     }
 
-    public function show($notificationId)
+    public function show(string $notificationId): RedirectResponse
     {
-        $notification = auth()->user()->notifications->find($notificationId);
+        $notification = $this->requireAuthUser()->notifications()->findOrFail($notificationId);
 
-        if ($notification) {
-            $notification->markAsRead();
+        $notification->markAsRead();
 
-            if (isset($notification->data['url'])) {
-                $redirectUrl = redirect($notification->data['url']);
-            } else {
-                $redirectUrl = redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'])));
-            }
-
-            return $redirectUrl;
+        if (isset($notification->data['url'])) {
+            return redirect($notification->data['url']);
         }
 
-        return abort(401);
+        return redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'] ?? null)));
     }
 
-    public function email($enable)
+    public function setEmailPreference(string $enable): JsonResponse
     {
-        User::find(auth()->user()->id)->emailNotifications($enable);
+        $this->requireAuthUser()->setEmailNotifications(isTruthy($enable));
 
         return response()->json(null, 204);
     }
 
-    public function status()
+    /**
+     * Attach the user and writing each notification of the page is about.
+     *
+     * @param  LengthAwarePaginator<int, DatabaseNotification>  $notifications
+     * @return LengthAwarePaginator<int, DatabaseNotification>
+     */
+    private function withNotifiers(LengthAwarePaginator $notifications): LengthAwarePaginator
     {
-        $info = auth()->user()->extra_info;
-        $status = [];
+        $notifierUsers = User::forAuthorSummary()
+            ->whereIn('id', $notifications->pluck('data.user_id')->filter()->unique())
+            ->get()
+            ->keyBy('id');
 
-        if (array_key_exists('notifications', $info)) {
-            $status = $info['notifications'];
-        } else {
-            $status['email'] = 'on';
-        }
+        $notifierWritings = Writing::select('id', 'title', 'slug')
+            ->whereIn('id', $notifications->pluck('data.writing_id')->filter()->unique())
+            ->get()
+            ->keyBy('id');
 
-        if (empty($status['email'])) {
-            $status['email'] = 'on';
-        }
+        $notifications->each(function (DatabaseNotification $notification) use ($notifierUsers, $notifierWritings): void {
+            $notification['notifier_user'] = $notifierUsers->get($notification->data['user_id'] ?? null);
+            $notification['notifier_writing'] = $notifierWritings->get($notification->data['writing_id'] ?? null);
+        });
 
-        return $status;
+        return $notifications;
     }
 }

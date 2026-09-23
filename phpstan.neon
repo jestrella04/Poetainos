@@ -1,0 +1,26 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/pestphp/pest/extension.neon
+
+parameters:
+    parseModelCastsMethod: true
+    level: 8
+
+    paths:
+        - app
+        - config
+        - database
+        - routes
+        - tests
+
+    tmpDir: storage/phpstan
+
+    checkOctaneCompatibility: false
+    checkModelProperties: true
+
+    # Pest resolves ->not on chained expectations dynamically.
+    universalObjectCratesClasses:
+        - Pest\Mixins\Expectation
+
+    ignoreErrors:
+        - '#^PHPDoc tag @mixin contains unknown class App\\Models\\IdeHelper[A-Za-z]+\.$#'

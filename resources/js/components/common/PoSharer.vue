@@ -1,19 +1,26 @@
-<script setup>
-import { inject } from 'vue'
+<script setup lang="ts">
+import { sharerKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useSocialLinks } from '@/composables/useSocialLinks'
+import { useFormatting } from '@/composables/useFormatting'
 
-const props = defineProps({
-  linkTitle: { type: String, required: true },
-  linkUrl: { type: String, required: true }
-})
+const props = defineProps<{
+  linkTitle: string
+  linkUrl: string
+}>()
 
-const helper = inject('helper')
-const sharer = inject('sharer')
-const social = helper.shareLinks(props.linkTitle, props.linkUrl)
+const { shareLinks } = useSocialLinks()
+const { cropUrl } = useFormatting()
+const sharer = injectStrict(sharerKey)
+const social = shareLinks(props.linkTitle, props.linkUrl)
 
-function copy(event) {
-  if ('copy' === event.target.closest('.social').id) {
+function copy(event: MouseEvent): void {
+  const target = event.target as HTMLElement
+  const socialEl = target.closest('.social')
+
+  if (socialEl !== null && 'copy' === socialEl.id) {
     event.preventDefault()
-    navigator.clipboard.writeText(props.linkUrl)
+    void navigator.clipboard.writeText(props.linkUrl)
   }
 
   sharer.value = false
@@ -23,10 +30,10 @@ function copy(event) {
 <template>
   <v-dialog width="500" persistent>
     <v-card :title="$t('main.share-content')">
-      <po-modal-close @click.prevent="sharer = false"></po-modal-close>
+      <po-modal-close @click.prevent="sharer = false" />
       <v-card-text class="text-center">
         <p class="text-bold">{{ linkTitle }}</p>
-        <p class="text-disabled">{{ $helper.cropUrl(linkUrl) }}</p>
+        <p class="text-disabled">{{ cropUrl(linkUrl) }}</p>
       </v-card-text>
 
       <div class="d-flex flex-wrap pa-5 ga-3 w-100 justify-center">
@@ -42,7 +49,7 @@ function copy(event) {
               :title="'copy' === data.name ? $t('main.copy-link') : data.name"
               @click="copy"
             >
-              <v-icon :icon="data.icon"></v-icon>
+              <v-icon :icon="data.icon" />
             </po-button>
           </div>
         </template>

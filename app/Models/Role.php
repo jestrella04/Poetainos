@@ -2,17 +2,22 @@
 
 namespace App\Models;
 
+use Database\Factories\RoleFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperRole
+ */
 class Role extends Model
 {
+    /** @use HasFactory<RoleFactory> */
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -23,18 +28,19 @@ class Role extends Model
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @return array<string, string>
      */
-    protected $casts = [
-        'extra_info' => 'array',
-    ];
-
-    public function users()
+    protected function casts(): array
     {
-        return $this->belongsToMany(User::class);
+        return [
+            'extra_info' => 'array',
+        ];
     }
 
-    public function permissions()
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function permissions(): array
     {
         if (isset($this->extra_info['permissions'])) {
             return $this->extra_info['permissions'];

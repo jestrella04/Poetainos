@@ -1,113 +1,129 @@
-<script setup>
-import { provide } from 'vue'
-import PoUsersStats from './partials/PoUsersStats.vue'
+<script setup lang="ts">
+import { computed, provide } from 'vue'
+import { useI18n } from 'vue-i18n'
 import PoUserDropdown from './partials/PoUserDropdown.vue'
+import { userKey } from '@/composables/keys'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
+import { useSocialLinks } from '@/composables/useSocialLinks'
+import type { User } from '@/types/models'
 
-const props = defineProps({
-  data: { type: Object, required: true }
-})
+const props = defineProps<{
+  data: User
+}>()
 
-provide('user', props.data)
+const { t } = useI18n()
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { userDisplayName, relativeDate, readable, cropUrl } = useFormatting()
+const { socialLink } = useSocialLinks()
+
+provide(userKey, props.data)
+
+const headlineStats = computed<{ label: string; value: string }[]>(() => [
+  { label: t('writings.writings'), value: readable(props.data.writings_count) },
+  { label: t('main.likes'), value: readable(props.data.likes_count) },
+  { label: t('main.profile-views'), value: readable(props.data.profile_views) }
+])
+
+const socialLinks = computed<Record<string, string>>(() =>
+  props.data.social ? (JSON.parse(props.data.social) as Record<string, string>) : {}
+)
 </script>
 
 <template>
-  <v-card class="mb-5 pos-relative" elevation="2" rounded>
-    <po-user-dropdown></po-user-dropdown>
+  <div class="position-relative mb-8">
+    <div class="d-flex flex-column flex-md-row ga-8 align-center align-md-start">
+      <po-avatar-award :user="data" avatar-size="112" avatar-color="secondary" />
 
-    <v-card-text>
-      <div class="text-center mb-5">
-        <po-avatar-award
-          v-if="data.karma && ['A', 'B', 'C'].includes(data.karma)"
-          :user="data"
-          avatar-size="96"
-          avatar-color="secondary"
-        />
-        <po-avatar v-else size="96" color="secondary" :user="data" />
-        <p class="font-weight-bold">{{ $helper.userDisplayName(data) }}</p>
-        <p class="text-medium-emphasis">@{{ data.username }}</p>
-      </div>
-
-      <template
-        v-if="!$helper.strNullOrEmpty(data.website) || !$helper.isEmpty(JSON.parse(data.social))"
-      >
-        <div class="d-flex flex-wrap justify-center ga-3 mb-5">
-          <template v-if="!$helper.strNullOrEmpty(data.website)">
-            <div>
-              <po-button icon color="primary" size="x-small" :href="data.website" target="_blank">
-                <v-icon icon="fas fa-globe"></v-icon>
-              </po-button>
-            </div>
-          </template>
-
-          <template v-for="(user, network) in JSON.parse(data.social)" :key="network">
-            <div v-if="!$helper.strNullOrEmpty(user)">
-              <po-button
-                icon
-                color="primary"
-                size="x-small"
-                :href="$helper.socialLink(user, network)"
-                target="_blank"
-              >
-                <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`"></v-icon>
-                <v-icon v-else :icon="`fab fa-${network}`"></v-icon>
-              </po-button>
-            </div>
-          </template>
-        </div>
-      </template>
-
-      <div class="mx-auto" style="width: 100%; max-width: 400px">
-        <p>{{ data.bio }}</p>
-      </div>
-    </v-card-text>
-
-    <v-divider></v-divider>
-    <v-card-actions>
-      <po-users-stats :data="data" :alone="true" />
-    </v-card-actions>
-  </v-card>
-
-  <v-card :subtitle="$t('main.more-info').toUpperCase()">
-    <v-card-text>
-      <v-row v-if="!$helper.strNullOrEmpty(data.created_at)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-calendar" class="mr-2"></v-icon>
-          {{ $t('main.registered') }}:
-        </v-col>
-        <v-col cols="12" md="8">
-          {{ $helper.relativeDate(data.created_at) }}
-        </v-col>
-      </v-row>
-
-      <v-row v-if="!$helper.strNullOrEmpty(data.location)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-map-marker-alt" class="mr-2"></v-icon>
-          {{ $t('main.location') }}:
-        </v-col>
-        <v-col cols="12" md="8">
-          {{ data.location }}
-        </v-col>
-      </v-row>
-
-      <v-row v-if="!$helper.strNullOrEmpty(data.occupation)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-toolbox" class="mr-2"></v-icon>
-          {{ $t('main.occupation') }}:
-        </v-col>
-        <v-col cols="12" md="8">
-          {{ data.occupation }}
-        </v-col>
-      </v-row>
-
-      <v-row v-if="!$helper.strNullOrEmpty(data.interests)">
-        <v-col cols="12" md="4">
-          <v-icon icon="fas fa-masks-theater" class="mr-2"></v-icon>
-          {{ $t('main.interests') }}:</v-col
+      <div class="flex-grow-1 text-center text-md-left">
+        <p
+          v-if="!strNullOrEmpty(data.location)"
+          class="text-uppercase text-eyebrow text-primary ma-0 mb-2"
         >
-        <v-col cols="12" md="8">
-          {{ data.interests }}
-        </v-col>
-      </v-row>
-    </v-card-text>
-  </v-card>
+          {{ data.location }}
+        </p>
+
+        <p id="user-name" class="text-display-large po-prose ma-0 mb-1">
+          {{ userDisplayName(data) }}
+        </p>
+        <p class="ma-0 mb-4">@{{ data.username }}</p>
+
+        <p v-if="!strNullOrEmpty(data.bio)" class="text-title-large po-prose ma-0 mb-4">
+          {{ data.bio }}
+        </p>
+
+        <div class="d-flex flex-wrap justify-center justify-md-start ga-3">
+          <template v-if="!isEmpty(socialLinks)">
+            <template v-for="(user, network) in socialLinks" :key="network">
+              <div v-if="!strNullOrEmpty(user)">
+                <po-button
+                  icon
+                  color="primary"
+                  size="x-small"
+                  :href="socialLink(user, network)"
+                  target="_blank"
+                >
+                  <v-icon v-if="network === 'twitter'" :icon="`fab fa-x-${network}`" />
+                  <v-icon v-else :icon="`fab fa-${network}`" />
+                </po-button>
+              </div>
+            </template>
+          </template>
+
+          <po-user-dropdown />
+        </div>
+      </div>
+
+      <div class="d-flex ga-8 text-center">
+        <div v-for="stat in headlineStats" :key="stat.label">
+          <p class="text-display-small po-prose ma-0 mb-1">{{ stat.value }}</p>
+          <p class="text-uppercase text-eyebrow mb-0">{{ stat.label }}</p>
+        </div>
+      </div>
+    </div>
+
+    <v-divider class="my-6" />
+
+    <v-row>
+      <v-col v-if="!strNullOrEmpty(data.created_at)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.registered') }}
+        </p>
+        <p class="ma-0">{{ relativeDate(data.created_at ?? '') }}</p>
+      </v-col>
+
+      <v-col v-if="!strNullOrEmpty(data.website)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.website') }}
+        </p>
+
+        <p class="ma-0">
+          <po-link
+            :href="data.website"
+            class="text-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ cropUrl(data.website ?? '') }}
+          </po-link>
+        </p>
+      </v-col>
+
+      <v-col v-if="!strNullOrEmpty(data.occupation)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.occupation') }}
+        </p>
+        <p class="ma-0">{{ data.occupation }}</p>
+      </v-col>
+
+      <v-col v-if="!strNullOrEmpty(data.interests)" cols="12" sm="6" md="3">
+        <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
+          {{ $t('main.interests') }}
+        </p>
+        <p class="ma-0">{{ data.interests }}</p>
+      </v-col>
+    </v-row>
+
+    <v-divider class="my-6" />
+  </div>
 </template>

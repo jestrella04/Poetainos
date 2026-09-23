@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -10,17 +9,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
+| routes are loaded by bootstrap/app.php within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/user', [UsersController::class, 'me'])->name('api.user.show');
+    Route::put('/karma/{user}', [UsersController::class, 'recalculateKarma'])->name('api.karma.update');
 });
-
-Route::put('/karma/{user}', function (User $user) {
-    $user->updateKarma();
-
-    return response($user->karma);
-})->name('api.karma.update');

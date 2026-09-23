@@ -1,33 +1,24 @@
-<script setup>
-import { router } from '@inertiajs/vue3'
+<script setup lang="ts">
+import type { Method, RequestPayload } from '@inertiajs/core'
+import { useInertiaVisit } from '@/composables/useInertiaVisit'
 
-const props = defineProps({
-  href: String,
-  inertia: Boolean,
-  method: { type: String, default: 'get' },
-  data: Object
-})
-
-function visit() {
-  // use the programmatic router.visit provided by Inertia
-  const visitOptions = { method: props.method }
-  if (props.data) {
-    visitOptions.data = props.data
+const props = withDefaults(
+  defineProps<{
+    href?: string
+    inertia?: boolean
+    method?: Method
+    data?: RequestPayload
+  }>(),
+  {
+    method: 'get'
   }
-  router.visit(props.href, visitOptions)
-}
+)
+
+const { handleClick } = useInertiaVisit(props)
 </script>
 
 <template>
-  <template v-if="!props.inertia">
-    <v-tab v-bind="$attrs" :href="props.href">
-      <slot />
-    </v-tab>
-  </template>
-
-  <template v-else>
-    <v-tab v-bind="$attrs" :href="props.href" @click.prevent="visit">
-      <slot />
-    </v-tab>
-  </template>
+  <v-tab v-bind="$attrs" :href="props.href" @click="handleClick">
+    <slot />
+  </v-tab>
 </template>

@@ -10,6 +10,7 @@
 /public/.well-known/*
 /bootstrap/ssr/*
 /storage/*.key
+/storage/phpstan
 /vendor
 .env
 .env.backup
@@ -23,3 +24,10 @@ yarn-error.log
 ./idea
 composer-setup.php
 composer.phar
+.claude
+/resources/js/components.d.ts
+/_ide_helper.php
+/_ide_helper_models.php
+/.phpstorm.meta.php
+/graphify-out
+/tests/Browser/Screenshots

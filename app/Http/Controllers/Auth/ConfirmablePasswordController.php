@@ -21,10 +21,14 @@ class ConfirmablePasswordController extends Controller
 
     /**
      * Confirm the user's password.
+     *
+     * @return JsonResponse|array<int|string, mixed>
      */
     public function store(Request $request): JsonResponse|array
     {
-        if (! Hash::check($request->password, $request->user()->password)) {
+        $user = $request->user();
+
+        if ($user === null || ! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'errors' => [
                     'password' => [__('The provided password does not match our records.')],

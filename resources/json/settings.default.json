@@ -35,18 +35,14 @@
   },
   "aura": {
     "min_at_home": {
-      "value": 10,
+      "value": 1,
       "description": "The minimum aura for a writing to be displayed on homepage."
     },
     "points": {
       "writing": {
-        "uplike": {
+        "like": {
           "value": 200,
-          "description": "How many points a writing will earn every time it gets a new uplike."
-        },
-        "downlike": {
-          "value": 1,
-          "description": "How many points a writing will earn every time it gets a new downlike."
+          "description": "How many points a writing will earn every time it gets a new like."
         },
         "comment": {
           "value": 100,
@@ -118,6 +114,12 @@
       "value": "",
       "icon": "fas fa-shopping-bag",
       "description": "URL to get the application on Samsung Finder."
+    }
+  },
+  "writings": {
+    "daily_post_limit": {
+      "value": 3,
+      "description": "The maximum number of writings a user can publish per day."
     }
   }
 }

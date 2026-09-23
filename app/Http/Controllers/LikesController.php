@@ -3,153 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
-use App\Models\Like;
 use App\Models\Writing;
-use App\Notifications\CommentLiked;
-use App\Notifications\WritingLiked;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Services\Reactions\LikeReaction;
+use App\Services\Reactions\ReactionToggler;
 
 class LikesController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Toggles the like: creates it if the user hasn't liked this resource
+     * yet, or removes it if they already have.
      *
-     * @return Response
+     * @return array{method: string, count: int}
      */
-    public function index()
+    public function store(string $likeable, string $likeableId, ReactionToggler $toggler): array
     {
-        //
+        return $toggler->toggle(
+            new LikeReaction($this->resolveLikeable($likeable, $likeableId)),
+            $this->requireAuthUser(),
+        );
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
+     * Resolve the polymorphic target of a like from its route type and id.
      */
-    public function create()
+    private function resolveLikeable(string $likeable, string $likeableId): Writing|Comment
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  Request  $request
-     * @return array
-     */
-    public function store($likeable, $likeable_id)
-    {
-        $like = new Like;
-        $like->user_id = auth()->user()->id;
-        $like->vote = 1;
-
-        if ($likeable == 'writing') {
-            $like->likeable()->associate(Writing::find($likeable_id));
-        } elseif ($likeable == 'comment') {
-            $like->likeable()->associate(Comment::find($likeable_id));
+        if (! is_numeric($likeableId)) {
+            abort(404);
         }
 
-        // Check existence
-        $exist = Like::where([
-            ['user_id', $like->user_id],
-            ['likeable_type', $like->likeable_type],
-            ['likeable_id', $like->likeable_id],
-        ])->count();
-
-        if ($exist > 0) {
-            return $this->destroy($likeable, $likeable_id);
-        }
-
-        $like->save();
-
-        // Update aura / karma
-        $like->user->updateAura();
-        // $like->user->updateKarma();
-
-        if ($likeable == 'writing') {
-            $like->likeable->updateAura();
-
-            // Notify writing author
-            if ($like->likeable->author->isNot(auth()->user())) {
-                $like->likeable->author->notify(
-                    new WritingLiked($like->likeable, auth()->user())
-                );
-            }
-        }
-
-        if ($likeable == 'comment') {
-            // Notify comment author
-            if ($like->likeable->author->isNot(auth()->user())) {
-                $like->likeable->author->notify(
-                    new CommentLiked($like->likeable, auth()->user())
-                );
-            }
-        }
-
-        return [
-            'method' => 'store',
-            'count' => $like->likeable->likes()->count(),
-        ];
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @return Response
-     */
-    public function show(Like $like)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return Response
-     */
-    public function edit(Like $like)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @return Response
-     */
-    public function update(Request $request, Like $like)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  Like  $like
-     * @return array
-     */
-    public function destroy($likeable, $likeable_id)
-    {
-        if ($likeable == 'writing') {
-            Like::where([
-                ['likeable_type', 'App\Models\Writing'],
-                ['likeable_id', $likeable_id],
-                ['user_id', auth()->user()->id],
-            ])->delete();
-            $count = Writing::find($likeable_id)->likes()->count();
-        } elseif ($likeable == 'comment') {
-            Like::where([
-                ['likeable_type', 'App\Models\Comment'],
-                ['likeable_id', $likeable_id],
-                ['user_id', auth()->user()->id],
-            ])->delete();
-            $count = Comment::find($likeable_id)->likes()->count();
-        }
-
-        return [
-            'method' => 'destroy',
-            'count' => $count,
-        ];
+        return match ($likeable) {
+            'writing' => Writing::findOrFail((int) $likeableId),
+            'comment' => Comment::findOrFail((int) $likeableId),
+            default => abort(404),
+        };
     }
 }

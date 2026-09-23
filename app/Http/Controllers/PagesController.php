@@ -12,43 +12,21 @@ class PagesController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return Response
      */
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('pages/PoPagesIndex', [
-            'meta' => [],
+            'meta' => [
+                'title' => getPageTitle([__('Pages')]),
+            ],
             'pages' => Page::all(),
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response | void
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response | void
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
-     *
-     * @return Response
      */
-    public function show(Page $page)
+    public function show(Page $page): Response
     {
         $page->text = hydrateSettings($page->text);
 
@@ -61,22 +39,11 @@ class PagesController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response | void
-     */
-    public function edit(Page $page)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param  Page  $page
-     * @return \Illuminate\Http\Response | array
+     * @return array<string, mixed>
      */
-    public function update(Request $request)
+    public function update(Request $request): array
     {
         // Get type model
         $page = Page::where('id', request('id'))->firstOrNew();
@@ -88,26 +55,25 @@ class PagesController extends Controller
             'text' => 'required|string|min:100',
         ]);
 
+        $action = $page->exists ? 'update' : 'create';
+
         // Update accordingly
         $page->title = request('title');
         $page->text = request('text');
 
-        if (! $page->exists) {
-            $action = 'create';
+        if ($action === 'create') {
             $page->slug = slugify($page->getTable(), request('title'));
         }
 
         $page->save();
 
-        if (isset($action) && $action === 'create') {
-            $message = __('Page created successfully');
-        } else {
-            $message = __('Page updated successfully');
-        }
+        $message = $action === 'create'
+            ? __('Page created successfully')
+            : __('Page updated successfully');
 
         return [
             'message' => $message,
-            'action' => $action ?? 'update',
+            'action' => $action,
             'id' => $page->id,
         ];
     }
@@ -115,9 +81,9 @@ class PagesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response | array
+     * @return array<string, string>
      */
-    public function destroy(Page $page)
+    public function destroy(Page $page): array
     {
         $page->delete();
 

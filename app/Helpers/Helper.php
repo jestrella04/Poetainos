@@ -1,16 +1,24 @@
 <?php
 
-use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-function getSiteConfig($path = '')
+/**
+ * A site setting by dot path, or every setting when the path is empty. A
+ * setting is stored as `{"description": …, "value": …}`; asking for it returns
+ * just the value.
+ */
+function getSiteConfig(string $path = ''): mixed
 {
-    if (! empty($path)) {
-        $path = config('writerhood.'.$path);
+    if ($path !== '') {
+        $path = config('poetainos.'.$path);
     } else {
-        $path = config('writerhood');
+        $path = config('poetainos');
     }
 
     if (is_array($path) && Arr::exists($path, 'value')) {
@@ -20,33 +28,40 @@ function getSiteConfig($path = '')
     }
 }
 
-function slugify($table, $title, $column = 'slug', $separator = '-')
+function slugify(string $table, string $title, string $column = 'slug', string $separator = '-'): string
 {
+    // Slugs that would be swallowed by a static route such as /writings/random
+    $reserved = ['create', 'edit', 'delete', 'store', 'random', 'awards', 'query'];
+
     // Normalize the title
-    $slug = Str::of($title)->slug($separator);
+    $slug = Str::of($title)->slug($separator)->toString();
 
     // Get any slug that could possibly be related.
     // This cuts the queries down by doing it once.
-    $allSlugs = getRelatedIdentifiers($table, $slug, $column);
+    $usedSlugs = existingSlugsLike($table, $slug, $column)->pluck($column);
+
+    $isTaken = fn (string $candidate): bool => in_array($candidate, $reserved, true)
+        || $usedSlugs->contains($candidate);
 
     // If we haven't used it before then we are all good.
-    if (! $allSlugs->contains($column, $slug)) {
+    if ($isTaken($slug) === false) {
         return $slug;
     }
 
-    // Just append numbers like a savage until we find one not used.
-    for ($i = 1; $i <= 10; $i++) {
-        $newSlug = $slug.$separator.$i;
+    // Otherwise append the first number that is still free.
+    $suffix = 1;
 
-        if (! $allSlugs->contains($column, $newSlug)) {
-            return $newSlug;
-        }
+    while ($isTaken($slug.$separator.$suffix)) {
+        $suffix++;
     }
 
-    throw new Exception('Can not create a unique slug');
+    return $slug.$separator.$suffix;
 }
 
-function getRelatedIdentifiers($table, $slug, $column)
+/**
+ * @return Collection<int, stdClass>
+ */
+function existingSlugsLike(string $table, string $slug, string $column): Collection
 {
     return DB::table($table)
         ->select($column)
@@ -54,84 +69,84 @@ function getRelatedIdentifiers($table, $slug, $column)
         ->get();
 }
 
-function getNotificationMessage($notification)
+/**
+ * @param  array<int, string>  $titleParts
+ */
+function getPageTitle(array $titleParts, string $separator = '–'): string
 {
-    switch ($notification->type) {
-        case 'App\Notifications\WritingCommented':
-            $message = __(':name has added a comment on your writing', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case 'App\Notifications\WritingCommentMentioned':
-        case 'App\Notifications\WritingReplyMentioned':
-            $message = __(':name has mentioned you in a comment', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case 'App\Notifications\WritingFeatured':
-            $message = __('Your writing has been awarded with a Golden Flower');
-            break;
-
-        case 'App\Notifications\WritingLiked':
-            $message = __(':name has liked your writing', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case 'App\Notifications\WritingReplied':
-            $message = __(':name has posted a reply to one of your comments', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case 'App\Notifications\WritingShelved':
-            $message = __(':name has added your writing to his shelf', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-
-        case 'App\Notifications\CommentLiked':
-            $message = __(':name has liked your comment', [
-                'name' => User::find($notification->data['user_id'])->getName(),
-            ]);
-            break;
-        default:
-            $message = false;
-    }
-
-    return $message;
-}
-
-function getPageTitle(array $titleParts, $separator = '–')
-{
-    $titleParts[] = getSiteConfig(('name'));
+    $titleParts[] = getSiteConfig('name');
 
     return implode(" {$separator} ", $titleParts);
 }
 
-function isTruthy($string)
+function isTruthy(mixed $value): bool
 {
-    $string = strtolower($string);
-
-    if (! empty($string) && in_array($string, [1, '1', true, 'true', 'on', 'yes'], true)) {
-        return true;
-    }
-
-    return false;
+    return in_array(strtolower((string) $value), ['1', 'true', 'on', 'yes'], true);
 }
 
-function hydrateSettings($text)
+function hydrateSettings(string $text): string
 {
-    return preg_replace_callback(
+    return (string) preg_replace_callback(
         '/{{([^}]+)}}/',
         fn ($matches) => getSiteConfig($matches[1]),
         $text
     );
 }
 
-function inRange($value, $min, $max)
+/**
+ * Whether a post-login "redirect" target is a same-site relative path,
+ * safe to hand to Redirect::setIntendedUrl(). Rejects absolute and
+ * protocol-relative URLs so the value can't be used for an open redirect.
+ */
+function isSafeRedirectPath(?string $url): bool
 {
-    return $value >= $min && $value < $max;
+    if ($url === null || $url === '') {
+        return false;
+    }
+
+    if (str_starts_with($url, '//') || str_contains($url, '://')) {
+        return false;
+    }
+
+    return str_starts_with($url, '/');
+}
+
+/**
+ * Resolve a request's `sort` value against a controller-specific whitelist,
+ * falling back to a default when the value is missing or not allowed.
+ *
+ * @param  array<int, string>  $allowed
+ */
+function resolveSort(array $allowed, string $default = 'latest'): string
+{
+    return in_array(request('sort'), $allowed, true) ? request('sort') : $default;
+}
+
+/**
+ * Random writings for a "related content" widget, with each one's author
+ * summary eager-loaded (the shape every such widget needs).
+ *
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @param  Builder<TModel>|Relation<TModel, *, *>  $query  A query builder, or a relation (e.g. $user->writings()) — both proxy with()/inRandomOrder()/take()/get() to the underlying builder.
+ * @return EloquentCollection<int, TModel>
+ */
+function randomWritingsWithAuthor(Builder|Relation $query, int $take = 5): EloquentCollection
+{
+    return $query
+        ->with(['author' => function ($authorQuery): void {
+            $authorQuery->forAuthorSummary();
+        }])
+        ->inRandomOrder()
+        ->take($take)
+        ->get();
+}
+
+/**
+ * Escape the characters that act as wildcards in a SQL LIKE pattern, so
+ * user input matches literally.
+ */
+function escapeLike(string $value): string
+{
+    return addcslashes($value, '\\%_');
 }

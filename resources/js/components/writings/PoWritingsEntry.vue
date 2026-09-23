@@ -1,215 +1,189 @@
-<script setup>
-import { ref, provide } from 'vue'
+<script setup lang="ts">
+import { computed, ref, provide } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
-import PoWritingStats from './partials/PoWritingStats.vue'
+import PoWritingExtras from './partials/PoWritingExtras.vue'
 import PoWritingDropdown from './partials/PoWritingDropdown.vue'
+import { loadingCommentsKey, writingKey } from '@/composables/keys'
+import { useAuth } from '@/composables/useAuth'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormatting } from '@/composables/useFormatting'
+import type { UserLike, Writing } from '@/types/models'
 
-const props = defineProps({
-  alone: { type: Boolean, default: true },
-  data: { type: Object, required: true },
-  likers: Object
-})
+const props = withDefaults(
+  defineProps<{
+    alone?: boolean
+    hero?: boolean
+    hideAuthor?: boolean
+    data: Writing
+    likers?: UserLike[]
+  }>(),
+  {
+    alone: true,
+    hero: false,
+    hideAuthor: false
+  }
+)
 
+const { authUser } = useAuth()
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { storage, toLocaleDate, userDisplayName, excerpt, readable } = useFormatting()
 const loadingComments = ref(true)
+const page = usePage()
+const hasCover = computed(
+  () => !isEmpty(props.data.extra_info) && !strNullOrEmpty(props.data.extra_info?.cover)
+)
+const isLiked = computed(() => page.props.auth.liked.writings.includes(props.data.id))
+const isShelved = computed(() => page.props.auth.shelved.includes(props.data.id))
+const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
+const hasSideCover = computed(() => hasCover.value && !props.alone)
+const isProminent = computed(() => props.alone || props.hero)
+const listSpacingClass = computed(() => (props.hero ? 'pb-16' : 'py-12 border-b'))
+// The hero writing may also be listed below it, so its DOM id needs its own prefix to stay unique
+const domId = computed(() =>
+  props.hero ? `hero-writing-${props.data.id}` : `writing-${props.data.id}`
+)
 
-provide('loadingComments', loadingComments)
-provide('writing', props.data)
+provide(loadingCommentsKey, loadingComments)
+provide(writingKey, props.data)
 </script>
-
-<style scoped>
-.writing-title {
-  line-height: 1.6rem !important;
-  margin-bottom: 0.3rem;
-}
-
-.writing-body {
-  white-space: pre-wrap !important;
-}
-</style>
 
 <template>
   <po-wrapper>
-    <v-card :class="{ 'pos-relative': true, 'writing-container': !alone }" elevation="2" rounded>
-      <po-writing-dropdown></po-writing-dropdown>
-      <template
-        v-if="!$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.cover)"
-      >
-        <v-img
-          class="align-end text-white"
-          height="200"
-          :src="$helper.storage(data.extra_info.cover)"
-          alt=""
-          cover
-        >
-          <div class="text-center py-3">
-            <po-link :href="route('users.show', data.author.username)" inertia>
-              <po-avatar-award
-                v-if="data.author.karma && ['A', 'B', 'C'].includes(data.author.karma)"
-                :user="data.author"
-                avatar-size="64"
-                avatar-color="secondary"
-                avatar-class="avatar-shadow"
-              />
-              <po-avatar
-                v-else
-                size="64"
-                color="secondary"
-                :user="data.author"
-                class="avatar-shadow"
-              />
-            </po-link>
+    <article :id="domId" :class="{ [listSpacingClass]: !alone }" class="pe-md-8">
+      <v-img
+        v-if="hasCover && alone"
+        height="320"
+        :src="storage(data.extra_info?.cover ?? '')"
+        alt=""
+        class="mb-6"
+        rounded
+        cover
+      />
+
+      <v-row>
+        <v-col v-if="hasSideCover" cols="12" md="3" order="1" order-md="2">
+          <v-img height="200" :src="storage(data.extra_info?.cover ?? '')" alt="" rounded cover />
+        </v-col>
+
+        <v-col cols="12" :md="hasSideCover ? 9 : 12" order="2" order-md="1">
+          <div class="d-flex ga-4">
+            <span class="text-medium-emphasis text-uppercase text-eyebrow ma-0">
+              {{ toLocaleDate(data.created_at) }}
+            </span>
+
+            <template v-if="!strNullOrEmpty(data.home_posted_at)">
+              <v-chip color="primary" variant="tonal" size="small">
+                <v-icon icon="fas fa-fan" class="mr-2" />
+                <span class="text-uppercase" :title="$t('writings.awarded')">
+                  {{ $t('main.awarded') }}
+                </span>
+              </v-chip>
+            </template>
           </div>
-        </v-img>
-      </template>
 
-      <div v-else class="text-center pt-6">
-        <po-link :href="route('users.show', data.author.username)" inertia>
-          <po-avatar-award
-            v-if="data.author.karma && ['A', 'B', 'C'].includes(data.author.karma)"
-            :user="data.author"
-            avatar-size="64"
-            avatar-color="secondary"
-          />
-          <po-avatar v-else size="64" color="secondary" :user="data.author" />
-        </po-link>
-      </div>
-
-      <v-card-text class="pos-relative pt-1">
-        <div class="text-center mb-3">
-          <p class="text-h6 text-uppercase writing-title">
-            <po-link
-              v-if="!alone"
-              :href="route('writings.show', data.slug)"
-              class="stretched"
-              inertia
+          <div class="position-relative">
+            <p
+              :id="`${domId}-title`"
+              :class="isProminent ? 'text-display-large' : 'text-display-small'"
+              class="po-prose ma-0 mb-2"
             >
-              {{ data.title }}
-            </po-link>
-            <span v-else>{{ data.title }}</span>
-          </p>
-
-          <p class="text-caption text-uppercase text-medium-emphasis">
-            {{
-              `${$helper.toLocaleDate(data.created_at)}
-            — ${$t('main.by-name', { name: $helper.userDisplayName(data.author) })}
-            `
-            }}
-          </p>
-        </div>
-
-        <template v-if="alone">
-          <blockquote class="writing-body mb-4">
-            {{ data.text }}
-          </blockquote>
-
-          <template
-            v-if="
-              !$helper.isEmpty(data.extra_info) && !$helper.strNullOrEmpty(data.extra_info.link)
-            "
-          >
-            <div class="d-flex align-center mb-4">
-              <v-icon icon="fas fa-link" size="24" class="mr-3"></v-icon>
-              <po-link :href="data.extra_info.link" target="_blank" rel="nofollow noopener">
-                {{ $helper.cropUrl(data.extra_info.link) }}
+              <po-link
+                v-if="!alone"
+                :href="route('writings.show', data.slug)"
+                class="stretched"
+                inertia
+              >
+                {{ data.title }}
               </po-link>
-            </div>
-          </template>
+              <template v-else>{{ data.title }}</template>
+            </p>
 
-          <div class="d-flex flex-column ga-3 mb-4">
-            <div v-if="!$helper.isEmpty(data.categories)" class="d-flex">
-              <div class="mr-3">
-                <v-icon icon="fas fa-folder-open" size="24"></v-icon>
-              </div>
+            <div class="d-flex align-center flex-wrap mb-4 ga-6">
+              <po-link
+                v-if="!hideAuthor"
+                :id="`${domId}-author`"
+                :href="route('users.show', data.author.username)"
+                inertia
+              >
+                <po-avatar-award
+                  :user="data.author"
+                  avatar-size="28"
+                  avatar-color="primary"
+                  class="me-1"
+                />
+                {{ userDisplayName(data.author) }}
+              </po-link>
 
-              <div class="d-inline-flex flex-wrap ga-1">
-                <po-chip
-                  v-for="category in data.categories"
-                  :key="category.slug"
-                  color="secondary"
-                  variant="elevated"
-                  size="small"
-                  :href="route('categories.show', category.slug)"
-                  inertia
-                >
-                  {{ category.name }}
-                </po-chip>
-              </div>
-            </div>
+              <div class="d-inline-flex align-center ga-3 text-medium-emphasis">
+                <span>
+                  {{ $t('main.count-views', { count: readable(data.views) }, data.views) }}
+                </span>
 
-            <div v-if="!$helper.isEmpty(data.tags)" class="d-flex">
-              <div class="mr-3">
-                <v-icon icon="fas fa-hashtag" size="24"></v-icon>
-              </div>
-
-              <div class="d-inline-flex flex-wrap ga-1">
-                <po-chip
-                  v-for="tag in data.tags"
-                  :key="tag.slug"
-                  color="secondary"
-                  variant="elevated"
-                  size="small"
-                  :href="route('tags.show', tag.slug)"
-                  inertia
-                >
-                  {{ tag.name }}
-                </po-chip>
+                <span>
+                  {{
+                    $t(
+                      'main.count-comments',
+                      { count: readable(data.comments_count) },
+                      data.comments_count
+                    )
+                  }}
+                </span>
               </div>
             </div>
+
+            <p
+              :class="[
+                isProminent ? 'text-headline-small' : 'text-title-large',
+                { 'text-pre-wrap': alone }
+              ]"
+              class="po-prose mb-6"
+            >
+              {{ alone ? data.text : excerpt(data.text) }}
+            </p>
           </div>
 
-          <div v-if="!$helper.isEmpty(likers)">
-            <p class="text-caption mb-2">{{ $t('main.liked-by') }}</p>
+          <po-writing-extras v-if="alone" :data="data" :likers="likers" />
 
-            <div class="d-inline-flex flex-wrap ga-2">
-              <div v-for="liker in likers" :key="liker.id">
-                <po-button
-                  icon
-                  :href="route('users.show', liker.username)"
-                  :title="$helper.userDisplayName(liker)"
-                  inertia
-                >
-                  <po-avatar size="48" color="secondary" :user="liker" />
-                </po-button>
-              </div>
-              <div v-if="likers.length > 5">
-                <v-avatar size="48" color="secondary" text="+" />
-              </div>
-            </div>
+          <div class="d-flex ga-2">
+            <po-reaction-button
+              :id="`${domId}-like`"
+              icon="fa-heart"
+              :count="data.likes_count"
+              :is-active="isLiked"
+              :post-url="route('likes.store', ['writing', data.id])"
+              :can-react="canReactToWriting"
+              :activate-title="$t('writings.like-writing')"
+              :deactivate-title="$t('writings.unlike-writing')"
+            />
+
+            <po-reaction-button
+              :id="`${domId}-shelve`"
+              icon="fa-bookmark"
+              :count="data.shelf_count"
+              :is-active="isShelved"
+              :post-url="route('shelves.store', data.slug)"
+              :can-react="canReactToWriting"
+              :activate-title="$t('writings.shelve-writing')"
+              :deactivate-title="$t('writings.unshelve-writing')"
+            />
+
+            <po-writing-dropdown :id-prefix="domId" />
           </div>
-        </template>
-
-        <template v-else>
-          <blockquote class="writing-body">
-            {{ $helper.excerpt(data.text) }}
-          </blockquote>
-        </template>
-      </v-card-text>
-
-      <v-divider></v-divider>
-      <v-card-actions>
-        <po-writing-stats></po-writing-stats>
-      </v-card-actions>
-    </v-card>
+        </v-col>
+      </v-row>
+    </article>
 
     <template v-if="alone">
-      <v-skeleton-loader
-        v-if="loadingComments"
-        :elevation="2"
-        type="list-item-avatar"
-        class="mb-2"
-      ></v-skeleton-loader>
-      <v-skeleton-loader
-        v-if="loadingComments"
-        :elevation="2"
-        type="list-item-avatar"
-        class="mb-2"
-      ></v-skeleton-loader>
-      <v-skeleton-loader
-        v-if="loadingComments"
-        :elevation="2"
-        type="list-item-avatar"
-        class="mb-2"
-      ></v-skeleton-loader>
+      <template v-if="loadingComments">
+        <v-skeleton-loader
+          v-for="n in 3"
+          :key="n"
+          :elevation="2"
+          type="list-item-avatar"
+          class="mb-2"
+        />
+      </template>
 
       <po-comments-index />
     </template>

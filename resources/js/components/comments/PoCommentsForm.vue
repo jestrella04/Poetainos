@@ -1,39 +1,36 @@
-<script setup>
-import { inject, ref } from 'vue'
-import axios from 'axios'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { replyBoxKey, writingKey } from '@/composables/keys'
+import { injectStrict } from '@/composables/injectStrict'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { LaravelValidationErrors } from '@/types/http'
 
-const props = defineProps({
-  formId: { type: String, required: true },
-  replyTo: String
-})
+const props = defineProps<{
+  formId: string
+  replyTo?: string
+}>()
 
-const emit = defineEmits('commentPosted')
-const helper = inject('helper')
-const writing = inject('writing')
+const emit = defineEmits<{
+  commentPosted: []
+}>()
+const { validationErrors } = useFormErrors()
+const { errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
+const writing = injectStrict(writingKey)
 const message = ref(props.replyTo)
-const errorMessages = ref([])
-const replyBox = inject('replyBox')
+const replyBox = injectStrict(replyBoxKey)
 
 async function submitForm() {
-  const form = document.querySelector(`#${props.formId}`)
-
-  if (!helper.checkFormValidity(form)) {
-    return
-  }
-
-  errorMessages.value = []
-
-  await axios
-    .post(form.action, { writing_id: writing.id, comment: message.value })
-    .then(() => {
+  await postForm({
+    formSelector: `#${props.formId}`,
+    payload: { writing_id: writing.id, comment: message.value },
+    onSuccess: () => {
       message.value = ''
       emit('commentPosted')
       replyBox.value = 0
-    })
-    .catch((error) => {
-      errorMessages.value = error.response.data.errors.comment
-    })
-    .finally(() => {})
+    },
+    onError: validationErrors
+  })
 }
 </script>
 
@@ -45,18 +42,29 @@ async function submitForm() {
     @submit.prevent="submitForm"
   >
     <v-textarea
+      :id="`${formId}-message`"
       v-model="message"
       :label="$t('comments.comment')"
       :placeholder="$t('comments.comment-mention', { at: '@' })"
       rows="3"
       max-length="300"
       hide-details="auto"
-      :error-messages="errorMessages"
+      :error-messages="errors.comment"
       auto-grow
       clearable
       persistent-placeholder
       required
-    ></v-textarea>
-    <po-button type="submit" block class="mt-1">{{ $t('comments.post-comment') }}</po-button>
+    />
+
+    <po-button
+      :id="`${formId}-submit`"
+      color="primary"
+      variant="tonal"
+      class="mt-1"
+      type="submit"
+      block
+    >
+      {{ $t('comments.post-comment') }}
+    </po-button>
   </v-form>
 </template>

@@ -1,48 +1,84 @@
-<script setup>
-import { inject, provide, reactive, computed, ref, watch, onMounted } from 'vue'
+<script setup lang="ts">
+import { provide, reactive, computed, ref, watch, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 import PoWritingDelete from './partials/PoWritingDelete.vue'
+import { formDataKey, isDeleteKey } from '@/composables/keys'
+import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useFormErrors } from '@/composables/useFormErrors'
+import { useFormSubmit } from '@/composables/useFormSubmit'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { LaravelValidationErrors } from '@/types/http'
 
-const page = computed(() => usePage())
-const helper = inject('helper')
-const writing = page.value.props.writing
+interface CategoryOption {
+  id: number
+  name: string
+}
+
+interface CategoryWithDescendants extends CategoryOption {
+  descendants: CategoryOption[]
+}
+
+interface WritingFormProps {
+  writing: {
+    data: {
+      title?: string
+      text?: string
+      slug?: string
+      extra_info?: { link?: string; cover?: string } | null
+    }
+    main_category: number | null
+    categories: number[]
+    tags: string[] | null
+  }
+  main_categories: CategoryWithDescendants[]
+  'max-file-size': number
+  agreement: boolean
+  isUpdate: boolean
+}
+
+interface PostedResult {
+  url: string
+}
+
+const page = usePage<InertiaPageProps<WritingFormProps>>()
+const { t } = useI18n()
+const { isEmpty } = useTypeGuards()
+const { validationErrors } = useFormErrors()
+const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
+
+function requiredLabel(key: string): string {
+  return `${t(key)} *`
+}
+const writing = page.props.writing
 const formData = reactive({
-  title: (writing.data.title ??= ''),
-  main_category: null, // Properly set onMounted
-  alt_categories: [], // Properly set onMounted
-  tags: (writing.tags ??= []),
-  text: (writing.data.text ??= ''),
+  title: writing.data.title ?? '',
+  main_category: null as number | null, // Properly set onMounted
+  alt_categories: [] as number[], // Properly set onMounted
+  tags: [...(writing.tags ?? [])],
+  text: writing.data.text ?? '',
   link: '',
-  cover: []
+  cover: [] as File[],
+  serviceAgreement: false,
+  privacyAgreement: false
 })
-const errors = ref({})
-const mainCategories = ref(page.value.props.main_categories)
-const altCategories = ref([])
-const isPosting = ref(false)
-const isPosted = ref({})
-const isUpdate = ref(false)
+const mainCategories = ref(page.props.main_categories)
+const altCategories = ref<CategoryOption[]>([])
+const isPosted = ref<Partial<PostedResult>>({})
+const isUpdate = ref(page.props.isUpdate)
 const isDelete = ref(false)
 
-provide('formData', formData)
-provide('isDelete', isDelete)
+provide(formDataKey, formData)
+provide(isDeleteKey, isDelete)
 
 onMounted(() => {
-  // Is the user updating?
-  isUpdate.value = !helper.strNullOrEmpty(writing.data.title)
-
   // If updating, trigger category update
-  if (isUpdate.value) {
+  if (isUpdate.value === true) {
     formData.main_category = writing.main_category
     formData.alt_categories = writing.categories
   }
 
-  // Logic needed to assign below values
-  if (
-    'extra_info' in writing.data &&
-    !helper.isNull(writing.data.extra_info) &&
-    'link' in writing.data.extra_info
-  ) {
+  if (writing.data.extra_info?.link !== undefined) {
     formData.link = writing.data.extra_info.link
   }
 })
@@ -51,24 +87,17 @@ watch(
   () => formData.main_category,
   (newValue, oldValue) => {
     // Clear selections (but not on first load)
-    if (!helper.isNull(oldValue) && newValue > 0) {
+    if (oldValue !== null && (newValue ?? 0) > 0) {
       formData.alt_categories = []
     }
 
     // Set new options
-    if (parseInt(formData.main_category) > 0) {
-      altCategories.value = JSON.parse(
-        JSON.stringify(
-          Object.values(mainCategories.value).filter((category) => {
-            return category.id === formData.main_category
-          })
-        )
-      )[0].descendants
-    } else {
-      altCategories.value = []
-    }
+    const selected = mainCategories.value.find((category) => category.id === formData.main_category)
+    altCategories.value = selected !== undefined ? selected.descendants : []
   }
 )
+
+const isAltCategoriesDisabled = computed(() => (formData.main_category ?? 0) <= 0)
 
 function clearInputs() {
   formData.title = ''
@@ -80,24 +109,14 @@ function clearInputs() {
   formData.cover = []
 }
 
-function clearErrors() {
-  errors.value = {}
-}
-
 async function submitForm() {
-  const form = document.querySelector('#writing-form')
-
-  clearErrors()
-
-  if (!helper.checkFormValidity(form)) {
-    return
-  }
-
   isPosted.value = {}
-  isPosting.value = true
 
-  await axios
-    .postForm(form.action, {
+  await postForm<PostedResult>({
+    formSelector: '#writing-form',
+    multipart: true,
+    cooldown: true,
+    payload: {
       _method: isUpdate.value ? 'PUT' : 'POST',
       title: formData.title,
       main_category: formData.main_category,
@@ -108,33 +127,31 @@ async function submitForm() {
       cover: formData.cover,
       service_agreement: formData.serviceAgreement,
       privacy_agreement: formData.privacyAgreement
-    })
-    .then((response) => {
+    },
+    onSuccess: (data) => {
       resetForm()
-      isPosted.value = response.data
-    })
-    .catch((error) => {
-      errors.value = error.response.data.errors
-    })
-    .finally(
-      setTimeout(() => {
-        isPosting.value = false
-      }, 1000)
-    )
+      isPosted.value = data
+    },
+    onError: validationErrors
+  })
 }
 
 function resetForm() {
-  clearErrors()
+  errors.value = {}
 
-  if (!isUpdate.value) {
+  if (isUpdate.value === false) {
     clearInputs()
   }
+}
+
+function categoryOptionProps(idPrefix: string): (category: CategoryOption) => { id: string } {
+  return (category) => ({ id: `${idPrefix}-${category.id}` })
 }
 </script>
 
 <template>
-  <po-wrapper class="w-100" style="max-width: 900px">
-    <po-head></po-head>
+  <po-wrapper class="w-100">
+    <po-head />
 
     <v-card
       :title="
@@ -148,13 +165,14 @@ function resetForm() {
         @submit.prevent="submitForm"
         @reset.prevent="resetForm"
       >
-        <p class="mb-4 text-caption text-disabled" style="margin-top: -0.5rem">
+        <p class="mb-4 text-disabled" style="margin-top: -0.5rem">
           {{ $t('main.required-fields-marked') }}
         </p>
 
         <v-text-field
+          id="writing-title"
           v-model="formData.title"
-          :label="$t('main.title') + ' *'"
+          :label="requiredLabel('main.title')"
           hide-details="auto"
           :error-messages="errors.title"
           :placeholder="$t('main.enter-title')"
@@ -163,11 +181,12 @@ function resetForm() {
           persistent-placeholder
           clearable
           required
-        ></v-text-field>
+        />
 
         <v-select
+          id="writing-main-category"
           v-model="formData.main_category"
-          :label="$t('categories.main-category') + ' *'"
+          :label="requiredLabel('categories.main-category')"
           hide-details="auto"
           :error-messages="errors.main_category"
           :placeholder="$t('categories.select-main')"
@@ -175,14 +194,16 @@ function resetForm() {
           :items="mainCategories"
           item-title="name"
           item-value="id"
+          :item-props="categoryOptionProps('main-category-option')"
           clearable
           required
           chips
-        ></v-select>
+        />
 
         <v-select
+          id="writing-alt-categories"
           v-model="formData.alt_categories"
-          :label="$t('categories.alt-categories') + ' *'"
+          :label="requiredLabel('categories.alt-categories')"
           hide-details="auto"
           :error-messages="errors.categories"
           :placeholder="$t('categories.select-alt')"
@@ -190,14 +211,16 @@ function resetForm() {
           :items="altCategories"
           item-title="name"
           item-value="id"
+          :item-props="categoryOptionProps('alt-category-option')"
           multiple
           clearable
           required
           chips
-          :disabled="!parseInt(formData.main_category) > 0"
-        ></v-select>
+          :disabled="isAltCategoriesDisabled"
+        />
 
         <v-combobox
+          id="writing-tags"
           v-model="formData.tags"
           :label="$t('tags.tags')"
           hide-details="auto"
@@ -210,11 +233,12 @@ function resetForm() {
           clearable
           chips
           closable-chips
-        ></v-combobox>
+        />
 
         <v-textarea
+          id="writing-text"
           v-model="formData.text"
-          :label="$t('main.text') + ' *'"
+          :label="requiredLabel('main.text')"
           hide-details="auto"
           :error-messages="errors.text"
           :placeholder="$t('main.enter-text')"
@@ -223,9 +247,10 @@ function resetForm() {
           persistent-placeholder
           clearable
           required
-        ></v-textarea>
+        />
 
         <v-text-field
+          id="writing-link"
           v-model="formData.link"
           type="url"
           :label="$t('main.link')"
@@ -236,9 +261,10 @@ function resetForm() {
           maxlength="250"
           persistent-placeholder
           clearable
-        ></v-text-field>
+        />
 
         <v-file-input
+          id="writing-cover"
           v-model="formData.cover"
           :label="$t('main.cover')"
           hide-details="auto"
@@ -249,12 +275,13 @@ function resetForm() {
           :hint="$t('main.max-file-size-is', { size: page.props['max-file-size'] }) + 'kb'"
           persistent-hint
           clearable
-        ></v-file-input>
+        />
 
-        <po-agreement v-if="!page.props.agreement"></po-agreement>
+        <po-agreement v-if="!page.props.agreement" />
 
         <po-button
           v-if="isUpdate"
+          id="writing-delete"
           color="error"
           variant="tonal"
           class="mb-2"
@@ -264,27 +291,29 @@ function resetForm() {
           {{ $t('writings.delete-writing-ask') }}
         </po-button>
 
-        <po-writing-delete
-          v-if="isUpdate"
-          v-model="isDelete"
-          :slug="writing.data.slug"
-        ></po-writing-delete>
+        <po-writing-delete v-if="isUpdate" v-model="isDelete" :slug="writing.data.slug ?? ''" />
 
-        <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-          <template v-if="isPosting"
-            ><v-progress-circular indeterminate></v-progress-circular
-          ></template>
+        <po-button
+          id="writing-submit"
+          type="submit"
+          color="primary"
+          size="large"
+          block
+          :disabled="isPosting"
+        >
+          <template v-if="isPosting"><v-progress-circular indeterminate /></template>
           <template v-else>{{ isUpdate ? $t('main.save') : $t('main.send') }}</template>
         </po-button>
       </v-form>
 
       <v-alert
-        v-if="!helper.isEmpty(isPosted)"
+        v-if="!isEmpty(isPosted)"
         id="writing-alert"
         type="success"
         variant="tonal"
         class="mb-5 mx-auto"
-        style="width: 85%; max-width: 600px"
+        width="85%"
+        max-width="600"
       >
         {{ isUpdate ? $t('writings.writing-updated') : $t('writings.writing-published') }}
         {{ $t('main.take-a-look') }}

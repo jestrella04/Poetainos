@@ -6,19 +6,14 @@ use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ComplaintsController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\GenericController;
-use App\Http\Controllers\HoodsController;
-use App\Http\Controllers\InitController;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PushNotificationsController;
-use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShelvesController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersNotificationsController;
-// use App\Http\Controllers\UsersHoodsController;
-// use App\Http\Controllers\UsersHoodsWritingsController;
 use App\Http\Controllers\WritingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,9 +44,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::put('settings/edit', [SettingsController::class, 'update'])->name('settings.edit');
     Route::put('categories/edit', [CategoriesController::class, 'update'])->name('categories.edit');
-    Route::put('tags/edit', [TagsController::class, 'update'])->name('tags.edit');
     Route::put('pages/edit', [PagesController::class, 'update'])->name('pages.edit');
-    Route::put('complaints', [ComplaintsController::class, 'update'])->name('complaints.edit');
 
     Route::delete('categories/delete/{category}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
     Route::delete('tags/delete/{tag}', [TagsController::class, 'destroy'])->name('tags.destroy');
@@ -61,7 +54,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 /* Non public routes */
-Route::middleware(['verified'])->group(function (): void {
+Route::middleware(['auth', 'verified'])->group(function (): void {
     // Writings
     Route::get('/writings/create', [WritingsController::class, 'create'])->name('writings.create');
     Route::post('/writings/create', [WritingsController::class, 'store'])->name('writings.store');
@@ -73,29 +66,27 @@ Route::middleware(['verified'])->group(function (): void {
     Route::get('/users/edit/{user}', [UsersController::class, 'edit'])->name('users.edit');
     Route::put('/users/edit/{user}', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/delete/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
-    Route::post('/users/query/{query}', [UsersController::class, 'query'])->name('users.query');
+    Route::get('/users/query', [UsersController::class, 'suggest'])->name('users.query');
     Route::post('/users/block/{user}', [UsersController::class, 'blockUser'])->name('users.block');
+    Route::delete('/users/block/{user}', [UsersController::class, 'unblockUser'])->name('users.unblock');
     Route::get('/account', [UsersController::class, 'account'])->name('users.account');
+    Route::get('/account/blocked', [UsersController::class, 'blockedUsers'])->name('users.blocked.index');
 
     // Comments
-    Route::post('/comments/create', [CommentsController::class, 'store'])->name('comments.store');
+    Route::post('/comments/create', [CommentsController::class, 'store'])->middleware('throttle:20,1')->name('comments.store');
     Route::delete('/comments/delete/{comment}', [CommentsController::class, 'destroy'])->name('comments.destroy');
 
     // Likes
-    Route::post('/likes/{type}/{id}/store', [LikesController::class, 'store'])->name('likes.store');
-    Route::delete('/likes/{type}/{id}/delete', [LikesController::class, 'destroy'])->name('likes.destroy');
+    Route::post('/likes/{likeable}/{likeableId}/store', [LikesController::class, 'store'])->middleware('throttle:60,1')->name('likes.store');
 
     // Other user tasks
-    Route::post('/shelves/{writing}/store', [ShelvesController::class, 'store'])->name('shelves.store');
-    Route::delete('/shelves/{writing}/delete', [ShelvesController::class, 'destroy'])->name('shelves.destroy');
-    Route::post('/hoods/store', [HoodsController::class, 'store'])->name('hoods.store');
+    Route::post('/shelves/{writing}/store', [ShelvesController::class, 'store'])->middleware('throttle:60,1')->name('shelves.store');
 
     // Notifications
     Route::get('/notifications', [UsersNotificationsController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/show/{notification}', [UsersNotificationsController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/clear/read', [UsersNotificationsController::class, 'clear'])->name('notifications.clear');
-    Route::post('/notifications/status', [UsersNotificationsController::class, 'status'])->name('notifications.status');
-    Route::post('/notifications/email/{enable}', [UsersNotificationsController::class, 'email'])->name('notifications.email');
+    Route::post('/notifications/email/{enable}', [UsersNotificationsController::class, 'setEmailPreference'])->name('notifications.email');
 
     // Push Subscriptions
     Route::post('subscriptions', [PushNotificationsController::class, 'update'])->name('push.update');
@@ -104,18 +95,14 @@ Route::middleware(['verified'])->group(function (): void {
 
 /* Public routes */
 
-// Installation
-Route::get('/init', [InitController::class, 'init'])->name('init.show');
-
 // Generic
 Route::get('/manifest.json', [GenericController::class, 'manifest'])->name('pwa.manifest');
 Route::get('/offline', [GenericController::class, 'offline'])->name('offline');
-Route::get('/search', [SearchController::class, 'show'])->name('search');
 Route::get('/explore', [GenericController::class, 'explore'])->name('explore');
 
 // Writings
-Route::get('/', [WritingsController::class, 'index'])->name('home');
-Route::get('/writings/awards', [WritingsController::class, 'index'])->name('writings.awards');
+Route::get('/', [WritingsController::class, 'home'])->name('home');
+Route::get('/writings/awards', [WritingsController::class, 'awards'])->name('writings.awards');
 Route::get('/writings/random', [WritingsController::class, 'random'])->name('writings.random');
 Route::get('/writings/{writing}', [WritingsController::class, 'show'])->name('writings.show');
 
@@ -125,33 +112,29 @@ Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show'
 Route::get('/users/{user}/writings', [GenericController::class, 'writings'])->name('users.writings.index');
 Route::get('/users/{user}/shelf', [GenericController::class, 'shelf'])->name('users.shelf.index');
 Route::get('/users/{user}/likes', [GenericController::class, 'likes'])->name('users.likes.index');
-// Route::get('/users/{user}/hood', [UsersHoodsController::class, 'index'])->name('users.hood.index');
-// Route::get('/users/{user}/hood/writings', [UsersHoodsWritingsController::class, 'index'])->name('users_hoods_writings.index');
 
 // Pages
 Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
 Route::get('/pages/{page}', [PagesController::class, 'show'])->name('pages.show');
 
 // Categories
-// Route::get('/categories', [CategoriesController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoriesController::class, 'show'])->name('categories.show');
 
 // Tags
-// Route::get('/tags', [TagsController::class, 'index'])->name('tags.index');
-Route::get('/tags/query', [TagsController::class, 'query'])->name('tags.query');
+Route::get('/tags/query', [TagsController::class, 'search'])->name('tags.query');
 Route::get('/tags/{tag}', [TagsController::class, 'show'])->name('tags.show');
 
 // Comments
-Route::get('/comments/{writing}', [CommentsController::class, 'index'])->name('comments.index');
+Route::get('/comments/{writingId}', [CommentsController::class, 'index'])->name('comments.index');
 
 // Contact form
 Route::get('/contact', [ContactsController::class, 'create'])->name('contact.create');
-Route::post('/contact', [ContactsController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactsController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::get('/reload-captcha', [ContactsController::class, 'reloadCaptcha'])->name('captcha.reload');
 
 // Complaints
 Route::get('/complaints/reasons', [ComplaintsController::class, 'reasons'])->name('complaints.reasons');
-Route::post('/complaints/store', [ComplaintsController::class, 'store'])->name('complaints.store');
+Route::post('/complaints/store', [ComplaintsController::class, 'store'])->middleware('throttle:10,1')->name('complaints.store');
 
 // Redirects, keep on the bottom
 Route::redirect('/socialite', '/login', 301);

@@ -2,130 +2,48 @@
 
 namespace App\Notifications;
 
-use App\Events\NotificationEvent;
 use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\DatabaseMessage;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
-use NotificationChannels\WebPush\WebPushChannel;
-use NotificationChannels\WebPush\WebPushMessage;
 
-class WritingCommentMentioned extends Notification implements ShouldQueue
+class WritingCommentMentioned extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
-    protected $comment;
-
-    protected $user;
-
-    protected $notification;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct(Comment $comment, User $user)
+    public function __construct(protected Comment $comment, protected User $user)
     {
-        $this->comment = $comment;
-        $this->user = $user;
-        $this->notification = [
-            'title' => __('Updates from :name at :site', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'greeting' => __('Hello!'),
-            'body' => __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', [
-                'name' => $this->user->getName(),
-                'site' => getSiteConfig('name'),
-            ]),
-            'footer' => __('Thank you for being part of the hood!'),
-            'url' => route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id,
-            'action' => __('View comment'),
-            'icon' => asset('images/logo-192.png'),
-            'tag' => getSiteConfig('name'),
-        ];
+        $this->content = $this->actorContent(
+            $this->user,
+            __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', $this->actorPlaceholders($this->user)),
+            route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id,
+            __('View comment'),
+        );
     }
 
     /**
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<int, string>
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
-        return ['mail', 'database', 'broadcast', WebPushChannel::class];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return MailMessage
-     */
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->subject($this->notification['title'])
-            ->greeting($this->notification['greeting'])
-            ->line($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->line($this->notification['footer']);
-    }
-
-    /**
-     * Get the web push representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
-     * @return DatabaseMessage
-     */
-    public function toWebPush($notifiable, $notification)
-    {
-        return (new WebPushMessage)
-            ->title($this->notification['title'])
-            ->icon($this->notification['icon'])
-            ->body($this->notification['body'])
-            ->action($this->notification['action'], $this->notification['url'])
-            ->options(['TTL' => 1000])
-            ->renotify()
-            ->requireInteraction()
-            ->tag($this->notification['tag']);
-        // ->data(['id' => $notification->id])
-        // ->badge()
-        // ->dir()
-        // ->image()
-        // ->lang()
-        // ->vibrate()
-    }
-
-    /**
-     * Get the broadcastable representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return BroadcastMessage
-     */
-    public function toBroadcast($notifiable)
-    {
-        return event(new NotificationEvent($notifiable));
+        return [...$this->mailChannelIfWanted($notifiable), ...parent::via($notifiable)];
     }
 
     /**
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
-            'writing_id' => $this->comment->writing->id,
+            'writing_id' => $this->comment->writing?->id,
             'user_id' => $this->user->id,
-            'url' => $this->notification['url'],
+            'url' => $this->content['url'],
         ];
     }
 }

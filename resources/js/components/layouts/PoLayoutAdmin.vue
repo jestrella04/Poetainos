@@ -1,12 +1,12 @@
-<script setup>
-import { useTheme } from 'vuetify'
+<script setup lang="ts">
+import { useSystemTheme } from '@/composables/useSystemTheme'
 import PoAdminMenu from '../admin/PoAdminMenu.vue'
 
-const theme = useTheme()
-theme.change(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+const { revealStyle } = useSystemTheme()
 </script>
 
 <style>
+/* Clears space for the fixed-width side nav (PoAdminMenu), which isn't part of Vuetify's layout system. */
 .admin-wrapper {
   margin-left: 60px;
 }
@@ -25,13 +25,13 @@ iframe {
 </style>
 
 <template>
-  <v-app>
+  <v-app :style="revealStyle">
     <po-head />
 
     <v-main>
-      <po-admin-menu></po-admin-menu>
+      <po-admin-menu />
 
-      <po-wrapper class="admin-wrapper pa-5">
+      <po-wrapper class="admin-wrapper pa-5 h-100">
         <v-card class="pa-5 h-100">
           <slot />
         </v-card>

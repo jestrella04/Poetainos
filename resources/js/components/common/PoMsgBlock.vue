@@ -1,9 +1,14 @@
-<script setup>
-defineProps({
-  msgTitle: { type: String, required: true },
-  msgBody: { type: String, required: true },
-  icon: { type: String, default: '' }
-})
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    msgTitle: string
+    msgBody: string
+    icon?: string
+  }>(),
+  {
+    icon: ''
+  }
+)
 </script>
 
 <template>
@@ -11,6 +16,8 @@ defineProps({
     <p class="font-weight-bold">{{ msgTitle }}</p>
     <p class="text-medium-emphasis">{{ msgBody }}</p>
 
-    <v-icon v-if="'' !== icon" :icon="icon" size="96" class="text-disabled my-10"></v-icon>
+    <v-icon v-if="'' !== icon" :icon="icon" size="96" class="text-disabled my-10" />
+
+    <slot />
   </div>
 </template>

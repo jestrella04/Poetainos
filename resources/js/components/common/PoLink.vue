@@ -1,20 +1,24 @@
-<script setup>
-defineProps({
-  href: String,
-  inertia: Boolean
-})
+<script setup lang="ts">
+import type { Method, RequestPayload } from '@inertiajs/core'
+import { useInertiaVisit } from '@/composables/useInertiaVisit'
+
+const props = withDefaults(
+  defineProps<{
+    href?: string
+    inertia?: boolean
+    method?: Method
+    data?: RequestPayload
+  }>(),
+  {
+    method: 'get'
+  }
+)
+
+const { handleClick } = useInertiaVisit(props)
 </script>
 
 <template>
-  <template v-if="!inertia">
-    <a :href="href">
-      <slot />
-    </a>
-  </template>
-
-  <template v-else>
-    <a :href="href" @click.prevent="$inertia.get(href)">
-      <slot />
-    </a>
-  </template>
+  <a :href="href" @click="handleClick">
+    <slot />
+  </a>
 </template>

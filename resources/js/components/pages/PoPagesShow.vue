@@ -1,12 +1,20 @@
-<script setup>
-import { computed } from 'vue'
+<script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
+import { useFormatting } from '@/composables/useFormatting'
+import type { InertiaPageProps } from '@/types/inertia'
 
-const page = computed(() => usePage())
-const data = page.value.props.page
+interface StaticPage {
+  title: string
+  text: string
+}
+
+const { markdown } = useFormatting()
+const page = usePage<InertiaPageProps<{ page: StaticPage }>>()
+const data = page.props.page
 </script>
 
 <style scoped>
+/* Typography for CMS/prose content rendered as raw HTML; Vuetify has no built-in prose styling. */
 *:deep(h1),
 *:deep(h2),
 *:deep(h3),
@@ -40,10 +48,10 @@ const data = page.value.props.page
 </style>
 
 <template>
-  <po-head></po-head>
+  <po-head />
   <v-card :title="data.title.toUpperCase()">
     <v-card-text>
-      <div v-html="$helper.markdown(data.text)" class="text-justify"></div>
+      <div v-html="markdown(data.text)" class="text-justify" />
     </v-card-text>
   </v-card>
 </template>

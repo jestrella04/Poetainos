@@ -21,8 +21,8 @@ class CreateVotesTable extends Migration
             $table->timestamp('created_at');
 
             $table->unique(['writing_id', 'user_id']);
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
-            $table->foreign('writing_id')->references('id')->on('writings')->onDelete('CASCADE');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('writing_id')->references('id')->on('writings')->onDelete('cascade');
         });
     }
 

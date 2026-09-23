@@ -2,157 +2,160 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RecalculateAura;
 use App\Models\Category;
-use App\Models\Like;
+use App\Models\DailySelection;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingPublished;
-use Carbon\Carbon;
+use App\Services\ContentDeleter;
+use App\Services\ImageStorage;
+use App\Services\WritingPublisher;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Intervention\Image\Laravel\Facades\Image;
-use Spatie\ImageOptimizer\OptimizerChain;
 
 class WritingsController extends Controller
 {
+    private const HOME_AUTHORS_SHOWN = 4;
+
+    private const HOME_TAGS_SHOWN = 6;
+
+    private const LIKERS_SHOWN = 5;
+
+    private const RELATED_SHOWN = 5;
+
     /**
-     * Display a listing of the resource.
+     * The home page: the newest writings, the pick of the day, and the writers and tags to discover.
      *
-     * @return Response|Paginator
+     * @return Response|Paginator<int, Writing>
      */
-    public function index()
+    public function home(): Response|Paginator
     {
-        $awards = request()->route()->getName() === 'writings.awards';
-        $sort = in_array(request('sort'), ['latest', 'popular', 'likes']) ? request('sort') : 'latest';
-        $filterAwards = $awards ? 'home_posted_at' : 'id';
-        $writings = Writing::whereNotIn('user_id', $this->getBlockedUsers())
-            ->whereNotNull($filterAwards)
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->with([
-                'author' => function ($query): void {
-                    $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
-                },
-            ]);
-
-        if ($sort === 'latest') {
-            $writings = $writings->latest();
-        } elseif ($sort === 'popular') {
-            $writings = $writings->orderBy('views', 'desc')->orderBy('aura', 'desc');
-        } elseif ($sort === 'likes') {
-            $writings = $writings->orderBy('likes_count', 'desc')->orderBy('aura', 'desc');
-        }
-
-        if (request()->expectsJson()) {
-            return $writings->simplePaginate($this->pagination)->withQueryString();
-        }
-
-        return Inertia::render('writings/PoWritingsIndex', [
-            'meta' => [
-                'title' => $awards ? getPageTitle([__('Golden Flowers')]) : getPageTitle([]),
-                'canonical' => route('home'),
+        return $this->listing(
+            Writing::query(),
+            ['title' => getPageTitle([]), 'canonical' => route('home')],
+            [
+                'isHome' => true,
+                'pickOfTheDay' => fn (): ?Writing => DailySelection::current()?->visibleWriting($this->blockedAuthorIds()),
+                'authors' => fn () => User::forAuthorSummary(withKarma: true)
+                    ->withCount('writings')
+                    ->ranked()
+                    ->take(self::HOME_AUTHORS_SHOWN)
+                    ->get(),
+                'tags' => fn () => Tag::withCount('writings')
+                    ->orderByDesc('writings_count')
+                    ->has('writings')
+                    ->take(self::HOME_TAGS_SHOWN)
+                    ->get(),
             ],
-            'writings' => Inertia::optional(fn () => $writings->simplePaginate($this->pagination)->withQueryString()),
-            'sort' => $sort,
-        ]);
+        );
+    }
+
+    /**
+     * The writings awarded a Golden Flower.
+     *
+     * @return Response|Paginator<int, Writing>
+     */
+    public function awards(): Response|Paginator
+    {
+        return $this->listing(
+            Writing::whereNotNull('home_posted_at'),
+            ['title' => getPageTitle([__('Golden Flowers')]), 'canonical' => route('writings.awards')],
+        );
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return Response
      */
-    public function create()
+    public function create(): Response
     {
-        return $this->edit(new Writing);
+        return $this->form(new Writing, __('Publish a writing'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function store(Request $request)
+    public function store(Request $request, WritingPublisher $publisher): array
     {
-        return $this->update($request, new Writing);
+        $user = $this->requireAuthUser();
+
+        $publisher->ensureBelowDailyPostLimit($user);
+        $request->validate($this->rules($user));
+
+        $writing = $publisher->create($user, $this->formInput($request), $this->uploadedCover($request));
+
+        RecalculateAura::dispatch($user);
+        $this->rememberAgreements($request, $user);
+
+        // Share on social media
+        $user->notify(new WritingPublished($writing));
+
+        return [
+            'url' => $writing->path(),
+        ];
     }
 
     /**
      * Display the specified resource.
-     *
-     * @return Response
      */
-    public function show(Writing $writing)
+    public function show(Writing $writing): Response
     {
-        // Increment writing views
-        $writing->incrementViews();
+        $this->countViewOnce($writing);
 
-        // Update Aura
-        $writing->updateAura();
-        // $writing->author->updateAura();
+        $writing->loadCount(['likes', 'comments', 'shelf'])->load([
+            'author' => fn ($query) => $query->forAuthorSummary(withKarma: true),
+            'categories:id,name,slug',
+            'tags:id,name,slug',
+        ]);
 
-        $user = auth()->check() ? User::find(auth()->user()->id) : null;
+        $user = Auth::user();
 
         return Inertia::render('writings/PoWritingsShow', [
             'meta' => [
                 'title' => getPageTitle([
                     $writing->title,
-                    $writing->author->getName(),
+                    $writing->author?->getName() ?? '',
                 ]),
                 'canonical' => $writing->path(),
             ],
-            'writing' => Writing::whereId($writing->id)
-                ->withCount(['likes', 'comments', 'shelf'])
-                ->with([
-                    'author' => function ($query): void {
-                        $query->select('id', 'username', 'name', 'karma', 'extra_info->avatar AS avatar');
-                    },
-                ])
-                ->with([
-                    'categories' => function ($query): void {
-                        $query->select('id', 'name', 'slug');
-                    },
-                ])
-                ->with([
-                    'tags' => function ($query): void {
-                        $query->select('id', 'name', 'slug');
-                    },
-                ])
-                ->first(),
-            'likers' => $writing->likers()->shuffle()->take(5),
+            'writing' => $writing,
+            'likers' => $writing->likers(self::LIKERS_SHOWN),
             'related' => [
                 'from_author' => Writing::whereNot('id', $writing->id)
                     ->where('user_id', $writing->user_id)
-                    ->inRandomOrder()->take(5)->get(),
-                'from_category' => Writing::whereIn(
-                    'id',
-                    DB::table('category_writing')
-                        ->select('writing_id')
-                        ->whereIn('category_id', $writing->categories()->pluck('id'))
-                )->with([
-                    'author' => function ($query): void {
-                        $query->select('id', 'username', 'name', 'extra_info->avatar AS avatar');
-                    },
-                ])->inRandomOrder()->take(5)->get(),
-
+                    ->inRandomOrder()->take(self::RELATED_SHOWN)->get(),
+                'from_category' => randomWritingsWithAuthor(
+                    Writing::whereNot('id', $writing->id)
+                        ->visibleTo($this->blockedAuthorIds())
+                        ->whereIn(
+                            'id',
+                            DB::table('category_writing')
+                                ->select('writing_id')
+                                ->whereIn('category_id', $writing->categories->modelKeys())
+                        ),
+                    self::RELATED_SHOWN,
+                ),
             ],
-            'isAuthorBlocked' => auth()->check() ? $user->isAuthorBlocked($writing->author) : false,
+            'isAuthorBlocked' => $user !== null && $writing->author !== null ? $user->isAuthorBlocked($writing->author) : false,
         ]);
     }
 
     /**
      * Display a random resource.
-     *
-     * @return RedirectResponse|Redirector
      */
-    public function random()
+    public function random(): RedirectResponse|Redirector
     {
         $writing = User::has('writings', '>', 0)
             ->inRandomOrder()
@@ -166,158 +169,30 @@ class WritingsController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @return Response
      */
-    public function edit(Writing $writing)
+    public function edit(Writing $writing): Response
     {
-        // Ensure user has the proper permission
-        if ($writing->exists) {
-            $this->authorize('update', $writing);
-        }
+        $this->authorize('update', $writing);
 
-        $mainCategories = Category::select('id', 'name')
-            ->whereNull('parent_id')
-            ->with('descendants')
-            ->get();
-
-        return Inertia::render('writings/PoWritingsForm', [
-            'meta' => [
-                'title' => request()->route()->getName() === 'writings.edit'
-                    ? getPageTitle([__('Update writing')])
-                    : getPageTitle([__('Publish a writing')]),
-            ],
-            'writing' => [
-                'data' => $writing,
-                'main_category' => $writing->exists ? $writing->mainCategory()->pluck('id')->first() : null,
-                'categories' => $writing->exists ? $writing->altCategories()->pluck('id') : [],
-                'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
-
-            ],
-            'main_categories' => $mainCategories,
-            'max-file-size' => getSiteConfig('uploads_max_file_size'),
-            'agreement' => User::find(auth()->user()->id)->isInAgreement(),
-        ]);
+        return $this->form($writing, __('Update writing'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function update(Request $request, Writing $writing)
+    public function update(Request $request, Writing $writing, WritingPublisher $publisher): array
     {
-        $action = 'create';
+        $this->authorize('update', $writing);
 
-        // Ensure user has the proper permission
-        if ($writing->exists) {
-            $this->authorize('update', $writing);
-            $action = 'update';
-        }
+        $request->validate($this->rules($this->requireAuthUser()));
 
-        // Check number of posts by user
-        $posts = auth()->user()->writings()->whereDate('created_at', '=', Carbon::today())->count();
+        $publisher->update($writing, $this->formInput($request), $this->uploadedCover($request));
 
-        if ($posts >= 3) {
-            throw ValidationException::withMessages([
-                'title' => __('You have reached your maximum number of posts for today. Please try again tomorrow.'),
-            ]);
-        }
+        RecalculateAura::dispatch($writing->author);
+        $this->rememberAgreements($request, $writing->author);
 
-        // Validate user input
-        request()->validate([
-            'title' => 'required|string|min:3|max:100',
-            'main_category' => 'required|integer|exists:categories,id',
-            'categories' => 'required|array|exists:categories,id|max:2',
-            'text' => 'required|string|min:10|max:2000',
-            'tags' => 'nullable|array',
-            'link' => 'nullable|url|max:250',
-            'cover' => 'nullable|file|image|max:'.getSiteConfig('uploads_max_file_size'),
-            'service_agreement' => 'sometimes|required|accepted',
-            'privacy_agreement' => 'sometimes|required|accepted',
-        ]);
-
-        // dd($request);
-
-        // Process the uploaded cover, if any
-        if ($request->hasFile('cover') && $request->file('cover')->isValid()) {
-            // Persist the image
-            $cover = $request->file('cover')->store('covers');
-            $coverRealPath = storage_path('app/'.$cover);
-
-            // Scale image and enforce 16:9 aspect ratio
-            Image::read($coverRealPath)->cover(1280, 720)->save();
-
-            // Optimize the image
-            app(OptimizerChain::class)->optimize($coverRealPath);
-        }
-
-        // Create the extra info array
-        $extraInfo = [
-            'link' => request('link') ?? '',
-            'cover' => $cover ?? ($writing->extra_info['cover'] ?? ''),
-        ];
-
-        // Persist to database
-        $writing->title = request('title');
-
-        if (! $writing->exists) {
-            $writing->user_id = auth()->user()->id;
-            $writing->slug = slugify($writing->getTable(), $writing->title);
-        }
-
-        $writing->text = request('text');
-        $writing->extra_info = $extraInfo;
-        $writing->save();
-
-        $categories = request('categories');
-        array_unshift($categories, request('main_category'));
-
-        $tagsToSync = [];
-
-        // Let's grab the entered tags
-        if (! empty(request('tags'))) {
-            foreach (request('tags') as $tag) {
-                $tag = preg_replace('/\s+/', ' ', $tag);
-                $tag = trim($tag);
-                $tag = Tag::firstOrCreate(
-                    ['name' => $tag],
-                    ['slug' => slugify('tags', $tag)]
-                );
-
-                $tagsToSync[] = $tag->id;
-            }
-        }
-
-        // Persist categories
-        $writing->categories()->sync($categories);
-
-        // Persist tags
-        $writing->tags()->sync($tagsToSync);
-
-        // Update user aura / karma
-        $writing->author->updateAura();
-        // $writing->author->updateKarma();
-
-        // Persist user agreements to avoid asking again
-        if (! empty(request('service_agreement') && ! empty(request('privacy_agreement')))) {
-            $writing->author->acceptAgreements();
-        }
-
-        // Set response message and trigger notification
-        if ($action === 'create') {
-            // Share on social media
-            $writing->author->notify(new WritingPublished($writing));
-
-            // Add a like automatically from the poster
-            /* $like = new Like;
-            $like->user_id = auth()->user()->id;
-            $like->vote = 1;
-            $like->likeable()->associate(Writing::find($writing->id));
-            $like->save(); */
-        }
-
-        // Set response data
         return [
             'url' => $writing->path(),
         ];
@@ -326,26 +201,125 @@ class WritingsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return array
+     * @return array<int, mixed>
      */
-    public function destroy(Writing $writing)
+    public function destroy(Writing $writing, ContentDeleter $deleter, ImageStorage $images): array
     {
         $this->authorize('delete', $writing);
-        $writing->deleteOrFail();
 
-        // Delete related notifications
-        DatabaseNotification::where('data->writing_id', $writing->id)->delete();
+        $cover = $writing->extra_info['cover'] ?? null;
 
-        // Delete related likes
-        Like::where([
-            ['likeable_type', 'App\Models\Writing'],
-            ['likeable_id', $writing->id],
-        ])->delete();
+        $deleter->deleteWriting($writing);
 
-        if (request('redirect')) {
-            request()->session()->flash('flash', __('Writing deleted successfully'));
-        }
+        $images->delete($cover);
 
         return [];
+    }
+
+    /**
+     * The writing form page, for a new writing or for editing an existing one.
+     */
+    private function form(Writing $writing, string $title): Response
+    {
+        $mainCategories = Category::select('id', 'name')
+            ->whereNull('parent_id')
+            ->with('descendants')
+            ->get();
+
+        return Inertia::render('writings/PoWritingsForm', [
+            'meta' => [
+                'title' => getPageTitle([$title]),
+            ],
+            'writing' => [
+                'data' => $writing,
+                'main_category' => $writing->exists ? $writing->mainCategory()->value('id') : null,
+                'categories' => $writing->exists ? $writing->altCategories()->pluck('id') : [],
+                'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
+
+            ],
+            'isUpdate' => $writing->exists,
+            'main_categories' => $mainCategories,
+            'max-file-size' => getSiteConfig('uploads_max_file_size'),
+            'agreement' => Auth::user()?->isInAgreement() ?? false,
+        ]);
+    }
+
+    /**
+     * A page of the given writings, hidden authors excluded, sorted by the requested order.
+     *
+     * @param  Builder<Writing>  $writings
+     * @param  array<string, mixed>  $meta
+     * @param  array<string, mixed>  $extraProps
+     * @return Response|Paginator<int, Writing>
+     */
+    private function listing(Builder $writings, array $meta, array $extraProps = []): Response|Paginator
+    {
+        $sort = resolveSort(['latest', 'popular', 'likes']);
+
+        return $this->writingsIndex(
+            $writings->visibleTo($this->blockedAuthorIds())->withListingRelations()->sorted($sort),
+            $sort,
+            $meta,
+            $extraProps,
+        );
+    }
+
+    /**
+     * The validation rules of the writing form. The form posts unchecked
+     * agreements even when the user already accepted them, so those are only
+     * required until then.
+     *
+     * @return array<string, mixed>
+     */
+    private function rules(User $user): array
+    {
+        $agreementRules = $user->isInAgreement() ? [] : [
+            'service_agreement' => 'sometimes|required|accepted',
+            'privacy_agreement' => 'sometimes|required|accepted',
+        ];
+
+        return [
+            'title' => 'required|string|min:3|max:100',
+            'main_category' => ['required', 'integer', Rule::exists('categories', 'id')->whereNull('parent_id')],
+            'categories' => 'required|array|exists:categories,id|max:2',
+            'text' => 'required|string|min:10|max:4000',
+            'tags' => 'nullable|array|max:'.WritingPublisher::MAX_TAGS,
+            'tags.*' => 'string|min:1|max:'.WritingPublisher::MAX_TAG_LENGTH,
+            'link' => 'nullable|url|max:250',
+            'cover' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
+            ...$agreementRules,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function formInput(Request $request): array
+    {
+        return [
+            'title' => $request->input('title'),
+            'text' => $request->input('text'),
+            'link' => $request->input('link'),
+            'main_category' => $request->input('main_category'),
+            'categories' => $request->input('categories'),
+            'tags' => $request->input('tags'),
+        ];
+    }
+
+    private function uploadedCover(Request $request): ?UploadedFile
+    {
+        $cover = $request->file('cover');
+
+        return $cover instanceof UploadedFile ? $cover : null;
+    }
+
+    /**
+     * Persist the user agreements so they aren't asked again.
+     */
+    private function rememberAgreements(Request $request, ?User $user): void
+    {
+        if (isTruthy($request->input('service_agreement')) && isTruthy($request->input('privacy_agreement'))) {
+            $user?->acceptAgreements();
+        }
     }
 }

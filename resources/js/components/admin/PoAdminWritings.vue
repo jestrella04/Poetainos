@@ -1,40 +1,41 @@
-<script setup>
-import { computed, ref, onMounted } from 'vue'
+<script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
-import axios from 'axios'
+import { useServerTable } from '@/composables/useServerTable'
+import { useFormatting } from '@/composables/useFormatting'
+import type { DataTableHeader } from 'vuetify'
+import type { InertiaPageProps } from '@/types/inertia'
+import type { UserLike } from '@/types/models'
 
 defineOptions({
   layout: PoLayoutAdmin
 })
 
-const page = computed(() => usePage())
-const headers = [
-  { title: 'Id', align: 'start', sortable: false, key: 'id' },
-  { title: 'Title', align: 'start', sortable: false, key: 'title' },
-  { title: 'Author', align: 'start', sortable: false, key: 'author' },
-  { title: 'Aura', align: 'start', sortable: false, key: 'aura' },
-  { title: 'Created at', align: 'start', sortable: false, key: 'created_at' },
-  { title: 'Actions', align: 'start', sortable: false, key: 'actions' }
-]
-const items = ref([])
-const totalItems = ref(page.value.props.total)
-const isLoading = ref(true)
-
-onMounted(() => {
-  loadItems({ page: 1 })
-})
-
-async function loadItems(event) {
-  await axios
-    .get(route('admin.writings', { page: event.page }))
-    .then((response) => {
-      items.value = response.data.data
-      isLoading.value = false
-    })
-    .catch()
-    .finally()
+interface WritingAdmin {
+  id: number
+  title: string
+  slug: string
+  aura: string
+  created_at: string
+  author: UserLike
 }
+
+const { t } = useI18n()
+const { userDisplayName, toLocaleDate } = useFormatting()
+const page = usePage<InertiaPageProps<{ total: number }>>()
+const headers: DataTableHeader[] = [
+  { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
+  { title: t('main.title'), align: 'start', sortable: false, key: 'title' },
+  { title: t('users.author'), align: 'start', sortable: false, key: 'author' },
+  { title: t('main.aura'), align: 'start', sortable: false, key: 'aura' },
+  { title: t('main.created-at'), align: 'start', sortable: false, key: 'created_at' },
+  { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
+]
+const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>(
+  'admin.writings',
+  page.props.total
+)
 </script>
 
 <template>
@@ -48,14 +49,15 @@ async function loadItems(event) {
       :items="items"
       :loading="isLoading"
       item-value="id"
+      :row-props="({ item }) => ({ id: `admin-writing-${item.id}` })"
       @update:options="loadItems"
     >
       <template v-slot:item.author="{ item }">
-        {{ $helper.userDisplayName(item.author) }}
+        {{ userDisplayName(item.author) }}
       </template>
 
       <template v-slot:item.created_at="{ item }">
-        {{ $helper.toLocaleDate(item.created_at) }}
+        {{ toLocaleDate(item.created_at) }}
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -67,7 +69,7 @@ async function loadItems(event) {
             icon
             inertia
           >
-            <v-icon icon="fas fa-eye"></v-icon>
+            <v-icon icon="fas fa-eye" />
           </po-button>
 
           <po-button
@@ -77,17 +79,11 @@ async function loadItems(event) {
             icon
             inertia
           >
-            <v-icon icon="fas fa-edit"></v-icon>
+            <v-icon icon="fas fa-edit" />
           </po-button>
 
-          <po-button
-            :href="route('writings.edit', item.slug)"
-            size="x-small"
-            color="secondary"
-            icon
-            inertia
-          >
-            <v-icon icon="fas fa-trash"></v-icon>
+          <po-button href="#" size="x-small" color="secondary" icon inertia>
+            <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>
