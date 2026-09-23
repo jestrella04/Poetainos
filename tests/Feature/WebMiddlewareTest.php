@@ -46,6 +46,19 @@ describe('security headers', function (): void {
     });
 });
 
+describe('document head', function (): void {
+    it('declares the Vuetify cascade layer order before any other stylesheet', function (): void {
+        // When
+        $response = get('/offline');
+
+        // Then
+        // Nothing that can open a cascade layer (a <style> or stylesheet <link>) may precede the declaration
+        expect($response->getContent())->toMatch(
+            '/^(?:(?!<style|<link[^>]*rel="stylesheet").)*<style>@layer vuetify-core, vuetify-components, vuetify-overrides, vuetify-utilities, vuetify-final;<\/style>/s'
+        );
+    });
+});
+
 describe('appearance', function (): void {
     it('is shared with views from the appearance cookie', function (string $cookieValue, string $expected): void {
         // When
