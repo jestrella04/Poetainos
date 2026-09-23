@@ -1,5 +1,7 @@
 <?php
 
+use Minishlink\WebPush\ContentEncoding;
+
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\postJson;
 
@@ -25,6 +27,7 @@ describe('subscribing to push notifications', function (): void {
         expect($subscription->endpoint)->toBe($endpoint);
         expect($subscription->public_key)->toBe($publicKey);
         expect($subscription->auth_token)->toBe($authToken);
+        expect($subscription->content_encoding)->toBe(ContentEncoding::aesgcm);
     });
 
     it('requires an endpoint', function (): void {
@@ -33,6 +36,21 @@ describe('subscribing to push notifications', function (): void {
 
         // Then
         $response->assertUnprocessable()->assertJsonValidationErrors('endpoint');
+    });
+
+    it('rejects an unsupported content encoding', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->postJson(route('push.update'), [
+            'endpoint' => fake()->url(),
+            'contentEncoding' => 'gzip',
+        ]);
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors('contentEncoding');
+        expect($user->pushSubscriptions()->exists())->toBeFalse();
     });
 
     it('rejects guests', function (): void {

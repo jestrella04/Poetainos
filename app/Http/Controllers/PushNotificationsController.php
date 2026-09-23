@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Minishlink\WebPush\ContentEncoding;
 
 class PushNotificationsController extends Controller
 {
@@ -12,7 +14,10 @@ class PushNotificationsController extends Controller
      */
     public function update(Request $request): JsonResponse
     {
-        $this->validate($request, ['endpoint' => 'required']);
+        $this->validate($request, [
+            'endpoint' => 'required',
+            'contentEncoding' => ['nullable', Rule::enum(ContentEncoding::class)],
+        ]);
 
         $request->user()?->updatePushSubscription(
             $request->endpoint,

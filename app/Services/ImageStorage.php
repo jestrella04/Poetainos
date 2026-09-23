@@ -60,7 +60,7 @@ class ImageStorage
     {
         $absolutePath = Storage::disk(self::DISK)->path($path);
 
-        Image::read($absolutePath)->cover($width, $height)->save();
+        Image::decodePath($absolutePath)->cover($width, $height)->save();
         app(OptimizerChain::class)->optimize($absolutePath);
 
         return $path;

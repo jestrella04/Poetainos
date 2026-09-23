@@ -5,10 +5,6 @@ namespace App\Notifications;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use NotificationChannels\FacebookPoster\FacebookPosterChannel;
-use NotificationChannels\FacebookPoster\FacebookPosterPost;
-use NotificationChannels\Twitter\TwitterChannel;
-use NotificationChannels\Twitter\TwitterStatusUpdate;
 use NotificationChannels\WebPush\WebPushChannel;
 
 class WritingFeatured extends PoetainosNotification implements ShouldQueue
@@ -24,13 +20,6 @@ class WritingFeatured extends PoetainosNotification implements ShouldQueue
                 'title' => $this->writing->title,
                 'site' => getSiteConfig('name'),
             ]),
-            'body_social' => [
-                __('":title" by :author has been awarded with a #GoldenFlower.', [
-                    'title' => $this->writing->title,
-                ]),
-                __('You cannot miss this! #poetry'),
-                $this->writing->path(),
-            ],
             'footer' => __('Thank you for being part of the hood!'),
             'url' => $this->writing->path(),
             'action' => __('View writing'),
@@ -47,24 +36,7 @@ class WritingFeatured extends PoetainosNotification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        return [...$this->mailChannelIfWanted($notifiable), 'database', TwitterChannel::class, FacebookPosterChannel::class, WebPushChannel::class];
-    }
-
-    public function toTwitter(mixed $notifiable): TwitterStatusUpdate
-    {
-        $msg = implode(' ', $this->content['body_social']);
-        $msg = str_replace(':author', $this->writing->author?->twitterHandleOrName() ?? '', $msg);
-        $msg = $msg.' '.$this->content['url'];
-
-        return new TwitterStatusUpdate($msg);
-    }
-
-    public function toFacebookPoster(mixed $notifiable): FacebookPosterPost
-    {
-        $msg = implode(' ', $this->content['body_social']);
-        $msg = str_replace(':author', $this->writing->author?->getName() ?? '', $msg);
-
-        return (new FacebookPosterPost($msg))->withLink($this->content['url']);
+        return [...$this->mailChannelIfWanted($notifiable), 'database', WebPushChannel::class];
     }
 
     /**

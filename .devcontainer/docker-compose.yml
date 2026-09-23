@@ -11,7 +11,7 @@ services:
     networks:
       - network
   php:
-    image: php:8.3-fpm
+    image: php:8.5-fpm
     ports:
       - "8000:8000"
     volumes:

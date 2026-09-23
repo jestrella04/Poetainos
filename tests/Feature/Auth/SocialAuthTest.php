@@ -159,10 +159,10 @@ describe('social login', function (): void {
 
     it('refuses a login when the provider shares no email address', function (): void {
         // Given
-        Socialite::fake('twitter', SocialiteUser::fake(['email' => null]));
+        Socialite::fake('google', SocialiteUser::fake(['email' => null]));
 
         // When
-        $response = get('/login/twitter/callback');
+        $response = get('/login/google/callback');
 
         // Then
         $response->assertRedirect(route('login'));
@@ -232,5 +232,16 @@ describe('social login', function (): void {
     })->with([
         'a web page' => [fn (): string => '<html>'.fake()->sentence().'</html>'],
         'a gif' => ['GIF89a'.str_repeat("\0", 32)],
+    ]);
+
+    it('rejects a provider that is not offered', function (string $path): void {
+        // When
+        $response = get($path);
+
+        // Then
+        $response->assertNotFound();
+    })->with([
+        'redirect' => ['/login/facebook'],
+        'callback' => ['/login/facebook/callback'],
     ]);
 });

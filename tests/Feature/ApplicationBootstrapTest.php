@@ -54,11 +54,11 @@ describe('a new registration', function (): void {
 });
 
 describe('the schedule', function (): void {
-    it('runs the daily maintenance and featured content commands', function (): void {
+    it('runs the daily maintenance and pick of the day commands', function (): void {
         // When
         $commands = collect(app(Schedule::class)->events())->map(fn ($event) => $event->command)->implode("\n");
 
         // Then
-        expect($commands)->toContain('aura:update', 'karma:update', 'sitemap:generate', 'writing:pick-of-the-day', 'writing:post-of-the-day', 'author:random', 'category:random');
+        expect($commands)->toContain('aura:update', 'karma:update', 'sitemap:generate', 'writing:pick-of-the-day');
     });
 });

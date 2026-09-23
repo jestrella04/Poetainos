@@ -3,7 +3,6 @@
 use App\Models\BlockedUser;
 use App\Models\DailySelection;
 use App\Models\Writing;
-use App\Notifications\WritingOfTheDayPosted;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Notification;
@@ -123,36 +122,6 @@ describe('the midnight command', function (): void {
     });
 });
 
-describe('the notification command', function (): void {
-    it('notifies about the persisted pick without creating another one', function (): void {
-        // Given
-        Notification::fake();
-        Writing::factory()->count(2)->create();
-        $featuredAuthor = DailySelection::pickForToday()->writing()->firstOrFail()->author()->firstOrFail();
-
-        // When
-        pendingArtisan('writing:post-of-the-day')->assertSuccessful();
-
-        // Then
-        expect(DailySelection::count())->toBe(1);
-        Notification::assertSentTo($featuredAuthor, WritingOfTheDayPosted::class);
-        Notification::assertSentTimes(WritingOfTheDayPosted::class, 1);
-    });
-
-    it('creates today\'s pick when the midnight command has not run yet', function (): void {
-        // Given
-        Notification::fake();
-        $writing = Writing::factory()->create();
-
-        // When
-        pendingArtisan('writing:post-of-the-day')->assertSuccessful();
-
-        // Then
-        expect(DailySelection::current()?->writing_id)->toBe($writing->id);
-        Notification::assertSentTo($writing->author, WritingOfTheDayPosted::class);
-    });
-});
-
 describe('the homepage hero', function (): void {
     it('shows the featured writing with its listing relations', function (): void {
         // Given
@@ -199,7 +168,7 @@ describe('the homepage hero', function (): void {
 });
 
 describe('the schedule', function (): void {
-    it('picks at midnight and notifies at 13:00', function (): void {
+    it('picks at midnight', function (): void {
         // Given
         $cronFor = fn (string $command): ?string => collect(app(Schedule::class)->events())
             ->first(fn ($event): bool => str_contains((string) $event->command, $command))
@@ -207,6 +176,5 @@ describe('the schedule', function (): void {
 
         // Then
         expect($cronFor('writing:pick-of-the-day'))->toBe('0 0 * * *');
-        expect($cronFor('writing:post-of-the-day'))->toBe('0 13 * * *');
     });
 });

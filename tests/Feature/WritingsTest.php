@@ -3,7 +3,6 @@
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\Writing;
-use App\Notifications\WritingPublished;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -100,7 +99,6 @@ describe('creating a writing', function (): void {
         $writing = Writing::where('title', $title)->firstOrFail();
         expect($writing->categories()->pluck('categories.id')->all())
             ->toContain($mainCategory->id, $subCategory->id);
-        Notification::assertSentTo($user, WritingPublished::class);
     });
 
     it('allows a user who already accepted the agreements to publish when the form submits them unchecked', function (): void {
