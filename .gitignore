@@ -31,3 +31,4 @@ composer.phar
 /.phpstorm.meta.php
 /graphify-out
 /tests/Browser/Screenshots
+.brainstorm
