@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Abort on the first failing step so a broken install or build never reaches `php artisan up`
+set -euo pipefail
+
+on_failure() {
+    echo "Deploy failed at line $1. The app is still in maintenance mode; fix the issue and re-run, or run 'php artisan up'." >&2
+}
+trap 'on_failure $LINENO' ERR
+
 # Turn on maintenance mode
 php artisan down
 
@@ -7,10 +15,13 @@ php artisan down
 # From time to time the reset cache command fails because of this
 sudo chmod -R 0777 storage/
 
-# Pull the latest changes from the git repository
-# git reset --hard
-# git clean -df
-git pull origin master
+# Pull the latest changes, then re-run this script from the top so the
+# freshly pulled version is executed (bash reads scripts lazily, so a
+# script modified mid-run would otherwise execute from shifted offsets)
+if [ "${DEPLOY_PULLED:-0}" != "1" ]; then
+    git pull origin master
+    DEPLOY_PULLED=1 exec "$0" "$@"
+fi
 
 # Get latest Composer
 sh ./getcomposer.sh
@@ -54,8 +65,25 @@ npm ci
 # Build assets using Vite
 npm run build
 
-# Restart SSR server so it picks up the new bundle
-php artisan inertia:stop-ssr
+# Restart SSR server so it picks up the new bundle; the process manager brings it back up.
+# stop-ssr exits non-zero when the server isn't running, which is fine here.
+php artisan inertia:stop-ssr || true
+
+# Wait for the SSR server to come back; the app falls back to client-side rendering without it
+ssr_is_up=false
+for _ in $(seq 1 10); do
+    sleep 1
+    if php artisan inertia:check-ssr > /dev/null 2>&1; then
+        ssr_is_up=true
+        break
+    fi
+done
+
+if [ "$ssr_is_up" = true ]; then
+    echo "Inertia SSR server is running."
+else
+    echo "WARNING: Inertia SSR server did not come back up; check its process manager and storage/logs/laravel.log." >&2
+fi
 
 # Turn off maintenance mode
 php artisan up
