@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\withUnencryptedCookie;
@@ -27,10 +28,10 @@ describe('security headers', function (): void {
         $response = get('/offline');
 
         // Then
-        preg_match("/script-src 'self' 'nonce-([^']+)'/", $response->headers->get('Content-Security-Policy'), $matches);
-        expect($matches)->toHaveKey(1);
+        $nonce = Str::match("/script-src 'self' 'nonce-([^']+)'/", $response->headers->get('Content-Security-Policy') ?? '');
+        expect($nonce)->not->toBeEmpty();
         // Ziggy emits the full script on its first render per process and a merge script after that
-        expect($response->getContent())->toMatch('/<script type="text\/javascript" nonce="'.preg_quote($matches[1], '/').'">(const Ziggy=|Object\.assign\(Ziggy\.routes)/');
+        expect($response->getContent())->toMatch('/<script type="text\/javascript" nonce="'.preg_quote($nonce, '/').'">(const Ziggy=|Object\.assign\(Ziggy\.routes)/');
     });
 
     it('allows runtime-injected inline styles under the production policy', function (): void {
