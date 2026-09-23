@@ -13,45 +13,11 @@ const page = usePage<InertiaPageProps<{ page: StaticPage }>>()
 const data = page.props.page
 </script>
 
-<style scoped>
-/* Typography for CMS/prose content rendered as raw HTML; Vuetify has no built-in prose styling. */
-*:deep(h1),
-*:deep(h2),
-*:deep(h3),
-*:deep(h4),
-*:deep(h5),
-*:deep(h6) {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
-
-*:deep(p) {
-  margin-bottom: 1rem;
-}
-
-*:deep(ul) {
-  list-style-type: circle;
-}
-
-*:deep(ul li),
-*:deep(ol li) {
-  padding-left: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-*:deep(code),
-*:deep(ul),
-*:deep(ol) {
-  margin-left: 2rem;
-  margin-bottom: 1rem;
-}
-</style>
-
 <template>
-  <po-head />
-  <v-card :title="data.title.toUpperCase()">
-    <v-card-text>
-      <div v-html="markdown(data.text)" class="text-justify" />
-    </v-card-text>
-  </v-card>
+  <po-wrapper>
+    <po-head />
+
+    <p class="text-uppercase text-eyebrow text-primary">{{ data.title }}</p>
+    <div v-html="markdown(data.text)" class="text-justify" />
+  </po-wrapper>
 </template>
