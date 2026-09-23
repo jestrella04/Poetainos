@@ -69,6 +69,15 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   build: {
     sourcemap: true,
     rollupOptions: {
+      onLog(level, log, handler) {
+        // @inertiajs/vite rewrites the app entry without emitting a sourcemap, which
+        // it can't be configured to do; the affected lines are its own generated code.
+        if (log.code === 'SOURCEMAP_BROKEN' && log.plugin === '@inertiajs/vite') {
+          return
+        }
+
+        handler(level, log)
+      },
       output: {
         manualChunks
       }
