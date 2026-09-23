@@ -20,8 +20,7 @@ type LoginStep = 'guest' | 'checking' | 'login' | 'register'
 const LOGIN_FORM = '#login-form'
 
 const socialProviders = [
-  { name: 'google', icon: 'fab fa-google', label: 'accounts.continue-with-google' },
-  { name: 'facebook', icon: 'fab fa-facebook-f', label: 'accounts.continue-with-facebook' }
+  { name: 'google', icon: 'fab fa-google', label: 'accounts.continue-with-google' }
 ]
 
 const { t } = useI18n()

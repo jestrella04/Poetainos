@@ -81,8 +81,8 @@ class SocialAuthController extends Controller
 
         // Social login implies a trusted email address (the provider already
         // authenticated it) — verify it once on first login. Socialite's User
-        // object has no portable "email verified" flag across our providers
-        // (Google/Facebook/Twitter), so check our own record instead.
+        // object has no portable "email verified" flag across providers, so
+        // check our own record instead.
         if ($user->email_verified_at === null) {
             $user->email_verified_at = Carbon::now();
         }

@@ -43,21 +43,3 @@ describe('user initials', function (): void {
         expect($initials)->toBe(mb_strtoupper(mb_substr($username, 0, 1)));
     })->with([null, ' ']);
 });
-
-describe('the X (Twitter) handle', function (): void {
-    it('is the stored handle with a single @, or the display name without one', function (Closure $stored, Closure $expected): void {
-        // Given
-        $handle = fakeUsername();
-        $name = fake()->firstName().' '.fake()->lastName();
-        $storedHandle = $stored($handle);
-        $user = createUser(['name' => $name, 'extra_info' => $storedHandle === null ? null : ['social' => ['twitter' => $storedHandle]]]);
-
-        // Then
-        expect($user->twitterHandleOrName())->toBe($expected($handle, $name));
-    })->with([
-        'a bare handle' => [fn (string $handle): string => $handle, fn (string $handle): string => '@'.$handle],
-        'a handle typed with an @' => [fn (string $handle): string => '@'.$handle, fn (string $handle): string => '@'.$handle],
-        'an empty handle' => [fn (): string => '', fn (string $handle, string $name): string => $name],
-        'no social links' => [fn (): ?string => null, fn (string $handle, string $name): string => $name],
-    ]);
-});

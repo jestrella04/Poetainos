@@ -31,27 +31,6 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'twitter' => [
-        'client_id' => env('TWITTER_CONSUMER_KEY'),
-        'client_secret' => env('TWITTER_CONSUMER_SECRET'),
-        'consumer_key' => env('TWITTER_CONSUMER_KEY'),
-        'consumer_secret' => env('TWITTER_CONSUMER_SECRET'),
-        'access_token' => env('TWITTER_ACCESS_TOKEN'),
-        'access_secret' => env('TWITTER_ACCESS_SECRET'),
-        'redirect' => env('TWITTER_CALLBACK_URL'),
-    ],
-
-    'facebook' => [
-        'client_id' => env('FACEBOOK_CLIENT_ID'),
-        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
-        'redirect' => env('FACEBOOK_CALLBACK_URL'),
-    ],
-
-    'facebook_poster' => [
-        'page_id' => env('FACEBOOK_PAGE_ID'),
-        'access_token' => env('FACEBOOK_ACCESS_TOKEN'),
-    ],
-
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

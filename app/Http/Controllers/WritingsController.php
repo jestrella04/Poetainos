@@ -8,7 +8,6 @@ use App\Models\DailySelection;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
-use App\Notifications\WritingPublished;
 use App\Services\ContentDeleter;
 use App\Services\ImageStorage;
 use App\Services\WritingPublisher;
@@ -98,9 +97,6 @@ class WritingsController extends Controller
 
         RecalculateAura::dispatch($user);
         $this->rememberAgreements($request, $user);
-
-        // Share on social media
-        $user->notify(new WritingPublished($writing));
 
         return [
             'url' => $writing->path(),

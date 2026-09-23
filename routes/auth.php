@@ -12,12 +12,14 @@ use App\Http\Controllers\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
-    Route::get('/login/{service}', [SocialAuthController::class, 'redirectToProvider'])->name('social.login');
-    Route::get('/login/{service}/callback', [SocialAuthController::class, 'handleProviderCallback']);
+    Route::whereIn('service', ['google'])->group(function (): void {
+        Route::get('/login/{service}', [SocialAuthController::class, 'redirectToProvider'])->name('social.login');
+        Route::get('/login/{service}/callback', [SocialAuthController::class, 'handleProviderCallback']);
 
-    Route::get('/login/{service}/confirm/{user:id}', [SocialAuthController::class, 'confirmProviderLink'])
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('social.confirm');
+        Route::get('/login/{service}/confirm/{user:id}', [SocialAuthController::class, 'confirmProviderLink'])
+            ->middleware(['signed', 'throttle:6,1'])
+            ->name('social.confirm');
+    });
 
     Route::post('register', [RegisteredUserController::class, 'store'])
         ->middleware('throttle:5,1')

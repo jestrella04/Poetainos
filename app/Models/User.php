@@ -102,16 +102,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * The user's X (Twitter) handle for a mention, or their display name when they have none.
-     */
-    public function twitterHandleOrName(): string
-    {
-        $handle = ltrim($this->extra_info['social']['twitter'] ?? '', '@');
-
-        return $handle !== '' ? '@'.$handle : $this->getName();
-    }
-
-    /**
      * @return BelongsTo<Role, $this>
      */
     public function role(): BelongsTo

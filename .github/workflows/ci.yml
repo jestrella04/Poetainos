@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PHP_VERSION: '8.3'
+  PHP_VERSION: '8.5'
   PHP_EXTENSIONS: bcmath, ctype, curl, fileinfo, gd, gmp, intl, mbstring, pdo_sqlite, sodium, xml, zip
 
 jobs:

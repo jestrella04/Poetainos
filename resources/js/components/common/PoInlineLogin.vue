@@ -35,17 +35,6 @@ const { asset } = useFormatting()
         <po-button
           icon
           color="primary"
-          :href="route('social.login', { service: 'facebook', redirect: asset($page.url) })"
-          :title="$t('accounts.continue-with-facebook')"
-        >
-          <v-icon icon="fab fa-facebook-f" />
-        </po-button>
-      </div>
-
-      <div>
-        <po-button
-          icon
-          color="primary"
           :href="route('login', { isEmail: true, redirect: asset($page.url) })"
           :title="$t('accounts.continue-with-email')"
           inertia
