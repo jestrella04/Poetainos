@@ -17,7 +17,7 @@ const data = page.props.page
   <po-wrapper>
     <po-head />
 
-    <p class="text-uppercase text-eyebrow text-primary">{{ data.title }}</p>
+    <p class="text-uppercase text-medium-emphasis text-eyebrow text-primary">{{ data.title }}</p>
     <div v-html="markdown(data.text)" class="text-justify" />
   </po-wrapper>
 </template>

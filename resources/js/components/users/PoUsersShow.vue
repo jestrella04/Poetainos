@@ -103,11 +103,12 @@ const {
                   {{ writing.title }}
                 </po-link>
 
-                <div class="d-inline-flex ga-3">
+                <div class="d-flex ga-3">
                   <span>{{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}</span>
                   <span>{{ relativeDate(writing.created_at) }}</span>
                 </div>
               </div>
+
               <v-divider class="my-4" />
             </template>
 
@@ -141,11 +142,12 @@ const {
                   {{ writing.title }}
                 </po-link>
 
-                <div class="d-inline-flex ga-3">
+                <div class="d-flex ga-3">
                   <span>{{ $t('main.by-name', { name: userDisplayName(writing.author) }) }}</span>
                   <span>{{ relativeDate(writing.created_at) }}</span>
                 </div>
               </div>
+
               <v-divider class="my-4" />
             </template>
 

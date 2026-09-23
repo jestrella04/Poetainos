@@ -19,6 +19,11 @@
     <link rel="apple-touch-icon" href="/images/logo.svg">
     <link rel="manifest" href="{{ route('pwa.manifest', [], false) }}">
 
+    <!-- Vuetify never declares its cascade layer order up front, so layers rank by first appearance.
+         The SSR theme stylesheet below opens with `vuetify-utilities`, which would otherwise make every
+         utility class (spacing, display, colors) lose to component styles. -->
+    <style>@layer vuetify-core, vuetify-components, vuetify-overrides, vuetify-utilities, vuetify-final;</style>
+
     <!-- Inertia -->
     @inertiaHead
 
