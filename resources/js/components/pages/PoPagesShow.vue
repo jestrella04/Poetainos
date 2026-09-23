@@ -33,8 +33,8 @@ const data = page.props.page
   list-style-type: circle;
 }
 
-*:deep(ul) *:deep(li),
-*:deep(ol) *:deep(li) {
+*:deep(ul li),
+*:deep(ol li) {
   padding-left: 0.5rem;
   margin-bottom: 0.5rem;
 }
