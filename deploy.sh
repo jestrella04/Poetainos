@@ -42,9 +42,8 @@ php artisan config:cache
 php artisan view:clear
 php artisan view:cache
 
-# Restart service worker and SSR server
+# Restart queue workers
 php artisan queue:restart
-php artisan inertia:stop-ssr
 
 # Generate assetlinks
 php artisan generate:assetlinks
@@ -54,6 +53,9 @@ npm ci
 
 # Build assets using Vite
 npm run build
+
+# Restart SSR server so it picks up the new bundle
+php artisan inertia:stop-ssr
 
 # Turn off maintenance mode
 php artisan up
