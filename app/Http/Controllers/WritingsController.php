@@ -125,6 +125,8 @@ class WritingsController extends Controller
                     $writing->author?->getName() ?? '',
                 ]),
                 'canonical' => $writing->path(),
+                'description' => $writing->excerpt(),
+                'image' => $writing->coverUrl(),
             ],
             'writing' => $writing,
             'likers' => $writing->likers(self::LIKERS_SHOWN),

@@ -59,11 +59,20 @@ php artisan queue:restart
 # Generate assetlinks
 php artisan generate:assetlinks
 
-# Install node modules
-npm ci
+# Install node modules only when the lockfile changed since the last install.
+# npm ci wipes node_modules and reinstalls everything, which can starve the server
+# of I/O and memory; the hash lives inside node_modules so a wipe invalidates it too.
+lock_hash_file=node_modules/.package-lock.sha
+current_lock_hash=$(sha256sum package-lock.json | cut -d' ' -f1)
+if [ ! -f "$lock_hash_file" ] || [ "$(cat "$lock_hash_file")" != "$current_lock_hash" ]; then
+    nice -n 19 ionice -c3 npm ci --no-audit --no-fund
+    echo "$current_lock_hash" > "$lock_hash_file"
+fi
 
-# Build assets using Vite
-npm run build
+# Build assets using Vite at low priority with a capped Node heap so the build
+# can't push php-fpm, MariaDB or SSR into swap or the OOM killer.
+# Override with DEPLOY_NODE_MAX_MEMORY_MB if the build needs more headroom.
+NODE_OPTIONS="--max-old-space-size=${DEPLOY_NODE_MAX_MEMORY_MB:-1024}" nice -n 19 ionice -c3 npm run build
 
 # Restart SSR server so it picks up the new bundle; the process manager brings it back up.
 # stop-ssr exits non-zero when the server isn't running, which is fine here.

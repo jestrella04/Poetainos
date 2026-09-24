@@ -44,9 +44,9 @@ interface SharedPageProps {
   flash: {
     message: string | null
   }
-  // Consumed internally by the ZiggyVue plugin, not read directly by app
-  // code — left unstructured rather than guessed.
-  ziggy: unknown
+  // Consumed internally by the ZiggyVue plugin; app code only reads the
+  // absolute base URL, so the rest is left unstructured rather than guessed.
+  ziggy: { url: string } & Record<string, unknown>
 }
 
 declare module '@inertiajs/core' {
