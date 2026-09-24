@@ -143,6 +143,18 @@ function fakeStrongPassword(): string
 }
 
 /**
+ * A six digit code guaranteed to differ from the given one.
+ */
+function wrongCodeFor(string $code): string
+{
+    do {
+        $wrongCode = fake()->numerify('######');
+    } while ($wrongCode === $code);
+
+    return $wrongCode;
+}
+
+/**
  * A short, punctuation-free title, so it survives slugging, HTML escaping and
  * the 3 to 40 character rules of titles and names unchanged.
  */

@@ -1,49 +1,36 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount, watch, provide } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { ref, onMounted, watch, provide } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import {
   forceSnackBarKey,
   loginModalKey,
   mobileSiteMenuKey,
   mobileUserMenuKey,
-  snackBarKey,
   unreadCountKey
 } from '@/composables/keys'
 import { useAuth } from '@/composables/useAuth'
 import { useNotificationsChannel } from '@/composables/useNotificationsChannel'
 import { useSystemTheme } from '@/composables/useSystemTheme'
-import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useSnackbar } from '@/composables/useSnackbar'
+import { useFlashMessages } from '@/composables/useFlashMessages'
 import { useStaticPages } from '@/composables/useStaticPages'
 
 const page = usePage()
 const { isAuthenticated, authUser, isAdmin } = useAuth()
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const { getSnackBar } = useSnackbar()
+const { showFlashMessages } = useFlashMessages()
 const { faqPath, aboutPath, termsPath, privacyPath } = useStaticPages()
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const forceSnackBar = ref(false)
 const unreadCount = ref(page.props.auth.notifications)
 const loginModal = ref(false)
-const snackBar = reactive({
-  active: false,
-  avatar: '/images/logo.svg',
-  color: 'info',
-  timeout: 6000,
-  message: ''
-})
 
 const { revealStyle } = useSystemTheme()
 
-provide(snackBarKey, snackBar)
 provide(forceSnackBarKey, forceSnackBar)
 provide(mobileSiteMenuKey, mobileSiteMenu)
 provide(mobileUserMenuKey, mobileUserMenu)
 provide(unreadCountKey, unreadCount)
 provide(loginModalKey, loginModal)
-
-let stopListeningForNavigation: () => void = () => undefined
 
 onMounted(() => {
   void import('@khmyznikov/pwa-install')
@@ -53,21 +40,9 @@ onMounted(() => {
     document.body.appendChild(document.createElement('pwa-install'))
   }
 
-  getFlashMessages()
-
-  // Flash messages arrive with a navigation; re-reading them on every re-render
-  // would bring back a snackbar the user already dismissed.
-  stopListeningForNavigation = router.on('navigate', () => {
-    getFlashMessages()
-  })
-
   if (isAuthenticated() && 'setAppBadge' in navigator) {
     void navigator.setAppBadge(unreadCount.value)
   }
-})
-
-onBeforeUnmount(() => {
-  stopListeningForNavigation()
 })
 
 useNotificationsChannel(
@@ -83,29 +58,10 @@ useNotificationsChannel(
 
 watch(forceSnackBar, () => {
   if (forceSnackBar.value === true) {
-    getFlashMessages()
+    showFlashMessages()
     forceSnackBar.value = false
   }
 })
-
-function getFlashMessages() {
-  const snack = getSnackBar()
-  const flash = page.props.flash.message
-
-  // Check for client side flash messages
-  if (snack !== null && !isEmpty(snack)) {
-    snackBar.message = snack.message ?? snackBar.message
-    snackBar.active = snack.active ?? snackBar.active
-    snackBar.color = snack.color ?? snackBar.color
-  }
-
-  // Check for server side flash messages
-  if (flash !== null && !strNullOrEmpty(flash)) {
-    snackBar.message = flash
-    snackBar.active = true
-    snackBar.color = 'primary'
-  }
-}
 </script>
 
 <template>

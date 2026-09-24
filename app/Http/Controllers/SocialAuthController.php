@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
-use App\Notifications\ConfirmSocialLogin;
+use App\Notifications\SocialLoginCode;
 use App\Services\ImageStorage;
+use App\Services\VerificationCodes;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\RedirectResponse;
@@ -13,12 +14,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
 {
+    private const PENDING_LINK_SESSION_KEY = 'social_link';
+
     private const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 
     private const AVATAR_TIMEOUT_SECONDS = 5;
@@ -68,49 +73,76 @@ class SocialAuthController extends Controller
         $user = $this->findOrCreateUser($social, $email);
 
         // An existing account meeting this provider for the first time must
-        // confirm ownership by email before we trust the provider's claim
-        // and log in — otherwise anyone who can get a provider to report a
-        // victim's email address could sign straight into their account.
+        // confirm ownership with an emailed code before we trust the provider's
+        // claim and log in — otherwise anyone who can get a provider to report
+        // a victim's email address could sign straight into their account.
         if ($exists && ! $this->isLinked($user, $service)) {
-            return $this->askToConfirmLink($user, $service);
+            return $this->askToConfirmLink($user, $service, $social->getAvatar());
         }
 
-        if (($user->extra_info['avatar'] ?? '') === '' && $social->getAvatar() !== null) {
-            $this->importAvatar($user, $social->getAvatar(), $images);
-        }
-
-        // Social login implies a trusted email address (the provider already
-        // authenticated it) — verify it once on first login. Socialite's User
-        // object has no portable "email verified" flag across providers, so
-        // check our own record instead.
-        if ($user->email_verified_at === null) {
-            $user->email_verified_at = Carbon::now();
-        }
-
-        $this->linkProvider($user, $service);
-        $user->save();
-
-        Auth::login($user);
-
-        request()->session()->flash('message', $exists === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
+        $this->completeLogin($user, $service, $social->getAvatar(), $images, $exists);
 
         return redirect(Redirect::intended(route('home'))->getTargetUrl());
     }
 
     /**
-     * Complete a social login for an existing account that just confirmed,
-     * via the signed emailed link, that it owns this provider's email.
+     * Display the page where an existing account enters the code that confirms
+     * its first sign-in through this provider.
      */
-    public function confirmProviderLink(string $service, User $user): RedirectResponse
+    public function showLinkConfirmation(string $service): RedirectResponse|Response
     {
-        $this->linkProvider($user, $service);
-        $user->save();
+        $user = $this->pendingLinkUser($service);
 
-        Auth::login($user);
+        if ($user === null) {
+            request()->session()->flash('message', 'accounts.social-link-expired');
 
-        request()->session()->flash('message', 'accounts.welcome-back');
+            return redirect(route('login'));
+        }
 
-        return redirect(Redirect::intended(route('home'))->getTargetUrl());
+        return Inertia::render('auth/PoSocialConfirm', [
+            'meta' => [
+                'title' => getPageTitle([__('Confirm Sign-in')]),
+                'canonical' => route('home'),
+            ],
+            'service' => $service,
+            'email' => $user->email,
+        ]);
+    }
+
+    /**
+     * Complete a social login for an existing account once it enters the code
+     * emailed to it, proving it owns this provider's email address.
+     *
+     * @return array{url: string}
+     */
+    public function confirmProviderLink(string $service, ImageStorage $images): array
+    {
+        request()->validate([
+            'code' => ['required', 'digits:6'],
+        ]);
+
+        $user = $this->requirePendingLinkUser($service);
+
+        if (app(VerificationCodes::class)->verify($user, VerificationCodes::PURPOSE_SOCIAL_LINK, request('code')) === false) {
+            throw ValidationException::withMessages([
+                'code' => __('The verification code is invalid or has expired.'),
+            ]);
+        }
+
+        $avatarUrl = request()->session()->pull(self::PENDING_LINK_SESSION_KEY)['avatar'];
+        $this->completeLogin($user, $service, $avatarUrl, $images, true);
+
+        return ['url' => Redirect::intended(route('home'))->getTargetUrl()];
+    }
+
+    /**
+     * Email a fresh confirmation code to the account awaiting its first sign-in through this provider.
+     */
+    public function resendLinkCode(string $service): \Illuminate\Http\Response
+    {
+        $this->sendLinkCode($this->requirePendingLinkUser($service), $service);
+
+        return response()->noContent();
     }
 
     /**
@@ -131,21 +163,80 @@ class SocialAuthController extends Controller
     }
 
     /**
-     * Email the account's owner a link to confirm that this provider may sign in to it.
+     * Remember which account is awaiting confirmation and email its owner a
+     * code to confirm that this provider may sign in to it.
      */
-    private function askToConfirmLink(User $user, string $service): RedirectResponse
+    private function askToConfirmLink(User $user, string $service, ?string $avatarUrl): RedirectResponse
     {
-        $confirmUrl = URL::temporarySignedRoute(
-            'social.confirm',
-            Carbon::now()->addMinutes(30),
-            ['user' => $user->id, 'service' => $service]
-        );
+        request()->session()->put(self::PENDING_LINK_SESSION_KEY, [
+            'user_id' => $user->id,
+            'service' => $service,
+            'avatar' => $avatarUrl,
+        ]);
 
-        $user->notify(new ConfirmSocialLogin($service, $confirmUrl));
+        $this->sendLinkCode($user, $service);
 
-        request()->session()->flash('message', 'accounts.confirm-social-link-sent');
+        return redirect(route('social.confirm', $service));
+    }
 
-        return redirect(route('login'));
+    private function sendLinkCode(User $user, string $service): void
+    {
+        $code = app(VerificationCodes::class)->issue($user, VerificationCodes::PURPOSE_SOCIAL_LINK);
+
+        $user->notify(new SocialLoginCode($code, $service, VerificationCodes::CODE_MINUTES));
+    }
+
+    /**
+     * The account this browser is confirming a first sign-in for through this provider, if any.
+     */
+    private function pendingLinkUser(string $service): ?User
+    {
+        $pending = request()->session()->get(self::PENDING_LINK_SESSION_KEY);
+
+        if ($pending === null || $pending['service'] !== $service) {
+            return null;
+        }
+
+        return User::whereKey($pending['user_id'])->first();
+    }
+
+    private function requirePendingLinkUser(string $service): User
+    {
+        $user = $this->pendingLinkUser($service);
+
+        if ($user === null) {
+            throw ValidationException::withMessages([
+                'code' => __('Your sign-in request has expired. Please sign in again.'),
+            ]);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Log the user in through a provider it is allowed to use, filling in the
+     * avatar and email verification the provider vouches for.
+     */
+    private function completeLogin(User $user, string $service, ?string $avatarUrl, ImageStorage $images, bool $isReturning): void
+    {
+        if (($user->extra_info['avatar'] ?? '') === '' && $avatarUrl !== null) {
+            $this->importAvatar($user, $avatarUrl, $images);
+        }
+
+        // Social login implies a trusted email address (the provider already
+        // authenticated it) — verify it once on first login. Socialite's User
+        // object has no portable "email verified" flag across providers, so
+        // check our own record instead.
+        if ($user->email_verified_at === null) {
+            $user->email_verified_at = Carbon::now();
+        }
+
+        $this->linkProvider($user, $service);
+        $user->save();
+
+        Auth::login($user);
+
+        request()->session()->flash('message', $isReturning === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
     }
 
     /**
