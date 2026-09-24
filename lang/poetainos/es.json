@@ -343,5 +343,9 @@
   "[:site] Your verification code": "[:site] Tu código de verificación",
   "Use the following code to verify your email address at :site. It expires in :minutes minutes.": "Usa el siguiente código para verificar tu correo en :site. Expira en :minutes minutos.",
   "If you did not create an account, you can safely ignore this email.": "Si no creaste una cuenta, puedes ignorar este correo.",
-  "The verification code is invalid or has expired.": "El código de verificación es inválido o ha expirado."
+  "The verification code is invalid or has expired.": "El código de verificación es inválido o ha expirado.",
+  "✨ Writing of the day ✨": "✨ Escrito del día ✨",
+  "\":title\", by :author": "«:title», de :author",
+  "Keep reading on Poetainos and leave the author a few words 👇": "Sigue leyendo en Poetainos y déjale unas palabras a quien lo escribió 👇",
+  "#Poetry #WritingOfTheDay #Poetainos": "#Poesía #EscritoDelDía #Poetainos"
 }

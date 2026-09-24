@@ -135,6 +135,33 @@ class Writing extends Model
         return $this->belongsToMany(User::class, 'shelves');
     }
 
+    /**
+     * The start of the text on a single line, cut at a word boundary when longer than the limit.
+     */
+    public function excerpt(int $maxLength = 200): string
+    {
+        $text = trim(preg_replace('/\s+/u', ' ', $this->text) ?? $this->text);
+
+        if (mb_strlen($text) <= $maxLength) {
+            return $text;
+        }
+
+        $cut = mb_substr($text, 0, $maxLength);
+        $lastSpace = mb_strrpos($cut, ' ');
+
+        return rtrim($lastSpace === false ? $cut : mb_substr($cut, 0, $lastSpace), ' ,.;:').'…';
+    }
+
+    /**
+     * The absolute URL of the cover image, if the writing has one.
+     */
+    public function coverUrl(): ?string
+    {
+        $cover = $this->extra_info['cover'] ?? null;
+
+        return $cover === null || $cover === '' ? null : asset('storage/'.$cover);
+    }
+
     public function incrementViews(): void
     {
         DB::table($this->getTable())->where('id', $this->id)->increment('views');

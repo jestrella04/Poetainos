@@ -23,8 +23,9 @@ Schedule::command('aura:update')->daily();
 Schedule::command('karma:update')->daily();
 Schedule::command('sitemap:generate')->daily();
 Schedule::command('writing:pick-of-the-day')->daily();
+Schedule::command('writing:post-of-the-day')->dailyAt('13:00');
 
-// Posting to X (writing:post-of-the-day, author:random, category:random) was removed in
-// September 2026 when the X API moved to paid, pay-per-use credits. To bring it back, restore
-// SocialPostNotification and its subclasses, the three commands and their schedule entries
-// from commit 478dc92, and reinstall laravel-notification-channels/twitter.
+// Posting to X (author:random, category:random and the X side of the writing of the day) was
+// removed in September 2026 when the X API moved to paid, pay-per-use credits. To bring it back,
+// restore SocialPostNotification and its subclasses, the commands and their schedule entries
+// from commit 02c9cac^, and reinstall laravel-notification-channels/twitter.
