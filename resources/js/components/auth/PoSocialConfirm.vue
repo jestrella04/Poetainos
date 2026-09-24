@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
-import { useSnackbar } from '@/composables/useSnackbar'
 import { useVerificationCode } from '@/composables/useVerificationCode'
 
 defineOptions({
   layout: PoLayoutLogin
 })
 
+const props = defineProps<{
+  service: string
+  email: string
+}>()
+
 const CODE_LENGTH = 6
 
-const { setSnackBar } = useSnackbar()
+const page = usePage()
 const { code, isVerifying, codeError, resendOutcome, resendCountdown, verifyCode, resendCode } =
   useVerificationCode()
+const providerName = computed(() => props.service.charAt(0).toUpperCase() + props.service.slice(1))
 
+// The welcome message is flashed by the server and shown on the next page
 function onVerified(redirectUrl: string): void {
-  setSnackBar({
-    message: 'accounts.email-verified',
-    color: 'primary',
-    active: true
-  })
-
   router.get(redirectUrl)
 }
 </script>
@@ -46,13 +47,25 @@ function onVerified(redirectUrl: string): void {
     />
 
     <p class="text-center text-uppercase font-weight-bold mb-3">
-      {{ $t('accounts.verify-email') }}
+      {{ $t('accounts.social-confirm-title') }}
     </p>
 
+    <v-alert
+      :text="
+        $t('accounts.social-confirm-first-time', {
+          provider: providerName,
+          site: page.props.site.name,
+          email: props.email
+        })
+      "
+      class="mb-4"
+      color="primary"
+      variant="tonal"
+      rounded
+    />
+
     <p class="text-justify mb-4">
-      {{ $t('accounts.verification-warning-1') }}
       {{ $t('accounts.verification-warning-2') }}
-      {{ $t('accounts.verification-warning-3') }}
     </p>
 
     <v-otp-input
@@ -63,7 +76,7 @@ function onVerified(redirectUrl: string): void {
       :error="codeError !== ''"
       type="number"
       autofocus
-      @finish="verifyCode(route('verification.verify'), onVerified)"
+      @finish="verifyCode(route('social.confirm.verify', props.service), onVerified)"
     />
 
     <p v-if="codeError !== ''" class="po-error text-center text-error ma-0 mb-4">
@@ -75,7 +88,7 @@ function onVerified(redirectUrl: string): void {
       class="mt-5 mb-5"
       :disabled="resendCountdown > 0"
       block
-      @click="resendCode(route('verification.send'))"
+      @click="resendCode(route('social.confirm.resend', props.service))"
     >
       {{
         resendCountdown > 0
@@ -84,8 +97,8 @@ function onVerified(redirectUrl: string): void {
       }}
     </po-button>
 
-    <po-button color="secondary" :href="route('home')" variant="text" inertia block>
-      {{ $t('accounts.skip-verification-continue') }}
+    <po-button color="secondary" :href="route('login')" variant="text" inertia block>
+      {{ $t('accounts.back-to-login') }}
     </po-button>
   </div>
 </template>

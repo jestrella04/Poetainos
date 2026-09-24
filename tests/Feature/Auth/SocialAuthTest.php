@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Notifications\ConfirmSocialLogin;
+use App\Notifications\SocialLoginCode;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
@@ -10,12 +10,40 @@ use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
 use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertAuthenticatedAs;
 use function Pest\Laravel\assertGuest;
 use function Pest\Laravel\get;
+use function Pest\Laravel\post;
+use function Pest\Laravel\postJson;
 
 function fakeAvatarPath(): string
 {
     return 'avatars/'.fake()->uuid().'.png';
+}
+
+/**
+ * Sign in with Google as an existing account that has never used it, and
+ * return the confirmation code emailed to the account.
+ */
+function startProviderLink(User $user, ?string $avatarUrl = null): string
+{
+    Notification::fake();
+    Socialite::fake('google', SocialiteUser::fake(['email' => $user->email, 'avatar' => $avatarUrl]));
+    get('/login/google/callback');
+
+    return sentLinkCode($user);
+}
+
+function sentLinkCode(User $user): string
+{
+    $code = '';
+    Notification::assertSentTo($user, SocialLoginCode::class, function (SocialLoginCode $notification) use (&$code): bool {
+        $code = $notification->code;
+
+        return true;
+    });
+
+    return $code;
 }
 
 describe('social login', function (): void {
@@ -79,46 +107,140 @@ describe('social login', function (): void {
         $response->assertRedirect(route('home'));
     });
 
-    it('requires emailed confirmation before an existing account trusts a new provider', function (): void {
+    it('asks an existing account for an emailed code before it trusts a new provider', function (): void {
         // Given
         Notification::fake();
-        $email = fake()->unique()->safeEmail();
-        $user = createUser([
-            'email' => $email,
-            'extra_info' => ['avatar' => fakeAvatarPath()],
-        ]);
-        $socialUser = SocialiteUser::fake(['email' => $email]);
-        Socialite::fake('google', $socialUser);
+        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        Socialite::fake('google', SocialiteUser::fake(['email' => $user->email]));
 
         // When
         $response = get('/login/google/callback');
 
         // Then
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('social.confirm', 'google'));
         assertGuest();
-        Notification::assertSentTo($user, ConfirmSocialLogin::class);
+        Notification::assertSentTo($user, SocialLoginCode::class);
     });
 
-    it('logs the user in once they follow the emailed confirmation link', function (): void {
+    it('shows the code confirmation page while a sign-in awaits confirmation', function (): void {
         // Given
-        Notification::fake();
-        $email = fake()->unique()->safeEmail();
+        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        startProviderLink($user);
+
+        // When
+        $response = get(route('social.confirm', 'google'));
+
+        // Then
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('auth/PoSocialConfirm', false)
+            ->where('service', 'google')
+            ->where('email', $user->email));
+    });
+
+    it('sends the user back to the login page when no sign-in awaits confirmation', function (): void {
+        // When
+        $response = get(route('social.confirm', 'google'));
+
+        // Then
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('message', 'accounts.social-link-expired');
+    });
+
+    it('logs the user in and links the provider once the emailed code is entered', function (): void {
+        // Given
         $user = createUser([
-            'email' => $email,
+            'email_verified_at' => null,
             'extra_info' => ['avatar' => fakeAvatarPath()],
         ]);
-        $socialUser = SocialiteUser::fake(['email' => $email]);
-        Socialite::fake('google', $socialUser);
-        get('/login/google/callback');
+        $code = startProviderLink($user);
 
-        // When / Then
-        Notification::assertSentTo($user, ConfirmSocialLogin::class, function (ConfirmSocialLogin $notification) {
-            $response = get($notification->confirmUrl);
-            $response->assertRedirect();
-            assertAuthenticated();
+        // When
+        $response = postJson(route('social.confirm.verify', 'google'), ['code' => $code]);
 
-            return true;
-        });
+        // Then
+        $response->assertOk()->assertJson(['url' => route('home')]);
+        assertAuthenticatedAs($user);
+        $user->refresh();
+        expect(data_get($user->extra_info, 'linked_providers'))->toBe(['google']);
+        expect($user->email_verified_at)->not->toBeNull();
+    });
+
+    it('returns to the page the user started from once the code is entered', function (): void {
+        // Given
+        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $intendedPath = '/'.fake()->slug();
+        get(route('social.login', ['service' => 'google', 'redirect' => $intendedPath]));
+        $code = startProviderLink($user);
+
+        // When
+        $response = postJson(route('social.confirm.verify', 'google'), ['code' => $code]);
+
+        // Then
+        $response->assertOk()->assertJson(['url' => url($intendedPath)]);
+    });
+
+    it('imports the provider avatar once the code is entered', function (): void {
+        // Given
+        Storage::fake('local');
+        ob_start();
+        imagepng(imagecreatetruecolor(600, 600));
+        $png = (string) ob_get_clean();
+        Http::fake(['avatars.example/*' => Http::response($png)]);
+        $user = createUser();
+        $code = startProviderLink($user, 'https://avatars.example/'.fake()->uuid().'.png');
+
+        // When
+        postJson(route('social.confirm.verify', 'google'), ['code' => $code])->assertOk();
+
+        // Then
+        $avatar = data_get($user->refresh()->extra_info, 'avatar');
+        expect($avatar)->toStartWith('avatars/');
+        Storage::disk('local')->assertExists($avatar);
+    });
+
+    it('rejects a wrong code and keeps the user signed out', function (): void {
+        // Given
+        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $code = startProviderLink($user);
+
+        // When
+        $response = postJson(route('social.confirm.verify', 'google'), ['code' => wrongCodeFor($code)]);
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors([
+            'code' => __('The verification code is invalid or has expired.'),
+        ]);
+        assertGuest();
+        expect(data_get($user->refresh()->extra_info, 'linked_providers'))->toBeNull();
+    });
+
+    it('rejects a code when no sign-in awaits confirmation', function (): void {
+        // When
+        $response = postJson(route('social.confirm.verify', 'google'), ['code' => fake()->numerify('######')]);
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors([
+            'code' => __('Your sign-in request has expired. Please sign in again.'),
+        ]);
+        assertGuest();
+    });
+
+    it('emails a fresh code on request and stops accepting the previous one', function (): void {
+        // Given
+        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $firstCode = startProviderLink($user);
+        Notification::fake();
+
+        // When
+        $response = post(route('social.confirm.resend', 'google'));
+
+        // Then
+        $response->assertNoContent();
+        $secondCode = sentLinkCode($user);
+        postJson(route('social.confirm.verify', 'google'), ['code' => $firstCode])->assertUnprocessable();
+        postJson(route('social.confirm.verify', 'google'), ['code' => $secondCode])->assertOk();
+        assertAuthenticatedAs($user);
     });
 
     it('does not require reconfirmation once a provider has been linked', function (): void {

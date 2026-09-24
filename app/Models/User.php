@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Notifications\VerifyEmailCode;
 use App\Services\AuraCalculator;
-use App\Services\EmailVerificationCodes;
+use App\Services\VerificationCodes;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
@@ -287,9 +287,9 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification(): void
     {
-        $code = app(EmailVerificationCodes::class)->issue($this);
+        $code = app(VerificationCodes::class)->issue($this, VerificationCodes::PURPOSE_EMAIL_VERIFICATION);
 
-        $this->notify(new VerifyEmailCode($code, EmailVerificationCodes::CODE_MINUTES));
+        $this->notify(new VerifyEmailCode($code, VerificationCodes::CODE_MINUTES));
     }
 
     /**
@@ -297,7 +297,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function verifyEmailWithCode(string $code): bool
     {
-        if (app(EmailVerificationCodes::class)->verify($this, $code) === false) {
+        if (app(VerificationCodes::class)->verify($this, VerificationCodes::PURPOSE_EMAIL_VERIFICATION, $code) === false) {
             return false;
         }
 

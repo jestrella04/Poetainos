@@ -26,15 +26,6 @@ function sendVerificationCode(User $user): string
     return $code;
 }
 
-function wrongCodeFor(string $code): string
-{
-    do {
-        $wrongCode = fake()->numerify('######');
-    } while ($wrongCode === $code);
-
-    return $wrongCode;
-}
-
 describe('verifying an email', function (): void {
     it('can render the email verification screen', function (): void {
         // Given

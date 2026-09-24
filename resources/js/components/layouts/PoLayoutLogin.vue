@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
 import { useSystemTheme } from '@/composables/useSystemTheme'
+import { useFlashMessages } from '@/composables/useFlashMessages'
 import type { InertiaPageProps } from '@/types/inertia'
 
 const page = usePage<InertiaPageProps<{ title?: string }>>()
 
 const { revealStyle } = useSystemTheme()
+
+useFlashMessages()
 </script>
 
 <style scoped>
@@ -27,6 +30,7 @@ const { revealStyle } = useSystemTheme()
 <template>
   <v-app :style="revealStyle">
     <po-head :title="page.props.title" />
+    <po-snack-bar />
 
     <v-main>
       <div class="d-flex flex-column align-center justify-center w-100 h-100">
