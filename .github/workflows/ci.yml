@@ -67,6 +67,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      # SSR is disabled in production for now; keep its bundle compiling so it can be re-enabled.
+      - name: Build SSR bundle
+        run: npm run build:ssr
+
       - name: ESLint
         run: npm run lint:check
 
