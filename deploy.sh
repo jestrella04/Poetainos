@@ -69,29 +69,35 @@ if [ ! -f "$lock_hash_file" ] || [ "$(cat "$lock_hash_file")" != "$current_lock_
     echo "$current_lock_hash" > "$lock_hash_file"
 fi
 
-# Build assets using Vite at low priority with a capped Node heap so the build
+# Build client assets using Vite at low priority with a capped Node heap so the build
 # can't push php-fpm, MariaDB or SSR into swap or the OOM killer.
 # Override with DEPLOY_NODE_MAX_MEMORY_MB if the build needs more headroom.
 NODE_OPTIONS="--max-old-space-size=${DEPLOY_NODE_MAX_MEMORY_MB:-1024}" nice -n 19 ionice -c3 npm run build
 
-# Restart SSR server so it picks up the new bundle; the process manager brings it back up.
-# stop-ssr exits non-zero when the server isn't running, which is fine here.
-php artisan inertia:stop-ssr || true
+# SSR is opt-in via INERTIA_SSR_ENABLED in .env (read from the config cached above).
+# It is off on the current 2GB server because the SSR process alone takes ~1GB.
+if php artisan config:show inertia.ssr.enabled | grep -q 'true'; then
+    NODE_OPTIONS="--max-old-space-size=${DEPLOY_NODE_MAX_MEMORY_MB:-1024}" nice -n 19 ionice -c3 npm run build:ssr
 
-# Wait for the SSR server to come back; the app falls back to client-side rendering without it
-ssr_is_up=false
-for _ in $(seq 1 10); do
-    sleep 1
-    if php artisan inertia:check-ssr > /dev/null 2>&1; then
-        ssr_is_up=true
-        break
+    # Restart SSR server so it picks up the new bundle; the process manager brings it back up.
+    # stop-ssr exits non-zero when the server isn't running, which is fine here.
+    php artisan inertia:stop-ssr || true
+
+    # Wait for the SSR server to come back; the app falls back to client-side rendering without it
+    ssr_is_up=false
+    for _ in $(seq 1 10); do
+        sleep 1
+        if php artisan inertia:check-ssr > /dev/null 2>&1; then
+            ssr_is_up=true
+            break
+        fi
+    done
+
+    if [ "$ssr_is_up" = true ]; then
+        echo "Inertia SSR server is running."
+    else
+        echo "WARNING: Inertia SSR server did not come back up; check its process manager and storage/logs/laravel.log." >&2
     fi
-done
-
-if [ "$ssr_is_up" = true ]; then
-    echo "Inertia SSR server is running."
-else
-    echo "WARNING: Inertia SSR server did not come back up; check its process manager and storage/logs/laravel.log." >&2
 fi
 
 # Turn off maintenance mode

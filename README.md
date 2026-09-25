@@ -80,7 +80,8 @@ Starts the Laravel server (http://localhost:8000), queue worker, log viewer (Pai
 
 | Command                          | Description                                                         |
 | -------------------------------- | ------------------------------------------------------------------- |
-| `npm run build`                  | Production build (client + SSR bundles)                             |
+| `npm run build`                  | Production client build                                             |
+| `npm run build:ssr`              | SSR bundle build (only needed when `INERTIA_SSR_ENABLED=true`)      |
 | `composer test`                  | Run the Pest test suite                                             |
 | `npm run test`                   | Run the Vitest test suite                                           |
 | `composer ci:check`              | Lint, format check, static analysis, type check, and frontend tests |

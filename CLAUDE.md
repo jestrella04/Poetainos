@@ -18,7 +18,8 @@ composer setup      # Full project setup from scratch
 ### Building
 
 ```bash
-npm run build       # Production build: client bundle + SSR bundle (bootstrap/ssr)
+npm run build       # Production client bundle
+npm run build:ssr   # SSR bundle (bootstrap/ssr); only needed when INERTIA_SSR_ENABLED=true
 ```
 
 ### Testing

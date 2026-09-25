@@ -19,10 +19,10 @@ Artisan::command('inspire', function (): void {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('aura:update')->daily();
-Schedule::command('karma:update')->daily();
-Schedule::command('sitemap:generate')->daily();
-Schedule::command('writing:pick-of-the-day')->daily();
+Schedule::command('writing:pick-of-the-day')->dailyAt('04:00');
+Schedule::command('aura:update')->dailyAt('04:00');
+Schedule::command('karma:update')->dailyAt('04:00');
+Schedule::command('sitemap:generate')->dailyAt('05:00');
 Schedule::command('writing:post-of-the-day')->dailyAt('13:00');
 
 // Posting to X (author:random, category:random and the X side of the writing of the day) was
