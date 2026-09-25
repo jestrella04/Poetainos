@@ -19,6 +19,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialAuthController extends Controller
 {
@@ -58,8 +59,16 @@ class SocialAuthController extends Controller
      */
     public function handleProviderCallback(string $service, ImageStorage $images): RedirectResponse
     {
-        // Get user data from the external service
-        $social = Socialite::driver($service)->user();
+        // A callback whose state doesn't match this session was replayed (refresh,
+        // back button) or outlived the session that started it, so start over
+        try {
+            $social = Socialite::driver($service)->user();
+        } catch (InvalidStateException) {
+            request()->session()->flash('message', 'accounts.social-link-expired');
+
+            return redirect(route('login'));
+        }
+
         $email = trim((string) $social->getEmail());
 
         // Without an email we can't tell accounts apart: every such login would share one user
