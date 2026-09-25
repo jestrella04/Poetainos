@@ -168,13 +168,13 @@ describe('the homepage hero', function (): void {
 });
 
 describe('the schedule', function (): void {
-    it('picks at midnight', function (): void {
+    it('picks at 4 AM', function (): void {
         // Given
         $cronFor = fn (string $command): ?string => collect(app(Schedule::class)->events())
             ->first(fn ($event): bool => str_contains((string) $event->command, $command))
             ?->expression;
 
         // Then
-        expect($cronFor('writing:pick-of-the-day'))->toBe('0 0 * * *');
+        expect($cronFor('writing:pick-of-the-day'))->toBe('0 4 * * *');
     });
 });
