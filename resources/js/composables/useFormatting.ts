@@ -1,10 +1,11 @@
-import { escape, head, isNil, last, toUpper, words } from 'lodash-es'
+import { escape, head, last, toUpper, words } from 'lodash-es'
 import { millify } from 'millify'
 import crop from 'crop-url'
 import linkifyHtml from 'linkify-html'
 import 'linkify-plugin-mention'
 import MarkdownIt, { type Token } from 'markdown-it'
 import { intlFormatDistance } from 'date-fns'
+import { regionalFormats } from '@/plugins/i18n'
 import type { UserLike } from '@/types/models'
 
 // Rendered markdown is plain HTML, so Vuetify typography only applies through its utility classes.
@@ -42,8 +43,6 @@ markdownRenderer.core.ruler.push('vuetify_classes', (state) => {
   }
 })
 
-const EXCERPT_LENGTH = 400
-
 // Matches config/app.php. Without a pinned zone, the SSR server (UTC) and the browser
 // format the same timestamp to different calendar days, which breaks hydration.
 const DISPLAY_TIME_ZONE = 'UTC'
@@ -63,11 +62,9 @@ export function useFormatting() {
   }
 
   function userDisplayName(user: UserLike): string {
-    if (!isNil(user.name) && '' !== user.name) {
-      return user.name
-    }
+    const name = user.name ?? ''
 
-    return user.username
+    return name !== '' ? name : user.username
   }
 
   function userInitials(user: UserLike): string {
@@ -82,17 +79,16 @@ export function useFormatting() {
     return toUpper(`${head(nameParts)?.substring(0, 1)}${lastPart?.substring(0, 1)}`)
   }
 
-  function readable(value: number): string {
+  function abbreviateNumber(value: number): string {
     return millify(value)
   }
 
   function formatCount(value: number): string {
-    // The plain 'es' locale skips the thousands separator on 4-digit numbers (3412).
-    return value.toLocaleString('es-CO')
+    return value.toLocaleString(regionalFormats().numbers)
   }
 
   function toLocaleDate(date: string | number | Date): string {
-    return new Date(date).toLocaleDateString('es-DO', {
+    return new Date(date).toLocaleDateString(regionalFormats().dates, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -101,7 +97,7 @@ export function useFormatting() {
   }
 
   function toLocaleMonthYear(date: string | number | Date): string {
-    return new Date(date).toLocaleDateString('es-DO', {
+    return new Date(date).toLocaleDateString(regionalFormats().dates, {
       year: 'numeric',
       month: 'long',
       timeZone: DISPLAY_TIME_ZONE
@@ -109,15 +105,7 @@ export function useFormatting() {
   }
 
   function relativeDate(date: string | number | Date): string {
-    return intlFormatDistance(new Date(date), new Date(), { locale: 'es' })
-  }
-
-  function excerpt(text: string): string {
-    if (text.length < EXCERPT_LENGTH) {
-      return text
-    }
-
-    return `${text.substring(0, EXCERPT_LENGTH)}...`
+    return intlFormatDistance(new Date(date), new Date(), { locale: regionalFormats().language })
   }
 
   function cropUrl(url: string, max = 40): string {
@@ -153,12 +141,11 @@ export function useFormatting() {
     storage,
     userDisplayName,
     userInitials,
-    readable,
+    abbreviateNumber,
     formatCount,
     toLocaleDate,
     toLocaleMonthYear,
     relativeDate,
-    excerpt,
     cropUrl,
     linkify,
     markdown,

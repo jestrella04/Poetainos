@@ -27,7 +27,7 @@ class PagesController extends Controller
      */
     public function show(Page $page): Response
     {
-        $page->text = hydrateSettings($page->text);
+        $page->text = interpolateSiteSettings($page->text);
 
         return Inertia::render('pages/PoPagesShow', [
             'meta' => [

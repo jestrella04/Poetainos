@@ -7,8 +7,8 @@ import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useRequestFailure } from '@/composables/useRequestFailure'
 
 const props = defineProps<{
-  compType: string
-  compId: number
+  complainableType: string
+  complainableId: number
 }>()
 
 const { isEmpty } = useTypeGuards()
@@ -57,8 +57,8 @@ async function submit(): Promise<void> {
     complaint
       .transform((data) => ({
         ...data,
-        complainable_type: props.compType,
-        complainable_id: props.compId
+        complainable_type: props.complainableType,
+        complainable_id: props.complainableId
       }))
       .post(route('complaints.store'), {
         onHttpException: markSubmitFailed,
@@ -85,7 +85,7 @@ async function submit(): Promise<void> {
         <v-divider class="mt-3" />
 
         <v-form id="complaint-form" @submit.prevent="submit">
-          <p v-if="hasNoReasonSelected" class="text-error mt-3" style="margin-bottom: -10px">
+          <p v-if="hasNoReasonSelected" class="text-error mt-3 mb-n2">
             {{ $t('main.select-least-one') }}
           </p>
 
@@ -96,7 +96,7 @@ async function submit(): Promise<void> {
           <template v-for="reason in reasons" :key="reason">
             <v-switch
               v-model="complaint.reasons"
-              style="margin-bottom: -20px"
+              class="mb-n5"
               color="primary"
               :label="reason"
               :value="reason"

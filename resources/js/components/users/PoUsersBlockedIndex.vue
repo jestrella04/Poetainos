@@ -8,7 +8,7 @@ import type { User } from '@/types/models'
 const { isEmpty } = useTypeGuards()
 const { userDisplayName } = useFormatting()
 
-const { items: blockedUsers, fetched, loadMore } = useInfiniteList<User>('blockedUsers')
+const { items: blockedUsers, isFetched, loadMore } = useInfiniteList<User>('blockedUsers')
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const { items: blockedUsers, fetched, loadMore } = useInfiniteList<User>('blocke
       {{ $t('accounts.blocked-users') }}
     </p>
 
-    <template v-if="!fetched">
+    <template v-if="!isFetched">
       <po-loading />
     </template>
 

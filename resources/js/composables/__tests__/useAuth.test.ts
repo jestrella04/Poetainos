@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 type AuthProps = Pick<InertiaConfig['sharedPageProps']['auth'], 'user' | 'admin'>
 
-// useAuth caches usePage() in a module-level computed, so the mock hands out
-// one stable page object and each test swaps its auth props in place.
+// The mock hands out one stable page object, as Inertia does, and each test
+// swaps its auth props in place.
 const { page } = vi.hoisted(() => {
   const auth: AuthProps = { user: null, admin: false }
 

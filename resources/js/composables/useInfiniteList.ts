@@ -10,7 +10,7 @@ import type { Paginated } from '@/types/models'
  * reload of `reloadPropKey`, and fetches the following pages as JSON.
  */
 export function useInfiniteList<T>(reloadPropKey: string) {
-  const { items, next, fetched, update, loadMore } = usePaginatedList<T>()
+  const { items, nextPageUrl, isFetched, update, loadMore } = usePaginatedList<T>()
 
   onMounted(() => {
     router.reload({
@@ -28,5 +28,5 @@ export function useInfiniteList<T>(reloadPropKey: string) {
     })
   })
 
-  return { items, next, fetched, loadMore }
+  return { items, nextPageUrl, isFetched, loadMore }
 }

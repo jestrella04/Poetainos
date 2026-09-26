@@ -12,7 +12,7 @@ const page = usePage<InertiaPageProps<{ sort: string; totalAuthors: number }>>()
 const { isEmpty } = useTypeGuards()
 const { formatCount } = useFormatting()
 
-const { items: users, fetched, loadMore } = useInfiniteList<User>('users')
+const { items: users, isFetched, loadMore } = useInfiniteList<User>('users')
 useSwipeTabs({ tabOrder: ['featured', 'latest', 'popular'], currentTab: () => page.props.sort })
 </script>
 
@@ -52,7 +52,7 @@ useSwipeTabs({ tabOrder: ['featured', 'latest', 'popular'], currentTab: () => pa
       </v-tabs>
     </div>
 
-    <template v-if="!fetched">
+    <template v-if="!isFetched">
       <po-loading />
     </template>
 

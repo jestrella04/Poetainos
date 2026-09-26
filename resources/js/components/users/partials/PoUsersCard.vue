@@ -8,7 +8,7 @@ defineProps<{
 }>()
 
 const { userDisplayName } = useFormatting()
-const { strNullOrEmpty } = useTypeGuards()
+const { isBlank } = useTypeGuards()
 </script>
 
 <template>
@@ -30,12 +30,12 @@ const { strNullOrEmpty } = useTypeGuards()
 
           <p class="text-medium-emphasis ma-0">
             @{{ data.username }}
-            <template v-if="!strNullOrEmpty(data.location)"> {{ data.location }}</template>
+            <template v-if="!isBlank(data.location)"> {{ data.location }}</template>
           </p>
         </div>
       </div>
 
-      <p v-if="!strNullOrEmpty(data.bio)" class="text-title-large po-prose ma-0 mb-4">
+      <p v-if="!isBlank(data.bio)" class="text-title-large po-prose ma-0 mb-4">
         {{ data.bio }}
       </p>
 

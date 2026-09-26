@@ -90,6 +90,8 @@ export interface Writing {
   title: string
   slug: string
   text: string
+  // Writing::listingExcerpt(): the start of the text, as listings show it
+  listing_excerpt: string | null
   created_at: string
   views: number
   aura: string

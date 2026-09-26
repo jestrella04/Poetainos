@@ -278,7 +278,7 @@
     "loading": "Cargando...",
     "location": "Ubicación",
     "mark-all-read": "Marcar todo como leído",
-    "max-file-size-is": "El tamaño máximo de carga es {size}",
+    "max-file-size-is": "El tamaño máximo de carga es {size} KB",
     "menu": "Menú",
     "message": "Mensaje",
     "message-scheduled": "Su mensaje se programó correctamente y se enviará en breve.",

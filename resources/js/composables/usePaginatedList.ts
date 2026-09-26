@@ -10,16 +10,16 @@ type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
  * far and the next page's URL, and appends each following page on demand.
  */
 export function usePaginatedList<T>() {
-  const { strNullOrEmpty } = useTypeGuards()
+  const { isBlank } = useTypeGuards()
   const request = useHttp<Record<string, never>, Paginated<T>>()
   const items = ref([]) as Ref<T[]>
-  const next = ref('')
-  const fetched = ref(false)
+  const nextPageUrl = ref('')
+  const isFetched = ref(false)
 
-  function update(data: T[], nextPageUrl: string | null): void {
+  function update(data: T[], followingPageUrl: string | null): void {
     items.value.push(...data)
-    next.value = nextPageUrl ?? ''
-    fetched.value = true
+    nextPageUrl.value = followingPageUrl ?? ''
+    isFetched.value = true
   }
 
   /**
@@ -37,12 +37,12 @@ export function usePaginatedList<T>() {
 
   /**
    * Replace the list with the first page at the given URL. Resolves whether it
-   * loaded. A newer call cancels an older one still in flight; the older one
-   * then resolves as loaded without touching the list, since it was superseded
-   * rather than failed.
+   * loaded. A newer call cancels an older one still in flight, which then
+   * resolves as loaded without touching the list: it was superseded, not failed.
    */
   async function loadFirstPage(url: string): Promise<boolean> {
     const load = ++latestFirstPageLoad
+    request.cancel()
     const page = await fetchPage(url)
 
     if (load !== latestFirstPageLoad) {
@@ -64,12 +64,12 @@ export function usePaginatedList<T>() {
   }: {
     done: (status: InfiniteScrollStatus) => void
   }): Promise<void> {
-    if (strNullOrEmpty(next.value)) {
+    if (isBlank(nextPageUrl.value)) {
       done('empty')
       return
     }
 
-    const page = await fetchPage(next.value)
+    const page = await fetchPage(nextPageUrl.value)
 
     if (page === null) {
       done('error')
@@ -80,5 +80,5 @@ export function usePaginatedList<T>() {
     done('ok')
   }
 
-  return { items, next, fetched, update, loadFirstPage, loadMore }
+  return { items, nextPageUrl, isFetched, update, loadFirstPage, loadMore }
 }

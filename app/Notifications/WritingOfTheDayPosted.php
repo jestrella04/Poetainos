@@ -48,6 +48,7 @@ class WritingOfTheDayPosted extends Notification implements ShouldQueue
      */
     public function toFacebookPage(mixed $notifiable): array
     {
+        $site = (string) getSiteConfig('name');
         $paragraphs = [
             __('✨ Writing of the day ✨'),
             __('":title", by :author', [
@@ -55,8 +56,9 @@ class WritingOfTheDayPosted extends Notification implements ShouldQueue
                 'author' => $this->writing->author?->getName() ?? '',
             ]),
             '“'.$this->writing->excerpt().'”',
-            __('Keep reading on Poetainos and leave the author a few words 👇'),
-            __('#Poetry #WritingOfTheDay #Poetainos'),
+            __('Keep reading on :site and leave the author a few words 👇', ['site' => $site]),
+            // A hashtag can't hold spaces
+            __('#Poetry #WritingOfTheDay #:site', ['site' => (string) preg_replace('/\s+/', '', $site)]),
         ];
 
         return [

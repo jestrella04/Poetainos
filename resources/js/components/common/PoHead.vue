@@ -18,16 +18,16 @@ const image = page.props.meta.image ?? page.props.site.image
 
 <template>
   <Head :title="title">
-    <link v-if="null !== canonical" rel="canonical" :href="canonical" head-key="canonical" />
+    <link v-if="canonical !== null" rel="canonical" :href="canonical" head-key="canonical" />
     <meta name="keywords" :content="$t('main.keywords')" />
     <meta name="description" :content="description" head-key="description" />
     <meta property="og:type" content="website" />
-    <meta v-if="null !== canonical" property="og:url" :content="canonical" head-key="og-url" />
+    <meta v-if="canonical !== null" property="og:url" :content="canonical" head-key="og-url" />
     <meta property="og:title" :content="title" />
     <meta property="og:description" :content="description" head-key="og-description" />
     <meta property="og:image" :content="image" head-key="og-image" />
     <meta property="twitter:card" content="summary_large_image" />
-    <meta v-if="null !== canonical" property="twitter:url" :content="canonical" head-key="tw-url" />
+    <meta v-if="canonical !== null" property="twitter:url" :content="canonical" head-key="tw-url" />
     <meta property="twitter:title" :content="title" />
     <meta property="twitter:description" :content="description" head-key="tw-description" />
     <meta property="twitter:image" :content="image" head-key="tw-image" />

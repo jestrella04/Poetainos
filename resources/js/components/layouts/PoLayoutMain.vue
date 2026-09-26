@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, provide } from 'vue'
+import { ref, onMounted, provide, watch } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import {
   loginModalKey,
@@ -20,6 +20,13 @@ const { faqPath, aboutPath, termsPath, privacyPath } = useStaticPages()
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
 const unreadCount = ref(page.props.auth.notifications)
+// The layout persists across visits, so it takes the count each new page brings
+watch(
+  () => page.props.auth.notifications,
+  (count) => {
+    unreadCount.value = count
+  }
+)
 const loginModal = ref(false)
 
 const { revealStyle } = useSystemTheme()

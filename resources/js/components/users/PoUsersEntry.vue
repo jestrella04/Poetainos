@@ -13,16 +13,16 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const { userDisplayName, relativeDate, readable, cropUrl } = useFormatting()
+const { isEmpty, isBlank } = useTypeGuards()
+const { userDisplayName, relativeDate, abbreviateNumber, cropUrl } = useFormatting()
 const { socialLink } = useSocialLinks()
 
 provide(userKey, props.data)
 
 const headlineStats = computed<{ label: string; value: string }[]>(() => [
-  { label: t('writings.writings'), value: readable(props.data.writings_count) },
-  { label: t('users.likes-given'), value: readable(props.data.given_likes_count) },
-  { label: t('main.profile-views'), value: readable(props.data.profile_views) }
+  { label: t('writings.writings'), value: abbreviateNumber(props.data.writings_count) },
+  { label: t('users.likes-given'), value: abbreviateNumber(props.data.given_likes_count) },
+  { label: t('main.profile-views'), value: abbreviateNumber(props.data.profile_views) }
 ])
 
 const socialLinks = computed<Record<string, string>>(() => props.data.social ?? {})
@@ -35,7 +35,7 @@ const socialLinks = computed<Record<string, string>>(() => props.data.social ?? 
 
       <div class="flex-grow-1 text-center text-md-left">
         <p
-          v-if="!strNullOrEmpty(data.location)"
+          v-if="!isBlank(data.location)"
           class="text-uppercase text-eyebrow text-primary ma-0 mb-2"
         >
           {{ data.location }}
@@ -46,14 +46,14 @@ const socialLinks = computed<Record<string, string>>(() => props.data.social ?? 
         </p>
         <p class="ma-0 mb-4">@{{ data.username }}</p>
 
-        <p v-if="!strNullOrEmpty(data.bio)" class="text-title-large po-prose ma-0 mb-4">
+        <p v-if="!isBlank(data.bio)" class="text-title-large po-prose ma-0 mb-4">
           {{ data.bio }}
         </p>
 
         <div class="d-flex flex-wrap justify-center justify-md-start ga-3">
           <template v-if="!isEmpty(socialLinks)">
             <template v-for="(user, network) in socialLinks" :key="network">
-              <div v-if="!strNullOrEmpty(user)">
+              <div v-if="!isBlank(user)">
                 <po-button
                   icon
                   color="primary"
@@ -83,14 +83,14 @@ const socialLinks = computed<Record<string, string>>(() => props.data.social ?? 
     <v-divider class="my-6" />
 
     <v-row>
-      <v-col v-if="!strNullOrEmpty(data.created_at)" cols="12" sm="6" md="3">
+      <v-col v-if="!isBlank(data.created_at)" cols="12" sm="6" md="3">
         <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
           {{ $t('main.registered') }}
         </p>
         <p class="ma-0">{{ relativeDate(data.created_at ?? '') }}</p>
       </v-col>
 
-      <v-col v-if="!strNullOrEmpty(data.website)" cols="12" sm="6" md="3">
+      <v-col v-if="!isBlank(data.website)" cols="12" sm="6" md="3">
         <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
           {{ $t('main.website') }}
         </p>
@@ -107,14 +107,14 @@ const socialLinks = computed<Record<string, string>>(() => props.data.social ?? 
         </p>
       </v-col>
 
-      <v-col v-if="!strNullOrEmpty(data.occupation)" cols="12" sm="6" md="3">
+      <v-col v-if="!isBlank(data.occupation)" cols="12" sm="6" md="3">
         <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
           {{ $t('main.occupation') }}
         </p>
         <p class="ma-0">{{ data.occupation }}</p>
       </v-col>
 
-      <v-col v-if="!strNullOrEmpty(data.interests)" cols="12" sm="6" md="3">
+      <v-col v-if="!isBlank(data.interests)" cols="12" sm="6" md="3">
         <p class="text-uppercase text-eyebrow text-medium-emphasis ma-0 mb-1">
           {{ $t('main.interests') }}
         </p>

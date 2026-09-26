@@ -25,10 +25,10 @@ const props = withDefaults(
 )
 
 const { authUser } = useAuth()
-const { strNullOrEmpty } = useTypeGuards()
-const { storage, toLocaleDate, userDisplayName, excerpt, readable } = useFormatting()
+const { isBlank } = useTypeGuards()
+const { storage, toLocaleDate, userDisplayName, abbreviateNumber } = useFormatting()
 const loadingComments = ref(true)
-const hasCover = computed(() => !strNullOrEmpty(props.data.cover))
+const hasCover = computed(() => !isBlank(props.data.cover))
 const isLiked = computed(() => props.data.is_liked === true)
 const isShelved = computed(() => props.data.is_shelved === true)
 const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
@@ -68,7 +68,7 @@ provide(writingKey, props.data)
               {{ toLocaleDate(data.created_at) }}
             </span>
 
-            <template v-if="!strNullOrEmpty(data.home_posted_at)">
+            <template v-if="!isBlank(data.home_posted_at)">
               <v-chip color="primary" variant="tonal" size="small">
                 <v-icon icon="fas fa-fan" class="mr-2" />
                 <span class="text-uppercase" :title="$t('writings.awarded')">
@@ -113,14 +113,14 @@ provide(writingKey, props.data)
 
               <div class="d-inline-flex align-center ga-3 text-medium-emphasis">
                 <span>
-                  {{ $t('main.count-views', { count: readable(data.views) }, data.views) }}
+                  {{ $t('main.count-views', { count: abbreviateNumber(data.views) }, data.views) }}
                 </span>
 
                 <span>
                   {{
                     $t(
                       'main.count-comments',
-                      { count: readable(data.comments_count) },
+                      { count: abbreviateNumber(data.comments_count) },
                       data.comments_count
                     )
                   }}
@@ -135,7 +135,7 @@ provide(writingKey, props.data)
               ]"
               class="po-prose mb-6"
             >
-              {{ alone ? data.text : excerpt(data.text) }}
+              {{ alone ? data.text : data.listing_excerpt }}
             </p>
           </div>
 

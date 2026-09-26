@@ -162,3 +162,16 @@ describe('Writing::randomByRandomAuthor', function (): void {
         expect(fn () => Writing::randomByRandomAuthor([$writing->id]))->toThrow(ModelNotFoundException::class);
     });
 });
+
+describe('interpolateSiteSettings', function (): void {
+    it('fills in single settings and leaves placeholders for groups of settings', function (): void {
+        // Given
+        config(['poetainos.name' => 'Casa de Letras', 'poetainos.social' => ['x' => 'casa']]);
+
+        // When
+        $text = interpolateSiteSettings('Welcome to {{name}}, find us at {{social}}');
+
+        // Then
+        expect($text)->toBe('Welcome to Casa de Letras, find us at {{social}}');
+    });
+});

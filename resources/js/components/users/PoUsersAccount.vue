@@ -189,6 +189,7 @@ function togglePushNotifications(value: boolean | null): void {
           {{ $t('accounts.danger-zone') }}
         </p>
 
+        <!-- A comfortable reading measure; Vuetify sizes widths in pixels, not characters -->
         <p class="text-title-medium text-medium-emphasis" style="max-width: 52ch">
           {{ $t('accounts.delete-account-summary') }}
         </p>

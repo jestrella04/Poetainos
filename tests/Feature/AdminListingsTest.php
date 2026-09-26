@@ -172,7 +172,7 @@ describe('the admin tools page', function (): void {
 
         // Then
         $response->assertOk()
-            ->assertInertia(fn ($page) => $page->where('info.PHP version', PHP_VERSION));
+            ->assertInertia(fn ($page) => $page->where('info.'.__('PHP version'), PHP_VERSION));
     });
 
     it('shows only the last lines of the application log', function (): void {

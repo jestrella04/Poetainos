@@ -9,7 +9,7 @@ const props = defineProps<{
   likers?: UserLike[]
 }>()
 
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { isEmpty, isBlank } = useTypeGuards()
 const { cropUrl } = useFormatting()
 
 const taxonomies = computed(() => [
@@ -30,7 +30,7 @@ const taxonomies = computed(() => [
 
 <template>
   <div class="d-flex flex-column ga-3 my-8">
-    <div v-if="!strNullOrEmpty(data.link)" class="d-flex">
+    <div v-if="!isBlank(data.link)" class="d-flex">
       <v-icon icon="fas fa-link" size="24" class="mr-3" />
 
       <po-link :href="data.link ?? ''" target="_blank" rel="nofollow noopener">

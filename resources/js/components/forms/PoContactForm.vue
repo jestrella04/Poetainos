@@ -60,7 +60,9 @@ function submitForm(event: Event): void {
 
 <template>
   <po-head />
-  <v-card :title="$t('main.contact-form').toUpperCase()">
+  <v-card>
+    <v-card-title class="text-uppercase">{{ $t('main.contact-form') }}</v-card-title>
+
     <v-form id="contact-form" class="px-5 pb-5" @submit.prevent="submitForm">
       <v-text-field
         v-model="form.name"

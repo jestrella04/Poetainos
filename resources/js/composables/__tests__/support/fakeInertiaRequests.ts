@@ -68,6 +68,9 @@ function fakeRequestHelper(initialData: Record<string, unknown> = {}) {
     clearErrors() {
       state.errors = {}
     },
+    cancel() {
+      // Requests settle through their queued outcome, cancelled or not
+    },
     get: (url: string, options: RequestOptions = {}) => send('get', url, options),
     post: (url: string, options: RequestOptions = {}) => send('post', url, options),
     put: (url: string, options: RequestOptions = {}) => send('put', url, options),

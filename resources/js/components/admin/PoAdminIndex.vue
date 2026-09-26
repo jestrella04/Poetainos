@@ -13,7 +13,7 @@ interface Counter {
   count: number
 }
 
-const { readable } = useFormatting()
+const { abbreviateNumber } = useFormatting()
 const page = usePage<InertiaPageProps<{ counters: Record<string, Counter> }>>()
 const counters = page.props.counters
 </script>
@@ -33,7 +33,7 @@ const counters = page.props.counters
     <div class="d-flex flex-wrap ga-5">
       <template v-for="counter in counters" :key="counter.title">
         <v-card color="primary" class="counter pa-5" rounded>
-          <p>{{ readable(counter.count) }}</p>
+          <p>{{ abbreviateNumber(counter.count) }}</p>
           <span>{{ counter.title }}</span>
         </v-card>
       </template>

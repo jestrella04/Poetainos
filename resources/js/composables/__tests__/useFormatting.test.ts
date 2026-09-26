@@ -4,7 +4,6 @@ import { useFormatting } from '../useFormatting'
 const {
   userDisplayName,
   userInitials,
-  excerpt,
   karmaMedal,
   linkify,
   markdown,
@@ -36,23 +35,6 @@ describe('userInitials', () => {
   it('falls back to the first letter of the username when the name is missing or blank', () => {
     expect(userInitials({ username: 'jane' })).toBe('J')
     expect(userInitials({ name: ' ', username: 'jane' })).toBe('J')
-  })
-})
-
-describe('excerpt', () => {
-  it('returns short text unchanged', () => {
-    expect(excerpt('short text')).toBe('short text')
-  })
-
-  it('truncates text over 400 characters with an ellipsis', () => {
-    // Given
-    const text = 'a'.repeat(500)
-
-    // When
-    const result = excerpt(text)
-
-    // Then
-    expect(result).toBe(`${'a'.repeat(400)}...`)
   })
 })
 

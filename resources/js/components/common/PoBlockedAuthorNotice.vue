@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="d-flex align-center mx-auto" style="height: 500px; width: 500px">
+  <v-sheet class="d-flex align-center mx-auto" height="500" width="500" color="transparent">
     <po-msg-block
       :msg-title="$t('users.user-is-blocked')"
       :msg-body="$t('main.author-blocked')"
@@ -15,5 +15,5 @@ defineProps<{
     >
       <po-unblocker :user="user" />
     </po-msg-block>
-  </div>
+  </v-sheet>
 </template>

@@ -6,6 +6,7 @@ use App\Models\Concerns\HidesBlockedAuthors;
 use Closure;
 use Database\Factories\WritingFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,20 @@ class Writing extends Model
         'title',
         'slug',
         'text',
+    ];
+
+    /**
+     * How much of the text a listing shows before the reader opens the writing.
+     */
+    private const LISTING_EXCERPT_LENGTH = 400;
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'listing_excerpt',
     ];
 
     /**
@@ -168,6 +183,18 @@ class Writing extends Model
         $lastSpace = mb_strrpos($cut, ' ');
 
         return rtrim($lastSpace === false ? $cut : mb_substr($cut, 0, $lastSpace), ' ,.;:').'…';
+    }
+
+    /**
+     * The start of the text shown in writing listings; null when the text wasn't selected.
+     *
+     * @return Attribute<?string, never>
+     */
+    protected function listingExcerpt(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?string => array_key_exists('text', $this->attributes) ? $this->excerpt(self::LISTING_EXCERPT_LENGTH) : null,
+        );
     }
 
     /**

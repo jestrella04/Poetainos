@@ -19,7 +19,7 @@ const socialProviders = [
   { name: 'google', icon: 'fab fa-google', label: 'accounts.continue-with-google' }
 ]
 
-const { strNullOrEmpty } = useTypeGuards()
+const { isBlank } = useTypeGuards()
 const { isSubmittedFormValid } = useFormValidation()
 const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
 const step = ref<LoginStep>('guest')
@@ -55,7 +55,7 @@ onMounted(() => {
 
     const email = params.get('email')
 
-    if (email !== null && !strNullOrEmpty(email)) {
+    if (email !== null && !isBlank(email)) {
       form.email = email
       step.value = 'login'
     }

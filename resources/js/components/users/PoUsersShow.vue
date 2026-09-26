@@ -25,14 +25,14 @@ interface UsersShowProps {
   }
 }
 
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { isEmpty, isBlank } = useTypeGuards()
 const { userDisplayName, relativeDate, formatCount } = useFormatting()
 const page = usePage<InertiaPageProps<UsersShowProps>>()
 
 const {
   items: authorWritings,
-  next,
-  fetched,
+  nextPageUrl,
+  isFetched,
   loadMore
 } = useInfiniteList<Writing>('authorWritings')
 </script>
@@ -47,7 +47,7 @@ const {
 
       <v-row>
         <v-col cols="12" md="8">
-          <template v-if="!fetched">
+          <template v-if="!isFetched">
             <po-loading />
           </template>
 
@@ -60,7 +60,7 @@ const {
               hide-author
             />
 
-            <po-infinite-scroll v-if="!strNullOrEmpty(next)" @load="loadMore" />
+            <po-infinite-scroll v-if="!isBlank(nextPageUrl)" @load="loadMore" />
 
             <po-link
               :href="route('users.writings.index', page.props.user.username)"

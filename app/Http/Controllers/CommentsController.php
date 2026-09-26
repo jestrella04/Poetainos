@@ -9,9 +9,9 @@ use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Services\ContentDeleter;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 
@@ -41,9 +41,9 @@ class CommentsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage, answering with its id.
      */
-    public function store(Request $request): Response
+    public function store(Request $request): JsonResponse
     {
         $request->validate([
             'comment' => 'required|string|max:300',
@@ -67,7 +67,7 @@ class CommentsController extends Controller
 
         $this->notifyMentions($comment, $writing, $user);
 
-        return response()->noContent();
+        return response()->json(['id' => $comment->id], 201);
     }
 
     /**

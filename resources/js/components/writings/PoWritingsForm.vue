@@ -108,7 +108,7 @@ function categoryOptionProps(idPrefix: string): (category: CategoryOption) => { 
       </v-card-title>
 
       <v-form id="writing-form" class="px-5 pb-5" @submit.prevent="submitForm">
-        <p class="mb-4 text-disabled" style="margin-top: -0.5rem">
+        <p class="mt-n2 mb-4 text-disabled">
           {{ $t('main.required-fields-marked') }}
         </p>
 
@@ -215,7 +215,7 @@ function categoryOptionProps(idPrefix: string): (category: CategoryOption) => { 
           prepend-icon=""
           :placeholder="$t('main.select-cover')"
           persistent-placeholder
-          :hint="$t('main.max-file-size-is', { size: page.props['max-file-size'] }) + 'kb'"
+          :hint="$t('main.max-file-size-is', { size: page.props['max-file-size'] })"
           persistent-hint
           clearable
         />

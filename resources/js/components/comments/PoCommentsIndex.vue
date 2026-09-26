@@ -12,9 +12,9 @@ import { mentionedUsernames } from '@/composables/validationRules'
 import type { Comment } from '@/types/models'
 
 const { isAuthenticated } = useAuth()
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { isEmpty, isBlank } = useTypeGuards()
 const { userDisplayName, toLocaleDate, linkify } = useFormatting()
-const { items: comments, next, loadFirstPage, loadMore } = usePaginatedList<Comment>()
+const { items: comments, nextPageUrl, loadFirstPage, loadMore } = usePaginatedList<Comment>()
 const hasLoadError = ref(false)
 const loadingComments = injectStrict(loadingCommentsKey)
 const writing = injectStrict(writingKey)
@@ -124,7 +124,7 @@ function reply(comment: Comment): string {
         </div>
       </template>
 
-      <po-infinite-scroll v-if="!strNullOrEmpty(next)" @load="loadMore" />
+      <po-infinite-scroll v-if="!isBlank(nextPageUrl)" @load="loadMore" />
     </template>
 
     <template v-else-if="!hasLoadError">

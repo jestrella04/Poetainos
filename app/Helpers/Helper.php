@@ -84,11 +84,19 @@ function isTruthy(mixed $value): bool
     return in_array(strtolower((string) $value), ['1', 'true', 'on', 'yes'], true);
 }
 
-function hydrateSettings(string $text): string
+/**
+ * Replace each `{{setting.path}}` placeholder in a text with that site
+ * setting's value. A placeholder that names no single value is left as is.
+ */
+function interpolateSiteSettings(string $text): string
 {
     return (string) preg_replace_callback(
         '/{{([^}]+)}}/',
-        fn ($matches) => getSiteConfig($matches[1]),
+        function (array $matches): string {
+            $value = getSiteConfig($matches[1]);
+
+            return is_scalar($value) ? (string) $value : $matches[0];
+        },
         $text
     );
 }

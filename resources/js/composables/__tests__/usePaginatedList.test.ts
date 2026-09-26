@@ -22,7 +22,9 @@ describe('usePaginatedList', () => {
     it('replaces the items with the first page and remembers the next page', async () => {
       // Given
       queueOutcome({ data: { data: [{ id: 1 }], next_page_url: '/comments?page=2' } })
-      const { items, next, fetched, update, loadFirstPage } = usePaginatedList<{ id: number }>()
+      const { items, nextPageUrl, isFetched, update, loadFirstPage } = usePaginatedList<{
+        id: number
+      }>()
       update([{ id: 9 }], null)
 
       // When
@@ -31,8 +33,8 @@ describe('usePaginatedList', () => {
       // Then
       expect(isLoaded).toBe(true)
       expect(items.value).toEqual([{ id: 1 }])
-      expect(next.value).toBe('/comments?page=2')
-      expect(fetched.value).toBe(true)
+      expect(nextPageUrl.value).toBe('/comments?page=2')
+      expect(isFetched.value).toBe(true)
     })
 
     it('keeps the current items and reports failure when the request fails', async () => {
@@ -86,7 +88,7 @@ describe('usePaginatedList', () => {
     it('appends the next page of items and reports ok on success', async () => {
       // Given
       queueOutcome({ data: { data: [{ id: 2 }], next_page_url: null } })
-      const { items, next, update, loadMore } = usePaginatedList<{ id: number }>()
+      const { items, nextPageUrl, update, loadMore } = usePaginatedList<{ id: number }>()
       update([{ id: 1 }], '/writings?page=2')
       const done = vi.fn()
 
@@ -96,7 +98,7 @@ describe('usePaginatedList', () => {
       // Then
       expect(sentRequests).toEqual([expect.objectContaining({ url: '/writings?page=2' })])
       expect(items.value).toEqual([{ id: 1 }, { id: 2 }])
-      expect(next.value).toBe('')
+      expect(nextPageUrl.value).toBe('')
       expect(done).toHaveBeenCalledWith('ok')
     })
 

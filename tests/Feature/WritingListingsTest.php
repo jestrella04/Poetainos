@@ -190,3 +190,32 @@ describe('the viewer\'s reactions on listed writings', function (): void {
             ->where('writing.is_shelved', false));
     });
 });
+
+describe('the listing excerpt', function (): void {
+    it('shows the start of the text on one line, cut at a word', function (): void {
+        // Given
+        $words = collect(range(1, 120))->map(fn (int $number): string => 'word'.$number);
+        $writing = Writing::factory()->create(['text' => $words->take(3)->implode("\n\n").' '.$words->skip(3)->implode(' ')]);
+
+        // When
+        $excerpt = (string) $writing->listing_excerpt;
+
+        // Then
+        expect($excerpt)->toStartWith('word1 word2 word3 word4')
+            ->toEndWith('…')
+            ->not->toContain("\n");
+        expect(mb_strlen($excerpt))->toBeLessThanOrEqual(401);
+        expect($words->contains(mb_substr($excerpt, (int) mb_strrpos($excerpt, ' ') + 1, -1)))->toBeTrue();
+    });
+
+    it('is left out when the text was not selected', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+
+        // When
+        $listed = Writing::select('id', 'title')->findOrFail($writing->id);
+
+        // Then
+        expect($listed->toArray())->toHaveKey('listing_excerpt', null);
+    });
+});

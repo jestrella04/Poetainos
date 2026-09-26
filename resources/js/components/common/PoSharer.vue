@@ -18,7 +18,7 @@ function copy(event: MouseEvent): void {
   const target = event.target as HTMLElement
   const socialEl = target.closest('.social')
 
-  if (socialEl !== null && 'copy' === socialEl.id) {
+  if (socialEl !== null && socialEl.id === 'copy') {
     event.preventDefault()
     void navigator.clipboard.writeText(props.linkUrl)
   }
@@ -46,7 +46,7 @@ function copy(event: MouseEvent): void {
               :href="data.url"
               rel="noindex noopener"
               target="_blank"
-              :title="'copy' === data.name ? $t('main.copy-link') : data.name"
+              :title="data.name === 'copy' ? $t('main.copy-link') : data.name"
               @click="copy"
             >
               <v-icon :icon="data.icon" />

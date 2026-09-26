@@ -50,7 +50,7 @@ const socialLinkFields: SocialLinkField[] = [
 
 const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
 const { authUser, isAdmin } = useAuth()
-const { strNullOrEmpty } = useTypeGuards()
+const { isBlank } = useTypeGuards()
 const { isSubmittedFormValid } = useFormValidation()
 const { onHttpException, onNetworkError } = useRequestFailure()
 const avatarInput = useTemplateRef<{ click: () => void }>('avatarInput')
@@ -80,7 +80,7 @@ const avatarUser = {
   name: user.name,
   avatar: user.profile?.avatar ?? null
 }
-const hasAvatar = !strNullOrEmpty(avatarUser.avatar)
+const hasAvatar = !isBlank(avatarUser.avatar)
 
 // The server opens the profile once saved, confirming with a flash message. The
 // avatar upload makes this multipart, which PHP only parses on POST, hence the
@@ -105,9 +105,11 @@ function openAvatarPicker(): void {
 </script>
 
 <template>
-  <po-wrapper class="w-100" style="max-width: 900px">
+  <v-responsive class="w-100" max-width="900">
     <po-head />
-    <v-card :title="$t('accounts.update-profile').toUpperCase()">
+    <v-card>
+      <v-card-title class="text-uppercase">{{ $t('accounts.update-profile') }}</v-card-title>
+
       <v-form id="profile-form" class="px-5 pb-5" @submit.prevent="submitForm">
         <div class="d-flex ga-3 mb-3 align-center">
           <po-avatar :user="avatarUser" size="72" color="secondary" />
@@ -259,5 +261,5 @@ function openAvatarPicker(): void {
         </po-button>
       </v-form>
     </v-card>
-  </po-wrapper>
+  </v-responsive>
 </template>
