@@ -28,7 +28,7 @@ describe('viewing and updating a profile', function (): void {
 
         // Then
         $viewResponse->assertOk();
-        $updateResponse->assertRedirect($user->path())->assertInertiaFlash('message', 'accounts.profile-updated');
+        $updateResponse->assertRedirect(route('users.account'))->assertInertiaFlash('message', 'accounts.profile-updated');
         $user->refresh();
         expect($user->name)->toBe($name);
         expect($user->profile->bio)->toBe($bio);
@@ -96,7 +96,7 @@ describe('viewing and updating a profile', function (): void {
 
         // Then
         $viewResponse->assertOk();
-        $updateResponse->assertRedirect();
+        $updateResponse->assertRedirect($user->path());
         expect($user->refresh()->name)->toBe($name);
     });
 });
@@ -248,6 +248,57 @@ describe('what a profile update keeps and rejects', function (): void {
         expect($user->wantsEmailNotifications())->toBeFalse();
         expect($user->socialAccounts()->pluck('provider')->all())->toBe(['google']);
         expect($user->isInAgreement())->toBeTrue();
+    });
+
+    it('allows a user who already accepted the agreements to update when the form submits them unchecked', function (): void {
+        // Given
+        $user = createUser();
+        $user->acceptAgreements();
+
+        // When
+        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => fake()->name(),
+            'email' => $user->email,
+            'service_agreement' => 'false',
+            'privacy_agreement' => 'false',
+        ]);
+
+        // Then
+        $response->assertSessionHasNoErrors()->assertRedirect(route('users.account'));
+    });
+
+    it('rejects an update when a user who has not agreed submits the agreements unchecked', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+            'name' => fake()->name(),
+            'email' => $user->email,
+            'service_agreement' => 'false',
+            'privacy_agreement' => 'false',
+        ]);
+
+        // Then
+        $response->assertSessionHasErrors(['service_agreement', 'privacy_agreement']);
+    });
+
+    it('lets an admin update a profile whose owner has not agreed, without agreeing on their behalf', function (): void {
+        // Given
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->put('/users/edit/'.$user->username, [
+            'name' => fake()->name(),
+            'email' => $user->email,
+            'service_agreement' => 'on',
+            'privacy_agreement' => 'on',
+        ]);
+
+        // Then
+        $response->assertSessionHasNoErrors()->assertRedirect();
+        expect($user->refresh()->isInAgreement())->toBeFalse();
     });
 
     it('rejects an email that another account already uses', function (): void {

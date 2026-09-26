@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
@@ -117,6 +118,32 @@ class Controller extends BaseController
             'writings',
             $isDeferred,
         );
+    }
+
+    /**
+     * The validation rules of the service and privacy agreements. Forms post
+     * unchecked agreements even when the user already accepted them, so those
+     * are only required until then, and never when nobody is agreeing (an
+     * admin editing someone else's content).
+     *
+     * @return array<string, string>
+     */
+    protected function agreementRules(?User $agreeingUser): array
+    {
+        return $agreeingUser === null || $agreeingUser->isInAgreement() ? [] : [
+            'service_agreement' => 'sometimes|required|accepted',
+            'privacy_agreement' => 'sometimes|required|accepted',
+        ];
+    }
+
+    /**
+     * Persist the user agreements so they aren't asked again.
+     */
+    protected function rememberAgreements(Request $request, ?User $user): void
+    {
+        if (isTruthy($request->input('service_agreement')) && isTruthy($request->input('privacy_agreement'))) {
+            $user?->acceptAgreements();
+        }
     }
 
     /**

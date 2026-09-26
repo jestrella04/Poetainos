@@ -126,11 +126,17 @@ class UsersController extends Controller
     }
 
     /**
-     * Update the specified resource in storage, then open the profile.
+     * Update the specified resource in storage, then open the user's account,
+     * or the edited profile when someone else (an admin) made the change.
      */
     public function update(Request $request, User $user, ImageStorage $images): RedirectResponse
     {
         $this->authorize('update', $user);
+
+        $isOwnProfile = $request->user()?->is($user) === true;
+
+        // Only users editing their own profile are asked for their agreements
+        $agreeingUser = $isOwnProfile ? $user : null;
 
         $request->validate([
             'role' => 'nullable|integer|exists:roles,id',
@@ -144,8 +150,7 @@ class UsersController extends Controller
             ...array_map(fn (int $maxLength): string => 'nullable|string|min:3|max:'.$maxLength, UserProfile::SOCIAL_NETWORKS),
             'avatar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
             'avatar-remove' => 'nullable|boolean',
-            'service_agreement' => 'sometimes|required|accepted',
-            'privacy_agreement' => 'sometimes|required|accepted',
+            ...$this->agreementRules($agreeingUser),
         ]);
 
         $profile = $user->editableProfile();
@@ -176,14 +181,11 @@ class UsersController extends Controller
             $user->sendEmailVerificationNotification();
         }
 
-        // Persist user agreements to avoid asking again
-        if (isTruthy($request->input('service_agreement')) && isTruthy($request->input('privacy_agreement'))) {
-            $user->acceptAgreements();
-        }
+        $this->rememberAgreements($request, $agreeingUser);
 
         Inertia::flash(['message' => 'accounts.profile-updated', 'color' => 'success']);
 
-        return redirect($user->path());
+        return redirect($isOwnProfile ? route('users.account') : $user->path());
     }
 
     /**

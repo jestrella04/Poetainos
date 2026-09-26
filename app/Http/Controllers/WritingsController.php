@@ -242,19 +242,12 @@ class WritingsController extends Controller
     }
 
     /**
-     * The validation rules of the writing form. The form posts unchecked
-     * agreements even when the user already accepted them, so those are only
-     * required until then.
+     * The validation rules of the writing form.
      *
      * @return array<string, mixed>
      */
     private function rules(?User $agreeingUser): array
     {
-        $agreementRules = $agreeingUser === null || $agreeingUser->isInAgreement() ? [] : [
-            'service_agreement' => 'sometimes|required|accepted',
-            'privacy_agreement' => 'sometimes|required|accepted',
-        ];
-
         return [
             'title' => 'required|string|min:3|max:100',
             'main_category' => ['required', 'integer', Rule::exists('categories', 'id')->whereNull('parent_id')],
@@ -264,7 +257,7 @@ class WritingsController extends Controller
             'tags.*' => 'string|min:1|max:'.WritingPublisher::MAX_TAG_LENGTH,
             'link' => 'nullable|url|max:250',
             'cover' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
-            ...$agreementRules,
+            ...$this->agreementRules($agreeingUser),
         ];
     }
 
@@ -288,15 +281,5 @@ class WritingsController extends Controller
         $cover = $request->file('cover');
 
         return $cover instanceof UploadedFile ? $cover : null;
-    }
-
-    /**
-     * Persist the user agreements so they aren't asked again.
-     */
-    private function rememberAgreements(Request $request, ?User $user): void
-    {
-        if (isTruthy($request->input('service_agreement')) && isTruthy($request->input('privacy_agreement'))) {
-            $user?->acceptAgreements();
-        }
     }
 }
