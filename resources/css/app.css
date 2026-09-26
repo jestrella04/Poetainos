@@ -18,6 +18,8 @@
    up the serif heading font from html's --v-font-body default. */
 .po-prose {
   font-family: var(--v-font-heading);
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 /* Vuetify sets no default anchor color/decoration, so plain <a> tags (titles,
