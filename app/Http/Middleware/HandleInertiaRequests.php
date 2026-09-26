@@ -39,8 +39,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $user = auth()->check()
-            ? User::forAuthorSummary()->find(auth()->id())
+        $user = auth()->guard()->check()
+            ? User::forAuthorSummary()->find(auth()->guard()->id())
             : null;
 
         return array_merge(parent::share($request), [
@@ -61,6 +61,7 @@ class HandleInertiaRequests extends Middleware
             'site' => [
                 'name' => getSiteConfig('name'),
                 'slogan' => getSiteConfig('slogan'),
+                'image' => asset('images/card.png'),
                 'pagination' => getSiteConfig('pagination'),
                 'social' => getSiteConfig('social'),
                 'stores' => getSiteConfig('stores'),

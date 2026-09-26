@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Writing;
 use App\Services\ContentDeleter;
 use App\Services\ImageStorage;
+use App\Services\ViewCounter;
 use App\Services\WritingPublisher;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -106,9 +107,9 @@ class WritingsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Writing $writing): Response
+    public function show(Writing $writing, ViewCounter $viewCounter): Response
     {
-        $this->countViewOnce($writing);
+        $viewCounter->count($writing);
 
         $writing->loadCount(['likes', 'comments', 'shelf'])->load([
             'author' => fn ($query) => $query->forAuthorSummary(withKarma: true),

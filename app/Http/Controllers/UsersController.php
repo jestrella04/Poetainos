@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Writing;
 use App\Services\ContentDeleter;
 use App\Services\ImageStorage;
+use App\Services\ViewCounter;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -82,9 +83,9 @@ class UsersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user): Response
+    public function show(User $user, ViewCounter $viewCounter): Response
     {
-        $this->countViewOnce($user);
+        $viewCounter->count($user);
 
         $authUser = Auth::user();
 

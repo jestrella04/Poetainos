@@ -23,8 +23,6 @@ class Controller extends BaseController
 
     private const DEFAULT_PAGINATION = 15;
 
-    private const RECENT_VIEWS_REMEMBERED = 100;
-
     protected int $perPage;
 
     /** @var array<int, int>|null */
@@ -102,23 +100,6 @@ class Controller extends BaseController
             'writings',
             $isDeferred,
         );
-    }
-
-    /**
-     * Count a view of the model once per visitor session, so refreshing the page doesn't inflate it.
-     */
-    protected function countViewOnce(User|Writing $viewed): void
-    {
-        $viewKey = $viewed->getTable().':'.$viewed->getKey();
-        $recentViews = session()->get('recent_views', []);
-
-        if (in_array($viewKey, $recentViews, true)) {
-            return;
-        }
-
-        $viewed->incrementViews();
-
-        session()->put('recent_views', array_slice([...$recentViews, $viewKey], -self::RECENT_VIEWS_REMEMBERED));
     }
 
     /**
