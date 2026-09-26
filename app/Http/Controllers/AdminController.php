@@ -179,18 +179,6 @@ class AdminController extends Controller
         return $this->listing('admin/PoAdminComplaints', __('Complaints'), Complaint::query());
     }
 
-    public function websockets(): Response
-    {
-        return Inertia::render('admin/PoAdminWebsockets', [
-            'meta' => [
-                'title' => getPageTitle([
-                    __('Websockets'),
-                    __('Administration'),
-                ]),
-            ],
-        ]);
-    }
-
     public function analytics(): Response
     {
         $user = config('services.counter.user_id');

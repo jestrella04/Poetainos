@@ -43,7 +43,9 @@ describe('useNotificationsChannel', () => {
     mount(hostFor(7, vi.fn()))
 
     // Then
-    expect(mocks.constructed).toHaveBeenCalledOnce()
+    expect(mocks.constructed).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ broadcaster: 'reverb', enabledTransports: ['ws', 'wss'] })
+    )
     expect(mocks.privateChannel).toHaveBeenCalledExactlyOnceWith('notifications.7')
     expect(mocks.listen).toHaveBeenCalledExactlyOnceWith('NotificationEvent', expect.any(Function))
   })

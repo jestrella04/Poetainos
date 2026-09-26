@@ -113,8 +113,7 @@
     "settings-saved": "¡Ajustes guardados con éxito!",
     "settings-warning": "Estás editando manualmente los ajustes en formato JSON, asegúrate de entender los cambios antes de salvar.",
     "summary": "Sumario",
-    "tools": "Herramientas",
-    "websockets": "Websockets"
+    "tools": "Herramientas"
   },
   "categories": {
     "alt-categories": "Categorías secundarias",

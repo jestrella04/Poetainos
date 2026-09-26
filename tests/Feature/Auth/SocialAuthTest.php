@@ -293,6 +293,19 @@ describe('social login', function (): void {
         expect(User::count())->toBe(0);
     });
 
+    it('sends the user back to the login page when the callback state does not match the session', function (): void {
+        // Given
+        config(['services.google.client_id' => 'client-id', 'services.google.client_secret' => 'client-secret']);
+
+        // When
+        $response = get('/login/google/callback?state='.fake()->sha1().'&code='.fake()->sha1());
+
+        // Then
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('message', 'accounts.social-link-expired');
+        assertGuest();
+    });
+
     it('keeps the rest of the profile when it imports the provider avatar', function (): void {
         // Given
         Storage::fake('local');

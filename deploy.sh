@@ -56,6 +56,9 @@ php artisan view:cache
 # Restart queue workers
 php artisan queue:restart
 
+# Gracefully restart the Reverb websocket server; its process manager brings it back up
+php artisan reverb:restart
+
 # Generate assetlinks
 php artisan generate:assetlinks
 

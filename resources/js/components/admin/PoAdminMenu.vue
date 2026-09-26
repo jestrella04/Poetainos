@@ -83,11 +83,6 @@ nav {
       </po-list-item>
       <v-divider class="my-0" />
 
-      <po-list-item :href="route('admin.websockets')" prepend-icon="fas fa-network-wired" inertia>
-        <span class="d-none d-md-inline">{{ $t('admin.websockets') }}</span>
-      </po-list-item>
-      <v-divider class="my-0" />
-
       <po-list-item :href="route('admin.analytics')" prepend-icon="fas fa-chart-pie" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.analytics') }}</span>
       </po-list-item>
