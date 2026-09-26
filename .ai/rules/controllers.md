@@ -28,3 +28,12 @@ Return `Inertia::render()` with models/collections/paginators passed directly as
 
 ## Use route() for links
 Prefer `route('name', ...)` for all links. `url('/')` is used only as the fixed target for generic notification action buttons.
+
+## Flash messages are i18n keys sent with Inertia::flash()
+Confirm an action with `Inertia::flash(['message' => 'namespace.key', 'color' => 'success'])` before redirecting; the message is a key from `resources/js/i18n/es.json`, not a translated sentence. Don't use `session()->flash('message', …)`; the layouts' snackbar reads Inertia's flash data.
+
+## Delete content through ContentDeleter
+Delete writings, comments and users with `App\Services\ContentDeleter`, never `->delete()` in a controller: it also removes the polymorphic likes, notifications and stored images the database can't cascade to, deleting files only after the transaction commits.
+
+## Writing listings go through Controller::writingsIndex()
+Pass the base writings query to `writingsIndex()`; it resolves the requested sort and applies `visibleTo()` (blocked authors), `withListingRelations()` and `sorted()`. Don't repeat those scopes or `resolveSort()` in a controller.

@@ -8,7 +8,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | resources/js/components/**/*.vue | .ai/rules/components.md |
 | app/Http/Controllers/** | .ai/rules/controllers.md |
 | eslint.config.js | .ai/rules/general.md |
-| resources/js/**/*.vue | .ai/rules/js.md |
+| resources/js/**/*.vue, resources/js/** | .ai/rules/js.md |
 | database/migrations/** | .ai/rules/migrations.md |
 | app/Models/** | .ai/rules/models.md |
 | app/Notifications/** | .ai/rules/notifications.md |
