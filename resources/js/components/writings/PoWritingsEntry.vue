@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, provide } from 'vue'
-import { usePage } from '@inertiajs/vue3'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
 import PoWritingExtras from './partials/PoWritingExtras.vue'
 import PoWritingDropdown from './partials/PoWritingDropdown.vue'
@@ -29,12 +28,11 @@ const { authUser } = useAuth()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { storage, toLocaleDate, userDisplayName, excerpt, readable } = useFormatting()
 const loadingComments = ref(true)
-const page = usePage()
 const hasCover = computed(
   () => !isEmpty(props.data.extra_info) && !strNullOrEmpty(props.data.extra_info?.cover)
 )
-const isLiked = computed(() => page.props.auth.liked.writings.includes(props.data.id))
-const isShelved = computed(() => page.props.auth.shelved.includes(props.data.id))
+const isLiked = computed(() => props.data.is_liked === true)
+const isShelved = computed(() => props.data.is_shelved === true)
 const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
 const hasSideCover = computed(() => hasCover.value && !props.alone)
 const isProminent = computed(() => props.alone || props.hero)

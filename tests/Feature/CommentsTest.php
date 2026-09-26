@@ -33,6 +33,22 @@ describe('the comments index', function (): void {
         $response->assertJsonCount(1, 'data');
     });
 
+    it('marks the comments the viewer liked', function (): void {
+        // Given
+        $viewer = createUser();
+        $writing = Writing::factory()->create();
+        $liked = Comment::factory()->for($writing)->create();
+        $other = Comment::factory()->for($writing)->create();
+        $liked->likes()->create(['user_id' => $viewer->id, 'vote' => 1]);
+
+        // When
+        $comments = collect((array) actingAs($viewer)->getJson(route('comments.index', $writing))->json('data'))->keyBy('id');
+
+        // Then
+        expect($comments[$liked->id]['is_liked'])->toBeTrue();
+        expect($comments[$other->id]['is_liked'])->toBeFalse();
+    });
+
     it('pages through every comment of a writing', function (): void {
         // Given
         $perPage = getSiteConfig('pagination');

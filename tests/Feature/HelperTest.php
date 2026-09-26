@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Writing;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
 describe('resolveSort', function (): void {
@@ -111,4 +112,53 @@ describe('isSafeRedirectPath', function (): void {
         'a path that smuggles a scheme' => ['/redirect?to=https://evil.example', false],
         'a relative path without a slash' => ['writings', false],
     ]);
+});
+
+describe('randomSample', function (): void {
+    it('draws at most the requested number of records, only from the query', function (): void {
+        // Given
+        $author = createUser();
+        $authorWritings = Writing::factory()->for($author, 'author')->count(6)->create();
+        Writing::factory()->count(3)->create();
+
+        // When
+        $sample = randomSample($author->writings(), 4);
+
+        // Then
+        expect($sample)->toHaveCount(4);
+        expect($authorWritings->modelKeys())->toContain(...$sample->modelKeys());
+    });
+
+    it('returns every record when there are fewer than requested', function (): void {
+        // Given
+        $writings = Writing::factory()->count(2)->create();
+
+        // When
+        $sample = randomSample(Writing::query(), 5);
+
+        // Then
+        expect($sample->modelKeys())->toEqualCanonicalizing($writings->modelKeys());
+    });
+});
+
+describe('Writing::randomByRandomAuthor', function (): void {
+    it('never picks an excluded writing', function (): void {
+        // Given
+        $excluded = Writing::factory()->create();
+        $eligible = Writing::factory()->create();
+
+        // When
+        $picked = Writing::randomByRandomAuthor([$excluded->id]);
+
+        // Then
+        expect($picked->id)->toBe($eligible->id);
+    });
+
+    it('is not found when every writing is excluded', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+
+        // Then
+        expect(fn () => Writing::randomByRandomAuthor([$writing->id]))->toThrow(ModelNotFoundException::class);
+    });
 });

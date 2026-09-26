@@ -189,6 +189,19 @@ describe('the admin tools page', function (): void {
             && ! str_contains((string) $log, 'entry-050')));
     });
 
+    it('shows whole last lines of a log too large to read in full', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+        $log = implode("\n", array_map(fn (int $number): string => sprintf('entry-%05d %s', $number, str_repeat('x', 100)), range(1, 2000)))."\n";
+
+        // When
+        $response = withApplicationLog($log, fn (): TestResponse => actingAs($admin)->get(route('admin.tools')));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('log', fn ($log): bool => str_starts_with((string) $log, 'entry-01901 ')
+            && str_ends_with((string) $log, 'entry-02000 '.str_repeat('x', 100)."\n")));
+    });
+
     it('shows an empty log when there is no log file', function (): void {
         // Given
         $admin = actingAsAdmin();

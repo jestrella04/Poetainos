@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
-use App\Models\Writing;
+use App\Services\AuraCalculator;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Collection;
 
 class UpdateAura extends Command
 {
@@ -26,15 +24,11 @@ class UpdateAura extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(AuraCalculator $calculator): int
     {
-        Writing::query()->chunkById(200, function (Collection $writings): void {
-            $writings->each->updateAura();
-        });
-
-        User::query()->chunkById(200, function (Collection $users): void {
-            $users->each->updateAura();
-        });
+        // Writings first: a user's aura counts the awards the writings' update may grant
+        $calculator->updateAllWritingAura();
+        $calculator->updateAllUserAura();
 
         return self::SUCCESS;
     }

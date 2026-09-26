@@ -43,13 +43,15 @@ export interface User extends UserLike {
   interests?: string
 }
 
-// CommentsController::index()'s author select() + withCount(['likes']).
+// CommentsController::index()'s author select() + withCount(['likes']), plus
+// the viewer's like, only sent to signed-in viewers.
 export interface Comment {
   id: number
   message: string
   created_at: string
   author: UserLike
   likes_count: number
+  is_liked?: boolean
 }
 
 export interface Paginated<T> {
@@ -106,4 +108,7 @@ export interface Writing {
   likes_count: number
   comments_count: number
   shelf_count: number
+  // The viewer's reactions (Writing::viewerReactions()), only sent to signed-in viewers
+  is_liked?: boolean
+  is_shelved?: boolean
 }

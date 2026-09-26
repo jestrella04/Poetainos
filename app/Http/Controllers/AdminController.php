@@ -17,12 +17,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Inertia\Inertia;
 use Inertia\Response;
-use SplFileObject;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminController extends Controller
 {
     private const LOG_LINES_SHOWN = 100;
+
+    private const LOG_TAIL_BYTES = 64 * 1024;
 
     private string $log;
 
@@ -222,26 +223,32 @@ class AdminController extends Controller
 
     /**
      * The last lines of the application log, or nothing when it can't be read.
+     * Only the end of the file is read, however large the log has grown.
      */
     private function tailLog(): string
     {
-        if (! is_readable($this->log)) {
+        if (is_readable($this->log) === false) {
             return '';
         }
 
-        $file = new SplFileObject($this->log, 'r');
-        $file->seek(PHP_INT_MAX);
-        $lastLine = $file->key();
+        $size = (int) filesize($this->log);
+        $handle = fopen($this->log, 'r');
 
-        $file->seek(max(0, $lastLine - self::LOG_LINES_SHOWN));
-
-        $tail = [];
-
-        while (! $file->eof()) {
-            $tail[] = $file->fgets();
-            $file->next();
+        if ($handle === false) {
+            return '';
         }
 
-        return implode('', $tail);
+        fseek($handle, max(0, $size - self::LOG_TAIL_BYTES));
+        $tail = (string) stream_get_contents($handle);
+        fclose($handle);
+
+        $lines = explode("\n", rtrim($tail, "\n"));
+
+        // Reading from the middle of the file starts partway through a line
+        if ($size > self::LOG_TAIL_BYTES) {
+            array_shift($lines);
+        }
+
+        return implode("\n", array_slice($lines, -self::LOG_LINES_SHOWN))."\n";
     }
 }

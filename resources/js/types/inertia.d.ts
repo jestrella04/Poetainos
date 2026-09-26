@@ -30,13 +30,8 @@ interface SharedSiteConfig {
 interface SharedPageProps {
   auth: {
     user: SharedAuthUser | null
-    admin: boolean | null
+    admin: boolean
     notifications: number
-    liked: {
-      writings: number[]
-      comments: number[]
-    }
-    shelved: number[]
   }
   route: {
     name: string | null

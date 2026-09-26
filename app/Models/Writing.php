@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Services\AuraCalculator;
+use Closure;
 use Database\Factories\WritingFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -112,11 +114,30 @@ class Writing extends Model
      */
     public function likers(int $limit): Collection
     {
-        return User::forAuthorSummary()
-            ->whereIn('id', $this->likes()->select('user_id'))
-            ->inRandomOrder()
-            ->limit($limit)
-            ->get();
+        return randomSample(User::forAuthorSummary()->whereIn('id', $this->likes()->select('user_id')), $limit);
+    }
+
+    /**
+     * A random writing by a random author, so prolific authors don't crowd
+     * out the rest, leaving out the given writings.
+     *
+     * @param  array<int, int>  $excludedIds
+     *
+     * @throws ModelNotFoundException<Writing> when no writing is left to pick.
+     */
+    public static function randomByRandomAuthor(array $excludedIds = []): self
+    {
+        $authorId = self::whereNotIn('id', $excludedIds)->distinct()->pluck('user_id')->shuffle()->first();
+
+        $writing = $authorId === null
+            ? null
+            : randomSample(self::whereNotIn('id', $excludedIds)->where('user_id', $authorId), 1)->first();
+
+        if ($writing === null) {
+            throw (new ModelNotFoundException)->setModel(self::class);
+        }
+
+        return $writing;
     }
 
     /**
@@ -222,7 +243,7 @@ class Writing extends Model
     }
 
     /**
-     * Counts and author summary eager-loaded by every writings listing.
+     * Counts, author summary and the viewer's reactions eager-loaded by every writings listing.
      *
      * @param  Builder<Writing>  $query
      * @return Builder<Writing>
@@ -230,8 +251,34 @@ class Writing extends Model
     public function scopeWithListingRelations(Builder $query): Builder
     {
         return $query->withCount(['likes', 'comments', 'shelf'])
+            ->withExists(self::viewerReactions())
             ->with(['author' => function ($query): void {
                 $query->forAuthorSummary(withKarma: true);
             }]);
+    }
+
+    /**
+     * Whether the signed-in viewer liked (`is_liked`) and shelved
+     * (`is_shelved`) each writing, as `withExists()`/`loadExists()`
+     * relations. Nothing for guests, who have no reactions.
+     *
+     * @return array<string, Closure>
+     */
+    public static function viewerReactions(): array
+    {
+        $viewerId = auth()->guard()->id();
+
+        if ($viewerId === null) {
+            return [];
+        }
+
+        return [
+            'likes as is_liked' => function ($query) use ($viewerId): void {
+                $query->where('user_id', $viewerId);
+            },
+            'shelf as is_shelved' => function ($query) use ($viewerId): void {
+                $query->where('shelves.user_id', $viewerId);
+            },
+        ];
     }
 }

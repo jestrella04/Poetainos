@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\WritingFeatured;
 use Carbon\Carbon;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -62,28 +61,15 @@ class AuraCalculator
 
     public function updateUserAura(User $user): void
     {
-        $counted = User::where('id', $user->id)
-            ->withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])
-            ->firstOrFail();
+        $this->updateUserAuras($user->id);
+    }
 
-        $points = $this->score('user', self::USER_POINT_KEYS, [
-            'writings' => $counted->writings_count,
-            'likes' => $counted->likes_count,
-            'comments' => $counted->comments_count,
-            'shelf' => $counted->shelf_count,
-            'awards' => $counted->awards_count,
-            'views' => $counted->profile_views,
-        ]);
-
-        // Without any weight configured there is nothing to score against
-        if ($points['base'] <= 0) {
-            return;
-        }
-
-        DB::table('users')->where('id', $user->id)->update([
-            'aura' => $points['score'],
-            'aura_updated_at' => Carbon::now(),
-        ]);
+    /**
+     * Bring every user's aura up to date in a single statement.
+     */
+    public function updateAllUserAura(): void
+    {
+        $this->updateUserAuras(null);
     }
 
     public function updateUserKarma(User $user): void
@@ -108,32 +94,16 @@ class AuraCalculator
 
     public function updateWritingAura(Writing $writing): void
     {
-        $counted = Writing::where('id', $writing->id)
-            ->withCount(['likes', 'comments', 'shelf'])
-            ->firstOrFail();
+        $this->updateWritingAuras($writing->id);
+    }
 
-        $points = $this->score('writing', self::WRITING_POINT_KEYS, [
-            'likes' => $counted->likes_count,
-            'comments' => $counted->comments_count,
-            'shelf' => $counted->shelf_count,
-            'views' => $counted->views,
-        ]);
-
-        if ($points['base'] <= 0) {
-            return;
-        }
-
-        $now = Carbon::now();
-        $aura = ['aura' => $points['score'], 'aura_updated_at' => $now];
-        $query = DB::table('writings')->where('id', $writing->id);
-
-        if ($this->qualifiesForHome($points['score'], $counted) && $this->awardHome(clone $query, $aura, $now)) {
-            $writing->author?->notify(new WritingFeatured($writing));
-
-            return;
-        }
-
-        $query->update($aura);
+    /**
+     * Bring every writing's aura up to date in a single statement, and
+     * feature on the home page the recent ones it lifted over the minimum.
+     */
+    public function updateAllWritingAura(): void
+    {
+        $this->updateWritingAuras(null);
     }
 
     /**
@@ -147,14 +117,12 @@ class AuraCalculator
     private function score(string $scope, array $pointKeys, array $counts): array
     {
         $countables = [];
-        $weights = [];
 
-        foreach ($pointKeys as $name => $pointKey) {
+        foreach (array_keys($pointKeys) as $name) {
             $countables[$name] = $counts[$name] ?? 0;
-            $weights[$name] = getSiteConfig("aura.points.{$scope}.{$pointKey}");
         }
 
-        return $this->weightedScore($countables, $weights);
+        return $this->weightedScore($countables, $this->weights($scope, $pointKeys));
     }
 
     /**
@@ -198,20 +166,125 @@ class AuraCalculator
         return self::LOWEST_KARMA;
     }
 
-    private function qualifiesForHome(float $aura, Writing $writing): bool
+    /**
+     * Update the aura of one user, or of all of them when no id is given.
+     */
+    private function updateUserAuras(?int $userId): void
     {
-        return $aura >= getSiteConfig('aura.min_at_home')
-            && Carbon::parse($writing->created_at)->diffInDays() <= self::FEATURED_MAX_AGE_DAYS;
+        $this->updateAuras('users', 'user', self::USER_POINT_KEYS, [
+            'writings' => ['(select count(*) from writings where writings.user_id = users.id)', []],
+            'likes' => ['(select count(*) from likes where likes.user_id = users.id)', []],
+            'comments' => ['(select count(*) from comments where comments.user_id = users.id)', []],
+            'shelf' => ['(select count(*) from shelves where shelves.user_id = users.id)', []],
+            'views' => ['users.profile_views', []],
+            'awards' => ['(select count(*) from writings where writings.user_id = users.id and writings.home_posted_at is not null)', []],
+        ], $userId);
+    }
+
+    /**
+     * Update the aura of one writing, or of all of them when no id is given,
+     * then feature the ones that now qualify.
+     */
+    private function updateWritingAuras(?int $writingId): void
+    {
+        $isUpdated = $this->updateAuras('writings', 'writing', self::WRITING_POINT_KEYS, [
+            'likes' => ['(select count(*) from likes where likes.likeable_type = ? and likes.likeable_id = writings.id)', [Writing::class]],
+            'comments' => ['(select count(*) from comments where comments.writing_id = writings.id)', []],
+            'shelf' => ['(select count(*) from shelves where shelves.writing_id = writings.id)', []],
+            'views' => ['writings.views', []],
+        ], $writingId);
+
+        if ($isUpdated === true) {
+            $this->featureQualifyingWritings($writingId);
+        }
+    }
+
+    /**
+     * Set the aura of a table's rows (one row, or all when no id is given) to
+     * the same weighted score weightedScore() computes, from counts taken in
+     * SQL. Nothing changes, and false is returned, without any weight configured.
+     *
+     * @param  array<string, string>  $pointKeys
+     * @param  array<string, array{0: string, 1: array<int, mixed>}>  $counts  Each countable's SQL expression and its bindings.
+     */
+    private function updateAuras(string $table, string $scope, array $pointKeys, array $counts, ?int $id): bool
+    {
+        $weights = $this->weights($scope, $pointKeys);
+        $base = array_sum($weights);
+
+        if ($base <= 0) {
+            return false;
+        }
+
+        $terms = [];
+        $bindings = [];
+
+        foreach ($counts as $name => [$countSql, $countBindings]) {
+            $terms[] = '? * '.$countSql;
+            $bindings = [...$bindings, $weights[$name], ...$countBindings];
+        }
+
+        $sql = "update {$table} set aura = round((".implode(' + ', $terms).') / cast(? as double), 2), aura_updated_at = ?';
+        $bindings = [...$bindings, count($counts) * $base, Carbon::now()];
+
+        if ($id !== null) {
+            $sql .= ' where id = ?';
+            $bindings[] = $id;
+        }
+
+        DB::update($sql, $bindings);
+
+        return true;
+    }
+
+    /**
+     * The point weight of each countable of a scope (`user` or `writing`); an unset weight counts as zero.
+     *
+     * @param  array<string, string>  $pointKeys
+     * @return array<string, float>
+     */
+    private function weights(string $scope, array $pointKeys): array
+    {
+        return array_map(
+            fn (string $pointKey): float => (float) (getSiteConfig("aura.points.{$scope}.{$pointKey}") ?? 0),
+            $pointKeys,
+        );
+    }
+
+    /**
+     * Feature on the home page, and announce to their authors, the writings
+     * (one, or all when no id is given) young and well-rated enough that
+     * haven't been featured yet.
+     */
+    private function featureQualifyingWritings(?int $writingId): void
+    {
+        $minimumAura = getSiteConfig('aura.min_at_home');
+
+        if ($minimumAura === null) {
+            return;
+        }
+
+        Writing::with('author')
+            ->whereNull('home_posted_at')
+            ->where('created_at', '>=', Carbon::now()->subDays(self::FEATURED_MAX_AGE_DAYS))
+            ->where('aura', '>=', $minimumAura)
+            ->when($writingId !== null, fn ($query) => $query->whereKey($writingId))
+            ->each(function (Writing $writing): void {
+                if ($this->awardHome($writing) === true) {
+                    $writing->author?->notify(new WritingFeatured($writing));
+                }
+            });
     }
 
     /**
      * Mark the writing as featured on the home page, once. Returns whether
      * this call was the one that did it, so only one caller announces it.
-     *
-     * @param  array<string, mixed>  $aura
      */
-    private function awardHome(Builder $query, array $aura, Carbon $now): bool
+    private function awardHome(Writing $writing): bool
     {
-        return $query->whereNull('home_posted_at')->update([...$aura, 'home_posted_at' => $now]) === 1;
+        return DB::table('writings')
+            ->where('id', $writing->id)
+            ->whereNull('home_posted_at')
+            ->update(['home_posted_at' => Carbon::now()]) === 1;
     }
 }

@@ -123,23 +123,37 @@ function resolveSort(array $allowed, string $default = 'latest'): string
 }
 
 /**
+ * Up to `$take` random records of a query, in random order. The ids are
+ * drawn from an id-only query and only the drawn rows are loaded, instead
+ * of ORDER BY RAND(), which reads and sorts every matching row in full.
+ *
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @param  Builder<TModel>|Relation<TModel, *, *>  $query  A query builder, or a relation (e.g. $user->writings()).
+ * @return EloquentCollection<int, TModel>
+ */
+function randomSample(Builder|Relation $query, int $take): EloquentCollection
+{
+    $model = $query->getModel();
+    $ids = (clone $query)->toBase()->pluck($model->getQualifiedKeyName())->shuffle()->take($take);
+
+    return $query->whereKey($ids->all())->get()->shuffle();
+}
+
+/**
  * Random writings for a "related content" widget, with each one's author
  * summary eager-loaded (the shape every such widget needs).
  *
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
- * @param  Builder<TModel>|Relation<TModel, *, *>  $query  A query builder, or a relation (e.g. $user->writings()) — both proxy with()/inRandomOrder()/take()/get() to the underlying builder.
+ * @param  Builder<TModel>|Relation<TModel, *, *>  $query  A query builder, or a relation (e.g. $user->writings()).
  * @return EloquentCollection<int, TModel>
  */
 function randomWritingsWithAuthor(Builder|Relation $query, int $take = 5): EloquentCollection
 {
-    return $query
-        ->with(['author' => function ($authorQuery): void {
-            $authorQuery->forAuthorSummary();
-        }])
-        ->inRandomOrder()
-        ->take($take)
-        ->get();
+    return randomSample($query->with(['author' => function ($authorQuery): void {
+        $authorQuery->forAuthorSummary();
+    }]), $take);
 }
 
 /**

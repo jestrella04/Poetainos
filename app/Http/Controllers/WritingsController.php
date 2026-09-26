@@ -110,7 +110,7 @@ class WritingsController extends Controller
     {
         $viewCounter->count($writing);
 
-        $writing->loadCount(['likes', 'comments', 'shelf'])->load([
+        $writing->loadCount(['likes', 'comments', 'shelf'])->loadExists(Writing::viewerReactions())->load([
             'author' => fn ($query) => $query->forAuthorSummary(withKarma: true),
             'categories:id,name,slug',
             'tags:id,name,slug',
@@ -131,9 +131,10 @@ class WritingsController extends Controller
             'writing' => $writing,
             'likers' => $writing->likers(self::LIKERS_SHOWN),
             'related' => [
-                'from_author' => Writing::whereNot('id', $writing->id)
-                    ->where('user_id', $writing->user_id)
-                    ->inRandomOrder()->take(self::RELATED_SHOWN)->get(),
+                'from_author' => randomSample(
+                    Writing::whereNot('id', $writing->id)->where('user_id', $writing->user_id),
+                    self::RELATED_SHOWN,
+                ),
                 'from_category' => randomWritingsWithAuthor(
                     Writing::whereNot('id', $writing->id)
                         ->visibleTo($this->blockedAuthorIds())
@@ -155,14 +156,7 @@ class WritingsController extends Controller
      */
     public function random(): RedirectResponse|Redirector
     {
-        $writing = User::has('writings', '>', 0)
-            ->inRandomOrder()
-            ->firstOrFail()
-            ->writings()
-            ->inRandomOrder()
-            ->firstOrFail();
-
-        return redirect($writing->path());
+        return redirect(Writing::randomByRandomAuthor()->path());
     }
 
     /**

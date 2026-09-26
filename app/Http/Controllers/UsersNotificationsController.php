@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Writing;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\DatabaseNotification;
@@ -40,7 +41,7 @@ class UsersNotificationsController extends Controller
 
     public function clear(): RedirectResponse
     {
-        $this->requireAuthUser()->unreadNotifications->markAsRead();
+        $this->requireAuthUser()->unreadNotifications()->update(['read_at' => Carbon::now()]);
 
         return to_route('notifications.index');
     }

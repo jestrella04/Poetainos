@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Writing;
 use Carbon\Carbon;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
@@ -139,5 +140,53 @@ describe('ranking authors', function (): void {
 
         // Then
         expect($ranked)->toBe([$gradeA->id, $gradeC->id, $missingKarma->id, $gradeF->id]);
+    });
+});
+
+describe('the viewer\'s reactions on listed writings', function (): void {
+    it('mark the writings the viewer liked and shelved', function (): void {
+        // Given
+        $viewer = createUser();
+        $liked = Writing::factory()->create();
+        $shelved = Writing::factory()->create();
+        $untouched = Writing::factory()->create();
+        $liked->likes()->create(['user_id' => $viewer->id, 'vote' => 1]);
+        $untouched->likes()->create(['user_id' => createUser()->id, 'vote' => 1]);
+        $viewer->shelf()->attach($shelved);
+
+        // When
+        $writings = collect((array) actingAs($viewer)->getJson(route('home'))->json('data'))->keyBy('id');
+
+        // Then
+        expect($writings[$liked->id])->toMatchArray(['is_liked' => true, 'is_shelved' => false]);
+        expect($writings[$shelved->id])->toMatchArray(['is_liked' => false, 'is_shelved' => true]);
+        expect($writings[$untouched->id])->toMatchArray(['is_liked' => false, 'is_shelved' => false]);
+    });
+
+    it('are left out for guests', function (): void {
+        // Given
+        Writing::factory()->create();
+
+        // When
+        $writing = getJson(route('home'))->json('data.0');
+
+        // Then
+        expect($writing)->not->toHaveKeys(['is_liked', 'is_shelved']);
+    });
+
+    it('mark the writing page the viewer liked', function (): void {
+        // Given
+        config(['inertia.testing.ensure_pages_exist' => false]);
+        $viewer = createUser();
+        $writing = Writing::factory()->create();
+        $writing->likes()->create(['user_id' => $viewer->id, 'vote' => 1]);
+
+        // When
+        $response = actingAs($viewer)->get($writing->path());
+
+        // Then
+        $response->assertInertia(fn ($page) => $page
+            ->where('writing.is_liked', true)
+            ->where('writing.is_shelved', false));
     });
 });

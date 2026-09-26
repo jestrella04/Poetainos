@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, provide } from 'vue'
-import { usePage } from '@inertiajs/vue3'
 import PoCommentsForm from './PoCommentsForm.vue'
 import PoCommentsDropdown from './PoCommentsDropdown.vue'
 import { loadingCommentsKey, loginModalKey, replyBoxKey, writingKey } from '@/composables/keys'
@@ -12,7 +11,6 @@ import { usePaginatedList } from '@/composables/usePaginatedList'
 import { mentionedUsernames } from '@/composables/validationRules'
 import type { Comment } from '@/types/models'
 
-const page = usePage()
 const { isAuthenticated } = useAuth()
 const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { userDisplayName, toLocaleDate, linkify } = useFormatting()
@@ -32,10 +30,6 @@ onMounted(() => {
 async function loadComments(): Promise<void> {
   hasLoadError.value = (await loadFirstPage(route('comments.index', writing.slug))) === false
   loadingComments.value = false
-}
-
-function isLiked(commentId: number): boolean {
-  return page.props.auth.liked.comments.includes(commentId)
 }
 
 function toggleReply(commentId: number) {
@@ -95,7 +89,7 @@ function reply(comment: Comment): string {
             <po-reaction-button
               icon="fa-heart"
               :count="comment.likes_count"
-              :is-active="isLiked(comment.id)"
+              :is-active="comment.is_liked === true"
               :post-url="route('likes.store', ['comment', comment.id])"
               :can-react="true"
               :activate-title="$t('comments.like-comment')"

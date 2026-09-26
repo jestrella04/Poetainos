@@ -197,6 +197,21 @@ describe('featuring a writing on the home page', function (): void {
 });
 
 describe('recalculating aura after an interaction', function (): void {
+    it('is queued once for a burst of interactions on the same content', function (): void {
+        // Given
+        Queue::fake();
+        $writing = Writing::factory()->create();
+        $liker = createUser();
+
+        // When
+        RecalculateAura::dispatch($liker, $writing);
+        RecalculateAura::dispatch($liker, $writing);
+        RecalculateAura::dispatch(createUser(), $writing);
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, 2);
+    });
+
     it('is queued for the liker and the writing when a writing is liked', function (): void {
         // Given
         Queue::fake();
@@ -240,7 +255,7 @@ describe('recalculating aura after an interaction', function (): void {
             && $job->writing?->is($writing) === true);
     });
 
-    it('is queued when a comment is posted and when it is deleted', function (): void {
+    it('is queued when a comment is posted', function (): void {
         // Given
         Queue::fake();
         $writing = Writing::factory()->create();
@@ -248,10 +263,21 @@ describe('recalculating aura after an interaction', function (): void {
 
         // When
         actingAs($commenter)->post('/comments/create', ['writing_id' => $writing->id, 'comment' => fake()->sentence()]);
-        $comment = Comment::firstOrFail();
-        actingAs($commenter)->delete("/comments/delete/{$comment->id}");
 
         // Then
-        Queue::assertPushed(RecalculateAura::class, 2);
+        Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($commenter) === true
+            && $job->writing?->is($writing) === true);
+    });
+
+    it('is queued when a comment is deleted', function (): void {
+        // Given
+        Queue::fake();
+        $comment = Comment::factory()->create();
+
+        // When
+        actingAs($comment->author()->firstOrFail())->delete("/comments/delete/{$comment->id}");
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->writing?->is($comment->writing) === true);
     });
 });

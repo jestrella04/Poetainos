@@ -1,6 +1,10 @@
 <?php
 
+use App\Models\Comment;
+use App\Models\User;
+use App\Models\Writing;
 use App\Services\AuraCalculator;
+use Carbon\Carbon;
 
 /**
  * @param  list<string>  $keys
@@ -105,5 +109,47 @@ describe('weightedScore', function (): void {
         // Then
         expect($points['base'])->toBe(0);
         expect($points['score'])->toBe(0.0);
+    });
+});
+
+describe('the set-based aura update', function (): void {
+    it('gives every writing and user the aura weightedScore() computes from their counts', function (): void {
+        // Given
+        $writingWeights = ['like' => fake()->numberBetween(1, 20), 'comment' => fake()->numberBetween(1, 20), 'shelf' => fake()->numberBetween(1, 20), 'views' => fake()->randomFloat(2, 0.01, 2)];
+        $userWeights = ['writing' => fake()->numberBetween(1, 20), 'like' => fake()->numberBetween(1, 20), 'comment' => fake()->numberBetween(1, 20), 'shelf' => fake()->numberBetween(1, 20), 'views' => fake()->randomFloat(2, 0.01, 2), 'award' => fake()->numberBetween(1, 20)];
+        config(['poetainos.aura.points' => ['writing' => $writingWeights, 'user' => $userWeights], 'poetainos.aura.min_at_home' => 1000000]);
+        $users = User::factory()->count(3)->create();
+        $writings = $users->flatMap(fn (User $user) => Writing::factory()->for($user, 'author')->count(2)->create([
+            'views' => fake()->numberBetween(0, 500),
+            'home_posted_at' => fake()->boolean() ? Carbon::now() : null,
+        ]));
+        foreach ($writings as $writing) {
+            $readers = $users->random(fake()->numberBetween(0, 3));
+            $readers->each(fn (User $reader) => $writing->likes()->create(['user_id' => $reader->id, 'vote' => 1]));
+            $readers->each(fn (User $reader) => Comment::factory()->for($writing)->for($reader, 'author')->create());
+            $reader = $users->random();
+            $reader->shelf()->syncWithoutDetaching([$writing->id]);
+        }
+        $calculator = app(AuraCalculator::class);
+
+        // When
+        pendingArtisan('aura:update')->assertSuccessful();
+
+        // Then
+        foreach (Writing::withCount(['likes', 'comments', 'shelf'])->get() as $writing) {
+            $expected = $calculator->weightedScore(
+                ['like' => $writing->likes_count, 'comment' => $writing->comments_count, 'shelf' => $writing->shelf_count, 'views' => $writing->views],
+                $writingWeights,
+            )['score'];
+            expect((float) $writing->aura)->toEqualWithDelta($expected, 0.001);
+        }
+
+        foreach (User::withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->get() as $user) {
+            $expected = $calculator->weightedScore(
+                ['writing' => $user->writings_count, 'like' => $user->likes_count, 'comment' => $user->comments_count, 'shelf' => $user->shelf_count, 'views' => $user->profile_views, 'award' => $user->awards_count],
+                $userWeights,
+            )['score'];
+            expect((float) $user->aura)->toEqualWithDelta($expected, 0.001);
+        }
     });
 });

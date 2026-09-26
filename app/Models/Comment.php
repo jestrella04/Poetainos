@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Closure;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -50,6 +51,27 @@ class Comment extends Model
     public function likes(): MorphMany
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Whether the signed-in viewer liked (`is_liked`) each comment, as a
+     * `withExists()` relation. Nothing for guests, who have no reactions.
+     *
+     * @return array<string, Closure>
+     */
+    public static function viewerReactions(): array
+    {
+        $viewerId = auth()->guard()->id();
+
+        if ($viewerId === null) {
+            return [];
+        }
+
+        return [
+            'likes as is_liked' => function ($query) use ($viewerId): void {
+                $query->where('user_id', $viewerId);
+            },
+        ];
     }
 
     /**

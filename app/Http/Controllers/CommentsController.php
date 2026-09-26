@@ -31,6 +31,7 @@ class CommentsController extends Controller
                 },
             ])
             ->withCount(['likes'])
+            ->withExists(Comment::viewerReactions())
             ->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc')
             ->simplePaginate($this->perPage);
