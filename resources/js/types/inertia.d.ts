@@ -19,6 +19,7 @@ interface SharedSiteLink {
 interface SharedSiteConfig {
   name: string
   slogan: string
+  image: string
   // Admin-editable JSON with no enforced schema on the PHP side; typed
   // loosely to match, rather than asserting a shape nothing guarantees.
   pagination: number

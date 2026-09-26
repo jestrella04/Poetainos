@@ -9,14 +9,11 @@ interface PageMeta {
   image?: string | null
 }
 
-const DEFAULT_IMAGE_PATH = '/images/cover.jpg'
-
 const page = usePage<InertiaPageProps<{ meta: PageMeta }>>()
 const title = (page.props.meta.title ??= page.props.site.name)
 const canonical = (page.props.meta.canonical ??= null)
 const description = (page.props.meta.description ??= page.props.site.slogan)
-// Link previews (Facebook, X) only accept absolute image URLs.
-const image = page.props.meta.image ?? new URL(DEFAULT_IMAGE_PATH, page.props.ziggy.url).href
+const image = page.props.meta.image ?? page.props.site.image
 </script>
 
 <template>

@@ -23,6 +23,7 @@ Schedule::command('writing:pick-of-the-day')->dailyAt('04:00');
 Schedule::command('aura:update')->dailyAt('04:00');
 Schedule::command('karma:update')->dailyAt('04:00');
 Schedule::command('sitemap:generate')->dailyAt('05:00');
+Schedule::command('cache:prune-expired')->dailyAt('06:00');
 Schedule::command('writing:post-of-the-day')->dailyAt('13:00');
 
 // Posting to X (author:random, category:random and the X side of the writing of the day) was

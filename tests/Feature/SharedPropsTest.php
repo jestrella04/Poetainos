@@ -100,6 +100,16 @@ describe('the shared auth props', function (): void {
     });
 });
 
+describe('the shared site props', function (): void {
+    it('include an absolute default image URL for link previews', function (): void {
+        // When
+        $response = get(route('explore'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page->where('site.image', url('images/card.png')));
+    });
+});
+
 describe('the ziggy route table', function (): void {
     it('is sent on the first visit', function (): void {
         // When

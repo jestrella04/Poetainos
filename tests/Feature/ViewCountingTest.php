@@ -3,11 +3,16 @@
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Writing;
+use App\Services\ViewCounter;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Str;
 
 use function Pest\Laravel\actingAs;
-use function Pest\Laravel\flushSession;
 use function Pest\Laravel\get;
+use function Pest\Laravel\travel;
+use function Pest\Laravel\withCookie;
+use function Pest\Laravel\withHeader;
+use function Pest\Laravel\withUnencryptedCookie;
 
 beforeEach(function (): void {
     // Components live under resources/js/components, not Inertia's default Pages directory.
@@ -28,17 +33,112 @@ describe('counting views', function (): void {
         expect($writing->refresh()->views)->toBe(1);
     });
 
-    it('counts each visitor separately', function (): void {
+    it('counts guests sharing an IP separately by their visitor cookie', function (): void {
         // Given
         $writing = Writing::factory()->create(['views' => 0]);
 
         // When
+        withCookie(ViewCounter::VISITOR_COOKIE, (string) Str::uuid())->get($writing->path());
+        withCookie(ViewCounter::VISITOR_COOKIE, (string) Str::uuid())->get($writing->path());
+
+        // Then
+        expect($writing->refresh()->views)->toBe(2);
+    });
+
+    it('counts signed-in readers separately by their account', function (): void {
+        // Given
+        $writing = Writing::factory()->create(['views' => 0]);
+
+        // When
+        actingAs(createUser())->get($writing->path());
+        actingAs(createUser())->get($writing->path());
+
+        // Then
+        expect($writing->refresh()->views)->toBe(2);
+    });
+
+    it('counts a reread once the cooldown has passed', function (): void {
+        // Given
+        $writing = Writing::factory()->create(['views' => 0]);
         get($writing->path());
-        flushSession();
+
+        // When
+        travel(ViewCounter::COOLDOWN_HOURS + 1)->hours();
         get($writing->path());
 
         // Then
         expect($writing->refresh()->views)->toBe(2);
+    });
+
+    it('treats a forged visitor cookie as a cookieless client', function (): void {
+        // Given
+        $writing = Writing::factory()->create(['views' => 0]);
+
+        // When
+        withUnencryptedCookie(ViewCounter::VISITOR_COOKIE, (string) Str::uuid())->get($writing->path());
+        withUnencryptedCookie(ViewCounter::VISITOR_COOKIE, (string) Str::uuid())->get($writing->path());
+
+        // Then
+        expect($writing->refresh()->views)->toBe(1);
+    });
+
+    it('caps the views counted from a single IP', function (): void {
+        // Given
+        $writing = Writing::factory()->create(['views' => 0]);
+
+        // When
+        foreach (range(0, ViewCounter::MAX_VIEWS_PER_IP) as $ignored) {
+            withCookie(ViewCounter::VISITOR_COOKIE, (string) Str::uuid())->get($writing->path());
+        }
+
+        // Then
+        expect($writing->refresh()->views)->toBe(ViewCounter::MAX_VIEWS_PER_IP);
+    });
+
+    it('does not count authors reading their own writing', function (): void {
+        // Given
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['views' => 0]);
+
+        // When
+        actingAs($author)->get($writing->path());
+
+        // Then
+        expect($writing->refresh()->views)->toBe(0);
+    });
+
+    it('does not count users viewing their own profile', function (): void {
+        // Given
+        $user = createUser();
+        DB::table('users')->where('id', $user->id)->update(['profile_views' => 0]);
+
+        // When
+        actingAs($user)->get($user->path());
+
+        // Then
+        expect($user->refresh()->profile_views)->toBe(0);
+    });
+
+    it('does not count crawlers', function (): void {
+        // Given
+        $writing = Writing::factory()->create(['views' => 0]);
+
+        // When
+        withHeader('User-Agent', 'Googlebot/2.1 (+http://www.google.com/bot.html)')->get($writing->path());
+
+        // Then
+        expect($writing->refresh()->views)->toBe(0);
+    });
+
+    it('hands guests a visitor cookie', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+
+        // When
+        $response = get($writing->path());
+
+        // Then
+        $response->assertCookie(ViewCounter::VISITOR_COOKIE);
     });
 
     it('counts different writings separately for the same visitor', function (): void {
