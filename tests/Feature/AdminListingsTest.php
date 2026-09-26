@@ -144,7 +144,6 @@ describe('the admin pages', function (): void {
     })->with([
         'dashboard' => ['admin.index', 'admin/PoAdminIndex'],
         'settings' => ['admin.settings', 'admin/PoAdminSettings'],
-        'websockets' => ['admin.websockets', 'admin/PoAdminWebsockets'],
         'analytics' => ['admin.analytics', 'admin/PoAdminAnalytics'],
     ]);
 

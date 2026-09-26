@@ -10,18 +10,17 @@ function optionalPort(port: string | undefined): number | undefined {
   return port === undefined || port === '' ? undefined : Number(port)
 }
 
-function createEcho(): Echo<'pusher'> {
-  const port = optionalPort(import.meta.env.VITE_PUSHER_PORT)
+function createEcho(): Echo<'reverb'> {
+  const port = optionalPort(import.meta.env.VITE_REVERB_PORT)
 
   return new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    wsHost: import.meta.env.VITE_PUSHER_HOST,
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
     wsPort: port,
     wssPort: port,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: import.meta.env.VITE_PUSHER_APP_FORCETLS === 'true',
-    disableStats: true,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
     // PusherConnector connects synchronously during Echo's constructor, so
     // Pusher must be supplied here rather than assigned on the instance
     // afterwards (the connection attempt would already have failed).
@@ -38,7 +37,7 @@ export function useNotificationsChannel(
   userId: () => number | null,
   onUnreadCount: (unread: number) => void
 ): void {
-  let echo: Echo<'pusher'> | null = null
+  let echo: Echo<'reverb'> | null = null
 
   onMounted(() => {
     const id = userId()

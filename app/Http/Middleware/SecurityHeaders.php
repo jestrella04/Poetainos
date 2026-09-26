@@ -22,6 +22,9 @@ class SecurityHeaders
 
         $response = $next($request);
 
+        $websocketOrigin = $this->websocketOrigin();
+        $websocketSrc = $websocketOrigin === null ? '' : " {$websocketOrigin}";
+
         // Baseline headers applied in every environment
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');
@@ -39,7 +42,7 @@ class SecurityHeaders
                     "style-src 'self' 'unsafe-inline'",
                     "img-src 'self' data: blob: https:",
                     "font-src 'self'",
-                    "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev https://t.counter.dev",
+                    "connect-src 'self'{$websocketSrc} https://cdn.counter.dev https://t.counter.dev",
                     'frame-src https://counter.dev',
                     "frame-ancestors 'none'",
                     "form-action 'self'",
@@ -53,7 +56,7 @@ class SecurityHeaders
             $viteUrl = $this->viteDevServerUrl();
             $scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.counter.dev".($viteUrl ? " {$viteUrl}" : '');
             $styleSrc = "style-src 'self' 'unsafe-inline'".($viteUrl ? " {$viteUrl}" : '');
-            $connectSrc = "connect-src 'self' wss://*.pusher.com https://*.pusher.com https://cdn.counter.dev https://t.counter.dev".($viteUrl ? " {$viteUrl} ".preg_replace('/^http/', 'ws', $viteUrl) : '');
+            $connectSrc = "connect-src 'self'{$websocketSrc} https://cdn.counter.dev https://t.counter.dev".($viteUrl ? " {$viteUrl} ".preg_replace('/^http/', 'ws', $viteUrl) : '');
             $fontSrc = "font-src 'self' data:".($viteUrl ? " {$viteUrl}" : '');
 
             $response->headers->set(
@@ -80,6 +83,22 @@ class SecurityHeaders
     protected function nonce(): string
     {
         return base64_encode(random_bytes(16));
+    }
+
+    /**
+     * The Reverb origin browsers open the notifications websocket against.
+     */
+    protected function websocketOrigin(): ?string
+    {
+        $options = config('broadcasting.connections.reverb.options');
+
+        if (($options['host'] ?? '') === '') {
+            return null;
+        }
+
+        $scheme = $options['scheme'] === 'https' ? 'wss' : 'ws';
+
+        return "{$scheme}://{$options['host']}:{$options['port']}";
     }
 
     protected function viteDevServerUrl(): ?string

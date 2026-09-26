@@ -44,6 +44,34 @@ describe('security headers', function (): void {
         // Then
         expect($response->headers->get('Content-Security-Policy'))->toContain("style-src 'self' 'unsafe-inline';");
     });
+
+    it('lets the notifications websocket reach Reverb under the production policy', function (): void {
+        // Given
+        app()->detectEnvironment(fn (): string => 'production');
+        config([
+            'broadcasting.connections.reverb.options.host' => 'ws.poetainos.test',
+            'broadcasting.connections.reverb.options.port' => 443,
+            'broadcasting.connections.reverb.options.scheme' => 'https',
+        ]);
+
+        // When
+        $response = get('/offline');
+
+        // Then
+        expect($response->headers->get('Content-Security-Policy'))->toContain("connect-src 'self' wss://ws.poetainos.test:443 ");
+    });
+
+    it('leaves the websocket out of the production policy when Reverb has no host', function (): void {
+        // Given
+        app()->detectEnvironment(fn (): string => 'production');
+        config(['broadcasting.connections.reverb.options.host' => null]);
+
+        // When
+        $response = get('/offline');
+
+        // Then
+        expect($response->headers->get('Content-Security-Policy'))->toContain("connect-src 'self' https://cdn.counter.dev");
+    });
 });
 
 describe('document head', function (): void {
