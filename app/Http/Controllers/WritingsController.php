@@ -9,7 +9,6 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
 use App\Services\ContentDeleter;
-use App\Services\ImageStorage;
 use App\Services\ViewCounter;
 use App\Services\WritingPublisher;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -203,15 +202,11 @@ class WritingsController extends Controller
      *
      * @return array<int, mixed>
      */
-    public function destroy(Writing $writing, ContentDeleter $deleter, ImageStorage $images): array
+    public function destroy(Writing $writing, ContentDeleter $deleter): array
     {
         $this->authorize('delete', $writing);
 
-        $cover = $writing->extra_info['cover'] ?? null;
-
         $deleter->deleteWriting($writing);
-
-        $images->delete($cover);
 
         return [];
     }

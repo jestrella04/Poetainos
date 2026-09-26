@@ -223,15 +223,11 @@ class UsersController extends Controller
      *
      * @return array<int, mixed>|RedirectResponse
      */
-    public function destroy(Request $request, User $user, ContentDeleter $deleter, ImageStorage $images): array|RedirectResponse
+    public function destroy(Request $request, User $user, ContentDeleter $deleter): array|RedirectResponse
     {
         $this->authorize('delete', $user);
 
-        $avatar = $user->extra_info['avatar'] ?? null;
-
         $deleter->deleteUser($user);
-
-        $images->delete($avatar);
 
         if ($request->user()?->is($user) === true) {
             Auth::logout();

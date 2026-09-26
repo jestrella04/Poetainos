@@ -154,16 +154,19 @@ describe('opening a notification', function (): void {
         $missing->assertNotFound();
     });
 
-    it('is a 404 when the writing it points to is gone', function (): void {
+    it('marks it read and returns to the list with a notice when the writing it points to is gone', function (): void {
         // Given
         $recipient = createUser();
         createDatabaseNotification($recipient, ['writing_id' => fake()->numberBetween(100000, 999999)]);
+        $notification = $recipient->notifications()->firstOrFail();
 
         // When
-        $response = actingAs($recipient)->get(route('notifications.show', $recipient->notifications()->firstOrFail()->id));
+        $response = actingAs($recipient)->get(route('notifications.show', $notification->id));
 
         // Then
-        $response->assertNotFound();
+        $response->assertRedirect(route('notifications.index'))
+            ->assertSessionHas('message', 'main.content-no-longer-available');
+        expect($notification->refresh()->read_at)->not->toBeNull();
     });
 });
 

@@ -55,7 +55,15 @@ class UsersNotificationsController extends Controller
             return redirect($notification->data['url']);
         }
 
-        return redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'] ?? null)));
+        $writing = Writing::whereKey($notification->data['writing_id'] ?? null)->first();
+
+        if ($writing === null) {
+            request()->session()->flash('message', 'main.content-no-longer-available');
+
+            return to_route('notifications.index');
+        }
+
+        return redirect($writing->path());
     }
 
     public function setEmailPreference(string $enable): JsonResponse
