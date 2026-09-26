@@ -18,14 +18,8 @@ class CategoriesController extends Controller
      */
     public function show(Category $category): Response|Paginator
     {
-        $sort = resolveSort(['latest', 'popular', 'likes']);
-
         return $this->writingsIndex(
-            $category->writingsRecursive()
-                ->visibleTo($this->blockedAuthorIds())
-                ->withListingRelations()
-                ->sorted($sort),
-            $sort,
+            $category->writingsRecursive(),
             [
                 'title' => getPageTitle([$category->name, __('Categories')]),
                 'canonical' => $category->path(),

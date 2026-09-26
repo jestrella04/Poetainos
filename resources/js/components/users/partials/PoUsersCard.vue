@@ -43,7 +43,9 @@ const { strNullOrEmpty } = useTypeGuards()
         <span>
           {{ $t('main.count-writings', { count: data.writings_count }, data.writings_count) }}
         </span>
-        <span>{{ $t('main.count-likes', { count: data.likes_count }, data.likes_count) }}</span>
+        <span>{{
+          $t('users.count-likes-given', { count: data.given_likes_count }, data.given_likes_count)
+        }}</span>
       </div>
     </v-card-text>
   </po-card>

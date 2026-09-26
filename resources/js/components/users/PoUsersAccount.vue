@@ -17,7 +17,7 @@ interface AccountSummary {
   created_at: string
   writings_count: number
   shelf_count: number
-  likes_count: number
+  given_likes_count: number
   blocked_authors_count: number
 }
 
@@ -126,7 +126,9 @@ function togglePushNotifications(value: boolean | null): void {
           <po-users-account-row
             :href="route('users.likes.index', username)"
             :title="$t('users.view-self-likes')"
-            :subtitle="$t('accounts.likes-count', { count: formatCount(account.likes_count) })"
+            :subtitle="
+              $t('accounts.likes-count', { count: formatCount(account.given_likes_count) })
+            "
           />
 
           <po-users-account-row

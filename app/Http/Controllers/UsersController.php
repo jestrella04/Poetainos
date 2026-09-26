@@ -33,7 +33,7 @@ class UsersController extends Controller
         $users = User::select('id', 'username', 'name', 'profile_views', 'aura', 'karma')
             ->withProfileFields('bio', 'avatar', 'location')
             ->has('writings')
-            ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
+            ->withCount(['writings', 'awards', 'givenLikes', 'comments', 'shelf']);
 
         $users = match ($sort) {
             'latest' => $users->latest(),
@@ -89,7 +89,7 @@ class UsersController extends Controller
             'user' => User::select('id', 'username', 'name', 'profile_views', 'aura', 'karma', 'created_at')
                 ->withProfileFields('bio', 'avatar', 'website', 'location', 'interests', 'occupation')
                 ->where('id', $user->id)
-                ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
+                ->withCount(['writings', 'awards', 'givenLikes', 'comments', 'shelf'])
                 ->firstOrFail()
                 ->setAttribute('social', $user->profile->socialHandles()),
             'authorWritings' => Inertia::optional(fn () => $user->writings()
@@ -213,78 +213,6 @@ class UsersController extends Controller
     }
 
     /**
-     * Get the currently authenticated user.
-     */
-    public function me(): User
-    {
-        return $this->requireAuthUser();
-    }
-
-    /**
-     * Recalculate the given user's karma.
-     */
-    public function recalculateKarma(User $user): \Illuminate\Http\Response
-    {
-        $this->authorize('update', $user);
-
-        $user->updateKarma();
-
-        return response($user->karma);
-    }
-
-    /**
-     * Block another user.
-     *
-     * @return array<int, mixed>
-     */
-    public function blockUser(User $user): array
-    {
-        $authUser = $this->requireAuthUser();
-
-        abort_if($authUser->is($user), 422, __('You cannot block yourself.'));
-
-        $authUser->block($user);
-
-        return [];
-    }
-
-    /**
-     * Unblock a previously blocked user.
-     *
-     * @return array<int, mixed>
-     */
-    public function unblockUser(User $user): array
-    {
-        $this->requireAuthUser()->unblock($user);
-
-        return [];
-    }
-
-    /**
-     * The authenticated user's blocked authors.
-     *
-     * @return Response|Paginator<int, User>
-     */
-    public function blockedUsers(): Response|Paginator
-    {
-        $authUser = $this->requireAuthUser();
-
-        $blockedUsers = User::forAuthorSummary()
-            ->whereIn('id', $authUser->blockedAuthors()->select('blocked_user_id'));
-
-        return $this->paginatedPage(
-            fn (): Paginator => $blockedUsers->simplePaginate($this->perPage)->withQueryString(),
-            'users/PoUsersBlockedIndex',
-            [
-                'meta' => [
-                    'title' => getPageTitle([__('Blocked authors'), __('My account')]),
-                ],
-            ],
-            'blockedUsers',
-        );
-    }
-
-    /**
      * Display the specified resource.
      */
     public function account(): Response
@@ -292,7 +220,7 @@ class UsersController extends Controller
         $user = $this->requireAuthUser();
         $this->authorize('update', $user);
 
-        $user->loadCount(['writings', 'shelf', 'likes', 'blockedAuthors']);
+        $user->loadCount(['writings', 'shelf', 'givenLikes', 'blockedAuthors']);
 
         return Inertia::render('users/PoUsersAccount', [
             'meta' => [
@@ -302,7 +230,7 @@ class UsersController extends Controller
                 'created_at',
                 'writings_count',
                 'shelf_count',
-                'likes_count',
+                'given_likes_count',
                 'blocked_authors_count',
             ]),
             'notifications' => [

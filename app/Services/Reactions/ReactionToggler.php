@@ -13,7 +13,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 class ReactionToggler
 {
     /**
-     * @return array{method: string, count: int}
+     * @return array{isActive: bool, count: int}
      */
     public function toggle(Reaction $reaction, User $actor): array
     {
@@ -21,14 +21,14 @@ class ReactionToggler
             $reaction->remove($actor);
             RecalculateAura::dispatch($actor, $reaction->writing());
 
-            return ['method' => 'destroy', 'count' => $reaction->count()];
+            return ['isActive' => false, 'count' => $reaction->count()];
         }
 
         try {
             $reaction->add($actor);
         } catch (UniqueConstraintViolationException) {
             // A double click already created it
-            return ['method' => 'store', 'count' => $reaction->count()];
+            return ['isActive' => true, 'count' => $reaction->count()];
         }
 
         RecalculateAura::dispatch($actor, $reaction->writing());
@@ -39,6 +39,6 @@ class ReactionToggler
             $author->notify($reaction->notification($actor));
         }
 
-        return ['method' => 'store', 'count' => $reaction->count()];
+        return ['isActive' => true, 'count' => $reaction->count()];
     }
 }

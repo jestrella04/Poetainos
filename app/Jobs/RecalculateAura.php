@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\User;
 use App\Models\Writing;
+use App\Services\AuraCalculator;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -36,9 +37,14 @@ class RecalculateAura implements ShouldBeUniqueUntilProcessing, ShouldQueue
         return ($this->user->id ?? '-').':'.($this->writing->id ?? '-');
     }
 
-    public function handle(): void
+    public function handle(AuraCalculator $calculator): void
     {
-        $this->user?->updateAura();
-        $this->writing?->updateAura();
+        if ($this->user !== null) {
+            $calculator->updateUserAura($this->user);
+        }
+
+        if ($this->writing !== null) {
+            $calculator->updateWritingAura($this->writing);
+        }
     }
 }

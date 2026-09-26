@@ -12,7 +12,6 @@ use App\Services\ContentDeleter;
 use App\Services\ViewCounter;
 use App\Services\WritingPublisher;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -40,7 +39,7 @@ class WritingsController extends Controller
      */
     public function home(): Response|Paginator
     {
-        return $this->listing(
+        return $this->writingsIndex(
             Writing::query(),
             ['title' => getPageTitle([]), 'canonical' => route('home')],
             [
@@ -67,7 +66,7 @@ class WritingsController extends Controller
      */
     public function awards(): Response|Paginator
     {
-        return $this->listing(
+        return $this->writingsIndex(
             Writing::whereNotNull('home_posted_at'),
             ['title' => getPageTitle([__('Golden Flowers')]), 'canonical' => route('writings.awards')],
         );
@@ -232,26 +231,6 @@ class WritingsController extends Controller
             // Nobody else can accept the agreements for the author, so the form only asks the author
             'agreement' => $this->agreeingUser($writing)?->isInAgreement() ?? true,
         ]);
-    }
-
-    /**
-     * A page of the given writings, hidden authors excluded, sorted by the requested order.
-     *
-     * @param  Builder<Writing>  $writings
-     * @param  array<string, mixed>  $meta
-     * @param  array<string, mixed>  $extraProps
-     * @return Response|Paginator<int, Writing>
-     */
-    private function listing(Builder $writings, array $meta, array $extraProps = []): Response|Paginator
-    {
-        $sort = resolveSort(['latest', 'popular', 'likes']);
-
-        return $this->writingsIndex(
-            $writings->visibleTo($this->blockedAuthorIds())->withListingRelations()->sorted($sort),
-            $sort,
-            $meta,
-            $extraProps,
-        );
     }
 
     /**

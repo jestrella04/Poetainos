@@ -209,16 +209,17 @@ class AdminController extends Controller
      */
     private function listing(string $component, string $title, Builder $rows): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return $rows->simplePaginate($this->perPage)->withQueryString();
-        }
-
-        return Inertia::render($component, [
-            'meta' => [
-                'title' => getPageTitle([$title, __('Administration')]),
+        return $this->paginatedPage(
+            fn (): Paginator => $rows->simplePaginate($this->perPage)->withQueryString(),
+            $component,
+            [
+                'meta' => [
+                    'title' => getPageTitle([$title, __('Administration')]),
+                ],
+                'total' => fn (): int => $rows->count(),
             ],
-            'total' => $rows->count(),
-        ]);
+            recordsProp: null,
+        );
     }
 
     /**

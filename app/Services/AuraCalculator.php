@@ -77,7 +77,7 @@ class AuraCalculator
         $since = Carbon::now()->subDays(self::KARMA_WINDOW_DAYS)->startOfDay();
 
         $points = $this->score('user', self::USER_POINT_KEYS, [
-            'likes' => $user->likes()->where('created_at', '>=', $since)->count(),
+            'likes' => $user->givenLikes()->where('created_at', '>=', $since)->count(),
             'comments' => $user->comments()->where('created_at', '>=', $since)->count(),
             'shelf' => Shelf::where('user_id', $user->id)->where('created_at', '>=', $since)->count(),
             'awards' => $user->writings()->where('home_posted_at', '>=', $since)->count(),

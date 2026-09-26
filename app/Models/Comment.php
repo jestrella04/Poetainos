@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HidesBlockedAuthors;
 use Closure;
 use Database\Factories\CommentFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Comment extends Model
 {
     /** @use HasFactory<CommentFactory> */
-    use HasFactory;
+    use HasFactory, HidesBlockedAuthors;
 
     /**
      * The attributes that are mass assignable.
@@ -72,21 +72,5 @@ class Comment extends Model
                 $query->where('user_id', $viewerId);
             },
         ];
-    }
-
-    /**
-     * Exclude comments authored by any of the given blocked user ids.
-     *
-     * @param  Builder<Comment>  $query
-     * @param  array<int>  $blockedUserIds
-     * @return Builder<Comment>
-     */
-    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
-    {
-        if ($blockedUserIds === []) {
-            return $query;
-        }
-
-        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
     }
 }

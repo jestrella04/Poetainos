@@ -7,7 +7,7 @@ function buildSource(overrides: Partial<Parameters<typeof useReactionToggle>[0]>
   return reactive({
     count: 3,
     isActive: false,
-    postUrl: '/likes/writing/1/store',
+    postUrl: '/likes/writing/1/toggle',
     canReact: true,
     ...overrides
   })
@@ -24,21 +24,21 @@ beforeEach(() => {
 describe('useReactionToggle', () => {
   it('adopts the returned count and becomes active on store', async () => {
     // Given
-    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { method: 'store', count: 4 } })
+    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { isActive: true, count: 4 } })
     const { count, isActive, toggle } = useReactionToggle(buildSource(), buildOptions())
 
     // When
     await toggle()
 
     // Then
-    expect(post).toHaveBeenCalledWith('/likes/writing/1/store')
+    expect(post).toHaveBeenCalledWith('/likes/writing/1/toggle')
     expect(count.value).toBe(4)
     expect(isActive.value).toBe(true)
   })
 
   it('adopts the returned count and becomes inactive on destroy', async () => {
     // Given
-    vi.spyOn(axios, 'post').mockResolvedValue({ data: { method: 'destroy', count: 2 } })
+    vi.spyOn(axios, 'post').mockResolvedValue({ data: { isActive: false, count: 2 } })
     const { count, isActive, toggle } = useReactionToggle(
       buildSource({ isActive: true }),
       buildOptions()
@@ -99,7 +99,7 @@ describe('useReactionToggle', () => {
 
   it('ignores a second toggle while one is in flight', async () => {
     // Given
-    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { method: 'store', count: 4 } })
+    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { isActive: true, count: 4 } })
     const { toggle } = useReactionToggle(buildSource(), buildOptions())
 
     // When

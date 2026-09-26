@@ -8,11 +8,9 @@ use App\Notifications\SocialLoginCode;
 use App\Services\ImageStorage;
 use App\Services\VerificationCodes;
 use Carbon\Carbon;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -25,22 +23,7 @@ class SocialAuthController extends Controller
 {
     private const PENDING_LINK_SESSION_KEY = 'social_link';
 
-    private const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
-
-    private const AVATAR_TIMEOUT_SECONDS = 5;
-
     private const AVATAR_SIZE = 512;
-
-    /**
-     * Image types accepted for a provider avatar, mapped to their file extension.
-     *
-     * @var array<int, string>
-     */
-    private const AVATAR_EXTENSIONS = [
-        IMAGETYPE_JPEG => 'jpg',
-        IMAGETYPE_PNG => 'png',
-        IMAGETYPE_WEBP => 'webp',
-    ];
 
     /**
      * Redirect the user to the external authentication page.
@@ -57,7 +40,7 @@ class SocialAuthController extends Controller
     /**
      * Obtain the user information from the external service.
      */
-    public function handleProviderCallback(string $service, ImageStorage $images): RedirectResponse
+    public function handleProviderCallback(string $service, ImageStorage $images, VerificationCodes $codes): RedirectResponse
     {
         // A callback whose state doesn't match this session was replayed (refresh,
         // back button) or outlived the session that started it, so start over
@@ -78,18 +61,18 @@ class SocialAuthController extends Controller
             return redirect(route('login'));
         }
 
-        $exists = User::where('email', $email)->exists();
         $user = $this->findOrCreateUser($social, $email);
+        $isExistingAccount = $user->wasRecentlyCreated === false;
 
         // An existing account meeting this provider for the first time must
         // confirm ownership with an emailed code before we trust the provider's
         // claim and log in — otherwise anyone who can get a provider to report
         // a victim's email address could sign straight into their account.
-        if ($exists && ! $this->isLinked($user, $service)) {
-            return $this->askToConfirmLink($user, $service, $social->getAvatar());
+        if ($isExistingAccount === true && $this->isLinked($user, $service) === false) {
+            return $this->askToConfirmLink($user, $service, $social->getAvatar(), $codes);
         }
 
-        $this->completeLogin($user, $service, $social->getAvatar(), $images, $exists);
+        $this->completeLogin($user, $service, $social->getAvatar(), $images, $isExistingAccount);
 
         return redirect(Redirect::intended(route('home'))->getTargetUrl());
     }
@@ -124,7 +107,7 @@ class SocialAuthController extends Controller
      *
      * @return array{url: string}
      */
-    public function confirmProviderLink(string $service, ImageStorage $images): array
+    public function confirmProviderLink(string $service, ImageStorage $images, VerificationCodes $codes): array
     {
         request()->validate([
             'code' => ['required', 'digits:6'],
@@ -132,7 +115,7 @@ class SocialAuthController extends Controller
 
         $user = $this->requirePendingLinkUser($service);
 
-        if (app(VerificationCodes::class)->verify($user, VerificationCodes::PURPOSE_SOCIAL_LINK, request('code')) === false) {
+        if ($codes->verify($user, VerificationCodes::PURPOSE_SOCIAL_LINK, request('code')) === false) {
             throw ValidationException::withMessages([
                 'code' => __('The verification code is invalid or has expired.'),
             ]);
@@ -147,9 +130,9 @@ class SocialAuthController extends Controller
     /**
      * Email a fresh confirmation code to the account awaiting its first sign-in through this provider.
      */
-    public function resendLinkCode(string $service): \Illuminate\Http\Response
+    public function resendLinkCode(string $service, VerificationCodes $codes): \Illuminate\Http\Response
     {
-        $this->sendLinkCode($this->requirePendingLinkUser($service), $service);
+        $this->sendLinkCode($this->requirePendingLinkUser($service), $service, $codes);
 
         return response()->noContent();
     }
@@ -175,7 +158,7 @@ class SocialAuthController extends Controller
      * Remember which account is awaiting confirmation and email its owner a
      * code to confirm that this provider may sign in to it.
      */
-    private function askToConfirmLink(User $user, string $service, ?string $avatarUrl): RedirectResponse
+    private function askToConfirmLink(User $user, string $service, ?string $avatarUrl, VerificationCodes $codes): RedirectResponse
     {
         request()->session()->put(self::PENDING_LINK_SESSION_KEY, [
             'user_id' => $user->id,
@@ -183,14 +166,14 @@ class SocialAuthController extends Controller
             'avatar' => $avatarUrl,
         ]);
 
-        $this->sendLinkCode($user, $service);
+        $this->sendLinkCode($user, $service, $codes);
 
         return redirect(route('social.confirm', $service));
     }
 
-    private function sendLinkCode(User $user, string $service): void
+    private function sendLinkCode(User $user, string $service, VerificationCodes $codes): void
     {
-        $code = app(VerificationCodes::class)->issue($user, VerificationCodes::PURPOSE_SOCIAL_LINK);
+        $code = $codes->issue($user, VerificationCodes::PURPOSE_SOCIAL_LINK);
 
         $user->notify(new SocialLoginCode($code, $service, VerificationCodes::CODE_MINUTES));
     }
@@ -249,36 +232,15 @@ class SocialAuthController extends Controller
     }
 
     /**
-     * Download the provider's avatar and add it to the user's profile, keeping
-     * the rest of the profile intact. Anything that isn't a small jpg, png or
-     * webp image is ignored, as is a provider that can't be reached.
+     * Add the provider's avatar to the user's profile, when it is an image we accept.
      */
     private function importAvatar(User $user, string $avatarUrl, ImageStorage $images): void
     {
-        try {
-            $response = Http::timeout(self::AVATAR_TIMEOUT_SECONDS)->get($avatarUrl);
-        } catch (ConnectionException) {
-            return;
+        $path = $images->storeRemote($avatarUrl, 'avatars', self::AVATAR_SIZE, self::AVATAR_SIZE);
+
+        if ($path !== null) {
+            $user->editableProfile()->update(['avatar' => $path]);
         }
-
-        $contents = $response->body();
-        $imageInfo = $response->successful() && strlen($contents) <= self::AVATAR_MAX_BYTES
-            ? getimagesizefromstring($contents)
-            : false;
-
-        if ($imageInfo === false || isset(self::AVATAR_EXTENSIONS[$imageInfo[2]]) === false) {
-            return;
-        }
-
-        $path = $images->storeContents(
-            $contents,
-            self::AVATAR_EXTENSIONS[$imageInfo[2]],
-            'avatars',
-            self::AVATAR_SIZE,
-            self::AVATAR_SIZE,
-        );
-
-        $user->editableProfile()->update(['avatar' => $path]);
     }
 
     /**

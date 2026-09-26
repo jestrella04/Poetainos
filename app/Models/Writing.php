@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\AuraCalculator;
+use App\Models\Concerns\HidesBlockedAuthors;
 use Closure;
 use Database\Factories\WritingFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\DB;
 class Writing extends Model
 {
     /** @use HasFactory<WritingFactory> */
-    use HasFactory;
+    use HasFactory, HidesBlockedAuthors;
 
     /**
      * The attributes that are mass assignable.
@@ -186,33 +186,12 @@ class Writing extends Model
         $this->syncOriginalAttribute('views');
     }
 
-    public function updateAura(): void
-    {
-        app(AuraCalculator::class)->updateWritingAura($this);
-    }
-
     /**
      * @return MorphMany<Complaint, $this>
      */
     public function complaints(): MorphMany
     {
         return $this->morphMany(Complaint::class, 'complainable');
-    }
-
-    /**
-     * Exclude writings authored by any of the given blocked user ids.
-     *
-     * @param  Builder<Writing>  $query
-     * @param  array<int>  $blockedUserIds
-     * @return Builder<Writing>
-     */
-    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
-    {
-        if ($blockedUserIds === []) {
-            return $query;
-        }
-
-        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
     }
 
     /**

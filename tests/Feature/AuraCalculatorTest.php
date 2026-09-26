@@ -144,9 +144,9 @@ describe('the set-based aura update', function (): void {
             expect((float) $writing->aura)->toEqualWithDelta($expected, 0.001);
         }
 
-        foreach (User::withCount(['writings', 'likes', 'comments', 'shelf', 'awards'])->get() as $user) {
+        foreach (User::withCount(['writings', 'givenLikes', 'comments', 'shelf', 'awards'])->get() as $user) {
             $expected = $calculator->weightedScore(
-                ['writing' => $user->writings_count, 'like' => $user->likes_count, 'comment' => $user->comments_count, 'shelf' => $user->shelf_count, 'views' => $user->profile_views, 'award' => $user->awards_count],
+                ['writing' => $user->writings_count, 'like' => $user->given_likes_count, 'comment' => $user->comments_count, 'shelf' => $user->shelf_count, 'views' => $user->profile_views, 'award' => $user->awards_count],
                 $userWeights,
             )['score'];
             expect((float) $user->aura)->toEqualWithDelta($expected, 0.001);

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Writing;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -67,11 +66,11 @@ class UsersNotificationsController extends Controller
         return redirect($writing->path());
     }
 
-    public function setEmailPreference(string $enable): JsonResponse
+    public function setEmailPreference(string $enable): \Illuminate\Http\Response
     {
         $this->requireAuthUser()->setEmailNotifications(isTruthy($enable));
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 
     /**

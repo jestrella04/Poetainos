@@ -90,7 +90,7 @@ function reply(comment: Comment): string {
               icon="fa-heart"
               :count="comment.likes_count"
               :is-active="comment.is_liked === true"
-              :post-url="route('likes.store', ['comment', comment.id])"
+              :post-url="route('likes.toggle', ['comment', comment.id])"
               :can-react="true"
               :activate-title="$t('comments.like-comment')"
               :deactivate-title="$t('comments.unlike-comment')"

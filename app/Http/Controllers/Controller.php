@@ -9,7 +9,6 @@ use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Controller as BaseController;
@@ -19,9 +18,16 @@ use Inertia\Response;
 
 class Controller extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests, ValidatesRequests;
 
     private const DEFAULT_PAGINATION = 15;
+
+    /**
+     * The orders every writings listing can be sorted by, the first being the default.
+     *
+     * @var array<int, string>
+     */
+    private const WRITING_SORTS = ['latest', 'popular', 'likes'];
 
     protected int $perPage;
 
@@ -51,7 +57,8 @@ class Controller extends BaseController
      * A page of records: the raw page for JSON requests, the given Inertia
      * page otherwise. `$isDeferred` leaves the records out of the first
      * response so the page can request them with a partial reload; the query
-     * only runs when they are actually sent.
+     * only runs when they are actually sent. Without a `$recordsProp` the page
+     * gets no records at all and fetches every page as JSON (the admin tables).
      *
      * @template TPage of \Illuminate\Contracts\Pagination\Paginator
      *
@@ -63,11 +70,15 @@ class Controller extends BaseController
         Closure $page,
         string $component,
         array $props,
-        string $recordsProp,
+        ?string $recordsProp,
         bool $isDeferred = true,
     ): Response|PaginatorContract {
         if (request()->expectsJson()) {
             return $page();
+        }
+
+        if ($recordsProp === null) {
+            return Inertia::render($component, $props);
         }
 
         return Inertia::render($component, [
@@ -77,9 +88,10 @@ class Controller extends BaseController
     }
 
     /**
-     * A page of writings: the raw page for JSON requests, the shared writings
-     * index otherwise. `$isDeferred` leaves the writings out of the first
-     * response so the page can request them with a partial reload.
+     * A page of the given writings, the viewer's blocked authors left out,
+     * sorted by the requested order: the raw page for JSON requests, the
+     * shared writings index otherwise. `$isDeferred` leaves the writings out
+     * of the first response so the page can request them with a partial reload.
      *
      * @param  Builder<Writing>|Relation<Writing, *, *>  $writings
      * @param  array<string, mixed>  $meta
@@ -88,13 +100,18 @@ class Controller extends BaseController
      */
     protected function writingsIndex(
         Builder|Relation $writings,
-        string $sort,
         array $meta,
         array $extraProps = [],
         bool $isDeferred = true,
     ): Response|Paginator {
+        $sort = resolveSort(self::WRITING_SORTS, self::WRITING_SORTS[0]);
+
         return $this->paginatedPage(
-            fn (): Paginator => $writings->simplePaginate($this->perPage)->withQueryString(),
+            fn (): Paginator => $writings->visibleTo($this->blockedAuthorIds())
+                ->withListingRelations()
+                ->sorted($sort)
+                ->simplePaginate($this->perPage)
+                ->withQueryString(),
             'writings/PoWritingsIndex',
             ['meta' => $meta, 'sort' => $sort, ...$extraProps],
             'writings',

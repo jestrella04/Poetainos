@@ -21,7 +21,7 @@ provide(userKey, props.data)
 
 const headlineStats = computed<{ label: string; value: string }[]>(() => [
   { label: t('writings.writings'), value: readable(props.data.writings_count) },
-  { label: t('main.likes'), value: readable(props.data.likes_count) },
+  { label: t('users.likes-given'), value: readable(props.data.given_likes_count) },
   { label: t('main.profile-views'), value: readable(props.data.profile_views) }
 ])
 

@@ -52,12 +52,10 @@ export function useReactionToggle(source: ReactionToggleSource, options: Reactio
     isSubmitting.value = true
 
     try {
-      const response = await axios.post<{ count: number; method: 'store' | 'destroy' }>(
-        source.postUrl
-      )
+      const response = await axios.post<{ count: number; isActive: boolean }>(source.postUrl)
 
       count.value = response.data.count
-      isActive.value = response.data.method === 'store'
+      isActive.value = response.data.isActive
     } catch {
       // Keep the previous state when the request fails.
     } finally {

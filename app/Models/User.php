@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Notifications\VerifyEmailCode;
-use App\Services\AuraCalculator;
 use App\Services\VerificationCodes;
 use Carbon\Carbon;
 use Database\Factories\UserFactory;
@@ -225,9 +224,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * The likes the user gave to writings and comments.
+     *
      * @return HasMany<Like, $this>
      */
-    public function likes(): HasMany
+    public function givenLikes(): HasMany
     {
         return $this->hasMany(Like::class);
     }
@@ -239,7 +240,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function likedWritingIds(): HasMany
     {
-        return $this->likes()->where('likeable_type', Writing::class)->select('likeable_id');
+        return $this->givenLikes()->where('likeable_type', Writing::class)->select('likeable_id');
     }
 
     /**
@@ -256,18 +257,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $this->profile_views++;
         $this->syncOriginalAttribute('profile_views');
-    }
-
-    public function updateAura(): void
-    {
-        app(AuraCalculator::class)->updateUserAura($this);
-    }
-
-    public function updateKarma(): self
-    {
-        app(AuraCalculator::class)->updateUserKarma($this);
-
-        return $this;
     }
 
     public function isAllowed(string $task): bool

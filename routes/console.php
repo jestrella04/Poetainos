@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
 /*
@@ -14,10 +12,6 @@ use Illuminate\Support\Facades\Schedule;
 | simple approach to interacting with each command's IO methods.
 |
 */
-
-Artisan::command('inspire', function (): void {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
 
 Schedule::command('writing:pick-of-the-day')->dailyAt('04:00');
 Schedule::command('aura:update')->dailyAt('04:00');

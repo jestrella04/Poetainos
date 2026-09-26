@@ -159,8 +159,8 @@ const {
               {{
                 $t(
                   'users.view-liked-count',
-                  { count: formatCount(page.props.user.likes_count) },
-                  page.props.user.likes_count
+                  { count: formatCount(page.props.user.given_likes_count) },
+                  page.props.user.given_likes_count
                 )
               }}
             </po-link>

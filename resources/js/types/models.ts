@@ -15,17 +15,16 @@ export interface UserLike {
   writings_count?: number
 }
 
-// The full profile shape returned by UsersController::show() — a User
-// model select() with several extra_info->x AS x JSON extractions (raw
-// JSON text, not auto-decoded, hence `social` staying a JSON string) plus
-// withCount() aggregates.
+// The full profile shape returned by UsersController::show(): the user's
+// columns, their profile fields flattened in (User::withProfileFields()) and
+// withCount() aggregates. `given_likes_count` counts the likes the user gave.
 export interface User extends UserLike {
   id: number
   profile_views: number
   aura: string
   writings_count: number
   awards_count: number
-  likes_count: number
+  given_likes_count: number
   comments_count: number
   shelf_count: number
   // `bio` and `location` are selected by both index() and show(); the rest

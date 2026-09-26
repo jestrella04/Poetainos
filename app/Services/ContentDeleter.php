@@ -60,7 +60,7 @@ class ContentDeleter
 
             $user->notifications()->delete();
             DB::table('notifications')->where('data->user_id', $user->id)->delete();
-            $user->likes()->delete();
+            $user->givenLikes()->delete();
             $this->deleteTraces($writings->modelKeys(), $commentIds);
         });
 

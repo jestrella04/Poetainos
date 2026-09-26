@@ -19,17 +19,17 @@ describe('liking a writing', function (): void {
         $liker = createUser();
 
         // When
-        $likeResponse = actingAs($liker)->post("/likes/writing/{$writing->id}/store");
+        $likeResponse = actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
 
         // Then
-        $likeResponse->assertJson(['method' => 'store', 'count' => 1]);
+        $likeResponse->assertJson(['isActive' => true, 'count' => 1]);
         Notification::assertSentTo($author, WritingLiked::class);
 
         // When
-        $unlikeResponse = actingAs($liker)->post("/likes/writing/{$writing->id}/store");
+        $unlikeResponse = actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
 
         // Then
-        $unlikeResponse->assertJson(['method' => 'destroy', 'count' => 0]);
+        $unlikeResponse->assertJson(['isActive' => false, 'count' => 0]);
     });
 
     it('does not notify the author when they like their own writing', function (): void {
@@ -39,7 +39,7 @@ describe('liking a writing', function (): void {
         $writing = Writing::factory()->for($author, 'author')->create();
 
         // When
-        actingAs($author)->post("/likes/writing/{$writing->id}/store");
+        actingAs($author)->post("/likes/writing/{$writing->id}/toggle");
 
         // Then
         Notification::assertNothingSent();
@@ -50,14 +50,14 @@ describe('liking a writing', function (): void {
         $writing = Writing::factory()->create();
         $liker = createUser();
         $otherLiker = createUser();
-        actingAs($liker)->post("/likes/writing/{$writing->id}/store");
-        actingAs($otherLiker)->post("/likes/writing/{$writing->id}/store");
+        actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
+        actingAs($otherLiker)->post("/likes/writing/{$writing->id}/toggle");
 
         // When
-        $response = actingAs($liker)->post("/likes/writing/{$writing->id}/store");
+        $response = actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
 
         // Then
-        $response->assertJson(['method' => 'destroy', 'count' => 1]);
+        $response->assertJson(['isActive' => false, 'count' => 1]);
     });
 
     it('404s instead of crashing for a nonexistent writing', function (): void {
@@ -65,7 +65,7 @@ describe('liking a writing', function (): void {
         $liker = createUser();
 
         // When
-        $response = actingAs($liker)->post('/likes/writing/'.fake()->numberBetween(100000, 999999).'/store');
+        $response = actingAs($liker)->post('/likes/writing/'.fake()->numberBetween(100000, 999999).'/toggle');
 
         // Then
         $response->assertNotFound();
@@ -77,7 +77,7 @@ describe('liking a writing', function (): void {
         $liker = createUser();
 
         // When
-        $response = actingAs($liker)->post('/likes/'.fake()->lexify('type-????')."/{$writing->id}/store");
+        $response = actingAs($liker)->post('/likes/'.fake()->lexify('type-????')."/{$writing->id}/toggle");
 
         // Then
         $response->assertNotFound();
@@ -93,17 +93,17 @@ describe('liking a comment', function (): void {
         $liker = createUser();
 
         // When
-        $likeResponse = actingAs($liker)->post("/likes/comment/{$comment->id}/store");
+        $likeResponse = actingAs($liker)->post("/likes/comment/{$comment->id}/toggle");
 
         // Then
-        $likeResponse->assertJson(['method' => 'store', 'count' => 1]);
+        $likeResponse->assertJson(['isActive' => true, 'count' => 1]);
         Notification::assertSentTo($author, CommentLiked::class);
 
         // When
-        $unlikeResponse = actingAs($liker)->post("/likes/comment/{$comment->id}/store");
+        $unlikeResponse = actingAs($liker)->post("/likes/comment/{$comment->id}/toggle");
 
         // Then
-        $unlikeResponse->assertJson(['method' => 'destroy', 'count' => 0]);
+        $unlikeResponse->assertJson(['isActive' => false, 'count' => 0]);
     });
 });
 
@@ -114,9 +114,9 @@ describe('a double click on the like button', function (): void {
         Like::creating(fn () => throw new UniqueConstraintViolationException('sqlite', 'insert', [], new Exception('duplicate')));
 
         // When
-        $response = actingAs(createUser())->post("/likes/writing/{$writing->id}/store");
+        $response = actingAs(createUser())->post("/likes/writing/{$writing->id}/toggle");
 
         // Then
-        $response->assertOk()->assertJson(['method' => 'store']);
+        $response->assertOk()->assertJson(['isActive' => true]);
     });
 });
