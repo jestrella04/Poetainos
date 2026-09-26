@@ -35,6 +35,7 @@ function hostFor(userId: number | null, onUnreadCount: (unread: number) => void)
 
 afterEach(() => {
   vi.clearAllMocks()
+  vi.unstubAllEnvs()
 })
 
 describe('useNotificationsChannel', () => {
@@ -44,11 +45,30 @@ describe('useNotificationsChannel', () => {
 
     // Then
     expect(mocks.constructed).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({ broadcaster: 'reverb', enabledTransports: ['ws', 'wss'] })
+      expect.objectContaining({ broadcaster: 'reverb' })
     )
     expect(mocks.privateChannel).toHaveBeenCalledExactlyOnceWith('App.Models.User.7')
     expect(mocks.notification).toHaveBeenCalledExactlyOnceWith(expect.any(Function))
   })
+
+  it.each([
+    ['http', false, ['ws']],
+    ['https', true, ['wss']]
+  ])(
+    'connects over the %s scheme only, without falling back to the other',
+    (scheme: string, forceTLS: boolean, enabledTransports: string[]) => {
+      // Given
+      vi.stubEnv('VITE_REVERB_SCHEME', scheme)
+
+      // When
+      mount(hostFor(7, vi.fn()))
+
+      // Then
+      expect(mocks.constructed).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ forceTLS, enabledTransports })
+      )
+    }
+  )
 
   it('reports the unread count the server sends', () => {
     // Given

@@ -13,6 +13,7 @@ function optionalPort(port: string | undefined): number | undefined {
 
 function createEcho(): Echo<'reverb'> {
   const port = optionalPort(import.meta.env.VITE_REVERB_PORT)
+  const isSecure = (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https'
 
   return new Echo({
     broadcaster: 'reverb',
@@ -20,8 +21,10 @@ function createEcho(): Echo<'reverb'> {
     wsHost: import.meta.env.VITE_REVERB_HOST,
     wsPort: port,
     wssPort: port,
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
-    enabledTransports: ['ws', 'wss'],
+    forceTLS: isSecure,
+    // Only the scheme's own transport: Pusher otherwise retries a failed ws
+    // connection over wss (or back), which the server doesn't serve
+    enabledTransports: [isSecure ? 'wss' : 'ws'],
     // PusherConnector connects synchronously during Echo's constructor, so
     // Pusher must be supplied here rather than assigned on the instance
     // afterwards (the connection attempt would already have failed).

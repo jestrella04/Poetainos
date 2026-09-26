@@ -15,7 +15,6 @@ class PwaController extends Controller
         $json = json_decode((string) file_get_contents(base_path('resources/json/manifest.json')));
 
         $json->name = getSiteConfig('name');
-        $json->gcm_sender_id = config('webpush.gcm.sender_id');
         $json->short_name = getSiteConfig('name');
         $json->description = getSiteConfig('slogan');
 
