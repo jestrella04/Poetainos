@@ -28,7 +28,7 @@ describe('viewing and updating a profile', function (): void {
 
         // Then
         $viewResponse->assertOk();
-        $updateResponse->assertOk();
+        $updateResponse->assertRedirect($user->path())->assertInertiaFlash('message', 'accounts.profile-updated');
         $user->refresh();
         expect($user->name)->toBe($name);
         expect($user->profile->bio)->toBe($bio);
@@ -45,7 +45,7 @@ describe('viewing and updating a profile', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($user->refresh()->email_verified_at)->toBeNull();
     });
 
@@ -60,7 +60,7 @@ describe('viewing and updating a profile', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($user->refresh()->email_verified_at)->not->toBeNull();
     });
 
@@ -96,7 +96,7 @@ describe('viewing and updating a profile', function (): void {
 
         // Then
         $viewResponse->assertOk();
-        $updateResponse->assertOk();
+        $updateResponse->assertRedirect();
         expect($user->refresh()->name)->toBe($name);
     });
 });
@@ -115,7 +115,7 @@ describe('changing a user\'s role', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($user->refresh()->role_id)->not->toBe($adminRole->id);
     });
 
@@ -133,7 +133,7 @@ describe('changing a user\'s role', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($user->refresh()->role_id)->toBe($adminRole->id);
     });
 });
@@ -148,7 +148,7 @@ describe('deleting an account', function (): void {
         $response = actingAs($admin)->delete('/admin/users/delete/'.$user->username);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect(route('home'))->assertInertiaFlash('message', 'users.user-deleted');
         expect(User::find($user->id))->toBeNull();
         assertAuthenticatedAs($admin);
     });
@@ -168,7 +168,7 @@ describe('deleting an account', function (): void {
 
         // Then
         $response->assertRedirect(route('home'));
-        $response->assertSessionHas('message', 'accounts.account-deleted');
+        $response->assertInertiaFlash('message', 'accounts.account-deleted');
         expect(User::find($user->id))->toBeNull();
         assertGuest();
         Storage::disk('local')->assertMissing($avatar);
@@ -185,7 +185,7 @@ describe('blocking a user', function (): void {
         $response = actingAs($user)->post('/users/block/'.$author->username);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect()->assertInertiaFlash('message', 'users.user-blocked');
         expect($user->refresh()->isAuthorBlocked($author))->toBeTrue();
     });
 
@@ -211,7 +211,7 @@ describe('blocking a user', function (): void {
         $response = actingAs($user)->delete('/users/block/'.$author->username);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect()->assertInertiaFlash('message', 'users.user-unblocked');
         expect($user->isAuthorBlocked($author))->toBeFalse();
     });
 });
@@ -241,7 +241,7 @@ describe('what a profile update keeps and rejects', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         $user->refresh();
         expect($user->profile->bio)->toBe($newBio);
         expect($user->profile->avatar)->toBe($avatar);
@@ -276,7 +276,7 @@ describe('what a profile update keeps and rejects', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
     });
 
     it('only offers the role list to admins', function (): void {
@@ -315,7 +315,7 @@ describe('a profile avatar', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         $avatar = (string) $user->refresh()->profile->avatar;
         expect($avatar)->toStartWith('avatars/')->not->toBe($oldAvatar);
         Storage::disk('local')->assertExists($avatar);
@@ -338,7 +338,7 @@ describe('a profile avatar', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($user->refresh()->profile->avatar)->toBeNull();
         Storage::disk('local')->assertMissing($oldAvatar);
     });

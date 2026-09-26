@@ -37,17 +37,22 @@ interface SharedPageProps {
     name: string | null
   }
   site: SharedSiteConfig
-  flash: {
-    message: string | null
-  }
   // Consumed internally by the ZiggyVue plugin; app code only reads the
   // absolute base URL, so the rest is left unstructured rather than guessed.
   ziggy: { url: string } & Record<string, unknown>
 }
 
+// One-time data sent with a response (Inertia::flash() on the server,
+// router.flash() on the client): a snackbar message, as an i18n key.
+interface FlashMessage {
+  message?: string
+  color?: string
+}
+
 declare module '@inertiajs/core' {
   export interface InertiaConfig {
     sharedPageProps: SharedPageProps
+    flashDataType: FlashMessage
   }
 }
 

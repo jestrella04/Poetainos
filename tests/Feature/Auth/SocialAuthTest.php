@@ -157,7 +157,7 @@ describe('social login', function (): void {
 
         // Then
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('message', 'accounts.social-link-expired');
+        $response->assertInertiaFlash('message', 'accounts.social-link-expired');
     });
 
     it('logs the user in and links the provider once the emailed code is entered', function (): void {
@@ -169,7 +169,7 @@ describe('social login', function (): void {
         $response = postJson(route('social.confirm.verify', 'google'), ['code' => $code]);
 
         // Then
-        $response->assertOk()->assertJson(['url' => route('home')]);
+        $response->assertRedirect(route('home'));
         assertAuthenticatedAs($user);
         $user->refresh();
         expect($user->socialAccounts()->pluck('provider')->all())->toBe(['google']);
@@ -187,7 +187,7 @@ describe('social login', function (): void {
         $response = postJson(route('social.confirm.verify', 'google'), ['code' => $code]);
 
         // Then
-        $response->assertOk()->assertJson(['url' => url($intendedPath)]);
+        $response->assertRedirect(url($intendedPath));
     });
 
     it('imports the provider avatar once the code is entered', function (): void {
@@ -201,7 +201,7 @@ describe('social login', function (): void {
         $code = startProviderLink($user, 'https://avatars.example/'.fake()->uuid().'.png');
 
         // When
-        postJson(route('social.confirm.verify', 'google'), ['code' => $code])->assertOk();
+        postJson(route('social.confirm.verify', 'google'), ['code' => $code])->assertRedirect();
 
         // Then
         $avatar = (string) $user->refresh()->profile->avatar;
@@ -249,7 +249,7 @@ describe('social login', function (): void {
         $response->assertNoContent();
         $secondCode = sentLinkCode($user);
         postJson(route('social.confirm.verify', 'google'), ['code' => $firstCode])->assertUnprocessable();
-        postJson(route('social.confirm.verify', 'google'), ['code' => $secondCode])->assertOk();
+        postJson(route('social.confirm.verify', 'google'), ['code' => $secondCode])->assertRedirect();
         assertAuthenticatedAs($user);
     });
 
@@ -295,7 +295,7 @@ describe('social login', function (): void {
 
         // Then
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('message', 'accounts.social-email-missing');
+        $response->assertInertiaFlash('message', 'accounts.social-email-missing');
         assertGuest();
         expect(User::count())->toBe(0);
     });
@@ -309,7 +309,7 @@ describe('social login', function (): void {
 
         // Then
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('message', 'accounts.social-link-expired');
+        $response->assertInertiaFlash('message', 'accounts.social-link-expired');
         assertGuest();
     });
 

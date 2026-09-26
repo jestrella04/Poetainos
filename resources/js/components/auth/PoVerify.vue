@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
-import { useSnackbar } from '@/composables/useSnackbar'
 import { useVerificationCode } from '@/composables/useVerificationCode'
 
 defineOptions({
@@ -10,19 +8,8 @@ defineOptions({
 
 const CODE_LENGTH = 6
 
-const { setSnackBar } = useSnackbar()
-const { code, isVerifying, codeError, resendOutcome, resendCountdown, verifyCode, resendCode } =
-  useVerificationCode()
-
-function onVerified(redirectUrl: string): void {
-  setSnackBar({
-    message: 'accounts.email-verified',
-    color: 'primary',
-    active: true
-  })
-
-  router.get(redirectUrl)
-}
+// The server redirects home once the code matches, flashing the confirmation
+const { form, resendOutcome, resendCountdown, verifyCode, resendCode } = useVerificationCode()
 </script>
 
 <template>
@@ -56,18 +43,18 @@ function onVerified(redirectUrl: string): void {
     </p>
 
     <v-otp-input
-      v-model="code"
+      v-model="form.code"
       :length="CODE_LENGTH"
-      :disabled="isVerifying"
-      :loading="isVerifying"
-      :error="codeError !== ''"
+      :disabled="form.processing"
+      :loading="form.processing"
+      :error="form.errors.code !== undefined"
       type="number"
       autofocus
-      @finish="verifyCode(route('verification.verify'), onVerified)"
+      @finish="verifyCode(route('verification.verify'))"
     />
 
-    <p v-if="codeError !== ''" class="po-error text-center text-error ma-0 mb-4">
-      {{ codeError }}
+    <p v-if="form.errors.code !== undefined" class="po-error text-center text-error ma-0 mb-4">
+      {{ form.errors.code }}
     </p>
 
     <po-button

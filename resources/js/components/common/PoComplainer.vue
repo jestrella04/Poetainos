@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import axios from 'axios'
-import { complainerKey, forceSnackBarKey } from '@/composables/keys'
+import { router, useHttp } from '@inertiajs/vue3'
+import { complainerKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useSnackbar } from '@/composables/useSnackbar'
-import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 
 const props = defineProps<{
   compType: string
@@ -13,61 +12,65 @@ const props = defineProps<{
 }>()
 
 const { isEmpty } = useTypeGuards()
-const { setSnackBar } = useSnackbar()
+const { whenSettled } = useRequestFailure()
 const complainer = injectStrict(complainerKey)
+const reasonsRequest = useHttp<Record<string, never>, { reasons: string[] }>()
+const complaint = useHttp({ reasons: [] as string[], comment: '' })
 const reasons = ref<string[]>([])
-const compReasons = ref<string[]>([])
-const compMessage = ref('')
 const hasReasonsLoadError = ref(false)
+const hasSubmitError = ref(false)
 const hasNoReasonSelected = ref(false)
-const forceSnackBar = injectStrict(forceSnackBarKey)
-const { isPosting, errors: hasSubmitError, submitForm } = useFormSubmit(false)
 
 watch(complainer, async () => {
   if (complainer.value === true) {
     hasReasonsLoadError.value = false
 
-    await axios
-      .get<{ reasons: string[] }>(route('complaints.reasons'))
-      .then((response) => {
-        reasons.value = response.data.reasons
+    await whenSettled(
+      reasonsRequest.get(route('complaints.reasons'), {
+        onSuccess: (data) => {
+          reasons.value = data.reasons
+        },
+        onHttpException: () => {
+          hasReasonsLoadError.value = true
+        },
+        onNetworkError: () => {
+          hasReasonsLoadError.value = true
+        }
       })
-      .catch(() => {
-        hasReasonsLoadError.value = true
-      })
+    )
   }
 })
 
+function markSubmitFailed(): void {
+  hasSubmitError.value = true
+}
+
 async function submit(): Promise<void> {
-  hasNoReasonSelected.value = isEmpty(compReasons.value)
+  hasNoReasonSelected.value = isEmpty(complaint.reasons)
+  hasSubmitError.value = false
 
   if (hasNoReasonSelected.value === true) {
     return
   }
 
-  await submitForm({
-    formSelector: '#complaint-form',
-    payload: {
-      complainable_type: props.compType,
-      complainable_id: props.compId,
-      reasons: compReasons.value,
-      comment: compMessage.value
-    },
-    onSuccess: () => {
-      setSnackBar({
-        message: 'complaints.complaint-received',
-        color: 'success',
-        active: true
+  await whenSettled(
+    complaint
+      .transform((data) => ({
+        ...data,
+        complainable_type: props.compType,
+        complainable_id: props.compId
+      }))
+      .post(route('complaints.store'), {
+        onHttpException: markSubmitFailed,
+        onNetworkError: markSubmitFailed,
+        onError: markSubmitFailed,
+        onSuccess: () => {
+          router.flash({ message: 'complaints.complaint-received', color: 'success' })
+          complainer.value = false
+          complaint.reset()
+        }
       })
-
-      forceSnackBar.value = true
-
-      complainer.value = false
-      compReasons.value = []
-      compMessage.value = ''
-    },
-    onError: () => true
-  })
+  )
 }
 </script>
 
@@ -81,7 +84,7 @@ async function submit(): Promise<void> {
 
         <v-divider class="mt-3" />
 
-        <v-form id="complaint-form" :action="route('complaints.store')" @submit.prevent="submit">
+        <v-form id="complaint-form" @submit.prevent="submit">
           <p v-if="hasNoReasonSelected" class="text-error mt-3" style="margin-bottom: -10px">
             {{ $t('main.select-least-one') }}
           </p>
@@ -92,7 +95,7 @@ async function submit(): Promise<void> {
 
           <template v-for="reason in reasons" :key="reason">
             <v-switch
-              v-model="compReasons"
+              v-model="complaint.reasons"
               style="margin-bottom: -20px"
               color="primary"
               :label="reason"
@@ -103,13 +106,13 @@ async function submit(): Promise<void> {
           </template>
 
           <v-textarea
-            v-model="compMessage"
+            v-model="complaint.comment"
             class="mt-5 mb-1"
             :label="$t('main.tell-bit-more-optional')"
             rows="2"
           />
-          <po-button color="primary" type="submit" block>
-            <span v-if="!isPosting">{{ $t('main.send') }}</span>
+          <po-button color="primary" type="submit" block :disabled="complaint.processing">
+            <span v-if="!complaint.processing">{{ $t('main.send') }}</span>
             <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>

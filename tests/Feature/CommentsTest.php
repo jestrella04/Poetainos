@@ -81,7 +81,7 @@ describe('commenting', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertNoContent();
         Notification::assertSentTo($author, WritingCommented::class);
 
         // Given
@@ -131,7 +131,7 @@ describe('deleting a comment', function (): void {
 
         // Then
         $otherResponse->assertForbidden();
-        $authorResponse->assertOk();
+        $authorResponse->assertRedirect();
         expect(Comment::find($comment->id))->toBeNull();
     });
 
@@ -144,7 +144,7 @@ describe('deleting a comment', function (): void {
         $response = actingAs($admin)->delete('/comments/delete/'.$comment->id);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect(Comment::find($comment->id))->toBeNull();
     });
 });
@@ -162,7 +162,7 @@ describe('mentions in a comment', function (): void {
         actingAs($commenter)->post('/comments/create', [
             'comment' => $message,
             'writing_id' => $writing->id,
-        ])->assertOk();
+        ])->assertNoContent();
 
         // Then
         Notification::assertSentTimes(WritingCommentMentioned::class, 5);
@@ -178,7 +178,7 @@ describe('mentions in a comment', function (): void {
         actingAs(createUser())->post('/comments/create', [
             'comment' => fake()->sentence()." @{$mentioned->username}.",
             'writing_id' => $writing->id,
-        ])->assertOk();
+        ])->assertNoContent();
 
         // Then
         Notification::assertSentTo($mentioned, WritingCommentMentioned::class);
@@ -196,7 +196,7 @@ describe('mentions in a comment', function (): void {
         actingAs($commenter)->post('/comments/create', [
             'comment' => "@{$mentioned->username} ".fake()->sentence(),
             'writing_id' => $writing->id,
-        ])->assertOk();
+        ])->assertNoContent();
 
         // Then
         Notification::assertNotSentTo($mentioned, WritingCommentMentioned::class);
@@ -212,7 +212,7 @@ describe('mentions in a comment', function (): void {
         actingAs(createUser())->post('/comments/create', [
             'comment' => "@{$mentioned->username} @{$mentioned->username} ".fake()->sentence(),
             'writing_id' => $writing->id,
-        ])->assertOk();
+        ])->assertNoContent();
 
         // Then
         Notification::assertSentToTimes($mentioned, WritingCommentMentioned::class, 1);
@@ -227,7 +227,7 @@ describe('mentions in a comment', function (): void {
         actingAs(createUser())->post('/comments/create', [
             'comment' => '@'.fakeUsername().' '.fake()->sentence(),
             'writing_id' => $writing->id,
-        ])->assertOk();
+        ])->assertNoContent();
 
         // Then
         Notification::assertNotSentTo($writing->author, WritingCommentMentioned::class);

@@ -47,7 +47,7 @@ class SocialAuthController extends Controller
         try {
             $social = Socialite::driver($service)->user();
         } catch (InvalidStateException) {
-            request()->session()->flash('message', 'accounts.social-link-expired');
+            Inertia::flash('message', 'accounts.social-link-expired');
 
             return redirect(route('login'));
         }
@@ -56,7 +56,7 @@ class SocialAuthController extends Controller
 
         // Without an email we can't tell accounts apart: every such login would share one user
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            request()->session()->flash('message', 'accounts.social-email-missing');
+            Inertia::flash('message', 'accounts.social-email-missing');
 
             return redirect(route('login'));
         }
@@ -74,7 +74,7 @@ class SocialAuthController extends Controller
 
         $this->completeLogin($user, $service, $social->getAvatar(), $images, $isExistingAccount);
 
-        return redirect(Redirect::intended(route('home'))->getTargetUrl());
+        return redirect()->intended(route('home'));
     }
 
     /**
@@ -86,7 +86,7 @@ class SocialAuthController extends Controller
         $user = $this->pendingLinkUser($service);
 
         if ($user === null) {
-            request()->session()->flash('message', 'accounts.social-link-expired');
+            Inertia::flash('message', 'accounts.social-link-expired');
 
             return redirect(route('login'));
         }
@@ -104,10 +104,8 @@ class SocialAuthController extends Controller
     /**
      * Complete a social login for an existing account once it enters the code
      * emailed to it, proving it owns this provider's email address.
-     *
-     * @return array{url: string}
      */
-    public function confirmProviderLink(string $service, ImageStorage $images, VerificationCodes $codes): array
+    public function confirmProviderLink(string $service, ImageStorage $images, VerificationCodes $codes): RedirectResponse
     {
         request()->validate([
             'code' => ['required', 'digits:6'],
@@ -124,7 +122,7 @@ class SocialAuthController extends Controller
         $avatarUrl = request()->session()->pull(self::PENDING_LINK_SESSION_KEY)['avatar'];
         $this->completeLogin($user, $service, $avatarUrl, $images, true);
 
-        return ['url' => Redirect::intended(route('home'))->getTargetUrl()];
+        return redirect()->intended(route('home'));
     }
 
     /**
@@ -228,7 +226,7 @@ class SocialAuthController extends Controller
 
         Auth::login($user);
 
-        request()->session()->flash('message', $isReturning === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
+        Inertia::flash('message', $isReturning === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
     }
 
     /**

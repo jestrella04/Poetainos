@@ -1,62 +1,46 @@
 import { onBeforeUnmount, onMounted, provide, reactive } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
+import type { FlashData } from '@inertiajs/core'
 import { snackBarKey } from './keys'
 import type { SnackBarState } from './keys'
-import { useSnackbar } from './useSnackbar'
-import { useTypeGuards } from './useTypeGuards'
 
 /**
- * Provides the layout's snackbar and fills it with the flash messages set
- * before a visit, either client side (useSnackbar) or by the server.
+ * Provides the layout's snackbar and shows in it the messages flashed with a
+ * response (Inertia::flash() on the server) or by the page (router.flash()).
  */
-export function useFlashMessages(): { showFlashMessages: () => void } {
+export function useFlashMessages(): void {
   const page = usePage()
-  const { isEmpty, strNullOrEmpty } = useTypeGuards()
-  const { getSnackBar } = useSnackbar()
   const snackBar = reactive<SnackBarState>({
     active: false,
     avatar: '/images/logo.svg',
-    color: 'info',
+    color: 'primary',
     timeout: 6000,
     message: ''
   })
 
   provide(snackBarKey, snackBar)
 
-  function showFlashMessages(): void {
-    const snack = getSnackBar()
-    const flash = page.props.flash.message
-
-    // Check for client side flash messages
-    if (snack !== null && !isEmpty(snack)) {
-      snackBar.message = snack.message ?? snackBar.message
-      snackBar.active = snack.active ?? snackBar.active
-      snackBar.color = snack.color ?? snackBar.color
+  function showFlash(flash: FlashData): void {
+    if (flash.message === undefined || flash.message === '') {
+      return
     }
 
-    // Check for server side flash messages
-    if (flash !== null && !strNullOrEmpty(flash)) {
-      snackBar.message = flash
-      snackBar.active = true
-      snackBar.color = 'primary'
-    }
+    snackBar.message = flash.message
+    snackBar.color = flash.color ?? 'primary'
+    snackBar.active = true
   }
 
-  let stopListeningForNavigation: () => void = () => undefined
+  let stopListening: () => void = () => undefined
 
   onMounted(() => {
-    showFlashMessages()
-
-    // Flash messages arrive with a navigation; re-reading them on every re-render
-    // would bring back a snackbar the user already dismissed.
-    stopListeningForNavigation = router.on('navigate', () => {
-      showFlashMessages()
+    // The first page's flash arrived with the HTML; later ones announce themselves
+    showFlash(page.flash)
+    stopListening = router.on('flash', (event) => {
+      showFlash(event.detail.flash)
     })
   })
 
   onBeforeUnmount(() => {
-    stopListeningForNavigation()
+    stopListening()
   })
-
-  return { showFlashMessages }
 }

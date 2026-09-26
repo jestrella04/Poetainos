@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Inertia\Inertia;
 use Inertia\Response;
 
 class UsersNotificationsController extends Controller
@@ -58,7 +59,7 @@ class UsersNotificationsController extends Controller
         $writing = Writing::whereKey($notification->data['writing_id'] ?? null)->first();
 
         if ($writing === null) {
-            request()->session()->flash('message', 'main.content-no-longer-available');
+            Inertia::flash('message', 'main.content-no-longer-available');
 
             return to_route('notifications.index');
         }

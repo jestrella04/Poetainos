@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\ContactFormSubmitted;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
@@ -24,11 +24,9 @@ class ContactsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @return array<int, mixed>
+     * Email the message to the site's admins, then return to the form.
      */
-    public function store(Request $request): array
+    public function store(Request $request): RedirectResponse
     {
         // The captcha key travels inside the rule string, so keep only the characters a captcha key is made of
         $captchaKey = (string) preg_replace('/[^A-Za-z0-9.\/$]/', '', (string) $request->input('key'));
@@ -52,12 +50,6 @@ class ContactsController extends Controller
         $recipients = getSiteConfig('emails.admin');
         Notification::route('mail', $recipients)->notify(new ContactFormSubmitted($name, $email, $subject, $message));
 
-        // Redirect back to the contact form
-        return [];
-    }
-
-    public function reloadCaptcha(): JsonResponse
-    {
-        return response()->json(['captcha' => captcha_src()]);
+        return back();
     }
 }

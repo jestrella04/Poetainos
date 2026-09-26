@@ -57,7 +57,8 @@ describe('resetting a password', function (): void {
             ]);
 
             // Then
-            $response->assertSessionHasNoErrors();
+            $response->assertSessionHasNoErrors()
+                ->assertRedirect(route('login', ['isReset' => 1, 'isEmail' => 1, 'email' => $user->email]));
 
             return true;
         });

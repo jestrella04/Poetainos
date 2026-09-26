@@ -30,11 +30,8 @@ describe('authenticating', function (): void {
         ]);
 
         // Then
-        // AuthenticatedSessionController::store() returns the redirect target as JSON
-        // for the frontend to navigate to, rather than an HTTP redirect response.
         assertAuthenticated();
-        $response->assertOk();
-        $response->assertJson(['redirect' => route('home')]);
+        $response->assertRedirect(route('home'))->assertInertiaFlash('message', 'accounts.welcome-back');
     });
 
     it('honors a safe, same-site redirect target after login', function (): void {
@@ -50,7 +47,7 @@ describe('authenticating', function (): void {
         ]);
 
         // Then
-        $response->assertJson(['redirect' => url('/writings/create')]);
+        $response->assertRedirect(url('/writings/create'));
     });
 
     it('ignores an external redirect target to prevent an open redirect', function (): void {
@@ -66,7 +63,7 @@ describe('authenticating', function (): void {
         ]);
 
         // Then
-        $response->assertJson(['redirect' => route('home')]);
+        $response->assertRedirect(route('home'));
     });
 
     it('does not authenticate with an invalid password', function (): void {

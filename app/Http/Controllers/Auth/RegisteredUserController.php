@@ -6,12 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
@@ -20,7 +19,7 @@ class RegisteredUserController extends Controller
      *
      * @throws ValidationException
      */
-    public function store(Request $request): Response
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'username' => ['required', 'string', 'min:3', 'max:45', 'unique:users', 'regex:'.User::USERNAME_PATTERN],
@@ -44,6 +43,6 @@ class RegisteredUserController extends Controller
         Auth::login($user);
         $user->sendEmailVerificationNotification();
 
-        return Inertia::render('auth/PoVerify');
+        return to_route('verification.notice');
     }
 }

@@ -165,7 +165,7 @@ describe('opening a notification', function (): void {
 
         // Then
         $response->assertRedirect(route('notifications.index'))
-            ->assertSessionHas('message', 'main.content-no-longer-available');
+            ->assertInertiaFlash('message', 'main.content-no-longer-available');
         expect($notification->refresh()->read_at)->not->toBeNull();
     });
 });

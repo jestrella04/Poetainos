@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { ref, reactive, provide, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
-import { useI18n } from 'vue-i18n'
+import { computed, ref, onMounted } from 'vue'
+import { useForm, useHttp } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
-import { formDataKey } from '@/composables/keys'
-import { useFormErrors } from '@/composables/useFormErrors'
-import { useFormSubmit } from '@/composables/useFormSubmit'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useSnackbar } from '@/composables/useSnackbar'
+import { useFormValidation } from '@/composables/useFormValidation'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 import { PASSWORD_PATTERN, USERNAME_PATTERN } from '@/composables/validationRules'
-import type { LaravelValidationErrors } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutLogin
@@ -17,173 +13,116 @@ defineOptions({
 
 type LoginStep = 'guest' | 'checking' | 'login' | 'register'
 
-const LOGIN_FORM = '#login-form'
+const RESET_DELAY_MS = 500
 
 const socialProviders = [
   { name: 'google', icon: 'fab fa-google', label: 'accounts.continue-with-google' }
 ]
 
-const { t } = useI18n()
-const { validationErrors } = useFormErrors()
 const { strNullOrEmpty } = useTypeGuards()
-const { setSnackBar } = useSnackbar()
-const {
-  isPosting: isLoading,
-  errors,
-  submitForm: postForm
-} = useFormSubmit<LaravelValidationErrors>({})
+const { isSubmittedFormValid } = useFormValidation()
+const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
 const step = ref<LoginStep>('guest')
 const arrivedFromPasswordReset = ref(false)
 const resetEmailSent = ref(false)
 
-const formData = reactive({
+const form = useForm({
   email: '',
   username: '',
   password: '',
-  confirmPassword: '',
-  serviceAgreement: false,
-  privacyAgreement: false
+  password_confirmation: '',
+  service_agreement: false,
+  privacy_agreement: false
 })
+const emailCheck = useHttp<{ email: string }, { exists: boolean }>({ email: '' })
+const isLoading = computed(() => form.processing || emailCheck.processing)
 
-provide(formDataKey, formData)
+// A failed sign-in is reported on "email" on purpose, not to tell whether the
+// email or the password was wrong; by then the email is known to exist and only
+// the password field is editable, so the message is shown there.
+const emailError = computed(() =>
+  step.value === 'login' ? undefined : (emailCheck.errors.email ?? form.errors.email)
+)
+const passwordError = computed(() =>
+  step.value === 'login' ? (form.errors.email ?? form.errors.password) : form.errors.password
+)
 
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
 
-  if ('1' === params.get('isEmail')) {
+  if (params.get('isEmail') === '1') {
     step.value = 'checking'
 
     const email = params.get('email')
 
     if (email !== null && !strNullOrEmpty(email)) {
-      formData.email = email
+      form.email = email
       step.value = 'login'
     }
   }
 
-  if ('1' === params.get('isReset')) {
+  if (params.get('isReset') === '1') {
     arrivedFromPasswordReset.value = true
   }
 })
 
-function clearInputs(): void {
-  formData.email = ''
-  formData.username = ''
-  formData.password = ''
-  formData.confirmPassword = ''
-  formData.serviceAgreement = false
-  formData.privacyAgreement = false
-}
-
 function resetForm(): void {
   setTimeout(() => {
     step.value = 'guest'
-    clearInputs()
-    errors.value = {}
-  }, 500)
-}
-
-// A failure that carries no field messages (throttled, offline, server error) still has to be shown
-function failuresOf(
-  error: unknown,
-  fallbackField: 'email' | 'password' = 'email'
-): LaravelValidationErrors {
-  const failures = validationErrors(error)
-
-  return Object.keys(failures).length === 0
-    ? { [fallbackField]: [t('main.error-try-again')] }
-    : failures
+    form.reset()
+    form.clearErrors()
+    emailCheck.clearErrors()
+  }, RESET_DELAY_MS)
 }
 
 async function checkEmail(): Promise<void> {
-  await postForm<{ exists: boolean }>({
-    formSelector: LOGIN_FORM,
-    url: route('email.check'),
-    payload: { email: formData.email },
-    onSuccess: (data) => {
-      step.value = data.exists === true ? 'login' : 'register'
-    },
-    onError: (error) => failuresOf(error)
-  })
-}
-
-async function login(): Promise<void> {
-  await postForm<{ redirect: string }>({
-    formSelector: LOGIN_FORM,
-    url: route('login'),
-    payload: {
-      email: formData.email,
-      password: formData.password
-    },
-    onSuccess: (data) => {
-      setSnackBar({
-        message: 'accounts.welcome-back',
-        color: 'primary',
-        active: true
+  await whenSettled(
+    emailCheck
+      .transform(() => ({ email: form.email }))
+      .post(route('email.check'), {
+        onHttpException,
+        onNetworkError,
+        onSuccess: (data) => {
+          step.value = data.exists === true ? 'login' : 'register'
+        }
       })
-
-      router.get(data.redirect)
-    },
-    // Laravel's LoginRequest::authenticate() always keys a failed-login
-    // error "email" (deliberately ambiguous about whether the email or
-    // the password was wrong). By this point the email is already
-    // confirmed to exist (see the checkEmail() step above) and only the
-    // password field is visible, so we surface the message there.
-    onError: (error) => {
-      const failures = failuresOf(error, 'password')
-
-      return { password: failures.email ?? failures.password ?? [] }
-    }
-  })
+  )
 }
 
-async function register(): Promise<void> {
-  await postForm({
-    formSelector: LOGIN_FORM,
-    url: route('register'),
-    payload: {
-      email: formData.email,
-      username: formData.username,
-      password: formData.password,
-      password_confirmation: formData.confirmPassword,
-      service_agreement: formData.serviceAgreement,
-      privacy_agreement: formData.privacyAgreement
-    },
-    onSuccess: () => {
-      router.get(route('verification.notice'))
-    },
-    onError: (error) => failuresOf(error)
-  })
-}
+function submitForm(event: Event): void {
+  if (isSubmittedFormValid(event) === false) {
+    return
+  }
 
-async function submitForm(): Promise<void> {
   switch (step.value) {
     case 'checking':
-      await checkEmail()
+      void checkEmail()
       break
 
     case 'login':
-      await login()
+      // The server redirects to where the user was headed, flashing the welcome back
+      form
+        .transform((data) => ({ email: data.email, password: data.password }))
+        .post(route('login'), { onHttpException, onNetworkError })
       break
 
     case 'register':
-      await register()
+      form.transform((data) => data).post(route('register'), { onHttpException, onNetworkError })
       break
   }
 }
 
-async function resetPassword(): Promise<void> {
-  await postForm({
-    formSelector: LOGIN_FORM,
-    url: route('password.email'),
-    payload: { email: formData.email },
-    // The password field is required in this step but is left empty when asking for a reset link
-    validate: false,
-    onSuccess: () => {
-      resetEmailSent.value = true
-    },
-    onError: (error) => failuresOf(error)
-  })
+function resetPassword(): void {
+  // The password field is required in this step but is left empty when asking for a reset link
+  form
+    .transform((data) => ({ email: data.email }))
+    .post(route('password.email'), {
+      onHttpException,
+      onNetworkError,
+      onSuccess: () => {
+        resetEmailSent.value = true
+      }
+    })
 }
 </script>
 
@@ -197,16 +136,16 @@ async function resetPassword(): Promise<void> {
       <v-form
         id="login-form"
         class="po-login"
-        @submit.prevent="submitForm()"
+        @submit.prevent="submitForm"
         @reset.prevent="resetForm()"
       >
         <v-text-field
           id="login-email"
-          v-model="formData.email"
+          v-model="form.email"
           type="email"
           :label="$t('main.email')"
           :placeholder="$t('main.enter-your-email')"
-          :error-messages="errors.email"
+          :error-messages="emailError"
           :readonly="step === 'login' || step === 'register'"
           persistent-placeholder
           :clearable="step === 'checking'"
@@ -217,12 +156,12 @@ async function resetPassword(): Promise<void> {
         <template v-if="step === 'register'">
           <v-text-field
             id="register-username"
-            v-model="formData.username"
+            v-model="form.username"
             type="text"
             :label="$t('users.user')"
             :pattern="USERNAME_PATTERN"
             :placeholder="$t('main.enter-your-user')"
-            :error-messages="errors.username"
+            :error-messages="form.errors.username"
             persistent-placeholder
             clearable
             required
@@ -231,12 +170,12 @@ async function resetPassword(): Promise<void> {
 
           <v-text-field
             id="register-password"
-            v-model="formData.password"
+            v-model="form.password"
             type="password"
             :label="$t('main.password')"
             :pattern="PASSWORD_PATTERN"
             :placeholder="$t('main.enter-your-password')"
-            :error-messages="errors.password"
+            :error-messages="passwordError"
             persistent-placeholder
             clearable
             required
@@ -245,29 +184,32 @@ async function resetPassword(): Promise<void> {
 
           <v-text-field
             id="register-password-confirmation"
-            v-model="formData.confirmPassword"
+            v-model="form.password_confirmation"
             type="password"
             :label="$t('accounts.confirm-password')"
             :pattern="PASSWORD_PATTERN"
             :placeholder="$t('main.enter-your-password')"
-            :error-messages="errors.password"
+            :error-messages="passwordError"
             persistent-placeholder
             clearable
             required
             hide-details="auto"
           />
 
-          <po-agreement />
+          <po-agreement
+            v-model:service-agreement="form.service_agreement"
+            v-model:privacy-agreement="form.privacy_agreement"
+          />
         </template>
 
         <template v-if="step === 'login'">
           <v-text-field
             id="login-password"
-            v-model="formData.password"
+            v-model="form.password"
             type="password"
             :label="$t('main.password')"
             :placeholder="$t('main.enter-your-password')"
-            :error-messages="errors.password"
+            :error-messages="passwordError"
             persistent-placeholder
             clearable
             required

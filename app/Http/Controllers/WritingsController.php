@@ -81,11 +81,9 @@ class WritingsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @return array<string, string>
+     * Store a newly created resource in storage, then open it.
      */
-    public function store(Request $request, WritingPublisher $publisher): array
+    public function store(Request $request, WritingPublisher $publisher): RedirectResponse
     {
         $user = $this->requireAuthUser();
 
@@ -97,9 +95,9 @@ class WritingsController extends Controller
         RecalculateAura::dispatch($user);
         $this->rememberAgreements($request, $user);
 
-        return [
-            'url' => $writing->path(),
-        ];
+        Inertia::flash(['message' => 'writings.writing-published', 'color' => 'success']);
+
+        return redirect($writing->path());
     }
 
     /**
@@ -169,11 +167,9 @@ class WritingsController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @return array<string, string>
+     * Update the specified resource in storage, then open it.
      */
-    public function update(Request $request, Writing $writing, WritingPublisher $publisher): array
+    public function update(Request $request, Writing $writing, WritingPublisher $publisher): RedirectResponse
     {
         $this->authorize('update', $writing);
 
@@ -185,23 +181,23 @@ class WritingsController extends Controller
         RecalculateAura::dispatch($writing->author);
         $this->rememberAgreements($request, $agreeingUser);
 
-        return [
-            'url' => $writing->path(),
-        ];
+        Inertia::flash(['message' => 'writings.writing-updated', 'color' => 'success']);
+
+        return redirect($writing->path());
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @return array<int, mixed>
+     * Remove the specified resource from storage, then go home.
      */
-    public function destroy(Writing $writing, ContentDeleter $deleter): array
+    public function destroy(Writing $writing, ContentDeleter $deleter): RedirectResponse
     {
         $this->authorize('delete', $writing);
 
         $deleter->deleteWriting($writing);
 
-        return [];
+        Inertia::flash(['message' => 'writings.writing-deleted', 'color' => 'success']);
+
+        return to_route('home');
     }
 
     /**

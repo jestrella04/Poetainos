@@ -111,7 +111,7 @@ describe('a writing\'s aura', function (): void {
         $withComment = (float) $writing->refresh()->aura;
 
         // When
-        actingAs($commenter)->delete("/comments/delete/{$comment->id}")->assertOk();
+        actingAs($commenter)->delete("/comments/delete/{$comment->id}")->assertRedirect();
 
         // Then
         expect($withComment)->toBeGreaterThan(0.0);

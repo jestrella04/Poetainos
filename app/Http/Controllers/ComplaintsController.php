@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 
@@ -27,10 +28,8 @@ class ComplaintsController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @return array<int, mixed>
      */
-    public function store(Request $request): array
+    public function store(Request $request): Response
     {
         // Validate user input
         $request->validate([
@@ -64,7 +63,7 @@ class ComplaintsController extends Controller
         $recipients = getSiteConfig('emails.admin');
         Notification::route('mail', $recipients)->notify(new ComplaintSubmitted);
 
-        return [];
+        return response()->noContent();
     }
 
     /**

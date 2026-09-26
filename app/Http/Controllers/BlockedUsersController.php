@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 use Inertia\Response;
 
 /**
@@ -34,11 +36,9 @@ class BlockedUsersController extends Controller
     }
 
     /**
-     * Block another user.
-     *
-     * @return array<int, mixed>
+     * Block another user, then return to the page they were blocked from.
      */
-    public function store(User $user): array
+    public function store(User $user): RedirectResponse
     {
         $authUser = $this->requireAuthUser();
 
@@ -46,18 +46,20 @@ class BlockedUsersController extends Controller
 
         $authUser->block($user);
 
-        return [];
+        Inertia::flash(['message' => 'users.user-blocked', 'color' => 'success']);
+
+        return back();
     }
 
     /**
-     * Unblock a previously blocked user.
-     *
-     * @return array<int, mixed>
+     * Unblock a previously blocked user, then return to where it was done.
      */
-    public function destroy(User $user): array
+    public function destroy(User $user): RedirectResponse
     {
         $this->requireAuthUser()->unblock($user);
 
-        return [];
+        Inertia::flash(['message' => 'users.user-unblocked', 'color' => 'success']);
+
+        return back();
     }
 }

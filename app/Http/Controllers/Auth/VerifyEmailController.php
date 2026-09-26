@@ -4,18 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class VerifyEmailController extends Controller
 {
     /**
      * Mark the authenticated user's email address as verified using the code
-     * that was emailed to them.
-     *
-     * @return array{url: string}
+     * that was emailed to them, then carry on to the home page.
      */
-    public function __invoke(Request $request): array
+    public function __invoke(Request $request): RedirectResponse
     {
         $request->validate([
             'code' => ['required', 'digits:6'],
@@ -33,6 +33,8 @@ class VerifyEmailController extends Controller
             event(new Verified($user));
         }
 
-        return ['url' => route('home')];
+        Inertia::flash('message', 'accounts.email-verified');
+
+        return to_route('home');
     }
 }

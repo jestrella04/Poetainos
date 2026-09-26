@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { http } from '@inertiajs/vue3'
 import type { App } from 'vue'
 import { pushKey } from '../composables/keys'
 
@@ -9,32 +9,36 @@ interface SubscriptionPayload {
   contentEncoding: string
 }
 
+function reportFailure(message: string, error: unknown): void {
+  if (import.meta.env.DEV) {
+    console.warn(message, error)
+  }
+}
+
+function toBase64(key: ArrayBuffer | null): string | null {
+  return key !== null ? btoa(String.fromCharCode(...new Uint8Array(key))) : null
+}
+
 export class Push {
   /**
    * Subscribe for push notifications.
    */
-  subscribe(): void {
-    void navigator.serviceWorker.ready.then((registration) => {
-      const options: PushSubscriptionOptionsInit = { userVisibleOnly: true }
-      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
+  async subscribe(): Promise<void> {
+    const registration = await navigator.serviceWorker.ready
+    const options: PushSubscriptionOptionsInit = { userVisibleOnly: true }
+    const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
 
-      if (vapidPublicKey !== undefined && vapidPublicKey !== '') {
-        options.applicationServerKey = this.urlBase64ToUint8Array(vapidPublicKey)
-      }
+    if (vapidPublicKey !== undefined && vapidPublicKey !== '') {
+      options.applicationServerKey = this.urlBase64ToUint8Array(vapidPublicKey)
+    }
 
-      registration.pushManager
-        .subscribe(options)
-        .then((subscription) => {
-          this.updateSubscription(subscription)
-        })
-        .catch((e: unknown) => {
-          if (Notification.permission === 'denied') {
-            console.log('Permission for Notifications was denied')
-          } else {
-            console.log('Unable to subscribe to push.', e)
-          }
-        })
-    })
+    try {
+      const subscription = await registration.pushManager.subscribe(options)
+      await this.updateSubscription(subscription)
+    } catch (error: unknown) {
+      // Declining the browser's permission prompt lands here too
+      reportFailure('Unable to subscribe to push notifications.', error)
+    }
   }
 
   /**
@@ -49,8 +53,8 @@ export class Push {
       const registration = await navigator.serviceWorker.ready
       const subscription = await registration.pushManager.getSubscription()
       return subscription !== null
-    } catch (e: unknown) {
-      console.log('Error thrown checking subscription status.', e)
+    } catch (error: unknown) {
+      reportFailure('Unable to check the push subscription.', error)
       return false
     }
   }
@@ -58,52 +62,45 @@ export class Push {
   /**
    * Unsubscribe from push notifications.
    */
-  unsubscribe(): void {
-    void navigator.serviceWorker.ready.then((registration) => {
-      registration.pushManager
-        .getSubscription()
-        .then((subscription) => {
-          if (subscription === null) {
-            return
-          }
+  async unsubscribe(): Promise<void> {
+    try {
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.getSubscription()
 
-          subscription
-            .unsubscribe()
-            .then(() => {
-              this.deleteSubscription(subscription)
-            })
-            .catch((e: unknown) => {
-              console.log('Unsubscription error: ', e)
-            })
-        })
-        .catch((e: unknown) => {
-          console.log('Error thrown while unsubscribing.', e)
-        })
-    })
+      if (subscription === null) {
+        return
+      }
+
+      await subscription.unsubscribe()
+      await this.deleteSubscription(subscription)
+    } catch (error: unknown) {
+      reportFailure('Unable to unsubscribe from push notifications.', error)
+    }
   }
 
   /**
    * Send a request to the server to update user's subscription.
    */
-  updateSubscription(subscription: PushSubscription): void {
-    const key = subscription.getKey('p256dh')
-    const token = subscription.getKey('auth')
-    const contentEncoding = (PushManager.supportedContentEncodings ?? ['aesgcm'])[0] ?? 'aesgcm'
+  async updateSubscription(subscription: PushSubscription): Promise<void> {
     const data: SubscriptionPayload = {
       endpoint: subscription.endpoint,
-      publicKey: key !== null ? btoa(String.fromCharCode(...new Uint8Array(key))) : null,
-      authToken: token !== null ? btoa(String.fromCharCode(...new Uint8Array(token))) : null,
-      contentEncoding
+      publicKey: toBase64(subscription.getKey('p256dh')),
+      authToken: toBase64(subscription.getKey('auth')),
+      contentEncoding: (PushManager.supportedContentEncodings ?? ['aesgcm'])[0] ?? 'aesgcm'
     }
 
-    void axios.post('/subscriptions', data)
+    await http.getClient().request({ method: 'post', url: route('push.update'), data })
   }
 
   /**
-   * Send a requst to the server to delete user's subscription.
+   * Send a request to the server to delete user's subscription.
    */
-  deleteSubscription(subscription: PushSubscription): void {
-    void axios.post('/subscriptions/delete', { endpoint: subscription.endpoint })
+  async deleteSubscription(subscription: PushSubscription): Promise<void> {
+    await http.getClient().request({
+      method: 'post',
+      url: route('push.delete'),
+      data: { endpoint: subscription.endpoint }
+    })
   }
 
   /**

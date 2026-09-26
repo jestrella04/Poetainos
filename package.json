@@ -40,7 +40,6 @@
     "@vue/tsconfig": "^0.9.1",
     "@vueuse/core": "^14.0.0",
     "autoprefixer": "^10.4.20",
-    "axios": "^1.13.2",
     "crop-url": "^4.0.1",
     "date-fns": "^4.1.0",
     "eslint": "^10.10.0",

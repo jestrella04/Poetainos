@@ -7,7 +7,7 @@ import type { Paginated } from '@/types/models'
 /**
  * Infinite-scroll list behavior shared by the paginated pages (users,
  * writings, notifications): loads the first page on mount through a partial
- * reload of `reloadPropKey`, and fetches the following pages via axios.
+ * reload of `reloadPropKey`, and fetches the following pages as JSON.
  */
 export function useInfiniteList<T>(reloadPropKey: string) {
   const { items, next, fetched, update, loadMore } = usePaginatedList<T>()

@@ -1,5 +1,5 @@
 import { ref, type Ref } from 'vue'
-import axios from 'axios'
+import { useHttp } from '@inertiajs/vue3'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import type { Paginated } from '@/types/models'
 
@@ -11,6 +11,7 @@ type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
  */
 export function usePaginatedList<T>() {
   const { strNullOrEmpty } = useTypeGuards()
+  const request = useHttp<Record<string, never>, Paginated<T>>()
   const items = ref([]) as Ref<T[]>
   const next = ref('')
   const fetched = ref(false)
@@ -22,19 +23,40 @@ export function usePaginatedList<T>() {
   }
 
   /**
-   * Replace the list with the first page at the given URL. Resolves whether it loaded.
+   * One page of the list, or null when it couldn't be loaded.
+   */
+  async function fetchPage(url: string): Promise<Paginated<T> | null> {
+    try {
+      return await request.get(url)
+    } catch {
+      return null
+    }
+  }
+
+  let latestFirstPageLoad = 0
+
+  /**
+   * Replace the list with the first page at the given URL. Resolves whether it
+   * loaded. A newer call cancels an older one still in flight; the older one
+   * then resolves as loaded without touching the list, since it was superseded
+   * rather than failed.
    */
   async function loadFirstPage(url: string): Promise<boolean> {
-    try {
-      const response = await axios.get<Paginated<T>>(url)
+    const load = ++latestFirstPageLoad
+    const page = await fetchPage(url)
 
-      items.value = []
-      update(response.data.data, response.data.next_page_url)
-
+    if (load !== latestFirstPageLoad) {
       return true
-    } catch {
+    }
+
+    if (page === null) {
       return false
     }
+
+    items.value = []
+    update(page.data, page.next_page_url)
+
+    return true
   }
 
   async function loadMore({
@@ -47,14 +69,15 @@ export function usePaginatedList<T>() {
       return
     }
 
-    try {
-      const response = await axios.get<Paginated<T>>(next.value)
+    const page = await fetchPage(next.value)
 
-      update(response.data.data, response.data.next_page_url)
-      done('ok')
-    } catch {
+    if (page === null) {
       done('error')
+      return
     }
+
+    update(page.data, page.next_page_url)
+    done('ok')
   }
 
   return { items, next, fetched, update, loadFirstPage, loadMore }

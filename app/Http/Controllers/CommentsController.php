@@ -9,8 +9,11 @@ use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Services\ContentDeleter;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Pagination\Paginator;
+use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
@@ -40,7 +43,7 @@ class CommentsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): void
+    public function store(Request $request): Response
     {
         $request->validate([
             'comment' => 'required|string|max:300',
@@ -63,21 +66,23 @@ class CommentsController extends Controller
         }
 
         $this->notifyMentions($comment, $writing, $user);
+
+        return response()->noContent();
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @return array<int, mixed>
+     * Remove the specified resource from storage, then return to the writing.
      */
-    public function destroy(Comment $comment, ContentDeleter $deleter): array
+    public function destroy(Comment $comment, ContentDeleter $deleter): RedirectResponse
     {
         $this->authorize('delete', $comment);
         $deleter->deleteComment($comment);
 
         RecalculateAura::dispatch($comment->author, $comment->writing);
 
-        return [];
+        Inertia::flash(['message' => 'comments.comment-deleted', 'color' => 'success']);
+
+        return back();
     }
 
     /**

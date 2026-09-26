@@ -1,47 +1,44 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { router } from '@inertiajs/vue3'
-import axios from 'axios'
-import { forceSnackBarKey, isDeleteKey } from '@/composables/keys'
+import { computed } from 'vue'
+import { useForm, useHttp } from '@inertiajs/vue3'
+import { isDeleteKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
-import { useFormErrors } from '@/composables/useFormErrors'
-import { useSnackbar } from '@/composables/useSnackbar'
-import { useFormSubmit } from '@/composables/useFormSubmit'
-import type { LaravelValidationErrors } from '@/types/http'
+import { useFormValidation } from '@/composables/useFormValidation'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 
-defineProps<{
+const props = defineProps<{
   username: string
 }>()
 
-const { validationErrors } = useFormErrors()
-const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
-const forceSnackBar = injectStrict(forceSnackBarKey)
-const formData = reactive({
-  password: ''
-})
-const { isPosting, errors, submitForm } = useFormSubmit<LaravelValidationErrors>({})
+const { isSubmittedFormValid } = useFormValidation()
+const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
+const passwordConfirmation = useHttp({ password: '' })
+const form = useForm({})
+const isProcessing = computed(() => passwordConfirmation.processing || form.processing)
 
-async function submit(): Promise<void> {
-  await submitForm({
-    formSelector: '#user-delete-form',
-    payload: { _method: 'DELETE' },
-    preSubmit: async () => {
-      await axios.post(route('password.confirmer'), { password: formData.password })
-    },
-    onSuccess: () => {
-      router.visit(route('home'))
-      setSnackBar({
-        message: 'accounts.account-deleted',
-        color: 'success',
-        active: true
-      })
+// Deleting an account asks for the password first; the server then logs the
+// user out and takes them home with a farewell flash message
+async function submit(event: Event): Promise<void> {
+  if (isSubmittedFormValid(event) === false) {
+    return
+  }
 
-      forceSnackBar.value = true
-      isDelete.value = false
-    },
-    onError: validationErrors
-  })
+  await whenSettled(
+    passwordConfirmation.post(route('password.confirmer'), {
+      onHttpException,
+      onNetworkError,
+      onSuccess: () => {
+        form.delete(route('users.destroy', props.username), {
+          onHttpException,
+          onNetworkError,
+          onSuccess: () => {
+            isDelete.value = false
+          }
+        })
+      }
+    })
+  )
 }
 </script>
 
@@ -62,25 +59,21 @@ async function submit(): Promise<void> {
 
         <v-divider class="mt-3" />
 
-        <v-form
-          id="user-delete-form"
-          :action="route('users.destroy', username)"
-          @submit.prevent="submit"
-        >
+        <v-form id="user-delete-form" @submit.prevent="submit">
           <v-text-field
-            v-model="formData.password"
+            v-model="passwordConfirmation.password"
             type="password"
             :label="$t('main.password')"
             :placeholder="$t('main.enter-password-to-continue')"
-            :error-messages="errors.password"
+            :error-messages="passwordConfirmation.errors.password"
             persistent-placeholder
             clearable
             required
             hide-details="auto"
           />
 
-          <po-button color="primary" type="submit" block :disabled="isPosting">
-            <span v-if="!isPosting">{{ $t('main.delete') }}</span>
+          <po-button color="primary" type="submit" block :disabled="isProcessing">
+            <span v-if="!isProcessing">{{ $t('main.delete') }}</span>
             <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>

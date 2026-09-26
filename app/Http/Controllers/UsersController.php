@@ -126,11 +126,9 @@ class UsersController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @return array<string, string>
+     * Update the specified resource in storage, then open the profile.
      */
-    public function update(Request $request, User $user, ImageStorage $images): array
+    public function update(Request $request, User $user, ImageStorage $images): RedirectResponse
     {
         $this->authorize('update', $user);
 
@@ -183,33 +181,35 @@ class UsersController extends Controller
             $user->acceptAgreements();
         }
 
-        // Set response data
-        return [
-            'url' => $user->path(),
-        ];
+        Inertia::flash(['message' => 'accounts.profile-updated', 'color' => 'success']);
+
+        return redirect($user->path());
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @return array<int, mixed>|RedirectResponse
+     * Remove the specified resource from storage. Users deleting their own
+     * account are logged out; either way the home page follows.
      */
-    public function destroy(Request $request, User $user, ContentDeleter $deleter): array|RedirectResponse
+    public function destroy(Request $request, User $user, ContentDeleter $deleter): RedirectResponse
     {
         $this->authorize('delete', $user);
 
+        $isOwnAccount = $request->user()?->is($user) === true;
+
         $deleter->deleteUser($user);
 
-        if ($request->user()?->is($user) === true) {
+        if ($isOwnAccount === true) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            $request->session()->flash('message', 'accounts.account-deleted');
-
-            return to_route('home');
         }
 
-        return [];
+        Inertia::flash([
+            'message' => $isOwnAccount === true ? 'accounts.account-deleted' : 'users.user-deleted',
+            'color' => 'success',
+        ]);
+
+        return to_route('home');
     }
 
     /**

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { formDataKey } from '@/composables/keys'
-import { injectStrict } from '@/composables/injectStrict'
 import { useStaticPages } from '@/composables/useStaticPages'
 
-const formData = injectStrict(formDataKey)
+const serviceAgreement = defineModel<boolean>('serviceAgreement', { required: true })
+const privacyAgreement = defineModel<boolean>('privacyAgreement', { required: true })
 const { termsPath, privacyPath } = useStaticPages()
 </script>
 
@@ -12,7 +11,7 @@ const { termsPath, privacyPath } = useStaticPages()
     <div class="flex-shrink-1">
       <v-switch
         id="agreement-terms"
-        v-model="formData.serviceAgreement"
+        v-model="serviceAgreement"
         :label="$t('accounts.i-accept-terms')"
         color="primary"
         required
@@ -31,7 +30,7 @@ const { termsPath, privacyPath } = useStaticPages()
     <div class="flex-shrink-1">
       <v-switch
         id="agreement-privacy"
-        v-model="formData.privacyAgreement"
+        v-model="privacyAgreement"
         :label="$t('accounts.i-accept-privacy')"
         color="primary"
         required

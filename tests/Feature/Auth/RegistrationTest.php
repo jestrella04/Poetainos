@@ -27,9 +27,7 @@ describe('registration', function (): void {
 
         // Then
         assertAuthenticated();
-        // RegisteredUserController::store() renders the verify-email prompt directly
-        // rather than redirecting.
-        $response->assertOk();
+        $response->assertRedirect(route('verification.notice'));
         expect(User::where('username', $username)->firstOrFail()->role?->name)->toBe('user');
     });
 

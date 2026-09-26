@@ -47,16 +47,16 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
-     *
-     * @return array<string, string>
+     * Handle an incoming authentication request, carrying on to where the user was headed.
      */
-    public function store(LoginRequest $request): array
+    public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
         $request->session()->regenerate();
 
-        return ['redirect' => Redirect::intended(route('home'))->getTargetUrl()];
+        Inertia::flash('message', 'accounts.welcome-back');
+
+        return redirect()->intended(route('home'));
     }
 
     /**
@@ -67,7 +67,7 @@ class AuthenticatedSessionController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        $request->session()->flash('message', 'accounts.logged-out-goodbye');
+        Inertia::flash('message', 'accounts.logged-out-goodbye');
 
         return redirect('/');
     }

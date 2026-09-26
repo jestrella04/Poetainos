@@ -11,14 +11,12 @@ describe('confirming a password', function (): void {
         $user = createUserWithPassword($password);
 
         // When
-        $response = actingAs($user)->post('/confirm-password', [
+        $response = actingAs($user)->postJson('/confirm-password', [
             'password' => $password,
         ]);
 
         // Then
-        // ConfirmablePasswordController::store() responds directly with JSON
-        // rather than a redirect with flashed session errors.
-        $response->assertOk();
+        $response->assertNoContent();
         expect(session('auth.password_confirmed_at'))->not->toBeNull();
     });
 
@@ -28,12 +26,11 @@ describe('confirming a password', function (): void {
         $user = createUserWithPassword($password);
 
         // When
-        $response = actingAs($user)->post('/confirm-password', [
+        $response = actingAs($user)->postJson('/confirm-password', [
             'password' => strrev($password).fake()->password(),
         ]);
 
         // Then
-        $response->assertStatus(422);
-        $response->assertJsonStructure(['errors' => ['password']]);
+        $response->assertUnprocessable()->assertJsonValidationErrors('password');
     });
 });

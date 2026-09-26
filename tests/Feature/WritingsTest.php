@@ -95,8 +95,8 @@ describe('creating a writing', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
         $writing = Writing::where('title', $title)->firstOrFail();
+        $response->assertRedirect($writing->path())->assertInertiaFlash('message', 'writings.writing-published');
         expect($writing->categories()->pluck('categories.id')->all())
             ->toContain($mainCategory->id, $subCategory->id);
     });
@@ -117,7 +117,7 @@ describe('creating a writing', function (): void {
         ]));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect(Writing::where('title', $title)->exists())->toBeTrue();
     });
 
@@ -162,7 +162,7 @@ describe('editing and deleting a writing', function (): void {
 
         // Then
         $editResponse->assertOk();
-        $deleteResponse->assertOk();
+        $deleteResponse->assertRedirect(route('home'));
         expect(Writing::find($writing->id))->toBeNull();
     });
 
@@ -191,7 +191,7 @@ describe('editing and deleting a writing', function (): void {
 
         // Then
         $editResponse->assertOk();
-        $deleteResponse->assertOk();
+        $deleteResponse->assertRedirect(route('home'));
         expect(Writing::find($writing->id))->toBeNull();
     });
 
@@ -204,7 +204,7 @@ describe('editing and deleting a writing', function (): void {
         $response = actingAs($admin)->deleteJson(route('admin.writings.destroy', $writing));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect(route('home'));
         expect(Writing::find($writing->id))->toBeNull();
     });
 
@@ -251,7 +251,7 @@ describe('updating a writing', function (): void {
         ]));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($writing->refresh()->title)->toBe($title);
     });
 
@@ -268,7 +268,7 @@ describe('updating a writing', function (): void {
         ]));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($author->refresh()->isInAgreement())->toBeFalse();
     });
 
@@ -283,7 +283,7 @@ describe('updating a writing', function (): void {
         // When
         actingAs($author)->put(route('writings.update', $writing), writingPayload($mainCategory, [
             'link' => $link,
-        ]))->assertOk();
+        ]))->assertRedirect();
 
         // Then
         expect($writing->refresh()->slug)->toBe($originalSlug);
@@ -297,7 +297,7 @@ describe('updating a writing', function (): void {
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
         // When
-        actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['title' => 'Random']))->assertOk();
+        actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['title' => 'Random']))->assertRedirect();
 
         // Then
         expect(Writing::where('title', 'Random')->firstOrFail()->slug)->toBe('random-1');
@@ -345,7 +345,7 @@ describe('updating a writing', function (): void {
         // When
         actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, [
             'tags' => ["{$firstWord}   {$secondWord}", $spacedTag, $otherTag],
-        ]))->assertOk();
+        ]))->assertRedirect();
 
         // Then
         $writing = Writing::firstOrFail();
@@ -386,7 +386,7 @@ describe('a writing cover', function (): void {
         actingAs($author)->post(route('writings.update', $writing), writingPayload($mainCategory, [
             '_method' => 'PUT',
             'cover' => UploadedFile::fake()->image(fake()->word().'.jpg', fake()->numberBetween(1400, 2400), fake()->numberBetween(800, 1400)),
-        ]))->assertOk();
+        ]))->assertRedirect();
 
         // Then
         $cover = $writing->refresh()->cover;
@@ -403,7 +403,7 @@ describe('a writing cover', function (): void {
         $writing = Writing::factory()->for($author, 'author')->create(['cover' => $cover]);
 
         // When
-        actingAs($author)->delete(route('writings.destroy', $writing))->assertOk();
+        actingAs($author)->delete(route('writings.destroy', $writing))->assertRedirect(route('home'));
 
         // Then
         Storage::disk('local')->assertMissing($cover);

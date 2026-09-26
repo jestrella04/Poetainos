@@ -6,18 +6,12 @@ const reloadSW = '__RELOAD_SW__'
 const intervalMS = 60 * 60 * 1000
 
 const { needRefresh, updateServiceWorker } = useRegisterSW({
-  onRegisteredSW(swUrl, r) {
-    console.log(`Service Worker at: ${swUrl}`)
-
-    if ((reloadSW as string) === 'true') {
-      if (r !== undefined) {
-        setInterval(() => {
-          console.log('Checking for sw update')
-          void r.update()
-        }, intervalMS)
-      }
-    } else {
-      console.log('SW Registered:', r)
+  onRegisteredSW(_swUrl, registration) {
+    // Installed apps can stay open for days, so they look for a new version every hour
+    if ((reloadSW as string) === 'true' && registration !== undefined) {
+      setInterval(() => {
+        void registration.update()
+      }, intervalMS)
     }
   }
 })

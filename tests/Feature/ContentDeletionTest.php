@@ -27,7 +27,7 @@ describe('deleting a writing', function (): void {
         $response = actingAs($author)->delete('/writings/delete/'.$writing->slug);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         assertDatabaseMissing('likes', ['likeable_type' => Writing::class, 'likeable_id' => $writing->id]);
         expect(Like::count())->toBe(1);
         expect(DB::table('notifications')->pluck('data')->map(fn (string $data): array => json_decode($data, true))->all())
@@ -49,7 +49,7 @@ describe('deleting a comment', function (): void {
         $response = actingAs($commenter)->delete("/comments/delete/{$comment->id}");
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         assertDatabaseCount('likes', 0);
         assertDatabaseCount('notifications', 0);
     });
@@ -69,7 +69,7 @@ describe('deleting a user', function (): void {
         $response = actingAs($admin)->delete('/admin/users/delete/'.$user->username);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect(User::find($user->id))->toBeNull();
         assertDatabaseCount('likes', 0);
         assertDatabaseCount('notifications', 0);
@@ -86,7 +86,7 @@ describe('deleting a writing with comments', function (): void {
         createDatabaseNotification($comment->author()->firstOrFail(), ['comment_id' => $comment->id]);
 
         // When
-        actingAs($author)->delete('/writings/delete/'.$writing->slug)->assertOk();
+        actingAs($author)->delete('/writings/delete/'.$writing->slug)->assertRedirect();
 
         // Then
         assertDatabaseCount('likes', 0);
@@ -113,7 +113,7 @@ describe('deleting a user with content', function (): void {
         createDatabaseNotification($reader, ['comment_id' => $theirComment->id]);
 
         // When
-        actingAs(actingAsAdmin())->delete('/admin/users/delete/'.$user->username)->assertOk();
+        actingAs(actingAsAdmin())->delete('/admin/users/delete/'.$user->username)->assertRedirect();
 
         // Then
         assertDatabaseCount('likes', 0);
