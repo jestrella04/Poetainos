@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import { useNotificationsChannel } from '../useNotificationsChannel'
 
 const mocks = vi.hoisted(() => ({
-  listen: vi.fn(),
+  notification: vi.fn(),
   privateChannel: vi.fn(),
   disconnect: vi.fn(),
   constructed: vi.fn()
@@ -16,7 +16,7 @@ vi.mock('laravel-echo', () => ({
       mocks.constructed(options)
     }
 
-    private = mocks.privateChannel.mockReturnValue({ listen: mocks.listen })
+    private = mocks.privateChannel.mockReturnValue({ notification: mocks.notification })
     disconnect = mocks.disconnect
   }
 }))
@@ -38,7 +38,7 @@ afterEach(() => {
 })
 
 describe('useNotificationsChannel', () => {
-  it("listens on the user's private notifications channel once mounted", () => {
+  it("listens for notifications on the user's private channel once mounted", () => {
     // When
     mount(hostFor(7, vi.fn()))
 
@@ -46,18 +46,18 @@ describe('useNotificationsChannel', () => {
     expect(mocks.constructed).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ broadcaster: 'reverb', enabledTransports: ['ws', 'wss'] })
     )
-    expect(mocks.privateChannel).toHaveBeenCalledExactlyOnceWith('notifications.7')
-    expect(mocks.listen).toHaveBeenCalledExactlyOnceWith('NotificationEvent', expect.any(Function))
+    expect(mocks.privateChannel).toHaveBeenCalledExactlyOnceWith('App.Models.User.7')
+    expect(mocks.notification).toHaveBeenCalledExactlyOnceWith(expect.any(Function))
   })
 
   it('reports the unread count the server sends', () => {
     // Given
     const onUnreadCount = vi.fn()
     mount(hostFor(7, onUnreadCount))
-    const [, handler] = mocks.listen.mock.calls[0] as [string, (payload: unknown) => void]
+    const [handler] = mocks.notification.mock.calls[0] as [(payload: unknown) => void]
 
     // When
-    handler({ user_id: 7, notifications: { unread: 4, total: 9 } })
+    handler({ id: 'b6f1', type: 'App\\Notifications\\WritingLiked', unread: 4 })
 
     // Then
     expect(onUnreadCount).toHaveBeenCalledExactlyOnceWith(4)

@@ -36,7 +36,7 @@ class WritingFeatured extends PoetainosNotification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        return [...$this->mailChannelIfWanted($notifiable), 'database', WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), 'database', 'broadcast', WebPushChannel::class];
     }
 
     /**

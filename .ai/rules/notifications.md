@@ -5,5 +5,5 @@ paths:
 
 # Notifications
 
-## Broadcast notification via event() helper
-Dispatch `NotificationEvent` with the global `event()` helper from a Notification's delivery method, not `::dispatch()`. Model lifecycle hooks (`booted()`, observers) are not used for this.
+## Live notifications use the native broadcast channel
+List `'broadcast'` after `'database'` in `via()`, so the unread count includes the new notification. `PoetainosNotification::toBroadcast()` returns a `BroadcastMessage` with the recipient's unread count, which the frontend receives with Echo `.private('App.Models.User.' + id).notification()`. Never dispatch events from inside a delivery method.

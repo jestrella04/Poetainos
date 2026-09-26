@@ -2,8 +2,9 @@ import { onBeforeUnmount, onMounted } from 'vue'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 
-interface NotificationEventPayload {
-  notifications: { unread: number }
+// What PoetainosNotification::toBroadcast() sends, next to the `id` and `type` Laravel adds
+interface UnreadCountNotification {
+  unread: number
 }
 
 function optionalPort(port: string | undefined): number | undefined {
@@ -30,7 +31,7 @@ function createEcho(): Echo<'reverb'> {
 
 /**
  * While the calling component is mounted, listens on the user's private
- * channel for the server's unread-notification counts, and closes the
+ * notification channel for the server's unread-notification counts, and closes the
  * connection when the component goes away.
  */
 export function useNotificationsChannel(
@@ -47,11 +48,9 @@ export function useNotificationsChannel(
     }
 
     echo = createEcho()
-    echo
-      .private(`notifications.${id}`)
-      .listen('NotificationEvent', (payload: NotificationEventPayload) => {
-        onUnreadCount(payload.notifications.unread)
-      })
+    echo.private(`App.Models.User.${id}`).notification((notification: UnreadCountNotification) => {
+      onUnreadCount(notification.unread)
+    })
   })
 
   onBeforeUnmount(() => {
