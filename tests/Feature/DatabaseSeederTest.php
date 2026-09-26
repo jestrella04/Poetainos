@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\Writing;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\Storage;
@@ -15,8 +15,8 @@ it('stores every seeded avatar and cover under an upload-style random name', fun
     seed(DatabaseSeeder::class);
 
     // Then
-    $imagePaths = User::all()->pluck('extra_info.avatar')
-        ->merge(Writing::all()->pluck('extra_info.cover'))
+    $imagePaths = UserProfile::pluck('avatar')
+        ->merge(Writing::pluck('cover'))
         ->filter();
 
     expect($imagePaths)->not->toBeEmpty();

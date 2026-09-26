@@ -22,7 +22,7 @@ describe('notification emails', function (): void {
 
     it('are sent to users who never chose', function (Closure $makeNotification): void {
         // Given
-        $recipient = createUser(['extra_info' => null]);
+        $recipient = createUser();
         $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
 
         // Then
@@ -31,7 +31,7 @@ describe('notification emails', function (): void {
 
     it('are sent to users who opted in', function (Closure $makeNotification): void {
         // Given
-        $recipient = createUser(['extra_info' => ['notifications' => ['email' => 'on']]]);
+        $recipient = createUser(['wants_email_notifications' => true]);
         $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
 
         // Then
@@ -40,7 +40,7 @@ describe('notification emails', function (): void {
 
     it('are not sent to users who opted out, but the in-app notification still is', function (Closure $makeNotification): void {
         // Given
-        $recipient = createUser(['extra_info' => ['notifications' => ['email' => 'off']]]);
+        $recipient = createUser(['wants_email_notifications' => false]);
         $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
 
         // Then

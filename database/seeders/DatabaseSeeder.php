@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(CategorySeeder::class);
 
-        $users = User::factory(self::USERS_COUNT)->create();
+        $users = User::factory(self::USERS_COUNT)->withProfile()->create();
         $tags = Tag::factory(self::TAGS_COUNT)->create();
         $mainCategories = Category::whereNull('parent_id')->with('children')->get();
         $writings = $this->seedWritings($users, $tags, $mainCategories);

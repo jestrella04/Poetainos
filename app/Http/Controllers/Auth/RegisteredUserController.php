@@ -35,12 +35,9 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'password_updated_at' => Carbon::now(),
-            'extra_info' => [
-                'agreement' => [
-                    'terms_of_use' => $request->service_agreement,
-                    'privacy_policy' => $request->privacy_agreement,
-                ],
-            ],
+            // Validation requires both agreements to be accepted
+            'terms_accepted_at' => Carbon::now(),
+            'privacy_accepted_at' => Carbon::now(),
             'role_id' => Role::where('name', 'user')->firstOrFail()->id,
         ]));
 

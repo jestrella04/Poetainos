@@ -25,7 +25,7 @@ interface WritingFormProps {
       title?: string
       text?: string
       slug?: string
-      extra_info?: { link?: string; cover?: string } | null
+      link?: string | null
     }
     main_category: number | null
     categories: number[]
@@ -78,9 +78,7 @@ onMounted(() => {
     formData.alt_categories = writing.categories
   }
 
-  if (writing.data.extra_info?.link !== undefined) {
-    formData.link = writing.data.extra_info.link
-  }
+  formData.link = writing.data.link ?? ''
 })
 
 watch(

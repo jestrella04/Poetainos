@@ -11,22 +11,7 @@ const props = defineProps<{
 const { strNullOrEmpty } = useTypeGuards()
 const { storage, userDisplayName, userInitials } = useFormatting()
 
-const avatar = computed(() => {
-  if (
-    props.user.avatar !== null &&
-    props.user.avatar !== undefined &&
-    props.user.avatar.trim() !== ''
-  ) {
-    return props.user.avatar
-  } else if (
-    props.user.extra_info?.avatar !== null &&
-    props.user.extra_info?.avatar !== undefined &&
-    props.user.extra_info.avatar !== ''
-  ) {
-    return props.user.extra_info.avatar
-  }
-  return ''
-})
+const avatar = computed(() => props.user.avatar?.trim() ?? '')
 </script>
 
 <template>

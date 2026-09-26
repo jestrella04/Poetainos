@@ -25,12 +25,10 @@ const props = withDefaults(
 )
 
 const { authUser } = useAuth()
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { strNullOrEmpty } = useTypeGuards()
 const { storage, toLocaleDate, userDisplayName, excerpt, readable } = useFormatting()
 const loadingComments = ref(true)
-const hasCover = computed(
-  () => !isEmpty(props.data.extra_info) && !strNullOrEmpty(props.data.extra_info?.cover)
-)
+const hasCover = computed(() => !strNullOrEmpty(props.data.cover))
 const isLiked = computed(() => props.data.is_liked === true)
 const isShelved = computed(() => props.data.is_shelved === true)
 const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
@@ -52,7 +50,7 @@ provide(writingKey, props.data)
       <v-img
         v-if="hasCover && alone"
         height="320"
-        :src="storage(data.extra_info?.cover ?? '')"
+        :src="storage(data.cover ?? '')"
         alt=""
         class="mb-6"
         rounded
@@ -61,7 +59,7 @@ provide(writingKey, props.data)
 
       <v-row>
         <v-col v-if="hasSideCover" cols="12" md="3" order="1" order-md="2">
-          <v-img height="200" :src="storage(data.extra_info?.cover ?? '')" alt="" rounded cover />
+          <v-img height="200" :src="storage(data.cover ?? '')" alt="" rounded cover />
         </v-col>
 
         <v-col cols="12" :md="hasSideCover ? 9 : 12" order="2" order-md="1">

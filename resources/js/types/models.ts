@@ -11,10 +11,6 @@ export interface UserLike {
   username: string
   name?: string | null
   avatar?: string | null
-  extra_info?: {
-    avatar?: string | null
-    social?: Record<string, string>
-  } | null
   karma?: 'A' | 'B' | 'C' | 'D' | 'F' | null
   writings_count?: number
 }
@@ -37,7 +33,8 @@ export interface User extends UserLike {
   bio?: string
   location?: string
   created_at?: string
-  social?: string
+  // The handles the user filled in, keyed by social network
+  social?: Record<string, string>
   website?: string
   occupation?: string
   interests?: string
@@ -98,10 +95,8 @@ export interface Writing {
   views: number
   aura: string
   home_posted_at?: string | null
-  extra_info?: {
-    cover?: string
-    link?: string
-  } | null
+  cover?: string | null
+  link?: string | null
   author: UserLike
   categories?: CategoryLike[]
   tags?: TagLike[]

@@ -25,9 +25,7 @@ const headlineStats = computed<{ label: string; value: string }[]>(() => [
   { label: t('main.profile-views'), value: readable(props.data.profile_views) }
 ])
 
-const socialLinks = computed<Record<string, string>>(() =>
-  props.data.social ? (JSON.parse(props.data.social) as Record<string, string>) : {}
-)
+const socialLinks = computed<Record<string, string>>(() => props.data.social ?? {})
 </script>
 
 <template>

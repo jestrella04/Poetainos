@@ -20,7 +20,7 @@ class ContentDeleter
 
     public function deleteWriting(Writing $writing): void
     {
-        $cover = $writing->extra_info['cover'] ?? null;
+        $cover = $writing->cover;
 
         DB::transaction(function () use ($writing): void {
             // Comments cascade with the writing, so their ids are collected first
@@ -45,9 +45,9 @@ class ContentDeleter
 
     public function deleteUser(User $user): void
     {
-        $writings = $user->writings()->get(['id', 'extra_info']);
-        $images = $writings->map(fn (Writing $writing): ?string => $writing->extra_info['cover'] ?? null)
-            ->push($user->extra_info['avatar'] ?? null);
+        $writings = $user->writings()->get(['id', 'cover']);
+        $images = $writings->map(fn (Writing $writing): ?string => $writing->cover)
+            ->push($user->profile->avatar);
 
         DB::transaction(function () use ($user, $writings): void {
             // Their writings and comments cascade with the user, so their ids are collected first

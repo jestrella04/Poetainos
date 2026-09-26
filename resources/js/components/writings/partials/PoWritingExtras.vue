@@ -30,11 +30,11 @@ const taxonomies = computed(() => [
 
 <template>
   <div class="d-flex flex-column ga-3 my-8">
-    <div v-if="!isEmpty(data.extra_info) && !strNullOrEmpty(data.extra_info?.link)" class="d-flex">
+    <div v-if="!strNullOrEmpty(data.link)" class="d-flex">
       <v-icon icon="fas fa-link" size="24" class="mr-3" />
 
-      <po-link :href="data.extra_info?.link" target="_blank" rel="nofollow noopener">
-        {{ cropUrl(data.extra_info?.link ?? '') }}
+      <po-link :href="data.link ?? ''" target="_blank" rel="nofollow noopener">
+        {{ cropUrl(data.link ?? '') }}
       </po-link>
     </div>
 

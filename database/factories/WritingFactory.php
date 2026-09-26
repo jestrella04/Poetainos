@@ -31,7 +31,7 @@ class WritingFactory extends Factory
             'title' => $this->faker->text(45),
             'slug' => $this->faker->unique()->slug(3),
             'text' => $this->faker->paragraphs($this->faker->numberBetween(2, 10), true),
-            'extra_info' => fn (): ?array => $this->faker->boolean() ? ['cover' => $this->storeDemoImage('images/cover.jpg', 'covers')] : null,
+            'cover' => fn (): ?string => $this->faker->boolean() ? $this->storeDemoImage('images/cover.jpg', 'covers') : null,
         ];
     }
 }

@@ -36,7 +36,7 @@ describe('the link preview of a writing', function (): void {
     it('describes the page with the excerpt and the absolute cover URL', function (): void {
         // Given
         $cover = 'covers/'.fake()->uuid().'.jpg';
-        $writing = Writing::factory()->create(['extra_info' => ['cover' => $cover]]);
+        $writing = Writing::factory()->create(['cover' => $cover]);
 
         // When
         $response = get($writing->path());
@@ -49,7 +49,7 @@ describe('the link preview of a writing', function (): void {
 
     it('leaves the image to the default when the writing has no cover', function (): void {
         // Given
-        $writing = Writing::factory()->create(['extra_info' => null]);
+        $writing = Writing::factory()->create(['cover' => null]);
 
         // When
         $response = get($writing->path());

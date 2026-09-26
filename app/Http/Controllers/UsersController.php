@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\Writing;
 use App\Services\ContentDeleter;
 use App\Services\ImageStorage;
@@ -29,17 +30,8 @@ class UsersController extends Controller
     public function index(): Paginator|Response
     {
         $sort = resolveSort(['latest', 'popular', 'featured'], 'featured');
-        $users = User::select(
-            'id',
-            'username',
-            'name',
-            'profile_views',
-            'aura',
-            'karma',
-            'extra_info->bio AS bio',
-            'extra_info->avatar AS avatar',
-            'extra_info->location AS location',
-        )
+        $users = User::select('id', 'username', 'name', 'profile_views', 'aura', 'karma')
+            ->withProfileFields('bio', 'avatar', 'location')
             ->has('writings')
             ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
 
@@ -94,27 +86,12 @@ class UsersController extends Controller
                 'title' => getPageTitle([$user->getName(), __('Writers')]),
                 'canonical' => $user->path(),
             ],
-            // MariaDB's JSON_VALUE (what `extra_info->social` compiles to) returns NULL for objects,
-            // so `social` is decoded from the bound model instead of selected.
-            'user' => User::select(
-                'id',
-                'username',
-                'name',
-                'profile_views',
-                'aura',
-                'karma',
-                'created_at',
-                'extra_info->bio AS bio',
-                'extra_info->avatar AS avatar',
-                'extra_info->website AS website',
-                'extra_info->location AS location',
-                'extra_info->interests AS interests',
-                'extra_info->occupation AS occupation',
-            )
+            'user' => User::select('id', 'username', 'name', 'profile_views', 'aura', 'karma', 'created_at')
+                ->withProfileFields('bio', 'avatar', 'website', 'location', 'interests', 'occupation')
                 ->where('id', $user->id)
                 ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
                 ->firstOrFail()
-                ->setAttribute('social', json_encode($user->extra_info['social'] ?? [])),
+                ->setAttribute('social', $user->profile->socialHandles()),
             'authorWritings' => Inertia::optional(fn () => $user->writings()
                 ->visibleTo($this->blockedAuthorIds())
                 ->withListingRelations()
@@ -142,7 +119,7 @@ class UsersController extends Controller
             'meta' => [
                 'title' => getPageTitle([__('Update profile')]),
             ],
-            'user' => $user,
+            'user' => $user->load('profile'),
             'agreement' => $user->isInAgreement(),
             'roles' => Auth::user()?->isAllowed('admin') === true ? Role::select('id', 'name')->get() : [],
         ]);
@@ -157,7 +134,6 @@ class UsersController extends Controller
     {
         $this->authorize('update', $user);
 
-        // Validate user input
         $request->validate([
             'role' => 'nullable|integer|exists:roles,id',
             'name' => 'required|string|min:3|max:250',
@@ -167,23 +143,18 @@ class UsersController extends Controller
             'occupation' => 'nullable|string|min:3|max:100',
             'interests' => 'nullable|string|min:3|max:250',
             'website' => 'nullable|url|max:250',
-            'twitter' => 'nullable|string|min:3|max:250',
-            'threads' => 'nullable|string|min:3|max:250',
-            'instagram' => 'nullable|string|min:3|max:100',
-            'facebook' => 'nullable|string|min:3|max:250',
-            'youtube' => 'nullable|string|min:3|max:100',
-            'goodreads' => 'nullable|string|min:3|max:250',
+            ...array_map(fn (int $maxLength): string => 'nullable|string|min:3|max:'.$maxLength, UserProfile::SOCIAL_NETWORKS),
             'avatar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
             'avatar-remove' => 'nullable|boolean',
             'service_agreement' => 'sometimes|required|accepted',
             'privacy_agreement' => 'sometimes|required|accepted',
         ]);
 
-        // Keep whatever else is stored on the profile (notification settings, linked providers…)
-        $user->extra_info = [
-            ...($user->extra_info ?? []),
-            ...$this->profileInfo($request, $this->resolveAvatar($request, $user, $images)),
-        ];
+        $profile = $user->editableProfile();
+        $profile->fill([
+            ...$request->only(['bio', 'website', 'location', 'interests', 'occupation', ...array_keys(UserProfile::SOCIAL_NETWORKS)]),
+            'avatar' => $this->resolveAvatar($request, $profile, $images),
+        ])->save();
 
         // Only an admin may change a user's role
         if ($request->input('role') !== null && $request->user()?->isAllowed('admin') === true) {
@@ -343,48 +314,21 @@ class UsersController extends Controller
     /**
      * The avatar path to store: the current one, a freshly uploaded one, or none when the user removed it.
      */
-    private function resolveAvatar(Request $request, User $user, ImageStorage $images): string
+    private function resolveAvatar(Request $request, UserProfile $profile, ImageStorage $images): ?string
     {
-        $currentAvatar = $user->extra_info['avatar'] ?? '';
-
         if (isTruthy($request->input('avatar-remove'))) {
-            $images->delete($currentAvatar);
+            $images->delete($profile->avatar);
 
-            return '';
+            return null;
         }
 
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             $avatar = $images->storeUpload($request->file('avatar'), 'avatars', self::AVATAR_SIZE, self::AVATAR_SIZE);
-            $images->delete($currentAvatar);
+            $images->delete($profile->avatar);
 
             return $avatar;
         }
 
-        return $currentAvatar;
-    }
-
-    /**
-     * The profile fields the edit form owns, as stored in extra_info.
-     *
-     * @return array<string, mixed>
-     */
-    private function profileInfo(Request $request, string $avatar): array
-    {
-        return [
-            'bio' => $request->input('bio') ?? '',
-            'social' => [
-                'twitter' => $request->input('twitter') ?? '',
-                'threads' => $request->input('threads') ?? '',
-                'instagram' => $request->input('instagram') ?? '',
-                'facebook' => $request->input('facebook') ?? '',
-                'youtube' => $request->input('youtube') ?? '',
-                'goodreads' => $request->input('goodreads') ?? '',
-            ],
-            'avatar' => $avatar,
-            'website' => $request->input('website') ?? '',
-            'location' => $request->input('location') ?? '',
-            'interests' => $request->input('interests') ?? '',
-            'occupation' => $request->input('occupation') ?? '',
-        ];
+        return $profile->avatar;
     }
 }

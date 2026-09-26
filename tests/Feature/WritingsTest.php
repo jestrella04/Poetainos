@@ -287,7 +287,7 @@ describe('updating a writing', function (): void {
 
         // Then
         expect($writing->refresh()->slug)->toBe($originalSlug);
-        expect(data_get($writing->extra_info, 'link'))->toBe($link);
+        expect($writing->link)->toBe($link);
     });
 
     it('does not reuse a slug that a static route owns', function (): void {
@@ -379,7 +379,7 @@ describe('a writing cover', function (): void {
         $oldCover = 'covers/'.fake()->uuid().'.png';
         Storage::disk('local')->put($oldCover, fake()->sentence());
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => $oldCover]]);
+        $writing = Writing::factory()->for($author, 'author')->create(['cover' => $oldCover]);
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
         // When
@@ -389,9 +389,9 @@ describe('a writing cover', function (): void {
         ]))->assertOk();
 
         // Then
-        $cover = data_get($writing->refresh()->extra_info, 'cover');
+        $cover = $writing->refresh()->cover;
         expect($cover)->toStartWith('covers/')->not->toBe($oldCover);
-        expect(storedImageWidth($cover))->toBe(1280);
+        expect(storedImageWidth((string) $cover))->toBe(1280);
         Storage::disk('local')->assertMissing($oldCover);
     });
 
@@ -400,7 +400,7 @@ describe('a writing cover', function (): void {
         $cover = 'covers/'.fake()->uuid().'.png';
         Storage::disk('local')->put($cover, fake()->sentence());
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => $cover]]);
+        $writing = Writing::factory()->for($author, 'author')->create(['cover' => $cover]);
 
         // When
         actingAs($author)->delete(route('writings.destroy', $writing))->assertOk();

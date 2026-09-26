@@ -3,6 +3,7 @@
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\Writing;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -99,9 +100,10 @@ describe('deleting a user with content', function (): void {
         Storage::fake('local');
         Storage::disk('local')->put('covers/cover.jpg', 'cover');
         Storage::disk('local')->put('avatars/avatar.png', 'avatar');
-        $user = createUser(['extra_info' => ['avatar' => 'avatars/avatar.png']]);
+        $user = createUser();
+        UserProfile::factory()->for($user)->create(['avatar' => 'avatars/avatar.png']);
         $reader = createUser();
-        $writing = Writing::factory()->for($user, 'author')->create(['extra_info' => ['cover' => 'covers/cover.jpg']]);
+        $writing = Writing::factory()->for($user, 'author')->create(['cover' => 'covers/cover.jpg']);
         $commentOnTheirWriting = Comment::factory()->for($writing)->for($reader, 'author')->create();
         $theirComment = Comment::factory()->for(Writing::factory())->for($user, 'author')->create();
         $writing->likes()->create(['user_id' => $reader->id, 'vote' => 1]);

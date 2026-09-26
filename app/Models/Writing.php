@@ -34,20 +34,17 @@ class Writing extends Model
         'title',
         'slug',
         'text',
-        'extra_info',
     ];
 
     /**
-     * The attributes that should be cast to native types.
+     * The attributes that should be hidden for arrays.
      *
-     * @return array<string, string>
+     * @var list<string>
      */
-    protected function casts(): array
-    {
-        return [
-            'extra_info' => 'array',
-        ];
-    }
+    protected $hidden = [
+        // Superseded by the cover and link columns; kept only until its data is verified and dropped
+        'extra_info',
+    ];
 
     public function getRouteKeyName()
     {
@@ -178,9 +175,7 @@ class Writing extends Model
      */
     public function coverUrl(): ?string
     {
-        $cover = $this->extra_info['cover'] ?? null;
-
-        return $cover === null || $cover === '' ? null : asset('storage/'.$cover);
+        return $this->cover === null || $this->cover === '' ? null : asset('storage/'.$this->cover);
     }
 
     public function incrementViews(): void

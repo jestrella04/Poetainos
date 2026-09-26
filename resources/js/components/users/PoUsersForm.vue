@@ -9,25 +9,25 @@ import { useFormSubmit } from '@/composables/useFormSubmit'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { LaravelValidationErrors } from '@/types/http'
 
-// $user (the raw Eloquent model, not a select()) — a different shape from
-// types/models.ts's `User` (which reflects UsersController::show()'s
-// flattened extra_info->x AS x columns): here extra_info is still a
-// genuine nested object, cast by the model.
+type SocialNetworkKey = 'twitter' | 'threads' | 'instagram' | 'facebook' | 'youtube' | 'goodreads'
+
+// UsersController::edit()'s user with its profile loaded (null until the user fills one in)
 interface EditableUser {
   id: number
   username: string
   name?: string | null
   email: string
   role_id?: number | null
-  extra_info?: {
-    avatar?: string
-    bio?: string
-    location?: string
-    occupation?: string
-    interests?: string
-    website?: string
-    social?: Record<string, string>
-  } | null
+  profile:
+    | (Partial<Record<SocialNetworkKey, string | null>> & {
+        avatar?: string | null
+        bio?: string | null
+        location?: string | null
+        occupation?: string | null
+        interests?: string | null
+        website?: string | null
+      })
+    | null
 }
 
 interface Role {
@@ -38,8 +38,6 @@ interface Role {
 interface PostedResult {
   url: string
 }
-
-type SocialNetworkKey = 'twitter' | 'threads' | 'instagram' | 'facebook' | 'youtube' | 'goodreads'
 
 interface SocialLinkField {
   key: SocialNetworkKey
@@ -58,7 +56,7 @@ const socialLinkFields: SocialLinkField[] = [
 
 const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
 const { authUser, isAdmin } = useAuth()
-const { isEmpty } = useTypeGuards()
+const { isEmpty, strNullOrEmpty } = useTypeGuards()
 const { validationErrors } = useFormErrors()
 const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 
@@ -94,22 +92,23 @@ formData.name = user.name ?? ''
 formData.username = user.username ?? ''
 formData.email = user.email ?? ''
 
-if (user.extra_info !== null && user.extra_info !== undefined) {
-  formData.bio = user.extra_info.bio ?? ''
-  formData.location = user.extra_info.location ?? ''
-  formData.occupation = user.extra_info.occupation ?? ''
-  formData.interests = user.extra_info.interests ?? ''
-  formData.website = user.extra_info.website ?? ''
+formData.bio = user.profile?.bio ?? ''
+formData.location = user.profile?.location ?? ''
+formData.occupation = user.profile?.occupation ?? ''
+formData.interests = user.profile?.interests ?? ''
+formData.website = user.profile?.website ?? ''
 
-  if (user.extra_info.social !== undefined) {
-    formData.twitter = user.extra_info.social.twitter ?? ''
-    formData.threads = user.extra_info.social.threads ?? ''
-    formData.instagram = user.extra_info.social.instagram ?? ''
-    formData.facebook = user.extra_info.social.facebook ?? ''
-    formData.youtube = user.extra_info.social.youtube ?? ''
-    formData.goodreads = user.extra_info.social.goodreads ?? ''
-  }
+for (const field of socialLinkFields) {
+  formData[field.key] = user.profile?.[field.key] ?? ''
 }
+
+// PoAvatar reads a flat `avatar`, as every listing sends it
+const avatarUser = {
+  username: user.username,
+  name: user.name,
+  avatar: user.profile?.avatar ?? null
+}
+const hasAvatar = !strNullOrEmpty(avatarUser.avatar)
 
 async function submitForm() {
   isPosted.value = {}
@@ -130,12 +129,7 @@ async function submitForm() {
       occupation: formData.occupation,
       interests: formData.interests,
       website: formData.website,
-      twitter: formData.twitter,
-      threads: formData.threads,
-      instagram: formData.instagram,
-      facebook: formData.facebook,
-      youtube: formData.youtube,
-      goodreads: formData.goodreads,
+      ...Object.fromEntries(socialLinkFields.map((field) => [field.key, formData[field.key]])),
       service_agreement: formData.serviceAgreement,
       privacy_agreement: formData.privacyAgreement
     },
@@ -162,7 +156,7 @@ function openAvatarPicker(): void {
         @submit.prevent="submitForm"
       >
         <div class="d-flex ga-3 mb-3 align-center">
-          <po-avatar :user="user" size="72" color="secondary" />
+          <po-avatar :user="avatarUser" size="72" color="secondary" />
           <po-button color="primary" variant="tonal" @click="openAvatarPicker">{{
             $t('main.choose-image')
           }}</po-button>
@@ -177,7 +171,7 @@ function openAvatarPicker(): void {
         </div>
 
         <v-checkbox
-          v-if="(user.extra_info?.avatar ?? '') !== ''"
+          v-if="hasAvatar"
           v-model="formData.avatarRemove"
           :label="$t('accounts.remove-current-avatar')"
           hide-details

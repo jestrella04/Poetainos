@@ -228,7 +228,7 @@ class SocialAuthController extends Controller
      */
     private function completeLogin(User $user, string $service, ?string $avatarUrl, ImageStorage $images, bool $isReturning): void
     {
-        if (($user->extra_info['avatar'] ?? '') === '' && $avatarUrl !== null) {
+        if (($user->profile->avatar ?? '') === '' && $avatarUrl !== null) {
             $this->importAvatar($user, $avatarUrl, $images);
         }
 
@@ -278,7 +278,7 @@ class SocialAuthController extends Controller
             self::AVATAR_SIZE,
         );
 
-        $user->extra_info = [...($user->extra_info ?? []), 'avatar' => $path];
+        $user->editableProfile()->update(['avatar' => $path]);
     }
 
     /**
@@ -286,7 +286,7 @@ class SocialAuthController extends Controller
      */
     private function isLinked(User $user, string $service): bool
     {
-        return in_array($service, $user->extra_info['linked_providers'] ?? [], true);
+        return $user->socialAccounts()->where('provider', $service)->exists();
     }
 
     /**
@@ -295,12 +295,6 @@ class SocialAuthController extends Controller
      */
     private function linkProvider(User $user, string $service): void
     {
-        if ($this->isLinked($user, $service)) {
-            return;
-        }
-
-        $extraInfo = $user->extra_info ?? [];
-        $extraInfo['linked_providers'] = [...($extraInfo['linked_providers'] ?? []), $service];
-        $user->extra_info = $extraInfo;
+        $user->socialAccounts()->firstOrCreate(['provider' => $service]);
     }
 }

@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Role;
+use App\Models\SocialAccount;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,7 +31,7 @@ describe('viewing and updating a profile', function (): void {
         $updateResponse->assertOk();
         $user->refresh();
         expect($user->name)->toBe($name);
-        expect(data_get($user->extra_info, 'bio'))->toBe($bio);
+        expect($user->profile->bio)->toBe($bio);
     });
 
     it('requires re-verification when a user changes their email address', function (): void {
@@ -156,7 +158,8 @@ describe('deleting an account', function (): void {
         Storage::fake('local');
         $avatar = 'avatars/'.fake()->uuid().'.png';
         Storage::disk('local')->put($avatar, fake()->sentence());
-        $user = createUser(['extra_info' => ['avatar' => $avatar]]);
+        $user = createUser();
+        UserProfile::factory()->for($user)->create(['avatar' => $avatar]);
 
         // When
         $response = actingAs($user)
@@ -221,14 +224,14 @@ describe('what a profile update keeps and rejects', function (): void {
     it('keeps the stored settings the form does not own', function (): void {
         // Given
         $newBio = fake()->sentence();
+        $avatar = 'avatars/'.fake()->uuid().'.png';
         $user = createUser([
-            'extra_info' => [
-                'bio' => fake()->sentence(),
-                'notifications' => ['email' => 'off'],
-                'linked_providers' => ['google'],
-                'agreement' => ['terms_of_use' => 'on', 'privacy_policy' => 'on'],
-            ],
+            'wants_email_notifications' => false,
+            'terms_accepted_at' => now(),
+            'privacy_accepted_at' => now(),
         ]);
+        UserProfile::factory()->for($user)->create(['bio' => fake()->sentence(), 'avatar' => $avatar]);
+        SocialAccount::factory()->for($user)->create(['provider' => 'google']);
 
         // When
         $response = actingAs($user)->put('/users/edit/'.$user->username, [
@@ -239,10 +242,11 @@ describe('what a profile update keeps and rejects', function (): void {
 
         // Then
         $response->assertOk();
-        $info = $user->refresh()->extra_info;
-        expect(data_get($info, 'bio'))->toBe($newBio);
-        expect(data_get($info, 'notifications.email'))->toBe('off');
-        expect(data_get($info, 'linked_providers'))->toBe(['google']);
+        $user->refresh();
+        expect($user->profile->bio)->toBe($newBio);
+        expect($user->profile->avatar)->toBe($avatar);
+        expect($user->wantsEmailNotifications())->toBeFalse();
+        expect($user->socialAccounts()->pluck('provider')->all())->toBe(['google']);
         expect($user->isInAgreement())->toBeTrue();
     });
 
@@ -299,7 +303,8 @@ describe('a profile avatar', function (): void {
         // Given
         $oldAvatar = 'avatars/'.fake()->uuid().'.png';
         Storage::disk('local')->put($oldAvatar, fake()->sentence());
-        $user = createUser(['extra_info' => ['avatar' => $oldAvatar, 'bio' => fake()->sentence()]]);
+        $user = createUser();
+        UserProfile::factory()->for($user)->create(['avatar' => $oldAvatar, 'bio' => fake()->sentence()]);
 
         // When
         $response = actingAs($user)->post('/users/edit/'.$user->username, [
@@ -311,7 +316,7 @@ describe('a profile avatar', function (): void {
 
         // Then
         $response->assertOk();
-        $avatar = data_get($user->refresh()->extra_info, 'avatar');
+        $avatar = (string) $user->refresh()->profile->avatar;
         expect($avatar)->toStartWith('avatars/')->not->toBe($oldAvatar);
         Storage::disk('local')->assertExists($avatar);
         Storage::disk('local')->assertMissing($oldAvatar);
@@ -322,7 +327,8 @@ describe('a profile avatar', function (): void {
         // Given
         $oldAvatar = 'avatars/'.fake()->uuid().'.png';
         Storage::disk('local')->put($oldAvatar, fake()->sentence());
-        $user = createUser(['extra_info' => ['avatar' => $oldAvatar]]);
+        $user = createUser();
+        UserProfile::factory()->for($user)->create(['avatar' => $oldAvatar]);
 
         // When
         $response = actingAs($user)->put('/users/edit/'.$user->username, [
@@ -333,22 +339,22 @@ describe('a profile avatar', function (): void {
 
         // Then
         $response->assertOk();
-        expect(data_get($user->refresh()->extra_info, 'avatar'))->toBe('');
+        expect($user->refresh()->profile->avatar)->toBeNull();
         Storage::disk('local')->assertMissing($oldAvatar);
     });
 });
 
 describe('the email notification preference', function (): void {
-    it('defaults to on and follows what the user chose', function (bool $expected, ?array $info): void {
+    it('defaults to on and follows what the user chose', function (bool $expected, ?bool $choice): void {
         // Given
-        $user = createUser(['extra_info' => $info]);
+        $user = createUser($choice === null ? [] : ['wants_email_notifications' => $choice]);
 
         // Then
-        expect($user->wantsEmailNotifications())->toBe($expected);
+        expect($user->refresh()->wantsEmailNotifications())->toBe($expected);
     })->with([
         'never chosen' => [true, null],
-        'chose on' => [true, ['notifications' => ['email' => 'on']]],
-        'chose off' => [false, ['notifications' => ['email' => 'off']]],
+        'chose on' => [true, true],
+        'chose off' => [false, false],
     ]);
 
     it('is switched through the notifications endpoint', function (): void {
