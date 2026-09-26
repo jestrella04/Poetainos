@@ -83,8 +83,8 @@ nav {
       </po-list-item>
       <v-divider class="my-0" />
 
-      <po-list-item :href="route('admin.tools')" prepend-icon="fas fa-tools" inertia>
-        <span class="d-none d-md-inline">{{ $t('admin.tools') }}</span>
+      <po-list-item :href="route('admin.logs')" prepend-icon="fas fa-file-lines" inertia>
+        <span class="d-none d-md-inline">{{ $t('admin.logs') }}</span>
       </po-list-item>
       <v-divider class="my-0" />
 

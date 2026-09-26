@@ -39,11 +39,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('pages', [AdminController::class, 'pages'])->name('pages');
     Route::get('users', [AdminController::class, 'users'])->name('users');
     Route::get('writings', [AdminController::class, 'writings'])->name('writings');
-    Route::get('tools', [AdminController::class, 'tools'])->name('tools');
+    Route::get('logs', [AdminController::class, 'logs'])->name('logs');
+    Route::get('logs/entries', [AdminController::class, 'logEntries'])->name('logs.entries');
+    Route::get('logs/{file}/download', [AdminController::class, 'downloadLog'])->where('file', '[\w.\-]+\.log')->name('logs.download');
     Route::get('complaints', [AdminController::class, 'complaints'])->name('complaints');
     Route::get('activity', [AdminController::class, 'activity'])->name('activity');
     Route::get('analytics', [AdminController::class, 'analytics'])->name('analytics');
-    Route::get('log', [AdminController::class, 'log'])->name('log');
 
     Route::put('settings/edit', [SettingsController::class, 'update'])->name('settings.edit');
     Route::post('categories', [CategoriesController::class, 'store'])->name('categories.store');
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('pages/delete/{page}', [PagesController::class, 'destroy'])->name('pages.destroy');
     Route::delete('users/delete/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
     Route::delete('writings/delete/{writing}', [WritingsController::class, 'destroy'])->name('writings.destroy');
+    Route::delete('logs/{file}', [AdminController::class, 'clearLog'])->where('file', '[\w.\-]+\.log')->name('logs.clear');
 });
 
 /* Non public routes */

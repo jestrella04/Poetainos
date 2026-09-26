@@ -47,6 +47,8 @@ markdownRenderer.core.ruler.push('vuetify_classes', (state) => {
 // format the same timestamp to different calendar days, which breaks hydration.
 const DISPLAY_TIME_ZONE = 'UTC'
 
+const FILE_SIZE_UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte'] as const
+
 const KARMA_MEDALS = new Map([
   ['A', 'amber-accent-4'],
   ['B', 'blue-grey-lighten-3'],
@@ -87,11 +89,33 @@ export function useFormatting() {
     return value.toLocaleString(regionalFormats().numbers)
   }
 
+  function fileSize(bytes: number): string {
+    const exponent = Math.min(
+      Math.floor(Math.log(Math.max(bytes, 1)) / Math.log(1024)),
+      FILE_SIZE_UNITS.length - 1
+    )
+
+    return new Intl.NumberFormat(regionalFormats().numbers, {
+      style: 'unit',
+      unit: FILE_SIZE_UNITS[exponent],
+      unitDisplay: 'short',
+      maximumFractionDigits: 1
+    }).format(bytes / 1024 ** exponent)
+  }
+
   function toLocaleDate(date: string | number | Date): string {
     return new Date(date).toLocaleDateString(regionalFormats().dates, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
+      timeZone: DISPLAY_TIME_ZONE
+    })
+  }
+
+  function toLocaleDateTime(date: string | number | Date): string {
+    return new Date(date).toLocaleString(regionalFormats().dates, {
+      dateStyle: 'medium',
+      timeStyle: 'medium',
       timeZone: DISPLAY_TIME_ZONE
     })
   }
@@ -143,7 +167,9 @@ export function useFormatting() {
     userInitials,
     abbreviateNumber,
     formatCount,
+    fileSize,
     toLocaleDate,
+    toLocaleDateTime,
     toLocaleMonthYear,
     relativeDate,
     cropUrl,

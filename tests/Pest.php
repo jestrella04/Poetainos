@@ -245,6 +245,43 @@ function deleteTemporaryPublicPath(): void
 }
 
 /**
+ * Point storage_path() at a throwaway directory whose logs/ folder holds the
+ * given files (name => contents), so the real logs stay untouched.
+ *
+ * @param  array<string, string>  $files
+ */
+function useTemporaryLogs(array $files): void
+{
+    $storagePath = sys_get_temp_dir().'/poetainos-storage-'.uniqid();
+    File::ensureDirectoryExists($storagePath.'/logs');
+
+    foreach ($files as $name => $contents) {
+        File::put($storagePath.'/logs/'.$name, $contents);
+    }
+
+    app()->useStoragePath($storagePath);
+}
+
+/**
+ * Delete the directory set up by useTemporaryLogs(), refusing to touch
+ * anything outside the system temp directory.
+ */
+function deleteTemporaryLogs(): void
+{
+    if (str_starts_with(storage_path(), sys_get_temp_dir().'/poetainos-storage-')) {
+        File::deleteDirectory(storage_path());
+    }
+}
+
+/**
+ * A log line in Laravel's default format.
+ */
+function logLine(string $level, string $message, string $date = '2026-09-26 22:44:27'): string
+{
+    return sprintf('[%s] production.%s: %s', $date, strtoupper($level), $message);
+}
+
+/**
  * Artisan test commands always come back pending while console output is mocked,
  * which is Laravel's default; narrowing here keeps the assertion API typed.
  *
