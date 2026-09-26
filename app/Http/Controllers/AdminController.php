@@ -12,6 +12,8 @@ use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use App\Services\ActivityFeed;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -135,6 +137,24 @@ class AdminController extends Controller
     public function pages(): Response|Paginator
     {
         return $this->listing('admin/PoAdminPages', __('Pages'), Page::query());
+    }
+
+    /**
+     * @return Response|Paginator<int, array{kind: string, subject_id: int, created_at: Carbon, user: User|null, writing: Writing|null}>
+     */
+    public function activity(ActivityFeed $feed): Response|Paginator
+    {
+        return $this->paginatedPage(
+            fn (): Paginator => $feed->page($this->perPage),
+            'admin/PoAdminActivity',
+            [
+                'meta' => [
+                    'title' => getPageTitle([__('Activity'), __('Administration')]),
+                ],
+                'total' => fn (): int => $feed->count(),
+            ],
+            recordsProp: null,
+        );
     }
 
     public function tools(): Response

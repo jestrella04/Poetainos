@@ -43,6 +43,11 @@ nav {
       </po-list-item>
       <v-divider class="my-0" />
 
+      <po-list-item :href="route('admin.activity')" prepend-icon="fas fa-clock" inertia>
+        <span class="d-none d-md-inline">{{ $t('admin.activity') }}</span>
+      </po-list-item>
+      <v-divider class="my-0" />
+
       <po-list-item :href="route('admin.settings')" prepend-icon="fas fa-cogs" inertia>
         <span class="d-none d-md-inline">{{ $t('admin.settings') }}</span>
       </po-list-item>

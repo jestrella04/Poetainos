@@ -41,6 +41,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('writings', [AdminController::class, 'writings'])->name('writings');
     Route::get('tools', [AdminController::class, 'tools'])->name('tools');
     Route::get('complaints', [AdminController::class, 'complaints'])->name('complaints');
+    Route::get('activity', [AdminController::class, 'activity'])->name('activity');
     Route::get('analytics', [AdminController::class, 'analytics'])->name('analytics');
     Route::get('log', [AdminController::class, 'log'])->name('log');
 
