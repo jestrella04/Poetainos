@@ -26,6 +26,17 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, HasPushSubscriptions, Notifiable;
 
     /**
+     * A valid username: word characters and single dots, not starting or ending with a dot.
+     */
+    public const USERNAME_PATTERN = '/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/';
+
+    /**
+     * An @mention of a username. It may capture a sentence's closing dot,
+     * which no username ends with, so callers trim trailing dots.
+     */
+    public const MENTION_PATTERN = '/\B@(\w[\w.]{0,44})/';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

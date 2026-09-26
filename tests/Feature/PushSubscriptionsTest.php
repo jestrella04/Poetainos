@@ -38,6 +38,21 @@ describe('subscribing to push notifications', function (): void {
         $response->assertUnprocessable()->assertJsonValidationErrors('endpoint');
     });
 
+    it('rejects an endpoint that is not a URL or is too long to store', function (string $endpoint): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->postJson(route('push.update'), ['endpoint' => $endpoint]);
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors('endpoint');
+        expect($user->pushSubscriptions()->exists())->toBeFalse();
+    })->with([
+        'not a URL' => fn (): string => fake()->word(),
+        'too long' => fn (): string => 'https://push.example.com/'.str_repeat('a', 500),
+    ]);
+
     it('rejects an unsupported content encoding', function (): void {
         // Given
         $user = createUser();

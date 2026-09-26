@@ -21,9 +21,9 @@ class CommentsController extends Controller
      *
      * @return Paginator<int, Comment>
      */
-    public function index(string $writingId): Paginator
+    public function index(Writing $writing): Paginator
     {
-        $comments = Comment::where('writing_id', $writingId)
+        return $writing->comments()
             ->visibleTo($this->blockedAuthorIds())
             ->with([
                 'author' => function ($query): void {
@@ -32,9 +32,8 @@ class CommentsController extends Controller
             ])
             ->withCount(['likes'])
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->simplePaginate($this->perPage);
-
-        return $comments;
     }
 
     /**
@@ -82,15 +81,17 @@ class CommentsController extends Controller
 
     /**
      * Notify the users @mentioned in a comment, up to MAX_MENTIONS of them.
-     * The writing's author and the commenter are already covered elsewhere.
+     * The writing's author and the commenter are already covered elsewhere,
+     * and users who blocked the commenter aren't told.
      */
     private function notifyMentions(Comment $comment, Writing $writing, User $commenter): void
     {
-        preg_match_all('/\B@([a-zA-Z0-9_-]+)/', $comment->message, $matches);
+        preg_match_all(User::MENTION_PATTERN, $comment->message, $matches);
 
-        $usernames = array_slice(array_unique($matches[1]), 0, self::MAX_MENTIONS);
+        $usernames = array_slice(array_unique(array_map(fn (string $username): string => rtrim($username, '.'), $matches[1])), 0, self::MAX_MENTIONS);
 
         User::whereIn('username', $usernames)
+            ->whereDoesntHave('blockedAuthors', fn ($query) => $query->where('blocked_user_id', $commenter->id))
             ->get()
             ->reject(fn (User $mentioned): bool => $mentioned->is($commenter) || $mentioned->is($writing->author))
             ->each(fn (User $mentioned) => $mentioned->notify(new WritingCommentMentioned($comment, $commenter)));

@@ -19,8 +19,9 @@ const reasons = ref<string[]>([])
 const compReasons = ref<string[]>([])
 const compMessage = ref('')
 const hasReasonsLoadError = ref(false)
+const hasNoReasonSelected = ref(false)
 const forceSnackBar = injectStrict(forceSnackBarKey)
-const { isPosting, errors, submitForm } = useFormSubmit(false)
+const { isPosting, errors: hasSubmitError, submitForm } = useFormSubmit(false)
 
 watch(complainer, async () => {
   if (complainer.value === true) {
@@ -38,8 +39,9 @@ watch(complainer, async () => {
 })
 
 async function submit(): Promise<void> {
-  if (isEmpty(compReasons.value)) {
-    errors.value = true
+  hasNoReasonSelected.value = isEmpty(compReasons.value)
+
+  if (hasNoReasonSelected.value === true) {
     return
   }
 
@@ -80,11 +82,11 @@ async function submit(): Promise<void> {
         <v-divider class="mt-3" />
 
         <v-form id="complaint-form" :action="route('complaints.store')" @submit.prevent="submit">
-          <p v-if="errors" class="text-error mt-3" style="margin-bottom: -10px">
+          <p v-if="hasNoReasonSelected" class="text-error mt-3" style="margin-bottom: -10px">
             {{ $t('main.select-least-one') }}
           </p>
 
-          <p v-if="hasReasonsLoadError" class="text-error mt-3">
+          <p v-if="hasReasonsLoadError || hasSubmitError" class="text-error mt-3">
             {{ $t('main.error-try-again') }}
           </p>
 

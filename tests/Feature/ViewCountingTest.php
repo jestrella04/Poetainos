@@ -33,6 +33,18 @@ describe('counting views', function (): void {
         expect($writing->refresh()->views)->toBe(1);
     });
 
+    it('counts a new guest once when their next visit carries the cookie they were handed', function (): void {
+        // Given
+        $writing = Writing::factory()->create(['views' => 0]);
+        $visitorId = get($writing->path())->getCookie(ViewCounter::VISITOR_COOKIE)?->getValue();
+
+        // When
+        withCookie(ViewCounter::VISITOR_COOKIE, (string) $visitorId)->get($writing->path());
+
+        // Then
+        expect($writing->refresh()->views)->toBe(1);
+    });
+
     it('counts guests sharing an IP separately by their visitor cookie', function (): void {
         // Given
         $writing = Writing::factory()->create(['views' => 0]);

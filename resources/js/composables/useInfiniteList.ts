@@ -1,11 +1,8 @@
-import { onMounted, ref, type Ref } from 'vue'
+import { onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
-import axios from 'axios'
-import { useTypeGuards } from '@/composables/useTypeGuards'
+import { usePaginatedList } from '@/composables/usePaginatedList'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { Paginated } from '@/types/models'
-
-export type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
 
 /**
  * Infinite-scroll list behavior shared by the paginated pages (users,
@@ -13,37 +10,7 @@ export type InfiniteScrollStatus = 'ok' | 'empty' | 'loading' | 'error'
  * reload of `reloadPropKey`, and fetches the following pages via axios.
  */
 export function useInfiniteList<T>(reloadPropKey: string) {
-  const { strNullOrEmpty } = useTypeGuards()
-  const items = ref([]) as Ref<T[]>
-  const next = ref('')
-  const fetched = ref(false)
-
-  function update(data: T[], nextPageUrl: string | null): void {
-    items.value.push(...data)
-    next.value = nextPageUrl ?? ''
-    fetched.value = true
-  }
-
-  async function loadMore({
-    done
-  }: {
-    done: (status: InfiniteScrollStatus) => void
-  }): Promise<void> {
-    if (strNullOrEmpty(next.value)) {
-      done('empty')
-      return
-    }
-
-    await axios
-      .get<Paginated<T>>(next.value)
-      .then((response) => {
-        update(response.data.data, response.data.next_page_url)
-        done('ok')
-      })
-      .catch(() => {
-        done('error')
-      })
-  }
+  const { items, next, fetched, update, loadMore } = usePaginatedList<T>()
 
   onMounted(() => {
     router.reload({

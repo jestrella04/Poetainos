@@ -45,8 +45,10 @@ class ViewCounter
 
         $cooldownEndsAt = Carbon::now()->addHours(self::COOLDOWN_HOURS);
 
-        if (cache()->add($itemKey.':'.$this->viewerKey(), true, $cooldownEndsAt) === false) {
-            return;
+        foreach ($this->viewerKeys() as $viewerKey) {
+            if (cache()->add($itemKey.':'.$viewerKey, true, $cooldownEndsAt) === false) {
+                return;
+            }
         }
 
         $viewed->incrementViews();
@@ -66,25 +68,34 @@ class ViewCounter
     }
 
     /**
-     * Identify the viewer by account, then visitor cookie, then IP and user agent,
-     * handing cookieless guests a visitor cookie for their next visits.
+     * The keys that identify the viewer, all of which must be new for the view
+     * to count: the account, else the visitor cookie. A guest without a cookie
+     * is handed one and keyed by it right away, so their next visit (which
+     * carries it) isn't counted again; their IP and user agent are keyed too,
+     * so a client that never sends the cookie back is only counted once.
+     *
+     * @return array<int, string>
      */
-    private function viewerKey(): string
+    private function viewerKeys(): array
     {
         $userId = auth()->guard()->id();
 
         if ($userId !== null) {
-            return 'user:'.$userId;
+            return ['user:'.$userId];
         }
 
         $visitorId = request()->cookie(self::VISITOR_COOKIE);
 
         if (is_string($visitorId) === true && Str::isUuid($visitorId) === true) {
-            return 'visitor:'.$visitorId;
+            return ['visitor:'.$visitorId];
         }
 
-        cookie()->queue(self::VISITOR_COOKIE, (string) Str::uuid(), self::VISITOR_COOKIE_MINUTES);
+        $visitorId = (string) Str::uuid();
+        cookie()->queue(self::VISITOR_COOKIE, $visitorId, self::VISITOR_COOKIE_MINUTES);
 
-        return 'guest:'.hash('sha256', request()->ip().'|'.request()->userAgent());
+        return [
+            'visitor:'.$visitorId,
+            'guest:'.hash('sha256', request()->ip().'|'.request()->userAgent()),
+        ];
     }
 }

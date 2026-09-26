@@ -42,8 +42,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('log', [AdminController::class, 'log'])->name('log');
 
     Route::put('settings/edit', [SettingsController::class, 'update'])->name('settings.edit');
-    Route::put('categories/edit', [CategoriesController::class, 'update'])->name('categories.edit');
-    Route::put('pages/edit', [PagesController::class, 'update'])->name('pages.edit');
+    Route::post('categories', [CategoriesController::class, 'store'])->name('categories.store');
+    Route::put('categories/{category}', [CategoriesController::class, 'update'])->name('categories.update');
+    Route::post('pages', [PagesController::class, 'store'])->name('pages.store');
+    Route::put('pages/{page}', [PagesController::class, 'update'])->name('pages.update');
 
     Route::delete('categories/delete/{category}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
     Route::delete('tags/delete/{tag}', [TagsController::class, 'destroy'])->name('tags.destroy');
@@ -124,7 +126,7 @@ Route::get('/tags/query', [TagsController::class, 'search'])->name('tags.query')
 Route::get('/tags/{tag}', [TagsController::class, 'show'])->name('tags.show');
 
 // Comments
-Route::get('/comments/{writingId}', [CommentsController::class, 'index'])->name('comments.index');
+Route::get('/writings/{writing}/comments', [CommentsController::class, 'index'])->name('comments.index');
 
 // Contact form
 Route::get('/contact', [ContactsController::class, 'create'])->name('contact.create');

@@ -23,7 +23,7 @@ class RegisteredUserController extends Controller
     public function store(Request $request): Response
     {
         $request->validate([
-            'username' => ['required', 'string', 'min:3', 'max:45', 'unique:users', 'regex:/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/'],
+            'username' => ['required', 'string', 'min:3', 'max:45', 'unique:users', 'regex:'.User::USERNAME_PATTERN],
             'email' => ['required', 'string', 'email', 'max:250', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'],
             'service_agreement' => ['required', 'accepted'],

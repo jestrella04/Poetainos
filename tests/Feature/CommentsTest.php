@@ -9,6 +9,7 @@ use App\Notifications\WritingCommentMentioned;
 use Illuminate\Support\Facades\Notification;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
 
 describe('the comments index', function (): void {
     it('excludes comments from authors the viewer has blocked', function (): void {
@@ -25,11 +26,27 @@ describe('the comments index', function (): void {
         Comment::factory()->for($writing)->for($blockedAuthor, 'author')->create();
 
         // When
-        $response = actingAs($viewer)->getJson("/comments/{$writing->id}");
+        $response = actingAs($viewer)->getJson(route('comments.index', $writing));
 
         // Then
         $response->assertOk();
         $response->assertJsonCount(1, 'data');
+    });
+
+    it('pages through every comment of a writing', function (): void {
+        // Given
+        $perPage = getSiteConfig('pagination');
+        $writing = Writing::factory()->create();
+        Comment::factory()->for($writing)->count($perPage + 1)->create();
+
+        // When
+        $firstPage = getJson(route('comments.index', $writing));
+        $secondPage = getJson($firstPage->json('next_page_url'));
+
+        // Then
+        $firstPage->assertJsonCount($perPage, 'data');
+        $secondPage->assertJsonCount(1, 'data');
+        expect($secondPage->json('next_page_url'))->toBeNull();
     });
 });
 
@@ -133,6 +150,40 @@ describe('mentions in a comment', function (): void {
 
         // Then
         Notification::assertSentTimes(WritingCommentMentioned::class, 5);
+    });
+
+    it('notify a username with a dot, even when the mention ends a sentence', function (): void {
+        // Given
+        Notification::fake();
+        $writing = Writing::factory()->create();
+        $mentioned = createUser(['username' => fakeUsername().'.'.fakeUsername()]);
+
+        // When
+        actingAs(createUser())->post('/comments/create', [
+            'comment' => fake()->sentence()." @{$mentioned->username}.",
+            'writing_id' => $writing->id,
+        ])->assertOk();
+
+        // Then
+        Notification::assertSentTo($mentioned, WritingCommentMentioned::class);
+    });
+
+    it('do not notify a user who blocked the commenter', function (): void {
+        // Given
+        Notification::fake();
+        $writing = Writing::factory()->create();
+        $commenter = createUser();
+        $mentioned = createUser(['username' => fakeUsername()]);
+        $mentioned->block($commenter);
+
+        // When
+        actingAs($commenter)->post('/comments/create', [
+            'comment' => "@{$mentioned->username} ".fake()->sentence(),
+            'writing_id' => $writing->id,
+        ])->assertOk();
+
+        // Then
+        Notification::assertNotSentTo($mentioned, WritingCommentMentioned::class);
     });
 
     it('notify each user once however many times they are mentioned', function (): void {

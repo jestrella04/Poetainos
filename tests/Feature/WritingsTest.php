@@ -255,6 +255,23 @@ describe('updating a writing', function (): void {
         expect($writing->refresh()->title)->toBe($title);
     });
 
+    it('does not record agreements for the author when an admin edits their writing', function (): void {
+        // Given
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        $response = actingAs(actingAsAdmin())->put(route('writings.update', $writing), writingPayload($mainCategory, [
+            'service_agreement' => 'on',
+            'privacy_agreement' => 'on',
+        ]));
+
+        // Then
+        $response->assertOk();
+        expect($author->refresh()->isInAgreement())->toBeFalse();
+    });
+
     it('keeps the slug and the other stored details when editing', function (): void {
         // Given
         $author = createUser();

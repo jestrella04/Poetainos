@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Writing;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Response;
 
 class CategoriesController extends Controller
@@ -36,61 +36,82 @@ class CategoriesController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Store a newly created resource in storage.
      *
-     * @return array<string, mixed>
+     * @return array{message: string, id: int}
      */
-    public function update(Request $request): array
+    public function store(): array
     {
-        // Get category model
-        $category = Category::where('id', request('id'))->firstOrNew();
+        $category = new Category;
 
-        // A category can't be moved under itself or one of its own descendants
-        $invalidParentIds = $category->exists ? $category->descendantsAndSelf()->pluck('id')->all() : [];
+        $this->validateCategory($category);
 
-        // Validate user input
-        request()->validate([
-            'id' => 'required|integer',
-            'name' => ['required', 'string', Rule::unique('App\Models\Category')->ignore($category), 'min:3', 'max:40'],
-            'parent' => ['nullable', 'integer', 'exists:categories,id', Rule::notIn($invalidParentIds)],
-            'description' => 'required|string|min:3|max:255',
-        ]);
+        $category->slug = slugify($category->getTable(), request('name'));
 
-        $action = $category->exists ? 'update' : 'create';
-
-        // Update accordingly
-        $category->name = request('name');
-        $category->parent_id = request('parent');
-        $category->description = request('description');
-
-        if ($action === 'create') {
-            $category->slug = slugify($category->getTable(), request('name'));
-        }
-
-        $category->save();
-
-        $message = $action === 'create'
-            ? __('Category created successfully')
-            : __('Category updated successfully');
-
-        return [
-            'message' => $message,
-            'action' => $action,
-            'id' => $category->id,
-        ];
+        return $this->save($category, __('Category created successfully'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified resource in storage.
+     *
+     * @return array{message: string, id: int}
+     */
+    public function update(Category $category): array
+    {
+        $this->validateCategory($category);
+
+        return $this->save($category, __('Category updated successfully'));
+    }
+
+    /**
+     * Remove the specified resource from storage. A category that still has
+     * writings or subcategories is kept, since deleting it would cascade to
+     * them and leave its writings without a category.
      *
      * @return array<string, string>
      */
     public function destroy(Category $category): array
     {
+        if ($category->writings()->exists() || $category->children()->exists()) {
+            throw ValidationException::withMessages([
+                'category' => __('A category with writings or subcategories cannot be deleted.'),
+            ]);
+        }
+
         $category->delete();
 
         return [
             'message' => __('Category deleted successfully'),
+        ];
+    }
+
+    /**
+     * A category can't be moved under itself or one of its own descendants.
+     */
+    private function validateCategory(Category $category): void
+    {
+        $invalidParentIds = $category->exists ? $category->descendantsAndSelf()->pluck('id')->all() : [];
+
+        request()->validate([
+            'name' => ['required', 'string', Rule::unique(Category::class)->ignore($category), 'min:3', 'max:40'],
+            'parent' => ['nullable', 'integer', 'exists:categories,id', Rule::notIn($invalidParentIds)],
+            'description' => 'required|string|min:3|max:255',
+        ]);
+    }
+
+    /**
+     * @return array{message: string, id: int}
+     */
+    private function save(Category $category, string $message): array
+    {
+        $category->name = request('name');
+        $category->parent_id = request('parent');
+        $category->description = request('description');
+        $category->save();
+
+        return [
+            'message' => $message,
+            'id' => $category->id,
         ];
     }
 }

@@ -4,11 +4,25 @@ use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use Carbon\Carbon;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
 describe('sorting ties', function (): void {
+    it('breaks any remaining tie by the newest id, so pages never overlap', function (string $sort): void {
+        // Given
+        $createdAt = Carbon::now()->subDay();
+        $older = Writing::factory()->create(['created_at' => $createdAt, 'views' => 0, 'aura' => 0]);
+        $newer = Writing::factory()->create(['created_at' => $createdAt, 'views' => 0, 'aura' => 0]);
+
+        // When
+        $ids = Writing::withListingRelations()->sorted($sort)->pluck('writings.id')->all();
+
+        // Then
+        expect($ids)->toBe([$newer->id, $older->id]);
+    })->with(['latest', 'popular', 'likes']);
+
     it('breaks popular and likes ties by aura descending', function (): void {
         // Given
         $views = fake()->numberBetween(0, 1000);

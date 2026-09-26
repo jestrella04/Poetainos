@@ -51,15 +51,14 @@ describe('saving a page from the admin area', function (): void {
         $title = fakeTitle();
 
         // When
-        $response = actingAs($admin)->putJson(route('admin.pages.edit'), [
-            'id' => 0,
+        $response = actingAs($admin)->postJson(route('admin.pages.store'), [
             'title' => $title,
             'text' => fakeText(100),
         ]);
 
         // Then
         $page = Page::where('title', $title)->firstOrFail();
-        $response->assertOk()->assertJson(['action' => 'create', 'id' => $page->id]);
+        $response->assertOk()->assertJson(['id' => $page->id]);
         expect($page->slug)->toBe(Str::slug($title));
     });
 
@@ -71,14 +70,13 @@ describe('saving a page from the admin area', function (): void {
         $newTitle = fakeTitle();
 
         // When
-        $response = actingAs($admin)->putJson(route('admin.pages.edit'), [
-            'id' => $page->id,
+        $response = actingAs($admin)->putJson(route('admin.pages.update', $page), [
             'title' => $newTitle,
             'text' => fakeText(100),
         ]);
 
         // Then
-        $response->assertOk()->assertJson(['action' => 'update', 'id' => $page->id]);
+        $response->assertOk()->assertJson(['id' => $page->id]);
         $page->refresh();
         expect($page->title)->toBe($newTitle);
         expect($page->slug)->toBe($originalSlug);
@@ -91,8 +89,7 @@ describe('saving a page from the admin area', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->putJson(route('admin.pages.edit'), [
-            'id' => $page->id,
+        $response = actingAs($admin)->putJson(route('admin.pages.update', $page), [
             'title' => $takenPage->title,
             'text' => fakeText(100),
         ]);
@@ -106,8 +103,7 @@ describe('saving a page from the admin area', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->putJson(route('admin.pages.edit'), [
-            'id' => 0,
+        $response = actingAs($admin)->postJson(route('admin.pages.store'), [
             'title' => fakeTitle(),
             'text' => fake()->lexify(str_repeat('?', 99)),
         ]);
@@ -123,8 +119,7 @@ describe('saving a page from the admin area', function (): void {
         $originalTitle = $page->title;
 
         // When
-        $response = actingAs(createUser())->putJson(route('admin.pages.edit'), [
-            'id' => $page->id,
+        $response = actingAs(createUser())->putJson(route('admin.pages.update', $page), [
             'title' => fakeTitle(),
             'text' => fakeText(100),
         ]);

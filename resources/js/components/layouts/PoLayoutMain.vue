@@ -72,7 +72,7 @@ watch(forceSnackBar, () => {
     <po-pwa-prompt />
 
     <v-toolbar color="primary" border="b" class="po-navbar d-none d-lg-flex">
-      <v-container class="d-inline-flex ga-12 justify-space--between">
+      <v-container class="d-inline-flex ga-12">
         <div class="align-self-center">
           <po-link
             :href="route('home')"

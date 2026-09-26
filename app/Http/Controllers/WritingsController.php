@@ -185,12 +185,13 @@ class WritingsController extends Controller
     {
         $this->authorize('update', $writing);
 
-        $request->validate($this->rules($this->requireAuthUser()));
+        $agreeingUser = $this->agreeingUser($writing);
+        $request->validate($this->rules($agreeingUser));
 
         $publisher->update($writing, $this->formInput($request), $this->uploadedCover($request));
 
         RecalculateAura::dispatch($writing->author);
-        $this->rememberAgreements($request, $writing->author);
+        $this->rememberAgreements($request, $agreeingUser);
 
         return [
             'url' => $writing->path(),
@@ -239,7 +240,8 @@ class WritingsController extends Controller
             'isUpdate' => $writing->exists,
             'main_categories' => $mainCategories,
             'max-file-size' => getSiteConfig('uploads_max_file_size'),
-            'agreement' => Auth::user()?->isInAgreement() ?? false,
+            // Nobody else can accept the agreements for the author, so the form only asks the author
+            'agreement' => $this->agreeingUser($writing)?->isInAgreement() ?? true,
         ]);
     }
 
@@ -264,15 +266,27 @@ class WritingsController extends Controller
     }
 
     /**
+     * The user whose agreements the writing form records: whoever publishes a
+     * new writing, or the author editing their own. Nobody, when someone else
+     * (an admin) edits it.
+     */
+    private function agreeingUser(Writing $writing): ?User
+    {
+        $user = $this->requireAuthUser();
+
+        return $writing->exists === false || $writing->author?->is($user) === true ? $user : null;
+    }
+
+    /**
      * The validation rules of the writing form. The form posts unchecked
      * agreements even when the user already accepted them, so those are only
      * required until then.
      *
      * @return array<string, mixed>
      */
-    private function rules(User $user): array
+    private function rules(?User $agreeingUser): array
     {
-        $agreementRules = $user->isInAgreement() ? [] : [
+        $agreementRules = $agreeingUser === null || $agreeingUser->isInAgreement() ? [] : [
             'service_agreement' => 'sometimes|required|accepted',
             'privacy_agreement' => 'sometimes|required|accepted',
         ];

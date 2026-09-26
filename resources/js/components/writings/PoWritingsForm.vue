@@ -153,11 +153,11 @@ function categoryOptionProps(idPrefix: string): (category: CategoryOption) => { 
   <po-wrapper class="w-100">
     <po-head />
 
-    <v-card
-      :title="
-        isUpdate ? $t('writings.update-writing') : $t('writings.publish-writing').toUpperCase()
-      "
-    >
+    <v-card>
+      <v-card-title class="text-uppercase">
+        {{ isUpdate ? $t('writings.update-writing') : $t('writings.publish-writing') }}
+      </v-card-title>
+
       <v-form
         id="writing-form"
         :action="isUpdate ? route('writings.update', writing.data.slug) : route('writings.store')"

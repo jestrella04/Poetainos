@@ -48,6 +48,7 @@
   "Can't start with a period nor end with a period": "No puede empezar ni terminar con un punto",
   "Cannot contain spaces or emojis": "No puede contener espacios ni emojis",
   "Categories": "Categorías",
+  "A category with writings or subcategories cannot be deleted.": "No se puede eliminar una categoría que tiene escritos o subcategorías.",
   "Category created successfully": "Categoría creada con éxito",
   "Category deleted successfully": "Categoría eliminada con éxito",
   "Category updated successfully": "Categoría actualizada con éxito",

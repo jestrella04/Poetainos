@@ -203,18 +203,22 @@ class Writing extends Model
      * Shared sort used by every writings listing. 'popular' and 'likes'
      * break ties by aura (desc) so that, among writings with an identical
      * views/likes count, the higher-quality (higher-aura) one surfaces
-     * first.
+     * first. The id breaks any remaining tie, so paginated pages never
+     * repeat or skip a writing. 'likes' orders by the `likes_count` that
+     * withListingRelations() adds, so it must be applied first.
      *
      * @param  Builder<Writing>  $query
      * @return Builder<Writing>
      */
     public function scopeSorted(Builder $query, string $sort): Builder
     {
-        return match ($sort) {
+        $sorted = match ($sort) {
             'popular' => $query->orderBy('views', 'desc')->orderBy('aura', 'desc'),
             'likes' => $query->orderBy('likes_count', 'desc')->orderBy('aura', 'desc'),
             default => $query->latest(),
         };
+
+        return $sorted->orderBy($query->getModel()->qualifyColumn('id'), 'desc');
     }
 
     /**

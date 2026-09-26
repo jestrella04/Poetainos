@@ -97,10 +97,13 @@ class AuraCalculator
             'awards' => $user->writings()->where('home_posted_at', '>=', $since)->count(),
         ]);
 
-        $user->forceFill([
-            'karma' => $this->karmaGrade($points['total']),
-            'aura_updated_at' => Carbon::now(),
-        ])->save();
+        $karma = $this->karmaGrade($points['total']);
+
+        // A query update, like the aura's, so the nightly run doesn't touch every user's updated_at
+        DB::table('users')->where('id', $user->id)->update(['karma' => $karma]);
+
+        $user->karma = $karma;
+        $user->syncOriginalAttribute('karma');
     }
 
     public function updateWritingAura(Writing $writing): void
