@@ -29,7 +29,7 @@ describe('the account page', function (): void {
                 ->component('users/PoUsersAccount')
                 ->where('account.writings_count', $writingsCount)
                 ->where('account.shelf_count', 1)
-                ->where('account.likes_count', 0)
+                ->where('account.given_likes_count', 0)
                 ->where('account.blocked_authors_count', 1)
                 ->has('account.created_at')
                 ->has('notifications.email'));

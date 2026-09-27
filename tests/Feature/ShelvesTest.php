@@ -17,17 +17,17 @@ describe('shelving a writing', function (): void {
         $reader = createUser();
 
         // When
-        $shelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        $shelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/toggle");
 
         // Then
-        $shelveResponse->assertJson(['method' => 'store', 'count' => 1]);
+        $shelveResponse->assertJson(['isActive' => true, 'count' => 1]);
         Notification::assertSentTo($author, WritingShelved::class);
 
         // When
-        $unshelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        $unshelveResponse = actingAs($reader)->post("/shelves/{$writing->slug}/toggle");
 
         // Then
-        $unshelveResponse->assertJson(['method' => 'destroy', 'count' => 0]);
+        $unshelveResponse->assertJson(['isActive' => false, 'count' => 0]);
     });
 
     it('does not notify the author when they shelve their own writing', function (): void {
@@ -37,7 +37,7 @@ describe('shelving a writing', function (): void {
         $writing = Writing::factory()->for($author, 'author')->create();
 
         // When
-        actingAs($author)->post("/shelves/{$writing->slug}/store");
+        actingAs($author)->post("/shelves/{$writing->slug}/toggle");
 
         // Then
         Notification::assertNothingSent();
@@ -48,14 +48,14 @@ describe('shelving a writing', function (): void {
         $writing = Writing::factory()->create();
         $reader = createUser();
         $otherReader = createUser();
-        actingAs($reader)->post("/shelves/{$writing->slug}/store");
-        actingAs($otherReader)->post("/shelves/{$writing->slug}/store");
+        actingAs($reader)->post("/shelves/{$writing->slug}/toggle");
+        actingAs($otherReader)->post("/shelves/{$writing->slug}/toggle");
 
         // When
-        $response = actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        $response = actingAs($reader)->post("/shelves/{$writing->slug}/toggle");
 
         // Then
-        $response->assertJson(['method' => 'destroy', 'count' => 1]);
+        $response->assertJson(['isActive' => false, 'count' => 1]);
     });
 });
 
@@ -66,9 +66,9 @@ describe('a double click on the shelf button', function (): void {
         Shelf::creating(fn () => throw new UniqueConstraintViolationException('sqlite', 'insert', [], new Exception('duplicate')));
 
         // When
-        $response = actingAs(createUser())->post("/shelves/{$writing->slug}/store");
+        $response = actingAs(createUser())->post("/shelves/{$writing->slug}/toggle");
 
         // Then
-        $response->assertOk()->assertJson(['method' => 'store']);
+        $response->assertOk()->assertJson(['isActive' => true]);
     });
 });

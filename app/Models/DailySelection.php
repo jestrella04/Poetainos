@@ -82,25 +82,20 @@ class DailySelection extends Model
     }
 
     /**
-     * Picks a random author, then a random writing by them, leaving out
-     * writings featured recently. Falls back to every writing when all
-     * of them were featured recently.
+     * A random writing by a random author, leaving out writings featured
+     * recently. Falls back to every writing when all of them were featured
+     * recently.
      */
     private static function randomEligibleWriting(): Writing
     {
         $excludedIds = self::where('selected_on', '>=', Carbon::today()->subDays(self::REPEAT_EXCLUSION_DAYS))
-            ->pluck('writing_id');
+            ->pluck('writing_id')
+            ->all();
 
         if (Writing::whereNotIn('id', $excludedIds)->doesntExist()) {
-            $excludedIds = collect();
+            $excludedIds = [];
         }
 
-        return User::whereHas('writings', fn ($query) => $query->whereNotIn('id', $excludedIds))
-            ->inRandomOrder()
-            ->firstOrFail()
-            ->writings()
-            ->whereNotIn('id', $excludedIds)
-            ->inRandomOrder()
-            ->firstOrFail();
+        return Writing::randomByRandomAuthor($excludedIds);
     }
 }

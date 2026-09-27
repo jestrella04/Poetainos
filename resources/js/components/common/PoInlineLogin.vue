@@ -15,7 +15,7 @@ const { asset } = useFormatting()
 
 <template>
   <div class="text-center">
-    <p v-if="'' !== message" class="text-medium-emphasis mb-5">
+    <p v-if="message !== ''" class="text-medium-emphasis mb-5">
       {{ message }}
     </p>
 

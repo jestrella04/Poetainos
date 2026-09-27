@@ -11,25 +11,20 @@ export interface UserLike {
   username: string
   name?: string | null
   avatar?: string | null
-  extra_info?: {
-    avatar?: string | null
-    social?: Record<string, string>
-  } | null
   karma?: 'A' | 'B' | 'C' | 'D' | 'F' | null
   writings_count?: number
 }
 
-// The full profile shape returned by UsersController::show() — a User
-// model select() with several extra_info->x AS x JSON extractions (raw
-// JSON text, not auto-decoded, hence `social` staying a JSON string) plus
-// withCount() aggregates.
+// The full profile shape returned by UsersController::show(): the user's
+// columns, their profile fields flattened in (User::withProfileFields()) and
+// withCount() aggregates. `given_likes_count` counts the likes the user gave.
 export interface User extends UserLike {
   id: number
   profile_views: number
   aura: string
   writings_count: number
   awards_count: number
-  likes_count: number
+  given_likes_count: number
   comments_count: number
   shelf_count: number
   // `bio` and `location` are selected by both index() and show(); the rest
@@ -37,19 +32,22 @@ export interface User extends UserLike {
   bio?: string
   location?: string
   created_at?: string
-  social?: string
+  // The handles the user filled in, keyed by social network
+  social?: Record<string, string>
   website?: string
   occupation?: string
   interests?: string
 }
 
-// CommentsController::index()'s author select() + withCount(['likes']).
+// CommentsController::index()'s author select() + withCount(['likes']), plus
+// the viewer's like, only sent to signed-in viewers.
 export interface Comment {
   id: number
   message: string
   created_at: string
   author: UserLike
   likes_count: number
+  is_liked?: boolean
 }
 
 export interface Paginated<T> {
@@ -92,18 +90,21 @@ export interface Writing {
   title: string
   slug: string
   text: string
+  // Writing::listingExcerpt(): the start of the text, as listings show it
+  listing_excerpt: string | null
   created_at: string
   views: number
   aura: string
   home_posted_at?: string | null
-  extra_info?: {
-    cover?: string
-    link?: string
-  } | null
+  cover?: string | null
+  link?: string | null
   author: UserLike
   categories?: CategoryLike[]
   tags?: TagLike[]
   likes_count: number
   comments_count: number
   shelf_count: number
+  // The viewer's reactions (Writing::viewerReactions()), only sent to signed-in viewers
+  is_liked?: boolean
+  is_shelved?: boolean
 }

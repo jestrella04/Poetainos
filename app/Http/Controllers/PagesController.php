@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
-use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,7 +27,7 @@ class PagesController extends Controller
      */
     public function show(Page $page): Response
     {
-        $page->text = hydrateSettings($page->text);
+        $page->text = interpolateSiteSettings($page->text);
 
         return Inertia::render('pages/PoPagesShow', [
             'meta' => [
@@ -39,43 +38,31 @@ class PagesController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @return array{message: string, id: int}
+     */
+    public function store(): array
+    {
+        $page = new Page;
+
+        $this->validatePage($page);
+
+        $page->slug = slugify($page->getTable(), request('title'));
+
+        return $this->save($page, __('Page created successfully'));
+    }
+
+    /**
      * Update the specified resource in storage.
      *
-     * @return array<string, mixed>
+     * @return array{message: string, id: int}
      */
-    public function update(Request $request): array
+    public function update(Page $page): array
     {
-        // Get type model
-        $page = Page::where('id', request('id'))->firstOrNew();
+        $this->validatePage($page);
 
-        // Validate user input
-        request()->validate([
-            'id' => 'required|integer',
-            'title' => ['required', 'string', Rule::unique('App\Models\Page')->ignore($page), 'min:3', 'max:40'],
-            'text' => 'required|string|min:100',
-        ]);
-
-        $action = $page->exists ? 'update' : 'create';
-
-        // Update accordingly
-        $page->title = request('title');
-        $page->text = request('text');
-
-        if ($action === 'create') {
-            $page->slug = slugify($page->getTable(), request('title'));
-        }
-
-        $page->save();
-
-        $message = $action === 'create'
-            ? __('Page created successfully')
-            : __('Page updated successfully');
-
-        return [
-            'message' => $message,
-            'action' => $action,
-            'id' => $page->id,
-        ];
+        return $this->save($page, __('Page updated successfully'));
     }
 
     /**
@@ -89,6 +76,29 @@ class PagesController extends Controller
 
         return [
             'message' => __('Page deleted successfully'),
+        ];
+    }
+
+    private function validatePage(Page $page): void
+    {
+        request()->validate([
+            'title' => ['required', 'string', Rule::unique(Page::class)->ignore($page), 'min:3', 'max:40'],
+            'text' => 'required|string|min:100',
+        ]);
+    }
+
+    /**
+     * @return array{message: string, id: int}
+     */
+    private function save(Page $page, string $message): array
+    {
+        $page->title = request('title');
+        $page->text = request('text');
+        $page->save();
+
+        return [
+            'message' => $message,
+            'id' => $page->id,
         ];
     }
 }

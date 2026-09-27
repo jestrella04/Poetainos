@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useHttp } from '@inertiajs/vue3'
 import { replyBoxKey, writingKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
-import { useFormErrors } from '@/composables/useFormErrors'
-import { useFormSubmit } from '@/composables/useFormSubmit'
-import type { LaravelValidationErrors } from '@/types/http'
+import { useFormValidation } from '@/composables/useFormValidation'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 
 const props = defineProps<{
   formId: string
@@ -14,42 +13,42 @@ const props = defineProps<{
 const emit = defineEmits<{
   commentPosted: []
 }>()
-const { validationErrors } = useFormErrors()
-const { errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
 const writing = injectStrict(writingKey)
-const message = ref(props.replyTo)
 const replyBox = injectStrict(replyBoxKey)
+const { isSubmittedFormValid } = useFormValidation()
+const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
+const request = useHttp({ writing_id: writing.id, comment: props.replyTo ?? '' })
 
-async function submitForm() {
-  await postForm({
-    formSelector: `#${props.formId}`,
-    payload: { writing_id: writing.id, comment: message.value },
-    onSuccess: () => {
-      message.value = ''
-      emit('commentPosted')
-      replyBox.value = 0
-    },
-    onError: validationErrors
-  })
+async function submitForm(event: Event): Promise<void> {
+  if (isSubmittedFormValid(event) === false) {
+    return
+  }
+
+  await whenSettled(
+    request.post(route('comments.store'), {
+      onHttpException,
+      onNetworkError,
+      onSuccess: () => {
+        request.comment = ''
+        emit('commentPosted')
+        replyBox.value = 0
+      }
+    })
+  )
 }
 </script>
 
 <template>
-  <v-form
-    :id="formId"
-    :action="route('comments.store')"
-    :data="writing.id"
-    @submit.prevent="submitForm"
-  >
+  <v-form :id="formId" @submit.prevent="submitForm">
     <v-textarea
       :id="`${formId}-message`"
-      v-model="message"
+      v-model="request.comment"
       :label="$t('comments.comment')"
       :placeholder="$t('comments.comment-mention', { at: '@' })"
       rows="3"
       max-length="300"
       hide-details="auto"
-      :error-messages="errors.comment"
+      :error-messages="request.errors.comment"
       auto-grow
       clearable
       persistent-placeholder
@@ -63,6 +62,7 @@ async function submitForm() {
       class="mt-1"
       type="submit"
       block
+      :disabled="request.processing"
     >
       {{ $t('comments.post-comment') }}
     </po-button>

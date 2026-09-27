@@ -4,12 +4,13 @@ import { useFormatting } from '../useFormatting'
 const {
   userDisplayName,
   userInitials,
-  excerpt,
   karmaMedal,
   linkify,
   markdown,
   formatCount,
+  fileSize,
   toLocaleDate,
+  toLocaleDateTime,
   toLocaleMonthYear
 } = useFormatting()
 
@@ -36,23 +37,6 @@ describe('userInitials', () => {
   it('falls back to the first letter of the username when the name is missing or blank', () => {
     expect(userInitials({ username: 'jane' })).toBe('J')
     expect(userInitials({ name: ' ', username: 'jane' })).toBe('J')
-  })
-})
-
-describe('excerpt', () => {
-  it('returns short text unchanged', () => {
-    expect(excerpt('short text')).toBe('short text')
-  })
-
-  it('truncates text over 400 characters with an ellipsis', () => {
-    // Given
-    const text = 'a'.repeat(500)
-
-    // When
-    const result = excerpt(text)
-
-    // Then
-    expect(result).toBe(`${'a'.repeat(400)}...`)
   })
 })
 
@@ -109,6 +93,21 @@ describe('formatCount', () => {
     expect(formatCount(980)).toBe('980')
     expect(formatCount(3412)).toBe('3.412')
     expect(formatCount(1234567)).toBe('1.234.567')
+  })
+})
+
+describe('fileSize', () => {
+  it('shows the size in the largest binary unit that keeps it above one', () => {
+    expect(fileSize(0)).toBe('0 byte')
+    expect(fileSize(980)).toBe('980 byte')
+    expect(fileSize(1536)).toBe('1,5 kB')
+    expect(fileSize(22_649_242)).toBe('21,6 MB')
+  })
+})
+
+describe('toLocaleDateTime', () => {
+  it('formats the date and time of day in the display time zone', () => {
+    expect(toLocaleDateTime('2026-09-26T22:44:27+00:00')).toBe('26 sept 2026, 10:44:27 p. m.')
   })
 })
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PASSWORD_PATTERN, USERNAME_PATTERN } from '../validationRules'
+import { PASSWORD_PATTERN, USERNAME_PATTERN, mentionedUsernames } from '../validationRules'
 
 // Browsers anchor a pattern attribute as ^(?:pattern)$
 function accepts(pattern: string, value: string): boolean {
@@ -38,5 +38,18 @@ describe('USERNAME_PATTERN', () => {
     ['more than 45 characters', 'a'.repeat(46)]
   ])('rejects a username with %s', (_label, username) => {
     expect(accepts(USERNAME_PATTERN, username)).toBe(false)
+  })
+})
+
+describe('mentionedUsernames', () => {
+  it('finds each mentioned username once, without a closing dot', () => {
+    // Given
+    const text = 'Thanks @emily.d and @Juan_2! Also @emily.d. Mail me at me@site.com.'
+
+    // When
+    const usernames = mentionedUsernames(text)
+
+    // Then
+    expect(usernames).toEqual(['emily.d', 'Juan_2'])
   })
 })

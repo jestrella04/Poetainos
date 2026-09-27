@@ -33,7 +33,7 @@ describe('submitting a complaint', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertNoContent();
         assertDatabaseHas('complaints', [
             'complainable_type' => get_class($subject),
             'complainable_id' => $subject->id,
@@ -104,7 +104,7 @@ describe('validating a complaint', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertNoContent();
     });
 
     it('limits how many reasons can be sent', function (): void {
@@ -134,7 +134,7 @@ describe('validating a complaint', function (): void {
             'complainable_id' => $writing->id,
             'reasons' => ['spam'],
             'comment' => $comment,
-        ])->assertOk();
+        ])->assertNoContent();
 
         // Then
         assertDatabaseHas('complaints', ['comment' => $comment]);

@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useSystemTheme } from '@/composables/useSystemTheme'
+import { useFlashMessages } from '@/composables/useFlashMessages'
 import PoAdminMenu from '../admin/PoAdminMenu.vue'
 
 const { revealStyle } = useSystemTheme()
+
+useFlashMessages()
 </script>
 
 <style>
@@ -27,6 +30,7 @@ iframe {
 <template>
   <v-app :style="revealStyle">
     <po-head />
+    <po-snack-bar />
 
     <v-main>
       <po-admin-menu />

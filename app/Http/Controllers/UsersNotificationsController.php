@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Writing;
-use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Inertia\Inertia;
 use Inertia\Response;
 
 class UsersNotificationsController extends Controller
@@ -40,7 +41,7 @@ class UsersNotificationsController extends Controller
 
     public function clear(): RedirectResponse
     {
-        $this->requireAuthUser()->unreadNotifications->markAsRead();
+        $this->requireAuthUser()->unreadNotifications()->update(['read_at' => Carbon::now()]);
 
         return to_route('notifications.index');
     }
@@ -55,14 +56,22 @@ class UsersNotificationsController extends Controller
             return redirect($notification->data['url']);
         }
 
-        return redirect(route('writings.show', Writing::findOrFail($notification->data['writing_id'] ?? null)));
+        $writing = Writing::whereKey($notification->data['writing_id'] ?? null)->first();
+
+        if ($writing === null) {
+            Inertia::flash('message', 'main.content-no-longer-available');
+
+            return to_route('notifications.index');
+        }
+
+        return redirect($writing->path());
     }
 
-    public function setEmailPreference(string $enable): JsonResponse
+    public function setEmailPreference(string $enable): \Illuminate\Http\Response
     {
         $this->requireAuthUser()->setEmailNotifications(isTruthy($enable));
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 
     /**

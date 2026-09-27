@@ -1,58 +1,31 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { useForm, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
-import { useFormErrors } from '@/composables/useFormErrors'
-import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useFormValidation } from '@/composables/useFormValidation'
+import { useRequestFailure } from '@/composables/useRequestFailure'
+import { PASSWORD_PATTERN } from '@/composables/validationRules'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { LaravelValidationErrors } from '@/types/http'
 
 defineOptions({
   layout: PoLayoutLogin
 })
 
 const page = usePage<InertiaPageProps<{ token: string; email: string }>>()
-const { validationErrors } = useFormErrors()
-const {
-  isPosting: isLoading,
-  errors,
-  submitForm: postForm
-} = useFormSubmit<LaravelValidationErrors>({})
-const token = page.props.token
-const email = page.props.email
+const { isSubmittedFormValid } = useFormValidation()
+const { onHttpException, onNetworkError } = useRequestFailure()
 
-const formData = reactive({
+const form = useForm({
+  token: page.props.token,
+  email: page.props.email,
   password: '',
-  confirmPassword: ''
+  password_confirmation: ''
 })
 
-function clearInputs() {
-  formData.password = ''
-  formData.confirmPassword = ''
-}
-
-function resetForm() {
-  setTimeout(() => {
-    clearInputs()
-    errors.value = {}
-  }, 500)
-}
-
-async function submitForm() {
-  await postForm({
-    formSelector: '#reset-form',
-    url: route('password.store'),
-    payload: {
-      token: token,
-      email: email,
-      password: formData.password,
-      password_confirmation: formData.confirmPassword
-    },
-    onSuccess: () => {
-      router.get(route('login', { isReset: 1, isEmail: 1, email: email }))
-    },
-    onError: validationErrors
-  })
+// The server sends the user back to sign in with the new password
+function submitForm(event: Event): void {
+  if (isSubmittedFormValid(event) === true) {
+    form.post(route('password.store'), { onHttpException, onNetworkError })
+  }
 }
 </script>
 
@@ -71,19 +44,14 @@ async function submitForm() {
       {{ $t('accounts.reset-password') }}
     </p>
 
-    <v-form
-      id="reset-form"
-      class="po-login"
-      @submit.prevent="submitForm()"
-      @reset.prevent="resetForm()"
-    >
+    <v-form id="reset-form" class="po-login" @submit.prevent="submitForm">
       <v-text-field
-        v-model="formData.password"
+        v-model="form.password"
         type="password"
         :label="$t('main.password')"
-        pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+        :pattern="PASSWORD_PATTERN"
         :placeholder="$t('main.enter-your-password')"
-        :error-messages="errors.password"
+        :error-messages="form.errors.password ?? form.errors.email"
         persistent-placeholder
         clearable
         required
@@ -91,19 +59,19 @@ async function submitForm() {
       />
 
       <v-text-field
-        v-model="formData.confirmPassword"
+        v-model="form.password_confirmation"
         type="password"
         :label="$t('accounts.confirm-password')"
-        pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+        :pattern="PASSWORD_PATTERN"
         :placeholder="$t('main.enter-your-password')"
-        :error-messages="errors.password"
+        :error-messages="form.errors.password ?? form.errors.email"
         persistent-placeholder
         clearable
         hide-details="auto"
       />
 
-      <po-button type="submit" color="primary" size="large" block :disabled="isLoading">
-        <span v-if="!isLoading">{{ $t('main.send') }}</span>
+      <po-button type="submit" color="primary" size="large" block :disabled="form.processing">
+        <span v-if="!form.processing">{{ $t('main.send') }}</span>
         <v-progress-circular v-else indeterminate />
       </po-button>
     </v-form>

@@ -33,7 +33,7 @@ function share(): void {
     :link-title="writing.title"
     :link-url="route('writings.show', [writing.slug])"
   />
-  <po-complainer v-model="complainer" comp-type="writings" :comp-id="writing.id" />
+  <po-complainer v-model="complainer" complainable-type="writings" :complainable-id="writing.id" />
   <po-blocker v-model="blocker" :user="writing.author" />
 
   <v-menu open-on-hover>

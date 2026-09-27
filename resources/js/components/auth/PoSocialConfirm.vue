@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import { useVerificationCode } from '@/composables/useVerificationCode'
 
@@ -16,14 +16,9 @@ const props = defineProps<{
 const CODE_LENGTH = 6
 
 const page = usePage()
-const { code, isVerifying, codeError, resendOutcome, resendCountdown, verifyCode, resendCode } =
-  useVerificationCode()
+// The server signs the user in and redirects onward once the code matches, flashing the welcome
+const { form, resendOutcome, resendCountdown, verifyCode, resendCode } = useVerificationCode()
 const providerName = computed(() => props.service.charAt(0).toUpperCase() + props.service.slice(1))
-
-// The welcome message is flashed by the server and shown on the next page
-function onVerified(redirectUrl: string): void {
-  router.get(redirectUrl)
-}
 </script>
 
 <template>
@@ -69,18 +64,18 @@ function onVerified(redirectUrl: string): void {
     </p>
 
     <v-otp-input
-      v-model="code"
+      v-model="form.code"
       :length="CODE_LENGTH"
-      :disabled="isVerifying"
-      :loading="isVerifying"
-      :error="codeError !== ''"
+      :disabled="form.processing"
+      :loading="form.processing"
+      :error="form.errors.code !== undefined"
       type="number"
       autofocus
-      @finish="verifyCode(route('social.confirm.verify', props.service), onVerified)"
+      @finish="verifyCode(route('social.confirm.verify', props.service))"
     />
 
-    <p v-if="codeError !== ''" class="po-error text-center text-error ma-0 mb-4">
-      {{ codeError }}
+    <p v-if="form.errors.code !== undefined" class="po-error text-center text-error ma-0 mb-4">
+      {{ form.errors.code }}
     </p>
 
     <po-button

@@ -27,6 +27,36 @@
     <!-- Inertia -->
     @inertiaHead
 
+    <!-- Link previews: crawlers (Facebook, WhatsApp...) don't run JS, so without an SSR head the page
+         would expose no title or Open Graph tags. The data-inertia keys match PoHead's head-keys, so
+         the client head manager replaces these tags instead of duplicating them. A partial reload
+         carries only the props it asked for, so it has no site props to fall back to. -->
+    @if (isset($page['props']['site']) && app(\Inertia\Ssr\SsrState::class)->dispatch() === null)
+        @php
+            $meta = $page['props']['meta'] ?? [];
+            $site = $page['props']['site'];
+            $title = $meta['title'] ?? $site['name'];
+            $canonical = $meta['canonical'] ?? null;
+            $description = $meta['description'] ?? $site['slogan'];
+            $image = $meta['image'] ?? $site['image'];
+        @endphp
+        <title data-inertia="">{{ $title }}</title>
+        @if ($canonical !== null)
+            <link rel="canonical" href="{{ $canonical }}" data-inertia="canonical">
+            <meta property="og:url" content="{{ $canonical }}" data-inertia="og-url">
+            <meta property="twitter:url" content="{{ $canonical }}" data-inertia="tw-url">
+        @endif
+        <meta name="description" content="{{ $description }}" data-inertia="description">
+        <meta property="og:type" content="website" data-inertia="og-type">
+        <meta property="og:title" content="{{ $title }}" data-inertia="og-title">
+        <meta property="og:description" content="{{ $description }}" data-inertia="og-description">
+        <meta property="og:image" content="{{ $image }}" data-inertia="og-image">
+        <meta property="twitter:card" content="summary_large_image" data-inertia="tw-card">
+        <meta property="twitter:title" content="{{ $title }}" data-inertia="tw-title">
+        <meta property="twitter:description" content="{{ $description }}" data-inertia="tw-description">
+        <meta property="twitter:image" content="{{ $image }}" data-inertia="tw-image">
+    @endif
+
     <!-- Ziggy/Laravel Routes -->
     @routes(nonce: Vite::cspNonce())
 

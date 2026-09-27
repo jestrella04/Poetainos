@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { blockerKey, forceSnackBarKey } from '@/composables/keys'
+import { useForm } from '@inertiajs/vue3'
+import { blockerKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useFormatting } from '@/composables/useFormatting'
-import { useSnackbar } from '@/composables/useSnackbar'
-import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { UserLike } from '@/types/models'
 
 const props = defineProps<{
@@ -11,26 +11,19 @@ const props = defineProps<{
 }>()
 
 const { userDisplayName } = useFormatting()
-const { setSnackBar } = useSnackbar()
+const { onHttpException, onNetworkError } = useRequestFailure()
 const blocker = injectStrict(blockerKey)
-const forceSnackBar = injectStrict(forceSnackBarKey)
-const { isPosting, submitForm } = useFormSubmit(false)
+const form = useForm({})
 
-async function submit(): Promise<void> {
-  await submitForm({
-    formSelector: '#blocking-form',
-    payload: { user: props.user.username },
+// The server reloads the page without the author's content and confirms with a flash message
+function submit(): void {
+  form.post(route('users.block', props.user.username), {
+    preserveScroll: true,
+    onHttpException,
+    onNetworkError,
     onSuccess: () => {
-      setSnackBar({
-        message: 'users.user-blocked',
-        color: 'success',
-        active: true
-      })
-
-      forceSnackBar.value = true
       blocker.value = false
-    },
-    onError: () => true
+    }
   })
 }
 </script>
@@ -48,13 +41,9 @@ async function submit(): Promise<void> {
 
         <v-divider class="mt-3" />
 
-        <v-form
-          id="blocking-form"
-          :action="route('users.block', user.username)"
-          @submit.prevent="submit"
-        >
-          <po-button color="primary" type="submit" block>
-            <span v-if="!isPosting">{{ $t('main.block') }}</span>
+        <v-form id="blocking-form" @submit.prevent="submit">
+          <po-button color="primary" type="submit" block :disabled="form.processing">
+            <span v-if="!form.processing">{{ $t('main.block') }}</span>
             <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>

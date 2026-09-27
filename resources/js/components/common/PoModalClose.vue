@@ -4,6 +4,6 @@
     color="secondary"
     variant="tonal"
     size="x-small"
-    style="position: absolute; right: 1rem; top: 1rem"
+    class="position-absolute top-0 right-0 ma-4"
   />
 </template>

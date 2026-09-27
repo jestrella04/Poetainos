@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, provide } from 'vue'
-import { usePage } from '@inertiajs/vue3'
 import PoCommentsIndex from '../comments/PoCommentsIndex.vue'
 import PoWritingExtras from './partials/PoWritingExtras.vue'
 import PoWritingDropdown from './partials/PoWritingDropdown.vue'
@@ -26,15 +25,12 @@ const props = withDefaults(
 )
 
 const { authUser } = useAuth()
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
-const { storage, toLocaleDate, userDisplayName, excerpt, readable } = useFormatting()
+const { isBlank } = useTypeGuards()
+const { storage, toLocaleDate, userDisplayName, abbreviateNumber } = useFormatting()
 const loadingComments = ref(true)
-const page = usePage()
-const hasCover = computed(
-  () => !isEmpty(props.data.extra_info) && !strNullOrEmpty(props.data.extra_info?.cover)
-)
-const isLiked = computed(() => page.props.auth.liked.writings.includes(props.data.id))
-const isShelved = computed(() => page.props.auth.shelved.includes(props.data.id))
+const hasCover = computed(() => !isBlank(props.data.cover))
+const isLiked = computed(() => props.data.is_liked === true)
+const isShelved = computed(() => props.data.is_shelved === true)
 const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
 const hasSideCover = computed(() => hasCover.value && !props.alone)
 const isProminent = computed(() => props.alone || props.hero)
@@ -54,7 +50,7 @@ provide(writingKey, props.data)
       <v-img
         v-if="hasCover && alone"
         height="320"
-        :src="storage(data.extra_info?.cover ?? '')"
+        :src="storage(data.cover ?? '')"
         alt=""
         class="mb-6"
         rounded
@@ -63,7 +59,7 @@ provide(writingKey, props.data)
 
       <v-row>
         <v-col v-if="hasSideCover" cols="12" md="3" order="1" order-md="2">
-          <v-img height="200" :src="storage(data.extra_info?.cover ?? '')" alt="" rounded cover />
+          <v-img height="200" :src="storage(data.cover ?? '')" alt="" rounded cover />
         </v-col>
 
         <v-col cols="12" :md="hasSideCover ? 9 : 12" order="2" order-md="1">
@@ -72,7 +68,7 @@ provide(writingKey, props.data)
               {{ toLocaleDate(data.created_at) }}
             </span>
 
-            <template v-if="!strNullOrEmpty(data.home_posted_at)">
+            <template v-if="!isBlank(data.home_posted_at)">
               <v-chip color="primary" variant="tonal" size="small">
                 <v-icon icon="fas fa-fan" class="mr-2" />
                 <span class="text-uppercase" :title="$t('writings.awarded')">
@@ -117,14 +113,14 @@ provide(writingKey, props.data)
 
               <div class="d-inline-flex align-center ga-3 text-medium-emphasis">
                 <span>
-                  {{ $t('main.count-views', { count: readable(data.views) }, data.views) }}
+                  {{ $t('main.count-views', { count: abbreviateNumber(data.views) }, data.views) }}
                 </span>
 
                 <span>
                   {{
                     $t(
                       'main.count-comments',
-                      { count: readable(data.comments_count) },
+                      { count: abbreviateNumber(data.comments_count) },
                       data.comments_count
                     )
                   }}
@@ -139,7 +135,7 @@ provide(writingKey, props.data)
               ]"
               class="po-prose mb-6"
             >
-              {{ alone ? data.text : excerpt(data.text) }}
+              {{ alone ? data.text : data.listing_excerpt }}
             </p>
           </div>
 
@@ -151,7 +147,7 @@ provide(writingKey, props.data)
               icon="fa-heart"
               :count="data.likes_count"
               :is-active="isLiked"
-              :post-url="route('likes.store', ['writing', data.id])"
+              :post-url="route('likes.toggle', ['writing', data.id])"
               :can-react="canReactToWriting"
               :activate-title="$t('writings.like-writing')"
               :deactivate-title="$t('writings.unlike-writing')"
@@ -162,7 +158,7 @@ provide(writingKey, props.data)
               icon="fa-bookmark"
               :count="data.shelf_count"
               :is-active="isShelved"
-              :post-url="route('shelves.store', data.slug)"
+              :post-url="route('shelves.toggle', data.slug)"
               :can-react="canReactToWriting"
               :activate-title="$t('writings.shelve-writing')"
               :deactivate-title="$t('writings.unshelve-writing')"

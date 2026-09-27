@@ -9,8 +9,11 @@ use App\Models\Writing;
 use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Services\ContentDeleter;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
@@ -21,9 +24,9 @@ class CommentsController extends Controller
      *
      * @return Paginator<int, Comment>
      */
-    public function index(string $writingId): Paginator
+    public function index(Writing $writing): Paginator
     {
-        $comments = Comment::where('writing_id', $writingId)
+        return $writing->comments()
             ->visibleTo($this->blockedAuthorIds())
             ->with([
                 'author' => function ($query): void {
@@ -31,16 +34,16 @@ class CommentsController extends Controller
                 },
             ])
             ->withCount(['likes'])
+            ->withExists(Comment::viewerReactions())
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->simplePaginate($this->perPage);
-
-        return $comments;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage, answering with its id.
      */
-    public function store(Request $request): void
+    public function store(Request $request): JsonResponse
     {
         $request->validate([
             'comment' => 'required|string|max:300',
@@ -63,34 +66,38 @@ class CommentsController extends Controller
         }
 
         $this->notifyMentions($comment, $writing, $user);
+
+        return response()->json(['id' => $comment->id], 201);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @return array<int, mixed>
+     * Remove the specified resource from storage, then return to the writing.
      */
-    public function destroy(Comment $comment, ContentDeleter $deleter): array
+    public function destroy(Comment $comment, ContentDeleter $deleter): RedirectResponse
     {
         $this->authorize('delete', $comment);
         $deleter->deleteComment($comment);
 
         RecalculateAura::dispatch($comment->author, $comment->writing);
 
-        return [];
+        Inertia::flash(['message' => 'comments.comment-deleted', 'color' => 'success']);
+
+        return back();
     }
 
     /**
      * Notify the users @mentioned in a comment, up to MAX_MENTIONS of them.
-     * The writing's author and the commenter are already covered elsewhere.
+     * The writing's author and the commenter are already covered elsewhere,
+     * and users who blocked the commenter aren't told.
      */
     private function notifyMentions(Comment $comment, Writing $writing, User $commenter): void
     {
-        preg_match_all('/\B@([a-zA-Z0-9_-]+)/', $comment->message, $matches);
+        preg_match_all(User::MENTION_PATTERN, $comment->message, $matches);
 
-        $usernames = array_slice(array_unique($matches[1]), 0, self::MAX_MENTIONS);
+        $usernames = array_slice(array_unique(array_map(fn (string $username): string => rtrim($username, '.'), $matches[1])), 0, self::MAX_MENTIONS);
 
         User::whereIn('username', $usernames)
+            ->whereDoesntHave('blockedAuthors', fn ($query) => $query->where('blocked_user_id', $commenter->id))
             ->get()
             ->reject(fn (User $mentioned): bool => $mentioned->is($commenter) || $mentioned->is($writing->author))
             ->each(fn (User $mentioned) => $mentioned->notify(new WritingCommentMentioned($comment, $commenter)));

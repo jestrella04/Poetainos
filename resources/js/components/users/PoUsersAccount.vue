@@ -2,8 +2,7 @@
 import { ref, provide, reactive, computed } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
 import PoUsersAccountRow from './partials/PoUsersAccountRow.vue'
-import { usePage } from '@inertiajs/vue3'
-import axios from 'axios'
+import { useHttp, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import { isDeleteKey, pushKey } from '@/composables/keys'
@@ -11,13 +10,14 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useFormatting } from '@/composables/useFormatting'
 import { useMembership } from '@/composables/useMembership'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { InertiaPageProps } from '@/types/inertia'
 
 interface AccountSummary {
   created_at: string
   writings_count: number
   shelf_count: number
-  likes_count: number
+  given_likes_count: number
   blocked_authors_count: number
 }
 
@@ -29,6 +29,8 @@ const { membershipDuration, membershipMessage } = useMembership()
 const { t } = useI18n()
 const push = injectStrict(pushKey)
 const { mdAndUp } = useDisplay()
+const emailPreference = useHttp()
+const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
 
 // This page is behind the `verified` auth middleware (routes/web.php), so
 // the authenticated user is always present here.
@@ -52,26 +54,31 @@ provide(isDeleteKey, isDelete)
 void push.isSubscribed().then((isSubscribed) => {
   if (isSubscribed === true) {
     // Keep subscription in sync with server
-    push.subscribe()
+    void push.subscribe()
     notifications.push = true
   } else {
     notifications.push = false
   }
 })
 
-function toggleEmailNotifications(value: boolean | null): void {
+async function toggleEmailNotifications(value: boolean | null): Promise<void> {
   notifications.email = value === true
 
-  void axios.post(route('notifications.email', [String(notifications.email)]))
+  await whenSettled(
+    emailPreference.post(route('notifications.email', [String(notifications.email)]), {
+      onHttpException,
+      onNetworkError
+    })
+  )
 }
 
 function togglePushNotifications(value: boolean | null): void {
   notifications.push = value === true
 
   if (notifications.push === true) {
-    push.subscribe()
+    void push.subscribe()
   } else {
-    push.unsubscribe()
+    void push.unsubscribe()
   }
 }
 </script>
@@ -126,7 +133,9 @@ function togglePushNotifications(value: boolean | null): void {
           <po-users-account-row
             :href="route('users.likes.index', username)"
             :title="$t('users.view-self-likes')"
-            :subtitle="$t('accounts.likes-count', { count: formatCount(account.likes_count) })"
+            :subtitle="
+              $t('accounts.likes-count', { count: formatCount(account.given_likes_count) })
+            "
           />
 
           <po-users-account-row
@@ -180,6 +189,7 @@ function togglePushNotifications(value: boolean | null): void {
           {{ $t('accounts.danger-zone') }}
         </p>
 
+        <!-- A comfortable reading measure; Vuetify sizes widths in pixels, not characters -->
         <p class="text-title-medium text-medium-emphasis" style="max-width: 52ch">
           {{ $t('accounts.delete-account-summary') }}
         </p>

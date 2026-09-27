@@ -18,9 +18,9 @@ interface WritingsIndexProps {
 }
 
 const page = usePage<InertiaPageProps<WritingsIndexProps>>()
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { isEmpty, isBlank } = useTypeGuards()
 
-const { items: writings, next, fetched, loadMore } = useInfiniteList<Writing>('writings')
+const { items: writings, nextPageUrl, isFetched, loadMore } = useInfiniteList<Writing>('writings')
 useSwipeTabs({ tabOrder: ['latest', 'popular', 'likes'], currentTab: () => page.props.sort })
 
 const heroWriting = computed(() => page.props.pickOfTheDay ?? null)
@@ -74,7 +74,7 @@ const restWritings = computed(() =>
           </v-tabs>
         </div>
 
-        <template v-if="!fetched">
+        <template v-if="!isFetched">
           <po-loading />
         </template>
 
@@ -83,7 +83,7 @@ const restWritings = computed(() =>
             <po-writings-entry :alone="false" :data="writing" />
           </template>
 
-          <po-infinite-scroll v-if="!strNullOrEmpty(next)" @load="loadMore" />
+          <po-infinite-scroll v-if="!isBlank(nextPageUrl)" @load="loadMore" />
         </template>
 
         <template v-else>

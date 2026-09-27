@@ -8,30 +8,15 @@ const props = defineProps<{
   user: UserLike
 }>()
 
-const { strNullOrEmpty } = useTypeGuards()
+const { isBlank } = useTypeGuards()
 const { storage, userDisplayName, userInitials } = useFormatting()
 
-const avatar = computed(() => {
-  if (
-    props.user.avatar !== null &&
-    props.user.avatar !== undefined &&
-    props.user.avatar.trim() !== ''
-  ) {
-    return props.user.avatar
-  } else if (
-    props.user.extra_info?.avatar !== null &&
-    props.user.extra_info?.avatar !== undefined &&
-    props.user.extra_info.avatar !== ''
-  ) {
-    return props.user.extra_info.avatar
-  }
-  return ''
-})
+const avatar = computed(() => props.user.avatar?.trim() ?? '')
 </script>
 
 <template>
   <v-avatar>
-    <v-img v-if="!strNullOrEmpty(avatar)" :src="storage(avatar)" :alt="userDisplayName(user)" />
+    <v-img v-if="!isBlank(avatar)" :src="storage(avatar)" :alt="userDisplayName(user)" />
     <span v-else>{{ userInitials(user) }}</span>
   </v-avatar>
 </template>

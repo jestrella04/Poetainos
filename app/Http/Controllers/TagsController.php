@@ -13,7 +13,7 @@ class TagsController extends Controller
     /**
      * Tags whose name matches the query, as select options.
      *
-     * @return Collection<int, array{value: mixed, label: mixed}>
+     * @return Collection<int, array{value: string, label: string}>
      */
     public function search(): Collection
     {
@@ -22,12 +22,10 @@ class TagsController extends Controller
         return Tag::where('name', 'like', $wildcard)
             ->take($this->perPage)
             ->get()
-            ->map(function ($tag, $key) {
-                return [
-                    'value' => $tag['name'],
-                    'label' => $tag['name'],
-                ];
-            });
+            ->map(fn (Tag $tag): array => [
+                'value' => $tag->name,
+                'label' => $tag->name,
+            ]);
     }
 
     /**
@@ -37,11 +35,8 @@ class TagsController extends Controller
      */
     public function show(Tag $tag): Response|Paginator
     {
-        $sort = resolveSort(['latest', 'popular', 'likes']);
-
         return $this->writingsIndex(
-            $tag->writings()->visibleTo($this->blockedAuthorIds())->withListingRelations()->sorted($sort),
-            $sort,
+            $tag->writings(),
             ['title' => getPageTitle([$tag->name, __('Tags')]), 'canonical' => $tag->path()],
             isDeferred: false,
         );

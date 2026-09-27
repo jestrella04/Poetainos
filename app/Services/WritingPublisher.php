@@ -67,7 +67,7 @@ class WritingPublisher
      */
     private function save(Writing $writing, array $data, ?UploadedFile $upload): Writing
     {
-        $currentCover = $writing->extra_info['cover'] ?? '';
+        $currentCover = $writing->cover;
         $cover = $upload !== null && $upload->isValid()
             ? $this->images->storeUpload($upload, 'covers', self::COVER_WIDTH, self::COVER_HEIGHT)
             : $currentCover;
@@ -80,11 +80,8 @@ class WritingPublisher
             }
 
             $writing->text = $data['text'];
-            $writing->extra_info = [
-                ...($writing->extra_info ?? []),
-                'link' => $data['link'] ?? '',
-                'cover' => $cover,
-            ];
+            $writing->link = $data['link'] ?? null;
+            $writing->cover = $cover;
             $writing->save();
 
             $writing->categories()->sync([$data['main_category'], ...(array) $data['categories']]);

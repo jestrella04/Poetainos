@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Events\NotificationEvent;
 use App\Models\User;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushChannel;
@@ -12,8 +12,9 @@ use NotificationChannels\WebPush\WebPushMessage;
 /**
  * Base for notifications that build their content once, in the
  * constructor, into $this->content (title/greeting/body/footer/url/
- * action/icon/tag) and deliver it identically across mail, web push and
- * broadcast. Subclasses keep their own constructor, via(), and toArray().
+ * action/icon/tag) and deliver it identically across mail and web push,
+ * while the broadcast only refreshes the recipient's unread badge.
+ * Subclasses keep their own constructor, via(), and toArray().
  */
 abstract class PoetainosNotification extends Notification
 {
@@ -109,13 +110,16 @@ abstract class PoetainosNotification extends Notification
     }
 
     /**
-     * Get the broadcastable representation of the notification.
+     * Get the broadcastable representation of the notification: the
+     * recipient's unread count, for the badge. `via()` lists the database
+     * channel first, so the count already includes this notification.
      *
      * @param  mixed  $notifiable
-     * @return array<int|string, mixed>|null
      */
-    public function toBroadcast($notifiable): ?array
+    public function toBroadcast($notifiable): BroadcastMessage
     {
-        return event(new NotificationEvent($notifiable));
+        return new BroadcastMessage([
+            'unread' => $notifiable instanceof User ? $notifiable->unreadNotifications()->count() : 0,
+        ]);
     }
 }

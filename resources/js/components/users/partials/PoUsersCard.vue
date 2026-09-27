@@ -8,7 +8,7 @@ defineProps<{
 }>()
 
 const { userDisplayName } = useFormatting()
-const { strNullOrEmpty } = useTypeGuards()
+const { isBlank } = useTypeGuards()
 </script>
 
 <template>
@@ -30,12 +30,12 @@ const { strNullOrEmpty } = useTypeGuards()
 
           <p class="text-medium-emphasis ma-0">
             @{{ data.username }}
-            <template v-if="!strNullOrEmpty(data.location)"> {{ data.location }}</template>
+            <template v-if="!isBlank(data.location)"> {{ data.location }}</template>
           </p>
         </div>
       </div>
 
-      <p v-if="!strNullOrEmpty(data.bio)" class="text-title-large po-prose ma-0 mb-4">
+      <p v-if="!isBlank(data.bio)" class="text-title-large po-prose ma-0 mb-4">
         {{ data.bio }}
       </p>
 
@@ -43,7 +43,9 @@ const { strNullOrEmpty } = useTypeGuards()
         <span>
           {{ $t('main.count-writings', { count: data.writings_count }, data.writings_count) }}
         </span>
-        <span>{{ $t('main.count-likes', { count: data.likes_count }, data.likes_count) }}</span>
+        <span>{{
+          $t('users.count-likes-given', { count: data.given_likes_count }, data.given_likes_count)
+        }}</span>
       </div>
     </v-card-text>
   </po-card>

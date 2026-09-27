@@ -36,7 +36,7 @@ describe('the contact form', function (): void {
         $response = postJson(route('contact.store'), contactPayload());
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         Notification::assertSentOnDemand(ContactFormSubmitted::class);
     });
 

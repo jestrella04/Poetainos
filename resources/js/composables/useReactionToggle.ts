@@ -1,5 +1,6 @@
-import { ref, watch } from 'vue'
-import axios from 'axios'
+import { computed, ref, watch } from 'vue'
+import { useHttp } from '@inertiajs/vue3'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 
 export interface ReactionToggleSource {
   count: number
@@ -23,7 +24,9 @@ export interface ReactionToggleOptions {
 export function useReactionToggle(source: ReactionToggleSource, options: ReactionToggleOptions) {
   const count = ref(source.count)
   const isActive = ref(source.isActive)
-  const isSubmitting = ref(false)
+  const request = useHttp<Record<string, never>, { count: number; isActive: boolean }>()
+  const isSubmitting = computed(() => request.processing)
+  const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
 
   watch(
     () => source.count,
@@ -49,20 +52,17 @@ export function useReactionToggle(source: ReactionToggleSource, options: Reactio
       return
     }
 
-    isSubmitting.value = true
-
-    try {
-      const response = await axios.post<{ count: number; method: 'store' | 'destroy' }>(
-        source.postUrl
-      )
-
-      count.value = response.data.count
-      isActive.value = response.data.method === 'store'
-    } catch {
-      // Keep the previous state when the request fails.
-    } finally {
-      isSubmitting.value = false
-    }
+    // A failed toggle keeps the previous state
+    await whenSettled(
+      request.post(source.postUrl, {
+        onHttpException,
+        onNetworkError,
+        onSuccess: (data) => {
+          count.value = data.count
+          isActive.value = data.isActive
+        }
+      })
+    )
   }
 
   return { count, isActive, isSubmitting, toggle }

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Services\AuraCalculator;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -25,10 +26,10 @@ class UpdateKarma extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(AuraCalculator $calculator): int
     {
-        User::query()->chunkById(200, function (Collection $users): void {
-            $users->each->updateKarma();
+        User::query()->chunkById(200, function (Collection $users) use ($calculator): void {
+            $users->each(fn (User $user) => $calculator->updateUserKarma($user));
         });
 
         return self::SUCCESS;

@@ -1,35 +1,25 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
-import { forceSnackBarKey, isDeleteKey } from '@/composables/keys'
+import { useForm } from '@inertiajs/vue3'
+import { isDeleteKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
-import { useSnackbar } from '@/composables/useSnackbar'
-import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 
-defineProps<{
+const props = defineProps<{
   slug: string
 }>()
 
-const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
-const forceSnackBar = injectStrict(forceSnackBarKey)
-const { isPosting, submitForm } = useFormSubmit(false)
+const { onHttpException, onNetworkError } = useRequestFailure()
+const form = useForm({})
 
-async function submit(): Promise<void> {
-  await submitForm({
-    formSelector: '#writing-delete-form',
-    payload: { _method: 'DELETE' },
+// The server takes the user home and confirms with a flash message
+function submit(): void {
+  form.delete(route('writings.destroy', props.slug), {
+    onHttpException,
+    onNetworkError,
     onSuccess: () => {
-      router.visit(route('home'))
-      setSnackBar({
-        message: 'writings.writing-deleted',
-        color: 'success',
-        active: true
-      })
-
-      forceSnackBar.value = true
       isDelete.value = false
-    },
-    onError: () => true
+    }
   })
 }
 </script>
@@ -51,13 +41,15 @@ async function submit(): Promise<void> {
 
         <v-divider class="mt-3" />
 
-        <v-form
-          id="writing-delete-form"
-          :action="route('writings.destroy', slug)"
-          @submit.prevent="submit"
-        >
-          <po-button id="writing-delete-submit" color="primary" type="submit" block>
-            <span v-if="!isPosting">{{ $t('main.delete') }}</span>
+        <v-form id="writing-delete-form" @submit.prevent="submit">
+          <po-button
+            id="writing-delete-submit"
+            color="primary"
+            type="submit"
+            block
+            :disabled="form.processing"
+          >
+            <span v-if="!form.processing">{{ $t('main.delete') }}</span>
             <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>

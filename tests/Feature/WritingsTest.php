@@ -95,8 +95,8 @@ describe('creating a writing', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
         $writing = Writing::where('title', $title)->firstOrFail();
+        $response->assertRedirect($writing->path())->assertInertiaFlash('message', 'writings.writing-published');
         expect($writing->categories()->pluck('categories.id')->all())
             ->toContain($mainCategory->id, $subCategory->id);
     });
@@ -117,7 +117,7 @@ describe('creating a writing', function (): void {
         ]));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect(Writing::where('title', $title)->exists())->toBeTrue();
     });
 
@@ -162,7 +162,7 @@ describe('editing and deleting a writing', function (): void {
 
         // Then
         $editResponse->assertOk();
-        $deleteResponse->assertOk();
+        $deleteResponse->assertRedirect(route('home'));
         expect(Writing::find($writing->id))->toBeNull();
     });
 
@@ -191,7 +191,7 @@ describe('editing and deleting a writing', function (): void {
 
         // Then
         $editResponse->assertOk();
-        $deleteResponse->assertOk();
+        $deleteResponse->assertRedirect(route('home'));
         expect(Writing::find($writing->id))->toBeNull();
     });
 
@@ -204,7 +204,7 @@ describe('editing and deleting a writing', function (): void {
         $response = actingAs($admin)->deleteJson(route('admin.writings.destroy', $writing));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect(route('home'));
         expect(Writing::find($writing->id))->toBeNull();
     });
 
@@ -251,8 +251,25 @@ describe('updating a writing', function (): void {
         ]));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($writing->refresh()->title)->toBe($title);
+    });
+
+    it('does not record agreements for the author when an admin edits their writing', function (): void {
+        // Given
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+
+        // When
+        $response = actingAs(actingAsAdmin())->put(route('writings.update', $writing), writingPayload($mainCategory, [
+            'service_agreement' => 'on',
+            'privacy_agreement' => 'on',
+        ]));
+
+        // Then
+        $response->assertRedirect();
+        expect($author->refresh()->isInAgreement())->toBeFalse();
     });
 
     it('keeps the slug and the other stored details when editing', function (): void {
@@ -266,11 +283,11 @@ describe('updating a writing', function (): void {
         // When
         actingAs($author)->put(route('writings.update', $writing), writingPayload($mainCategory, [
             'link' => $link,
-        ]))->assertOk();
+        ]))->assertRedirect();
 
         // Then
         expect($writing->refresh()->slug)->toBe($originalSlug);
-        expect(data_get($writing->extra_info, 'link'))->toBe($link);
+        expect($writing->link)->toBe($link);
     });
 
     it('does not reuse a slug that a static route owns', function (): void {
@@ -280,7 +297,7 @@ describe('updating a writing', function (): void {
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
         // When
-        actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['title' => 'Random']))->assertOk();
+        actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, ['title' => 'Random']))->assertRedirect();
 
         // Then
         expect(Writing::where('title', 'Random')->firstOrFail()->slug)->toBe('random-1');
@@ -328,7 +345,7 @@ describe('updating a writing', function (): void {
         // When
         actingAs($author)->post(route('writings.store'), writingPayload($mainCategory, [
             'tags' => ["{$firstWord}   {$secondWord}", $spacedTag, $otherTag],
-        ]))->assertOk();
+        ]))->assertRedirect();
 
         // Then
         $writing = Writing::firstOrFail();
@@ -362,19 +379,19 @@ describe('a writing cover', function (): void {
         $oldCover = 'covers/'.fake()->uuid().'.png';
         Storage::disk('local')->put($oldCover, fake()->sentence());
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => $oldCover]]);
+        $writing = Writing::factory()->for($author, 'author')->create(['cover' => $oldCover]);
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
         // When
         actingAs($author)->post(route('writings.update', $writing), writingPayload($mainCategory, [
             '_method' => 'PUT',
             'cover' => UploadedFile::fake()->image(fake()->word().'.jpg', fake()->numberBetween(1400, 2400), fake()->numberBetween(800, 1400)),
-        ]))->assertOk();
+        ]))->assertRedirect();
 
         // Then
-        $cover = data_get($writing->refresh()->extra_info, 'cover');
+        $cover = $writing->refresh()->cover;
         expect($cover)->toStartWith('covers/')->not->toBe($oldCover);
-        expect(storedImageWidth($cover))->toBe(1280);
+        expect(storedImageWidth((string) $cover))->toBe(1280);
         Storage::disk('local')->assertMissing($oldCover);
     });
 
@@ -383,10 +400,10 @@ describe('a writing cover', function (): void {
         $cover = 'covers/'.fake()->uuid().'.png';
         Storage::disk('local')->put($cover, fake()->sentence());
         $author = createUser();
-        $writing = Writing::factory()->for($author, 'author')->create(['extra_info' => ['cover' => $cover]]);
+        $writing = Writing::factory()->for($author, 'author')->create(['cover' => $cover]);
 
         // When
-        actingAs($author)->delete(route('writings.destroy', $writing))->assertOk();
+        actingAs($author)->delete(route('writings.destroy', $writing))->assertRedirect(route('home'));
 
         // Then
         Storage::disk('local')->assertMissing($cover);

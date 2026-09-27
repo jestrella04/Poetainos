@@ -18,7 +18,8 @@ describe('admin moderation of another user\'s writing', function () {
     // and gets a 405. Re-enable once that upstream gap is fixed.
     it('lets an admin edit another user\'s writing', function () {
         $admin = actingAsAdmin([
-            'extra_info' => ['agreement' => ['terms_of_use' => 'on', 'privacy_policy' => 'on']],
+            'terms_accepted_at' => now(),
+            'privacy_accepted_at' => now(),
         ]);
         $otherAuthor = createUser();
         $writing = Writing::factory()->for($otherAuthor, 'author')->create();
@@ -45,7 +46,8 @@ describe('admin moderation of another user\'s writing', function () {
 
     it('lets an admin delete another user\'s writing', function () {
         $admin = actingAsAdmin([
-            'extra_info' => ['agreement' => ['terms_of_use' => 'on', 'privacy_policy' => 'on']],
+            'terms_accepted_at' => now(),
+            'privacy_accepted_at' => now(),
         ]);
         $otherAuthor = createUser();
         $writing = Writing::factory()->for($otherAuthor, 'author')->create();

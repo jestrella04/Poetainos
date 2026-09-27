@@ -1,12 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope } from 'vue'
 import type { EffectScope } from 'vue'
-import axios from 'axios'
 import { useVerificationCode } from '../useVerificationCode'
+import { queueOutcome, resetFakeRequests, sentRequests } from './support/fakeInertiaRequests'
 
-vi.mock('vue-i18n', () => ({
-  useI18n: () => ({ t: (key: string) => key })
-}))
+vi.mock('@inertiajs/vue3', async () => {
+  const { fakeUseForm, fakeUseHttp } = await import('./support/fakeInertiaRequests')
+
+  return { useForm: fakeUseForm, useHttp: fakeUseHttp, router: { flash: vi.fn() } }
+})
 
 let scope: EffectScope
 
@@ -16,7 +18,7 @@ function setUp(): ReturnType<typeof useVerificationCode> {
 }
 
 beforeEach(() => {
-  vi.restoreAllMocks()
+  resetFakeRequests()
   vi.useFakeTimers()
 })
 
@@ -26,64 +28,46 @@ afterEach(() => {
 })
 
 describe('useVerificationCode', () => {
-  it('posts the code and hands the redirect url to onVerified', async () => {
+  it('posts the typed code', async () => {
     // Given
-    const post = vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { url: '/home' } })
-    const onVerified = vi.fn()
-    const { code, isVerifying, verifyCode } = setUp()
-    code.value = '123456'
+    const { form, verifyCode } = setUp()
+    form.code = '123456'
 
     // When
-    await verifyCode('/confirm', onVerified)
+    verifyCode('/confirm')
+    await vi.runAllTimersAsync()
 
     // Then
-    expect(post).toHaveBeenCalledWith('/confirm', { code: '123456' })
-    expect(onVerified).toHaveBeenCalledWith('/home')
-    expect(isVerifying.value).toBe(false)
+    expect(sentRequests).toEqual([{ method: 'post', url: '/confirm', data: { code: '123456' } }])
   })
 
-  it('clears a rejected code and shows the server message', async () => {
+  it('clears a rejected code and keeps the server message', async () => {
     // Given
-    vi.spyOn(axios, 'post').mockRejectedValueOnce({
-      response: { data: { errors: { code: ['The code has expired.'] } } }
-    })
-    const onVerified = vi.fn()
-    const { code, codeError, verifyCode } = setUp()
-    code.value = '123456'
+    queueOutcome({ errors: { code: 'The code has expired.' } })
+    const { form, verifyCode } = setUp()
+    form.code = '123456'
 
     // When
-    await verifyCode('/confirm', onVerified)
+    verifyCode('/confirm')
+    await vi.runAllTimersAsync()
 
     // Then
-    expect(onVerified).not.toHaveBeenCalled()
-    expect(code.value).toBe('')
-    expect(codeError.value).toBe('The code has expired.')
-  })
-
-  it('falls back to a generic message when the rejection has none', async () => {
-    // Given
-    vi.spyOn(axios, 'post').mockRejectedValueOnce({})
-    const { codeError, verifyCode } = setUp()
-
-    // When
-    await verifyCode('/confirm', vi.fn())
-
-    // Then
-    expect(codeError.value).toBe('main.error-try-again')
+    expect(form.code).toBe('')
+    expect(form.errors.code).toBe('The code has expired.')
   })
 
   it('confirms a resend and blocks another one until the cooldown ends', async () => {
     // Given
-    vi.spyOn(axios, 'post').mockResolvedValueOnce({})
-    const { codeError, resendOutcome, resendCountdown, resendCode } = setUp()
-    codeError.value = 'The code has expired.'
+    queueOutcome({ data: {} })
+    const { form, resendOutcome, resendCountdown, resendCode } = setUp()
+    form.errors.code = 'The code has expired.'
 
     // When
     await resendCode('/resend')
 
     // Then
     expect(resendOutcome.value).toBe('success')
-    expect(codeError.value).toBe('')
+    expect(form.errors).toEqual({})
     expect(resendCountdown.value).toBe(60)
 
     vi.advanceTimersByTime(60_000)
@@ -94,7 +78,7 @@ describe('useVerificationCode', () => {
 
   it('reports a failed resend without starting the cooldown', async () => {
     // Given
-    vi.spyOn(axios, 'post').mockRejectedValueOnce({})
+    queueOutcome({ failure: 'http' })
     const { resendOutcome, resendCountdown, resendCode } = setUp()
 
     // When

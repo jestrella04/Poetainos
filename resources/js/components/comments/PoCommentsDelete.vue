@@ -1,37 +1,27 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
-import { forceSnackBarKey, isDeleteKey, writingKey } from '@/composables/keys'
+import { useForm } from '@inertiajs/vue3'
+import { isDeleteKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
-import { useSnackbar } from '@/composables/useSnackbar'
-import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { Comment } from '@/types/models'
 
-defineProps<{
+const props = defineProps<{
   comment: Comment
 }>()
 
-const { setSnackBar } = useSnackbar()
 const isDelete = injectStrict(isDeleteKey)
-const forceSnackBar = injectStrict(forceSnackBarKey)
-const writing = injectStrict(writingKey)
-const { isPosting, submitForm } = useFormSubmit(false)
+const { onHttpException, onNetworkError } = useRequestFailure()
+const form = useForm({})
 
-async function submit(): Promise<void> {
-  await submitForm({
-    formSelector: '#comment-delete-form',
-    payload: { _method: 'DELETE' },
+// The server reloads the writing without the comment and confirms with a flash message
+function submit(): void {
+  form.delete(route('comments.destroy', props.comment.id), {
+    preserveScroll: true,
+    onHttpException,
+    onNetworkError,
     onSuccess: () => {
-      router.visit(route('writings.show', writing.slug))
-      setSnackBar({
-        message: 'comments.comment-deleted',
-        color: 'success',
-        active: true
-      })
-
-      forceSnackBar.value = true
       isDelete.value = false
-    },
-    onError: () => true
+    }
   })
 }
 </script>
@@ -48,13 +38,9 @@ async function submit(): Promise<void> {
 
         <v-divider class="mt-3" />
 
-        <v-form
-          id="comment-delete-form"
-          :action="route('comments.destroy', comment.id)"
-          @submit.prevent="submit"
-        >
-          <po-button color="primary" type="submit" block>
-            <span v-if="!isPosting">{{ $t('main.delete') }}</span>
+        <v-form id="comment-delete-form" @submit.prevent="submit">
+          <po-button color="primary" type="submit" block :disabled="form.processing">
+            <span v-if="!form.processing">{{ $t('main.delete') }}</span>
             <v-progress-circular v-else indeterminate />
           </po-button>
         </v-form>

@@ -31,7 +31,7 @@ function share(): void {
     :link-title="userDisplayName(user)"
     :link-url="route('users.show', [user.username])"
   />
-  <po-complainer v-model="complainer" comp-type="users" :comp-id="user.id" />
+  <po-complainer v-model="complainer" complainable-type="users" :complainable-id="user.id" />
   <po-blocker v-model="blocker" :user="user" />
 
   <v-menu open-on-hover>

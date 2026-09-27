@@ -43,7 +43,7 @@ class InstallSite extends Command
         $credentials = $this->askForCredentials();
 
         $validator = Validator::make($credentials, [
-            'username' => ['required', 'string', 'min:3', 'max:45', 'regex:/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/'],
+            'username' => ['required', 'string', 'min:3', 'max:45', 'regex:'.User::USERNAME_PATTERN],
             'email' => ['required', 'string', 'email', 'max:250'],
             'password' => ['required', 'string', 'min:8'],
         ]);

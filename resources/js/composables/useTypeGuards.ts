@@ -1,25 +1,22 @@
-import { isEmpty as lodashIsEmpty, isNil as lodashIsNil, isNull as lodashIsNull } from 'lodash-es'
+import { isEmpty as lodashIsEmpty } from 'lodash-es'
 
 /**
- * Generic null/empty checks shared across components and other
- * composables.
+ * Emptiness checks shared across components and other composables.
  */
 export function useTypeGuards() {
-  function isNil(obj: unknown): obj is null | undefined {
-    return lodashIsNil(obj)
+  /**
+   * Whether a value holds nothing: null, undefined, or an empty string, array, object, map or set.
+   */
+  function isEmpty(value: unknown): boolean {
+    return lodashIsEmpty(value)
   }
 
-  function isNull(obj: unknown): obj is null {
-    return lodashIsNull(obj)
+  /**
+   * Whether a string is missing or holds nothing but whitespace.
+   */
+  function isBlank(text: string | null | undefined): boolean {
+    return text === null || text === undefined || text.trim() === ''
   }
 
-  function isEmpty(obj: unknown): boolean {
-    return lodashIsEmpty(obj)
-  }
-
-  function strNullOrEmpty(str: string | null | undefined): boolean {
-    return lodashIsNil(str) || '' === str.trim()
-  }
-
-  return { isNil, isNull, isEmpty, strNullOrEmpty }
+  return { isEmpty, isBlank }
 }

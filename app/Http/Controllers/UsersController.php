@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\Writing;
 use App\Services\ContentDeleter;
 use App\Services\ImageStorage;
@@ -29,19 +30,10 @@ class UsersController extends Controller
     public function index(): Paginator|Response
     {
         $sort = resolveSort(['latest', 'popular', 'featured'], 'featured');
-        $users = User::select(
-            'id',
-            'username',
-            'name',
-            'profile_views',
-            'aura',
-            'karma',
-            'extra_info->bio AS bio',
-            'extra_info->avatar AS avatar',
-            'extra_info->location AS location',
-        )
+        $users = User::select('id', 'username', 'name', 'profile_views', 'aura', 'karma')
+            ->withProfileFields('bio', 'avatar', 'location')
             ->has('writings')
-            ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf']);
+            ->withCount(['writings', 'awards', 'givenLikes', 'comments', 'shelf']);
 
         $users = match ($sort) {
             'latest' => $users->latest(),
@@ -94,27 +86,12 @@ class UsersController extends Controller
                 'title' => getPageTitle([$user->getName(), __('Writers')]),
                 'canonical' => $user->path(),
             ],
-            // MariaDB's JSON_VALUE (what `extra_info->social` compiles to) returns NULL for objects,
-            // so `social` is decoded from the bound model instead of selected.
-            'user' => User::select(
-                'id',
-                'username',
-                'name',
-                'profile_views',
-                'aura',
-                'karma',
-                'created_at',
-                'extra_info->bio AS bio',
-                'extra_info->avatar AS avatar',
-                'extra_info->website AS website',
-                'extra_info->location AS location',
-                'extra_info->interests AS interests',
-                'extra_info->occupation AS occupation',
-            )
+            'user' => User::select('id', 'username', 'name', 'profile_views', 'aura', 'karma', 'created_at')
+                ->withProfileFields('bio', 'avatar', 'website', 'location', 'interests', 'occupation')
                 ->where('id', $user->id)
-                ->withCount(['writings', 'awards', 'likes', 'comments', 'shelf'])
+                ->withCount(['writings', 'awards', 'givenLikes', 'comments', 'shelf'])
                 ->firstOrFail()
-                ->setAttribute('social', json_encode($user->extra_info['social'] ?? [])),
+                ->setAttribute('social', $user->profile->socialHandles()),
             'authorWritings' => Inertia::optional(fn () => $user->writings()
                 ->visibleTo($this->blockedAuthorIds())
                 ->withListingRelations()
@@ -142,22 +119,25 @@ class UsersController extends Controller
             'meta' => [
                 'title' => getPageTitle([__('Update profile')]),
             ],
-            'user' => $user,
+            'user' => $user->load('profile'),
             'agreement' => $user->isInAgreement(),
             'roles' => Auth::user()?->isAllowed('admin') === true ? Role::select('id', 'name')->get() : [],
         ]);
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @return array<string, string>
+     * Update the specified resource in storage, then open the user's account,
+     * or the edited profile when someone else (an admin) made the change.
      */
-    public function update(Request $request, User $user, ImageStorage $images): array
+    public function update(Request $request, User $user, ImageStorage $images): RedirectResponse
     {
         $this->authorize('update', $user);
 
-        // Validate user input
+        $isOwnProfile = $request->user()?->is($user) === true;
+
+        // Only users editing their own profile are asked for their agreements
+        $agreeingUser = $isOwnProfile ? $user : null;
+
         $request->validate([
             'role' => 'nullable|integer|exists:roles,id',
             'name' => 'required|string|min:3|max:250',
@@ -167,23 +147,17 @@ class UsersController extends Controller
             'occupation' => 'nullable|string|min:3|max:100',
             'interests' => 'nullable|string|min:3|max:250',
             'website' => 'nullable|url|max:250',
-            'twitter' => 'nullable|string|min:3|max:250',
-            'threads' => 'nullable|string|min:3|max:250',
-            'instagram' => 'nullable|string|min:3|max:100',
-            'facebook' => 'nullable|string|min:3|max:250',
-            'youtube' => 'nullable|string|min:3|max:100',
-            'goodreads' => 'nullable|string|min:3|max:250',
+            ...array_map(fn (int $maxLength): string => 'nullable|string|min:3|max:'.$maxLength, UserProfile::SOCIAL_NETWORKS),
             'avatar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
             'avatar-remove' => 'nullable|boolean',
-            'service_agreement' => 'sometimes|required|accepted',
-            'privacy_agreement' => 'sometimes|required|accepted',
+            ...$this->agreementRules($agreeingUser),
         ]);
 
-        // Keep whatever else is stored on the profile (notification settings, linked providers…)
-        $user->extra_info = [
-            ...($user->extra_info ?? []),
-            ...$this->profileInfo($request, $this->resolveAvatar($request, $user, $images)),
-        ];
+        $profile = $user->editableProfile();
+        $profile->fill([
+            ...$request->only(['bio', 'website', 'location', 'interests', 'occupation', ...array_keys(UserProfile::SOCIAL_NETWORKS)]),
+            'avatar' => $this->resolveAvatar($request, $profile, $images),
+        ])->save();
 
         // Only an admin may change a user's role
         if ($request->input('role') !== null && $request->user()?->isAllowed('admin') === true) {
@@ -207,114 +181,37 @@ class UsersController extends Controller
             $user->sendEmailVerificationNotification();
         }
 
-        // Persist user agreements to avoid asking again
-        if (isTruthy($request->input('service_agreement')) && isTruthy($request->input('privacy_agreement'))) {
-            $user->acceptAgreements();
-        }
+        $this->rememberAgreements($request, $agreeingUser);
 
-        // Set response data
-        return [
-            'url' => $user->path(),
-        ];
+        Inertia::flash(['message' => 'accounts.profile-updated', 'color' => 'success']);
+
+        return redirect($isOwnProfile ? route('users.account') : $user->path());
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @return array<int, mixed>|RedirectResponse
+     * Remove the specified resource from storage. Users deleting their own
+     * account are logged out; either way the home page follows.
      */
-    public function destroy(Request $request, User $user, ContentDeleter $deleter, ImageStorage $images): array|RedirectResponse
+    public function destroy(Request $request, User $user, ContentDeleter $deleter): RedirectResponse
     {
         $this->authorize('delete', $user);
 
-        $avatar = $user->extra_info['avatar'] ?? null;
+        $isOwnAccount = $request->user()?->is($user) === true;
 
         $deleter->deleteUser($user);
 
-        $images->delete($avatar);
-
-        if ($request->user()?->is($user) === true) {
+        if ($isOwnAccount === true) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            $request->session()->flash('message', 'accounts.account-deleted');
-
-            return to_route('home');
         }
 
-        return [];
-    }
+        Inertia::flash([
+            'message' => $isOwnAccount === true ? 'accounts.account-deleted' : 'users.user-deleted',
+            'color' => 'success',
+        ]);
 
-    /**
-     * Get the currently authenticated user.
-     */
-    public function me(): User
-    {
-        return $this->requireAuthUser();
-    }
-
-    /**
-     * Recalculate the given user's karma.
-     */
-    public function recalculateKarma(User $user): \Illuminate\Http\Response
-    {
-        $this->authorize('update', $user);
-
-        $user->updateKarma();
-
-        return response($user->karma);
-    }
-
-    /**
-     * Block another user.
-     *
-     * @return array<int, mixed>
-     */
-    public function blockUser(User $user): array
-    {
-        $authUser = $this->requireAuthUser();
-
-        abort_if($authUser->is($user), 422, __('You cannot block yourself.'));
-
-        $authUser->block($user);
-
-        return [];
-    }
-
-    /**
-     * Unblock a previously blocked user.
-     *
-     * @return array<int, mixed>
-     */
-    public function unblockUser(User $user): array
-    {
-        $this->requireAuthUser()->unblock($user);
-
-        return [];
-    }
-
-    /**
-     * The authenticated user's blocked authors.
-     *
-     * @return Response|Paginator<int, User>
-     */
-    public function blockedUsers(): Response|Paginator
-    {
-        $authUser = $this->requireAuthUser();
-
-        $blockedUsers = User::forAuthorSummary()
-            ->whereIn('id', $authUser->blockedAuthors()->select('blocked_user_id'));
-
-        return $this->paginatedPage(
-            fn (): Paginator => $blockedUsers->simplePaginate($this->perPage)->withQueryString(),
-            'users/PoUsersBlockedIndex',
-            [
-                'meta' => [
-                    'title' => getPageTitle([__('Blocked authors'), __('My account')]),
-                ],
-            ],
-            'blockedUsers',
-        );
+        return to_route('home');
     }
 
     /**
@@ -325,7 +222,7 @@ class UsersController extends Controller
         $user = $this->requireAuthUser();
         $this->authorize('update', $user);
 
-        $user->loadCount(['writings', 'shelf', 'likes', 'blockedAuthors']);
+        $user->loadCount(['writings', 'shelf', 'givenLikes', 'blockedAuthors']);
 
         return Inertia::render('users/PoUsersAccount', [
             'meta' => [
@@ -335,7 +232,7 @@ class UsersController extends Controller
                 'created_at',
                 'writings_count',
                 'shelf_count',
-                'likes_count',
+                'given_likes_count',
                 'blocked_authors_count',
             ]),
             'notifications' => [
@@ -347,48 +244,21 @@ class UsersController extends Controller
     /**
      * The avatar path to store: the current one, a freshly uploaded one, or none when the user removed it.
      */
-    private function resolveAvatar(Request $request, User $user, ImageStorage $images): string
+    private function resolveAvatar(Request $request, UserProfile $profile, ImageStorage $images): ?string
     {
-        $currentAvatar = $user->extra_info['avatar'] ?? '';
-
         if (isTruthy($request->input('avatar-remove'))) {
-            $images->delete($currentAvatar);
+            $images->delete($profile->avatar);
 
-            return '';
+            return null;
         }
 
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             $avatar = $images->storeUpload($request->file('avatar'), 'avatars', self::AVATAR_SIZE, self::AVATAR_SIZE);
-            $images->delete($currentAvatar);
+            $images->delete($profile->avatar);
 
             return $avatar;
         }
 
-        return $currentAvatar;
-    }
-
-    /**
-     * The profile fields the edit form owns, as stored in extra_info.
-     *
-     * @return array<string, mixed>
-     */
-    private function profileInfo(Request $request, string $avatar): array
-    {
-        return [
-            'bio' => $request->input('bio') ?? '',
-            'social' => [
-                'twitter' => $request->input('twitter') ?? '',
-                'threads' => $request->input('threads') ?? '',
-                'instagram' => $request->input('instagram') ?? '',
-                'facebook' => $request->input('facebook') ?? '',
-                'youtube' => $request->input('youtube') ?? '',
-                'goodreads' => $request->input('goodreads') ?? '',
-            ],
-            'avatar' => $avatar,
-            'website' => $request->input('website') ?? '',
-            'location' => $request->input('location') ?? '',
-            'interests' => $request->input('interests') ?? '',
-            'occupation' => $request->input('occupation') ?? '',
-        ];
+        return $profile->avatar;
     }
 }

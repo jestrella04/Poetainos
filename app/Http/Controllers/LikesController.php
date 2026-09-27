@@ -13,9 +13,9 @@ class LikesController extends Controller
      * Toggles the like: creates it if the user hasn't liked this resource
      * yet, or removes it if they already have.
      *
-     * @return array{method: string, count: int}
+     * @return array{isActive: bool, count: int}
      */
-    public function store(string $likeable, string $likeableId, ReactionToggler $toggler): array
+    public function toggle(string $likeable, string $likeableId, ReactionToggler $toggler): array
     {
         return $toggler->toggle(
             new LikeReaction($this->resolveLikeable($likeable, $likeableId)),

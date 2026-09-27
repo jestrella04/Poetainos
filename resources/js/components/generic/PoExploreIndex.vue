@@ -20,7 +20,7 @@ interface ExploreProps {
 }
 
 const { formatCount } = useFormatting()
-const { strNullOrEmpty } = useTypeGuards()
+const { isBlank } = useTypeGuards()
 const page = usePage<InertiaPageProps<ExploreProps>>()
 const categories = computed(() => [...page.props.categories.main, ...page.props.categories.alt])
 </script>
@@ -60,7 +60,7 @@ const categories = computed(() => [...page.props.categories.main, ...page.props.
           </p>
 
           <p
-            v-if="!strNullOrEmpty(cat.description)"
+            v-if="!isBlank(cat.description)"
             class="text-title-large po-prose ma-0 mb-2 flex-grow-1"
           >
             {{ cat.description }}

@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/vue3'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useSocialLinks } from '@/composables/useSocialLinks'
 
-const { isEmpty, strNullOrEmpty } = useTypeGuards()
+const { isEmpty, isBlank } = useTypeGuards()
 const { socialLink, socialIcon } = useSocialLinks()
 const page = usePage()
 const relatedApps = ref<RelatedApplication[]>([])
@@ -37,7 +37,7 @@ onMounted(() => {
     <div v-if="isEmpty(relatedApps)" class="d-inline-flex ga-3">
       <template v-for="(app, store) in page.props.site.stores" :key="store">
         <po-button
-          v-if="'' !== app.value"
+          v-if="app.value !== ''"
           :href="app.value"
           :prepend-icon="app.icon"
           color="secondary"
@@ -50,7 +50,7 @@ onMounted(() => {
 
     <div class="d-inline-flex ga-3">
       <template v-for="(user, social) in page.props.site.social" :key="social">
-        <template v-if="!strNullOrEmpty(user.value)">
+        <template v-if="!isBlank(user.value)">
           <po-button
             icon
             color="primary"

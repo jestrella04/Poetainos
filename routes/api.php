@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\UsersController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,6 +15,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->group(function (): void {
-    Route::get('/user', [UsersController::class, 'me'])->name('api.user.show');
-    Route::put('/karma/{user}', [UsersController::class, 'recalculateKarma'])->name('api.karma.update');
+    Route::get('/user', [UserController::class, 'show'])->name('api.user.show');
+    Route::put('/karma/{user}', [UserController::class, 'recalculateKarma'])->name('api.karma.update');
 });

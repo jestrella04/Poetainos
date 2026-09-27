@@ -74,17 +74,17 @@
     ],
     "dev": [
       "Composer\\Config::disableProcessTimeout",
-      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#86efac,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"php artisan reverb:start\" \"npm run dev\" --names=server,queue,logs,reverb,vite --kill-others"
     ],
     "preview": [
       "Composer\\Config::disableProcessTimeout",
       "npm run build",
-      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run preview\" --names=server,queue,logs,vite --kill-others"
+      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#86efac,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"php artisan reverb:start\" \"npm run preview\" --names=server,queue,logs,reverb,vite --kill-others"
     ],
     "remote": [
       "Composer\\Config::disableProcessTimeout",
       "npm run build",
-      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74,#f4f0ff\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run preview\" \"ssh -t -R 80:localhost:8000 proxy.tunnl.gg\" --names=server,queue,logs,vite,remote --kill-others"
+      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#86efac,#fdba74,#f4f0ff\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"php artisan reverb:start\" \"npm run preview\" \"ssh -t -R 80:localhost:8000 proxy.tunnl.gg\" --names=server,queue,logs,reverb,vite,remote --kill-others"
     ],
     "ci:check": [
       "Composer\\Config::disableProcessTimeout",

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserProfile;
 use App\Models\Writing;
 
 use function Pest\Laravel\actingAs;
@@ -91,7 +92,7 @@ describe('the author profile', function (): void {
         // Given
         $author = createUser();
         $occupation = fake()->jobTitle();
-        $author->forceFill(['extra_info' => ['occupation' => $occupation]])->save();
+        UserProfile::factory()->for($author)->create(['occupation' => $occupation]);
 
         // When
         $response = get(route('users.show', $author->username));
@@ -101,21 +102,18 @@ describe('the author profile', function (): void {
             ->assertInertia(fn ($page) => $page->where('user.occupation', $occupation));
     });
 
-    it('exposes the social links of the author as a JSON object', function (): void {
+    it('exposes the social handles the author filled in', function (): void {
         // Given
         $author = createUser();
         $twitter = fakeUsername();
-        $author->forceFill(['extra_info' => ['social' => ['twitter' => $twitter, 'instagram' => '']]])->save();
+        UserProfile::factory()->for($author)->create(['twitter' => $twitter, 'instagram' => null]);
 
         // When
         $response = get(route('users.show', $author->username));
 
         // Then
         $response->assertOk()
-            ->assertInertia(fn ($page) => $page->where(
-                'user.social',
-                fn ($social) => json_decode($social, true) === ['twitter' => $twitter, 'instagram' => ''],
-            ));
+            ->assertInertia(fn ($page) => $page->where('user.social', ['twitter' => $twitter]));
     });
 
     it('exposes empty social links when the author has none', function (): void {
@@ -127,6 +125,6 @@ describe('the author profile', function (): void {
 
         // Then
         $response->assertOk()
-            ->assertInertia(fn ($page) => $page->where('user.social', '[]'));
+            ->assertInertia(fn ($page) => $page->where('user.social', []));
     });
 });

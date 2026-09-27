@@ -12,27 +12,20 @@ use App\Models\Shelf;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use App\Services\ActivityFeed;
+use App\Services\LogReader;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use SplFileObject;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AdminController extends Controller
 {
-    private const LOG_LINES_SHOWN = 100;
-
-    private string $log;
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->log = storage_path('logs/laravel.log');
-    }
-
     public function index(): Response
     {
         return Inertia::render('admin/PoAdminIndex', [
@@ -136,39 +129,71 @@ class AdminController extends Controller
         return $this->listing('admin/PoAdminPages', __('Pages'), Page::query());
     }
 
-    public function tools(): Response
+    /**
+     * @return Response|Paginator<int, array{kind: string, subject_id: int, created_at: Carbon, user: User|null, writing: Writing|null}>
+     */
+    public function activity(ActivityFeed $feed): Response|Paginator
     {
-        return Inertia::render('admin/PoAdminTools', [
+        return $this->paginatedPage(
+            fn (): Paginator => $feed->page($this->perPage),
+            'admin/PoAdminActivity',
+            [
+                'meta' => [
+                    'title' => getPageTitle([__('Activity'), __('Administration')]),
+                ],
+                'total' => fn (): int => $feed->count(),
+            ],
+            recordsProp: null,
+        );
+    }
+
+    public function logs(LogReader $reader): Response
+    {
+        return Inertia::render('admin/PoAdminLogs', [
             'meta' => [
                 'title' => getPageTitle([
-                    __('Tools'),
+                    __('Logs'),
                     __('Administration'),
                 ]),
             ],
-            'log' => $this->tailLog(),
-            'info' => [
-                __('PHP version') => PHP_VERSION,
-                __('Laravel version') => app()->version(),
-                __('Memory limit') => ini_get('memory_limit'),
-                __('Upload max filesize') => ini_get('upload_max_filesize'),
-                __('Post max size') => ini_get('post_max_size'),
-                __('Max execution time') => ini_get('max_execution_time').'s',
-                __('OPcache enabled') => function_exists('opcache_get_status') && opcache_get_status() !== false ? __('Yes') : __('No'),
-                __('Loaded extensions') => implode(', ', get_loaded_extensions()),
-            ],
+            'files' => $reader->files(),
         ]);
     }
 
     /**
-     * Download the full application log; an empty file when nothing has been logged yet.
+     * One page of a log's entries, newest first.
+     *
+     * @return array{entries: list<array{level: string|null, environment: string|null, date: string|null, message: string, details: string}>, before: int|null}
      */
-    public function log(): StreamedResponse
+    public function logEntries(LogReader $reader): array
     {
-        return response()->streamDownload(function (): void {
-            if (is_readable($this->log) === true) {
-                readfile($this->log);
-            }
-        }, 'laravel.log', ['Content-Type' => 'text/plain']);
+        request()->validate([
+            'file' => ['required', 'string'],
+            'before' => ['nullable', 'integer', 'min:0'],
+            'level' => ['nullable', Rule::in(LogReader::LEVELS)],
+            'search' => ['nullable', 'string', 'max:200'],
+        ]);
+
+        return $reader->entries(
+            $this->logPath($reader, request('file')),
+            request('before') === null ? null : (int) request('before'),
+            request('level'),
+            request('search'),
+        );
+    }
+
+    public function downloadLog(LogReader $reader, string $file): BinaryFileResponse
+    {
+        return response()->download($this->logPath($reader, $file), $file, ['Content-Type' => 'text/plain']);
+    }
+
+    public function clearLog(LogReader $reader, string $file): RedirectResponse
+    {
+        $reader->clear($this->logPath($reader, $file));
+
+        Inertia::flash(['message' => 'admin.log-cleared', 'color' => 'success']);
+
+        return back();
     }
 
     /**
@@ -208,40 +233,28 @@ class AdminController extends Controller
      */
     private function listing(string $component, string $title, Builder $rows): Response|Paginator
     {
-        if (request()->expectsJson()) {
-            return $rows->simplePaginate($this->perPage)->withQueryString();
-        }
-
-        return Inertia::render($component, [
-            'meta' => [
-                'title' => getPageTitle([$title, __('Administration')]),
+        return $this->paginatedPage(
+            fn (): Paginator => $rows->simplePaginate($this->perPage)->withQueryString(),
+            $component,
+            [
+                'meta' => [
+                    'title' => getPageTitle([$title, __('Administration')]),
+                ],
+                'total' => fn (): int => $rows->count(),
             ],
-            'total' => $rows->count(),
-        ]);
+            recordsProp: null,
+        );
     }
 
     /**
-     * The last lines of the application log, or nothing when it can't be read.
+     * The path of a listed log file; anything else is not found.
      */
-    private function tailLog(): string
+    private function logPath(LogReader $reader, string $file): string
     {
-        if (! is_readable($this->log)) {
-            return '';
-        }
+        $path = $reader->path($file);
 
-        $file = new SplFileObject($this->log, 'r');
-        $file->seek(PHP_INT_MAX);
-        $lastLine = $file->key();
+        abort_if($path === null, 404);
 
-        $file->seek(max(0, $lastLine - self::LOG_LINES_SHOWN));
-
-        $tail = [];
-
-        while (! $file->eof()) {
-            $tail[] = $file->fgets();
-            $file->next();
-        }
-
-        return implode('', $tail);
+        return $path;
     }
 }

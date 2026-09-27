@@ -18,7 +18,7 @@ const unreadCount = injectStrict(unreadCountKey)
 
 const {
   items: notifications,
-  fetched,
+  isFetched,
   loadMore
 } = useInfiniteList<AppNotification>('notifications')
 useSwipeTabs({ tabOrder: ['unread', 'all'], currentTab: () => page.props.tab })
@@ -52,12 +52,12 @@ useSwipeTabs({ tabOrder: ['unread', 'all'], currentTab: () => page.props.tab })
   </v-row>
 
   <div class="mx-auto column-full">
-    <template v-if="!fetched">
+    <template v-if="!isFetched">
       <po-loading type="avatar, paragraph, button" cols="12" md="12" lg="12" class="mx-auto" />
     </template>
 
     <template v-else-if="!isEmpty(notifications)">
-      <template v-if="'unread' === page.props.tab">
+      <template v-if="page.props.tab === 'unread'">
         <div class="mb-3 text-right">
           <po-button
             :href="route('notifications.clear')"

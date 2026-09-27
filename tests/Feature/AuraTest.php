@@ -4,6 +4,7 @@ use App\Jobs\RecalculateAura;
 use App\Models\Comment;
 use App\Models\Writing;
 use App\Notifications\WritingFeatured;
+use App\Services\AuraCalculator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
@@ -16,7 +17,7 @@ describe('a user\'s aura', function (): void {
         $user = createUser(['aura' => fake()->randomFloat(2, 1, 100)]);
 
         // When
-        $user->updateAura();
+        app(AuraCalculator::class)->updateUserAura($user);
 
         // Then
         expect((float) $user->refresh()->aura)->toBe(0.0);
@@ -28,7 +29,7 @@ describe('a user\'s aura', function (): void {
         DB::table('users')->where('id', $user->id)->update(['profile_views' => fake()->numberBetween(1, 1000)]);
 
         // When
-        $user->updateAura();
+        app(AuraCalculator::class)->updateUserAura($user);
 
         // Then
         expect((float) $user->refresh()->aura)->toBeGreaterThan(0.0);
@@ -41,7 +42,7 @@ describe('a user\'s aura', function (): void {
         $user = createUser(['aura' => $aura]);
 
         // When
-        $user->updateAura();
+        app(AuraCalculator::class)->updateUserAura($user);
 
         // Then
         expect((float) $user->refresh()->aura)->toBe($aura);
@@ -57,7 +58,7 @@ describe('a user\'s karma grade', function (): void {
             ->each(fn (Writing $writing) => $writing->likes()->create(['user_id' => $user->id, 'vote' => 1]));
 
         // When
-        $user->updateKarma();
+        app(AuraCalculator::class)->updateUserKarma($user);
 
         // Then
         expect($user->refresh()->karma)->toBe($grade);
@@ -78,7 +79,7 @@ describe('a user\'s karma grade', function (): void {
         DB::table('likes')->where('id', $like->id)->update(['created_at' => now()->subDays(fake()->numberBetween(91, 365))]);
 
         // When
-        $user->updateKarma();
+        app(AuraCalculator::class)->updateUserKarma($user);
 
         // Then
         expect($user->refresh()->karma)->toBe('F');
@@ -92,9 +93,9 @@ describe('a writing\'s aura', function (): void {
         $liker = createUser();
 
         // When
-        actingAs($liker)->post("/likes/writing/{$writing->id}/store");
+        actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
         $withLike = (float) $writing->refresh()->aura;
-        actingAs($liker)->post("/likes/writing/{$writing->id}/store");
+        actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
 
         // Then
         expect($withLike)->toBeGreaterThan(0.0);
@@ -106,11 +107,11 @@ describe('a writing\'s aura', function (): void {
         $writing = Writing::factory()->create(['views' => 0]);
         $commenter = createUser();
         $comment = Comment::factory()->for($writing)->for($commenter, 'author')->create();
-        $writing->updateAura();
+        app(AuraCalculator::class)->updateWritingAura($writing);
         $withComment = (float) $writing->refresh()->aura;
 
         // When
-        actingAs($commenter)->delete("/comments/delete/{$comment->id}")->assertOk();
+        actingAs($commenter)->delete("/comments/delete/{$comment->id}")->assertRedirect();
 
         // Then
         expect($withComment)->toBeGreaterThan(0.0);
@@ -121,11 +122,11 @@ describe('a writing\'s aura', function (): void {
         // Given
         $writing = Writing::factory()->create(['views' => 0]);
         $reader = createUser();
-        actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        actingAs($reader)->post("/shelves/{$writing->slug}/toggle");
         $onShelf = (float) $writing->refresh()->aura;
 
         // When
-        actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        actingAs($reader)->post("/shelves/{$writing->slug}/toggle");
 
         // Then
         expect($onShelf)->toBeGreaterThan(0.0);
@@ -139,7 +140,7 @@ describe('a writing\'s aura', function (): void {
         $writing = Writing::factory()->create(['aura' => $aura]);
 
         // When
-        $writing->updateAura();
+        app(AuraCalculator::class)->updateWritingAura($writing);
 
         // Then
         expect((float) $writing->refresh()->aura)->toBe($aura);
@@ -158,10 +159,10 @@ describe('featuring a writing on the home page', function (): void {
         $writing = Writing::factory()->for($author, 'author')->create(['views' => fake()->numberBetween(1, 1000)]);
 
         // When
-        $writing->updateAura();
+        app(AuraCalculator::class)->updateWritingAura($writing);
         $firstAward = $writing->refresh()->home_posted_at;
-        $writing->updateAura();
-        $writing->updateAura();
+        app(AuraCalculator::class)->updateWritingAura($writing);
+        app(AuraCalculator::class)->updateWritingAura($writing);
 
         // Then
         expect($firstAward)->not->toBeNull();
@@ -175,7 +176,7 @@ describe('featuring a writing on the home page', function (): void {
         $writing = Writing::factory()->create(['views' => fake()->numberBetween(1, 1000), 'created_at' => now()->subDays(fake()->numberBetween(32, 365))]);
 
         // When
-        $writing->updateAura();
+        app(AuraCalculator::class)->updateWritingAura($writing);
 
         // Then
         expect($writing->refresh()->home_posted_at)->toBeNull();
@@ -188,7 +189,7 @@ describe('featuring a writing on the home page', function (): void {
         $writing = Writing::factory()->create(['views' => fake()->numberBetween(1, 1000)]);
 
         // When
-        $writing->updateAura();
+        app(AuraCalculator::class)->updateWritingAura($writing);
 
         // Then
         expect($writing->refresh()->home_posted_at)->toBeNull();
@@ -197,6 +198,21 @@ describe('featuring a writing on the home page', function (): void {
 });
 
 describe('recalculating aura after an interaction', function (): void {
+    it('is queued once for a burst of interactions on the same content', function (): void {
+        // Given
+        Queue::fake();
+        $writing = Writing::factory()->create();
+        $liker = createUser();
+
+        // When
+        RecalculateAura::dispatch($liker, $writing);
+        RecalculateAura::dispatch($liker, $writing);
+        RecalculateAura::dispatch(createUser(), $writing);
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, 2);
+    });
+
     it('is queued for the liker and the writing when a writing is liked', function (): void {
         // Given
         Queue::fake();
@@ -204,7 +220,7 @@ describe('recalculating aura after an interaction', function (): void {
         $liker = createUser();
 
         // When
-        actingAs($liker)->post("/likes/writing/{$writing->id}/store");
+        actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
 
         // Then
         Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($liker) === true
@@ -219,7 +235,7 @@ describe('recalculating aura after an interaction', function (): void {
         $liker = createUser();
 
         // When
-        actingAs($liker)->post("/likes/comment/{$comment->id}/store");
+        actingAs($liker)->post("/likes/comment/{$comment->id}/toggle");
 
         // Then
         Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($liker) === true
@@ -233,14 +249,14 @@ describe('recalculating aura after an interaction', function (): void {
         $reader = createUser();
 
         // When
-        actingAs($reader)->post("/shelves/{$writing->slug}/store");
+        actingAs($reader)->post("/shelves/{$writing->slug}/toggle");
 
         // Then
         Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($reader) === true
             && $job->writing?->is($writing) === true);
     });
 
-    it('is queued when a comment is posted and when it is deleted', function (): void {
+    it('is queued when a comment is posted', function (): void {
         // Given
         Queue::fake();
         $writing = Writing::factory()->create();
@@ -248,10 +264,21 @@ describe('recalculating aura after an interaction', function (): void {
 
         // When
         actingAs($commenter)->post('/comments/create', ['writing_id' => $writing->id, 'comment' => fake()->sentence()]);
-        $comment = Comment::firstOrFail();
-        actingAs($commenter)->delete("/comments/delete/{$comment->id}");
 
         // Then
-        Queue::assertPushed(RecalculateAura::class, 2);
+        Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($commenter) === true
+            && $job->writing?->is($writing) === true);
+    });
+
+    it('is queued when a comment is deleted', function (): void {
+        // Given
+        Queue::fake();
+        $comment = Comment::factory()->create();
+
+        // When
+        actingAs($comment->author()->firstOrFail())->delete("/comments/delete/{$comment->id}");
+
+        // Then
+        Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->writing?->is($comment->writing) === true);
     });
 });

@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use App\Services\SiteSettings;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class SettingsController extends Controller
 {
     /**
      * Update the specified resource in storage.
-     *
-     * @return array<string, string>
      */
-    public function update(Request $request, SiteSettings $siteSettings): array
+    public function update(Request $request, SiteSettings $siteSettings): RedirectResponse
     {
         // Validate user input
         $request->validate([
@@ -55,10 +55,8 @@ class SettingsController extends Controller
 
         $siteSettings->refresh();
 
-        $message = __('Settings saved successfully');
+        Inertia::flash(['message' => 'admin.settings-saved', 'color' => 'success']);
 
-        return [
-            'message' => $message,
-        ];
+        return back();
     }
 }

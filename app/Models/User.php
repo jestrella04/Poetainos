@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Notifications\VerifyEmailCode;
-use App\Services\AuraCalculator;
 use App\Services\VerificationCodes;
+use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,18 +12,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
 /**
+ * @property-read UserProfile $profile Never null: an empty profile stands in until the user fills one in.
+ *
  * @mixin IdeHelperUser
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasPushSubscriptions, Notifiable;
+
+    /**
+     * A valid username: word characters and single dots, not starting or ending with a dot.
+     */
+    public const USERNAME_PATTERN = '/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,44}$/';
+
+    /**
+     * An @mention of a username. It may capture a sentence's closing dot,
+     * which no username ends with, so callers trim trailing dots.
+     */
+    public const MENTION_PATTERN = '/\B@(\w[\w.]{0,44})/';
 
     /**
      * The attributes that are mass assignable.
@@ -36,7 +50,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'password_updated_at',
-        'extra_info',
     ];
 
     /**
@@ -47,6 +60,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        // Superseded by the profile and account columns; kept only until its data is verified and dropped
+        'extra_info',
     ];
 
     /**
@@ -58,7 +73,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
-            'extra_info' => 'array',
+            'terms_accepted_at' => 'datetime',
+            'privacy_accepted_at' => 'datetime',
+            'wants_email_notifications' => 'boolean',
         ];
     }
 
@@ -119,13 +136,56 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function scopeForAuthorSummary(Builder $query, bool $withKarma = false): Builder
     {
-        $columns = ['id', 'username', 'name', 'extra_info->avatar AS avatar'];
+        $columns = ['id', 'username', 'name'];
 
         if ($withKarma === true) {
             $columns[] = 'karma';
         }
 
-        return $query->select($columns);
+        return $query->select($columns)->withProfileFields('avatar');
+    }
+
+    /**
+     * Add profile fields to the selected columns under their own names,
+     * keeping the flat shape listings send (`avatar`, `bio`…) without
+     * loading the profile relation.
+     *
+     * @param  Builder<User>  $query
+     * @return Builder<User>
+     */
+    public function scopeWithProfileFields(Builder $query, string ...$fields): Builder
+    {
+        foreach ($fields as $field) {
+            $query->addSelect([
+                $field => UserProfile::select($field)->whereColumn('user_profiles.user_id', 'users.id'),
+            ]);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return HasOne<UserProfile, $this>
+     */
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class)->withDefault();
+    }
+
+    /**
+     * The profile, created on first use so it can be saved.
+     */
+    public function editableProfile(): UserProfile
+    {
+        return $this->profile()->firstOrCreate([]);
+    }
+
+    /**
+     * @return HasMany<SocialAccount, $this>
+     */
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
     }
 
     /**
@@ -164,9 +224,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * The likes the user gave to writings and comments.
+     *
      * @return HasMany<Like, $this>
      */
-    public function likes(): HasMany
+    public function givenLikes(): HasMany
     {
         return $this->hasMany(Like::class);
     }
@@ -178,7 +240,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function likedWritingIds(): HasMany
     {
-        return $this->likes()->where('likeable_type', Writing::class)->select('likeable_id');
+        return $this->givenLikes()->where('likeable_type', Writing::class)->select('likeable_id');
     }
 
     /**
@@ -197,18 +259,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->syncOriginalAttribute('profile_views');
     }
 
-    public function updateAura(): void
-    {
-        app(AuraCalculator::class)->updateUserAura($this);
-    }
-
-    public function updateKarma(): self
-    {
-        app(AuraCalculator::class)->updateUserKarma($this);
-
-        return $this;
-    }
-
     public function isAllowed(string $task): bool
     {
         if ($this->role === null) {
@@ -222,19 +272,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isInAgreement(): bool
     {
-        $terms = $this->extra_info['agreement']['terms_of_use'] ?? false;
-        $privacy = $this->extra_info['agreement']['privacy_policy'] ?? false;
-
-        return isTruthy($terms) && isTruthy($privacy);
+        return $this->terms_accepted_at !== null && $this->privacy_accepted_at !== null;
     }
 
     public function acceptAgreements(): void
     {
-        $info = $this->extra_info;
-        $info['agreement']['terms_of_use'] = 'on';
-        $info['agreement']['privacy_policy'] = 'on';
-
-        $this->update(['extra_info' => $info]);
+        $this->terms_accepted_at ??= Carbon::now();
+        $this->privacy_accepted_at ??= Carbon::now();
+        $this->save();
     }
 
     public function block(User $userToBlock): BlockedUser
@@ -268,17 +313,13 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function wantsEmailNotifications(): bool
     {
-        $setting = $this->extra_info['notifications']['email'] ?? null;
-
-        return $setting === null || $setting === '' || isTruthy($setting);
+        return $this->wants_email_notifications !== false;
     }
 
-    public function setEmailNotifications(bool $enabled): void
+    public function setEmailNotifications(bool $isEnabled): void
     {
-        $info = $this->extra_info;
-        $info['notifications']['email'] = $enabled ? 'on' : 'off';
-
-        $this->update(['extra_info' => $info]);
+        $this->wants_email_notifications = $isEnabled;
+        $this->save();
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\SocialAccount;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Notifications\SocialLoginCode;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -19,6 +21,28 @@ use function Pest\Laravel\postJson;
 function fakeAvatarPath(): string
 {
     return 'avatars/'.fake()->uuid().'.png';
+}
+
+/**
+ * A user with the given profile fields and social login providers already linked.
+ *
+ * @param  array<string, mixed>  $attributes
+ * @param  array<model-property<UserProfile>, mixed>  $profile
+ * @param  list<string>  $linkedProviders
+ */
+function createSocialUser(array $attributes = [], array $profile = [], array $linkedProviders = []): User
+{
+    $user = createUser($attributes);
+
+    if ($profile !== []) {
+        UserProfile::factory()->for($user)->create(['avatar' => null, 'bio' => null, ...$profile]);
+    }
+
+    foreach ($linkedProviders as $provider) {
+        SocialAccount::factory()->for($user)->create(['provider' => $provider]);
+    }
+
+    return $user;
 }
 
 /**
@@ -51,14 +75,10 @@ describe('social login', function (): void {
         // Given
         $verifiedAt = Carbon::instance(fake()->dateTimeBetween('-5 years', '-1 day'));
         $email = fake()->unique()->safeEmail();
-        $user = createUser([
-            'email' => $email,
-            // Already has an avatar and a linked Google provider, so the callback's
-            // avatar-download and confirm-a-new-provider branches are both skipped —
-            // this test targets the email-verification branch only.
-            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
-            'email_verified_at' => $verifiedAt,
-        ]);
+        // Already has an avatar and a linked Google provider, so the callback's
+        // avatar-download and confirm-a-new-provider branches are both skipped —
+        // this test targets the email-verification branch only.
+        $user = createSocialUser(['email' => $email, 'email_verified_at' => $verifiedAt], ['avatar' => fakeAvatarPath()], ['google']);
         $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
@@ -73,11 +93,7 @@ describe('social login', function (): void {
     it('verifies a not-yet-verified email on first login', function (): void {
         // Given
         $email = fake()->unique()->safeEmail();
-        $user = createUser([
-            'email' => $email,
-            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
-            'email_verified_at' => null,
-        ]);
+        $user = createSocialUser(['email' => $email, 'email_verified_at' => null], ['avatar' => fakeAvatarPath()], ['google']);
         $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
@@ -92,10 +108,7 @@ describe('social login', function (): void {
     it('ignores an external redirect target to prevent an open redirect', function (): void {
         // Given
         $email = fake()->unique()->safeEmail();
-        $user = createUser([
-            'email' => $email,
-            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
-        ]);
+        $user = createSocialUser(['email' => $email], ['avatar' => fakeAvatarPath()], ['google']);
         $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
@@ -110,7 +123,7 @@ describe('social login', function (): void {
     it('asks an existing account for an emailed code before it trusts a new provider', function (): void {
         // Given
         Notification::fake();
-        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $user = createSocialUser([], ['avatar' => fakeAvatarPath()]);
         Socialite::fake('google', SocialiteUser::fake(['email' => $user->email]));
 
         // When
@@ -124,7 +137,7 @@ describe('social login', function (): void {
 
     it('shows the code confirmation page while a sign-in awaits confirmation', function (): void {
         // Given
-        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $user = createSocialUser([], ['avatar' => fakeAvatarPath()]);
         startProviderLink($user);
 
         // When
@@ -144,31 +157,28 @@ describe('social login', function (): void {
 
         // Then
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('message', 'accounts.social-link-expired');
+        $response->assertInertiaFlash('message', 'accounts.social-link-expired');
     });
 
     it('logs the user in and links the provider once the emailed code is entered', function (): void {
         // Given
-        $user = createUser([
-            'email_verified_at' => null,
-            'extra_info' => ['avatar' => fakeAvatarPath()],
-        ]);
+        $user = createSocialUser(['email_verified_at' => null], ['avatar' => fakeAvatarPath()]);
         $code = startProviderLink($user);
 
         // When
         $response = postJson(route('social.confirm.verify', 'google'), ['code' => $code]);
 
         // Then
-        $response->assertOk()->assertJson(['url' => route('home')]);
+        $response->assertRedirect(route('home'));
         assertAuthenticatedAs($user);
         $user->refresh();
-        expect(data_get($user->extra_info, 'linked_providers'))->toBe(['google']);
+        expect($user->socialAccounts()->pluck('provider')->all())->toBe(['google']);
         expect($user->email_verified_at)->not->toBeNull();
     });
 
     it('returns to the page the user started from once the code is entered', function (): void {
         // Given
-        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $user = createSocialUser([], ['avatar' => fakeAvatarPath()]);
         $intendedPath = '/'.fake()->slug();
         get(route('social.login', ['service' => 'google', 'redirect' => $intendedPath]));
         $code = startProviderLink($user);
@@ -177,7 +187,7 @@ describe('social login', function (): void {
         $response = postJson(route('social.confirm.verify', 'google'), ['code' => $code]);
 
         // Then
-        $response->assertOk()->assertJson(['url' => url($intendedPath)]);
+        $response->assertRedirect(url($intendedPath));
     });
 
     it('imports the provider avatar once the code is entered', function (): void {
@@ -191,17 +201,17 @@ describe('social login', function (): void {
         $code = startProviderLink($user, 'https://avatars.example/'.fake()->uuid().'.png');
 
         // When
-        postJson(route('social.confirm.verify', 'google'), ['code' => $code])->assertOk();
+        postJson(route('social.confirm.verify', 'google'), ['code' => $code])->assertRedirect();
 
         // Then
-        $avatar = data_get($user->refresh()->extra_info, 'avatar');
+        $avatar = (string) $user->refresh()->profile->avatar;
         expect($avatar)->toStartWith('avatars/');
         Storage::disk('local')->assertExists($avatar);
     });
 
     it('rejects a wrong code and keeps the user signed out', function (): void {
         // Given
-        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $user = createSocialUser([], ['avatar' => fakeAvatarPath()]);
         $code = startProviderLink($user);
 
         // When
@@ -212,7 +222,7 @@ describe('social login', function (): void {
             'code' => __('The verification code is invalid or has expired.'),
         ]);
         assertGuest();
-        expect(data_get($user->refresh()->extra_info, 'linked_providers'))->toBeNull();
+        expect($user->socialAccounts()->exists())->toBeFalse();
     });
 
     it('rejects a code when no sign-in awaits confirmation', function (): void {
@@ -228,7 +238,7 @@ describe('social login', function (): void {
 
     it('emails a fresh code on request and stops accepting the previous one', function (): void {
         // Given
-        $user = createUser(['extra_info' => ['avatar' => fakeAvatarPath()]]);
+        $user = createSocialUser([], ['avatar' => fakeAvatarPath()]);
         $firstCode = startProviderLink($user);
         Notification::fake();
 
@@ -239,17 +249,14 @@ describe('social login', function (): void {
         $response->assertNoContent();
         $secondCode = sentLinkCode($user);
         postJson(route('social.confirm.verify', 'google'), ['code' => $firstCode])->assertUnprocessable();
-        postJson(route('social.confirm.verify', 'google'), ['code' => $secondCode])->assertOk();
+        postJson(route('social.confirm.verify', 'google'), ['code' => $secondCode])->assertRedirect();
         assertAuthenticatedAs($user);
     });
 
     it('does not require reconfirmation once a provider has been linked', function (): void {
         // Given
         $email = fake()->unique()->safeEmail();
-        $user = createUser([
-            'email' => $email,
-            'extra_info' => ['avatar' => fakeAvatarPath(), 'linked_providers' => ['google']],
-        ]);
+        $user = createSocialUser(['email' => $email], ['avatar' => fakeAvatarPath()], ['google']);
         $socialUser = SocialiteUser::fake(['email' => $email]);
         Socialite::fake('google', $socialUser);
 
@@ -276,7 +283,7 @@ describe('social login', function (): void {
         // Then
         $response->assertRedirect();
         $user = User::where('email', $email)->firstOrFail();
-        expect(data_get($user->extra_info, 'avatar'))->toBeNull();
+        expect($user->profile->avatar)->toBeNull();
     });
 
     it('refuses a login when the provider shares no email address', function (): void {
@@ -288,7 +295,7 @@ describe('social login', function (): void {
 
         // Then
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('message', 'accounts.social-email-missing');
+        $response->assertInertiaFlash('message', 'accounts.social-email-missing');
         assertGuest();
         expect(User::count())->toBe(0);
     });
@@ -302,7 +309,7 @@ describe('social login', function (): void {
 
         // Then
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('message', 'accounts.social-link-expired');
+        $response->assertInertiaFlash('message', 'accounts.social-link-expired');
         assertGuest();
     });
 
@@ -315,15 +322,7 @@ describe('social login', function (): void {
         Http::fake(['avatars.example/*' => Http::response($png)]);
         $bio = fake()->sentence();
         $email = fake()->unique()->safeEmail();
-        $user = createUser([
-            'email' => $email,
-            'extra_info' => [
-                'bio' => $bio,
-                'avatar' => '',
-                'notifications' => ['email' => 'off'],
-                'linked_providers' => ['google'],
-            ],
-        ]);
+        $user = createSocialUser(['email' => $email, 'wants_email_notifications' => false], ['bio' => $bio], ['google']);
         Socialite::fake('google', SocialiteUser::fake([
             'email' => $email,
             'avatar' => 'https://avatars.example/'.fake()->uuid().'.png',
@@ -333,10 +332,10 @@ describe('social login', function (): void {
         get('/login/google/callback')->assertRedirect();
 
         // Then
-        $info = $user->refresh()->extra_info;
-        expect(data_get($info, 'bio'))->toBe($bio);
-        expect(data_get($info, 'notifications.email'))->toBe('off');
-        $avatar = data_get($info, 'avatar');
+        $user->refresh();
+        expect($user->profile->bio)->toBe($bio);
+        expect($user->wantsEmailNotifications())->toBeFalse();
+        $avatar = (string) $user->profile->avatar;
         expect($avatar)->toStartWith('avatars/')->toEndWith('.png');
         Storage::disk('local')->assertExists($avatar);
         expect(storedImageWidth($avatar))->toBe(512);
@@ -348,10 +347,7 @@ describe('social login', function (): void {
         Http::fake(['avatars.example/*' => Http::response($body)]);
         $bio = fake()->sentence();
         $email = fake()->unique()->safeEmail();
-        $user = createUser([
-            'email' => $email,
-            'extra_info' => ['bio' => $bio, 'linked_providers' => ['google']],
-        ]);
+        $user = createSocialUser(['email' => $email], ['bio' => $bio], ['google']);
         Socialite::fake('google', SocialiteUser::fake([
             'email' => $email,
             'avatar' => 'https://avatars.example/'.fake()->uuid().'.png',
@@ -361,8 +357,8 @@ describe('social login', function (): void {
         get('/login/google/callback')->assertRedirect();
 
         // Then
-        expect(data_get($user->refresh()->extra_info, 'avatar'))->toBeNull();
-        expect(data_get($user->extra_info, 'bio'))->toBe($bio);
+        expect($user->refresh()->profile->avatar)->toBeNull();
+        expect($user->profile->bio)->toBe($bio);
         expect(Storage::disk('local')->allFiles())->toBe([]);
     })->with([
         'a web page' => [fn (): string => '<html>'.fake()->sentence().'</html>'],

@@ -8,6 +8,7 @@ use App\Notifications\WritingCommented;
 use App\Notifications\WritingCommentMentioned;
 use App\Notifications\WritingFeatured;
 use App\Notifications\WritingLiked;
+use App\Notifications\WritingShelved;
 
 describe('notification emails', function (): void {
     /**
@@ -21,7 +22,7 @@ describe('notification emails', function (): void {
 
     it('are sent to users who never chose', function (Closure $makeNotification): void {
         // Given
-        $recipient = createUser(['extra_info' => null]);
+        $recipient = createUser();
         $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
 
         // Then
@@ -30,7 +31,7 @@ describe('notification emails', function (): void {
 
     it('are sent to users who opted in', function (Closure $makeNotification): void {
         // Given
-        $recipient = createUser(['extra_info' => ['notifications' => ['email' => 'on']]]);
+        $recipient = createUser(['wants_email_notifications' => true]);
         $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
 
         // Then
@@ -39,7 +40,7 @@ describe('notification emails', function (): void {
 
     it('are not sent to users who opted out, but the in-app notification still is', function (Closure $makeNotification): void {
         // Given
-        $recipient = createUser(['extra_info' => ['notifications' => ['email' => 'off']]]);
+        $recipient = createUser(['wants_email_notifications' => false]);
         $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
 
         // Then
@@ -89,5 +90,40 @@ describe('the content of "someone did something on your writing" notifications',
 
         // Then
         expect($mail->actionUrl)->toBe($writing->path().'#comment-'.$comment->id);
+    });
+});
+
+describe('live notification broadcasts', function (): void {
+    it('go out after the in-app notification is stored', function (Closure $makeNotification): void {
+        // Given
+        $recipient = createUser();
+        $notification = $makeNotification(createUser(), Writing::factory()->for($recipient, 'author')->create());
+
+        // When
+        $channels = $notification->via($recipient);
+
+        // Then
+        expect(array_values(array_intersect($channels, ['database', 'broadcast'])))->toBe(['database', 'broadcast']);
+    })->with([
+        'a like on a writing' => [fn (User $actor, Writing $writing) => new WritingLiked($writing, $actor)],
+        'a shelving' => [fn (User $actor, Writing $writing) => new WritingShelved($writing, $actor)],
+        'a new comment' => [fn (User $actor, Writing $writing) => new WritingCommented($writing, $actor)],
+        'a featured writing' => [fn (User $actor, Writing $writing) => new WritingFeatured($writing)],
+    ]);
+
+    it('carry the recipient\'s unread count for the badge', function (): void {
+        // Given
+        $recipient = createUser();
+        $writing = Writing::factory()->for($recipient, 'author')->create();
+        $unread = fake()->numberBetween(1, 5);
+        foreach (range(1, $unread) as $ignored) {
+            createDatabaseNotification($recipient, ['writing_id' => $writing->id]);
+        }
+
+        // When
+        $message = (new WritingLiked($writing, createUser()))->toBroadcast($recipient);
+
+        // Then
+        expect($message->data)->toBe(['unread' => $unread]);
     });
 });

@@ -61,7 +61,7 @@ describe('verifying an email', function (): void {
         // Then
         Event::assertDispatched(Verified::class);
         expect($user->refresh()->hasVerifiedEmail())->toBeTrue();
-        $response->assertOk()->assertJson(['url' => route('home')]);
+        $response->assertRedirect(route('home'))->assertInertiaFlash('message', 'accounts.email-verified');
     });
 
     it('is not verified with a wrong code', function (): void {

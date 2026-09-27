@@ -1,45 +1,37 @@
 <script setup lang="ts">
-import { provide, reactive, ref } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import { formDataKey } from '@/composables/keys'
+import { useTemplateRef } from 'vue'
+import { useForm, usePage } from '@inertiajs/vue3'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useFormErrors } from '@/composables/useFormErrors'
-import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useFormValidation } from '@/composables/useFormValidation'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { InertiaPageProps } from '@/types/inertia'
-import type { LaravelValidationErrors } from '@/types/http'
 
-// $user (the raw Eloquent model, not a select()) — a different shape from
-// types/models.ts's `User` (which reflects UsersController::show()'s
-// flattened extra_info->x AS x columns): here extra_info is still a
-// genuine nested object, cast by the model.
+type SocialNetworkKey = 'twitter' | 'threads' | 'instagram' | 'facebook' | 'youtube' | 'goodreads'
+
+// UsersController::edit()'s user with its profile loaded (null until the user fills one in)
 interface EditableUser {
   id: number
   username: string
   name?: string | null
   email: string
   role_id?: number | null
-  extra_info?: {
-    avatar?: string
-    bio?: string
-    location?: string
-    occupation?: string
-    interests?: string
-    website?: string
-    social?: Record<string, string>
-  } | null
+  profile:
+    | (Partial<Record<SocialNetworkKey, string | null>> & {
+        avatar?: string | null
+        bio?: string | null
+        location?: string | null
+        occupation?: string | null
+        interests?: string | null
+        website?: string | null
+      })
+    | null
 }
 
 interface Role {
   id: number
   name: string
 }
-
-interface PostedResult {
-  url: string
-}
-
-type SocialNetworkKey = 'twitter' | 'threads' | 'instagram' | 'facebook' | 'youtube' | 'goodreads'
 
 interface SocialLinkField {
   key: SocialNetworkKey
@@ -58,137 +50,96 @@ const socialLinkFields: SocialLinkField[] = [
 
 const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
 const { authUser, isAdmin } = useAuth()
-const { isEmpty } = useTypeGuards()
-const { validationErrors } = useFormErrors()
-const { isPosting, errors, submitForm: postForm } = useFormSubmit<LaravelValidationErrors>({})
+const { isBlank } = useTypeGuards()
+const { isSubmittedFormValid } = useFormValidation()
+const { onHttpException, onNetworkError } = useRequestFailure()
+const avatarInput = useTemplateRef<{ click: () => void }>('avatarInput')
 
 const user = page.props.user
-const formData = reactive({
-  avatar: [] as File[],
-  avatarRemove: false,
-  role: '' as string | number, // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion -- widens for the later `formData.role = user.role_id` numeric assignment
-  name: '',
-  username: '',
-  email: '',
-  bio: '',
-  location: '',
-  occupation: '',
-  interests: '',
-  website: '',
-  twitter: '',
-  threads: '',
-  instagram: '',
-  facebook: '',
-  youtube: '',
-  goodreads: '',
-  serviceAgreement: false,
-  privacyAgreement: false
+const form = useForm({
+  avatar: null as File | null,
+  'avatar-remove': false,
+  role: user.role_id ?? null,
+  name: user.name ?? '',
+  email: user.email,
+  bio: user.profile?.bio ?? '',
+  location: user.profile?.location ?? '',
+  occupation: user.profile?.occupation ?? '',
+  interests: user.profile?.interests ?? '',
+  website: user.profile?.website ?? '',
+  ...(Object.fromEntries(
+    socialLinkFields.map((field) => [field.key, user.profile?.[field.key] ?? ''])
+  ) as Record<SocialNetworkKey, string>),
+  service_agreement: false,
+  privacy_agreement: false
 })
-const isPosted = ref<Partial<PostedResult>>({})
 
-provide(formDataKey, formData)
-
-// Init form data
-formData.role = user.role_id ?? ''
-formData.name = user.name ?? ''
-formData.username = user.username ?? ''
-formData.email = user.email ?? ''
-
-if (user.extra_info !== null && user.extra_info !== undefined) {
-  formData.bio = user.extra_info.bio ?? ''
-  formData.location = user.extra_info.location ?? ''
-  formData.occupation = user.extra_info.occupation ?? ''
-  formData.interests = user.extra_info.interests ?? ''
-  formData.website = user.extra_info.website ?? ''
-
-  if (user.extra_info.social !== undefined) {
-    formData.twitter = user.extra_info.social.twitter ?? ''
-    formData.threads = user.extra_info.social.threads ?? ''
-    formData.instagram = user.extra_info.social.instagram ?? ''
-    formData.facebook = user.extra_info.social.facebook ?? ''
-    formData.youtube = user.extra_info.social.youtube ?? ''
-    formData.goodreads = user.extra_info.social.goodreads ?? ''
-  }
+// PoAvatar reads a flat `avatar`, as every listing sends it
+const avatarUser = {
+  username: user.username,
+  name: user.name,
+  avatar: user.profile?.avatar ?? null
 }
+const hasAvatar = !isBlank(avatarUser.avatar)
 
-async function submitForm() {
-  isPosted.value = {}
+// The server opens the profile once saved, confirming with a flash message. The
+// avatar upload makes this multipart, which PHP only parses on POST, hence the
+// method spoofing.
+function submitForm(event: Event): void {
+  if (isSubmittedFormValid(event) === false) {
+    return
+  }
 
-  await postForm<PostedResult>({
-    formSelector: '#profile-form',
-    multipart: true,
-    cooldown: true,
-    payload: {
-      _method: 'PUT',
-      avatar: formData.avatar,
-      'avatar-remove': formData.avatarRemove ? 1 : 0,
-      role: formData.role,
-      name: formData.name,
-      email: formData.email,
-      bio: formData.bio,
-      location: formData.location,
-      occupation: formData.occupation,
-      interests: formData.interests,
-      website: formData.website,
-      twitter: formData.twitter,
-      threads: formData.threads,
-      instagram: formData.instagram,
-      facebook: formData.facebook,
-      youtube: formData.youtube,
-      goodreads: formData.goodreads,
-      service_agreement: formData.serviceAgreement,
-      privacy_agreement: formData.privacyAgreement
-    },
-    onSuccess: (data) => {
-      isPosted.value = data
-    },
-    onError: validationErrors
-  })
+  form
+    .transform((data) => ({ ...data, _method: 'put' }))
+    .post(route('users.update', user.username), {
+      forceFormData: true,
+      onHttpException,
+      onNetworkError
+    })
 }
 
 function openAvatarPicker(): void {
-  document.querySelector<HTMLElement>('#avatar-input')?.click()
+  avatarInput.value?.click()
 }
 </script>
 
 <template>
-  <po-wrapper class="w-100" style="max-width: 900px">
+  <v-responsive class="w-100" max-width="900">
     <po-head />
-    <v-card :title="$t('accounts.update-profile').toUpperCase()">
-      <v-form
-        id="profile-form"
-        :action="route('users.update', user.username)"
-        class="px-5 pb-5"
-        @submit.prevent="submitForm"
-      >
+    <v-card>
+      <v-card-title class="text-uppercase">{{ $t('accounts.update-profile') }}</v-card-title>
+
+      <v-form id="profile-form" class="px-5 pb-5" @submit.prevent="submitForm">
         <div class="d-flex ga-3 mb-3 align-center">
-          <po-avatar :user="user" size="72" color="secondary" />
+          <po-avatar :user="avatarUser" size="72" color="secondary" />
           <po-button color="primary" variant="tonal" @click="openAvatarPicker">{{
             $t('main.choose-image')
           }}</po-button>
 
           <v-file-input
             id="avatar-input"
+            ref="avatarInput"
             class="d-none"
-            v-model="formData.avatar"
+            v-model="form.avatar"
             :label="$t('main.choose-image')"
             hide-details
           />
         </div>
 
         <v-checkbox
-          v-if="(user.extra_info?.avatar ?? '') !== ''"
-          v-model="formData.avatarRemove"
+          v-if="hasAvatar"
+          v-model="form['avatar-remove']"
           :label="$t('accounts.remove-current-avatar')"
           hide-details
         />
 
         <template v-if="isAdmin()">
           <v-select
-            v-model="formData.role"
+            v-model="form.role"
             :label="$t('main.role')"
             hide-details="auto"
-            :error-messages="errors.role"
+            :error-messages="form.errors.role"
             :items="page.props.roles"
             item-value="id"
             item-title="name"
@@ -197,11 +148,11 @@ function openAvatarPicker(): void {
         </template>
 
         <v-text-field
-          v-model="formData.name"
+          v-model="form.name"
           type="text"
           :label="$t('main.name')"
           hide-details="auto"
-          :error-messages="errors.name"
+          :error-messages="form.errors.name"
           minlength="3"
           maxlength="250"
           required
@@ -209,10 +160,9 @@ function openAvatarPicker(): void {
         />
 
         <v-text-field
-          v-model="formData.username"
+          :model-value="user.username"
           :label="$t('users.username')"
           hide-details="auto"
-          :error-messages="errors.username"
           minlength="3"
           maxlength="100"
           required
@@ -220,11 +170,11 @@ function openAvatarPicker(): void {
         />
 
         <v-text-field
-          v-model="formData.email"
+          v-model="form.email"
           type="text"
           :label="$t('main.email')"
           hide-details="auto"
-          :error-messages="errors.email"
+          :error-messages="form.errors.email"
           minlength="3"
           maxlength="250"
           required
@@ -232,10 +182,10 @@ function openAvatarPicker(): void {
         />
 
         <v-textarea
-          v-model="formData.bio"
+          v-model="form.bio"
           :label="$t('users.bio')"
           hide-details="auto"
-          :error-messages="errors.bio"
+          :error-messages="form.errors.bio"
           minlength="10"
           maxlength="300"
           clearable
@@ -243,44 +193,44 @@ function openAvatarPicker(): void {
         />
 
         <v-text-field
-          v-model="formData.location"
+          v-model="form.location"
           type="text"
           :label="$t('main.location')"
           hide-details="auto"
-          :error-messages="errors.location"
+          :error-messages="form.errors.location"
           minlength="3"
           maxlength="250"
           clearable
         />
 
         <v-text-field
-          v-model="formData.occupation"
+          v-model="form.occupation"
           type="text"
           :label="$t('main.occupation')"
           hide-details="auto"
-          :error-messages="errors.occupation"
+          :error-messages="form.errors.occupation"
           minlength="3"
           maxlength="100"
           clearable
         />
 
         <v-text-field
-          v-model="formData.interests"
+          v-model="form.interests"
           type="text"
           :label="$t('main.interests')"
           hide-details="auto"
-          :error-messages="errors.interests"
+          :error-messages="form.errors.interests"
           minlength="3"
           maxlength="250"
           clearable
         />
 
         <v-text-field
-          v-model="formData.website"
+          v-model="form.website"
           type="url"
           :label="$t('main.website')"
           hide-details="auto"
-          :error-messages="errors.website"
+          :error-messages="form.errors.website"
           minlength="3"
           maxlength="250"
           clearable
@@ -289,36 +239,27 @@ function openAvatarPicker(): void {
         <v-text-field
           v-for="field in socialLinkFields"
           :key="field.key"
-          v-model="formData[field.key]"
+          v-model="form[field.key]"
           type="text"
           :label="field.label"
           hide-details="auto"
-          :error-messages="errors[field.key]"
+          :error-messages="form.errors[field.key]"
           minlength="3"
           :maxlength="field.maxlength"
           clearable
         />
 
-        <po-agreement v-if="!page.props.agreement && user.id === authUser()!.id" />
+        <po-agreement
+          v-if="!page.props.agreement && user.id === authUser()!.id"
+          v-model:service-agreement="form.service_agreement"
+          v-model:privacy-agreement="form.privacy_agreement"
+        />
 
-        <po-button type="submit" color="primary" size="large" block :disabled="isPosting">
-          <template v-if="isPosting"><v-progress-circular indeterminate /></template>
+        <po-button type="submit" color="primary" size="large" block :disabled="form.processing">
+          <template v-if="form.processing"><v-progress-circular indeterminate /></template>
           <template v-else>{{ $t('main.save') }}</template>
         </po-button>
       </v-form>
-
-      <v-alert
-        v-if="!isEmpty(isPosted)"
-        type="success"
-        variant="tonal"
-        class="mb-5 mx-auto"
-        width="85%"
-        max-width="600"
-      >
-        {{ $t('accounts.profile-updated') }}
-        {{ $t('main.take-a-look') }}
-        <po-link :href="isPosted.url" inertia>{{ $t('main.here') }}.</po-link>
-      </v-alert>
     </v-card>
-  </po-wrapper>
+  </v-responsive>
 </template>

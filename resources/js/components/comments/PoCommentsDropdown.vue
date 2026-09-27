@@ -20,7 +20,7 @@ provide(isDeleteKey, isDelete)
 </script>
 
 <template>
-  <po-complainer v-model="complainer" comp-type="comments" :comp-id="comment.id" />
+  <po-complainer v-model="complainer" complainable-type="comments" :complainable-id="comment.id" />
   <po-blocker v-model="blocker" :user="comment.author" />
   <po-comments-delete v-model="isDelete" :comment="comment" />
 

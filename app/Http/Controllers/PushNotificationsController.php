@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Minishlink\WebPush\ContentEncoding;
 
@@ -12,32 +12,36 @@ class PushNotificationsController extends Controller
     /**
      * Update user's subscription.
      */
-    public function update(Request $request): JsonResponse
+    public function update(Request $request): Response
     {
-        $this->validate($request, [
-            'endpoint' => 'required',
+        $request->validate([
+            'endpoint' => 'required|url|max:500',
+            'publicKey' => 'nullable|string|max:255',
+            'authToken' => 'nullable|string|max:255',
             'contentEncoding' => ['nullable', Rule::enum(ContentEncoding::class)],
         ]);
 
-        $request->user()?->updatePushSubscription(
-            $request->endpoint,
-            $request->publicKey,
-            $request->authToken,
-            $request->contentEncoding
+        $this->requireAuthUser()->updatePushSubscription(
+            request('endpoint'),
+            request('publicKey'),
+            request('authToken'),
+            request('contentEncoding'),
         );
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 
     /**
      * Delete the specified subscription.
      */
-    public function destroy(Request $request): JsonResponse
+    public function destroy(Request $request): Response
     {
-        $this->validate($request, ['endpoint' => 'required']);
+        $request->validate([
+            'endpoint' => 'required|url|max:500',
+        ]);
 
-        $request->user()?->deletePushSubscription($request->endpoint);
+        $this->requireAuthUser()->deletePushSubscription(request('endpoint'));
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 }

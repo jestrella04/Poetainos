@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
-use App\Services\AuraCalculator;
+use App\Models\Concerns\HidesBlockedAuthors;
+use Closure;
 use Database\Factories\WritingFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,7 +23,7 @@ use Illuminate\Support\Facades\DB;
 class Writing extends Model
 {
     /** @use HasFactory<WritingFactory> */
-    use HasFactory;
+    use HasFactory, HidesBlockedAuthors;
 
     /**
      * The attributes that are mass assignable.
@@ -32,20 +35,31 @@ class Writing extends Model
         'title',
         'slug',
         'text',
-        'extra_info',
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @return array<string, string>
+     * How much of the text a listing shows before the reader opens the writing.
      */
-    protected function casts(): array
-    {
-        return [
-            'extra_info' => 'array',
-        ];
-    }
+    private const LISTING_EXCERPT_LENGTH = 400;
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'listing_excerpt',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        // Superseded by the cover and link columns; kept only until its data is verified and dropped
+        'extra_info',
+    ];
 
     public function getRouteKeyName()
     {
@@ -112,11 +126,30 @@ class Writing extends Model
      */
     public function likers(int $limit): Collection
     {
-        return User::forAuthorSummary()
-            ->whereIn('id', $this->likes()->select('user_id'))
-            ->inRandomOrder()
-            ->limit($limit)
-            ->get();
+        return randomSample(User::forAuthorSummary()->whereIn('id', $this->likes()->select('user_id')), $limit);
+    }
+
+    /**
+     * A random writing by a random author, so prolific authors don't crowd
+     * out the rest, leaving out the given writings.
+     *
+     * @param  array<int, int>  $excludedIds
+     *
+     * @throws ModelNotFoundException<Writing> when no writing is left to pick.
+     */
+    public static function randomByRandomAuthor(array $excludedIds = []): self
+    {
+        $authorId = self::whereNotIn('id', $excludedIds)->distinct()->pluck('user_id')->shuffle()->first();
+
+        $writing = $authorId === null
+            ? null
+            : randomSample(self::whereNotIn('id', $excludedIds)->where('user_id', $authorId), 1)->first();
+
+        if ($writing === null) {
+            throw (new ModelNotFoundException)->setModel(self::class);
+        }
+
+        return $writing;
     }
 
     /**
@@ -153,13 +186,23 @@ class Writing extends Model
     }
 
     /**
+     * The start of the text shown in writing listings; null when the text wasn't selected.
+     *
+     * @return Attribute<?string, never>
+     */
+    protected function listingExcerpt(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?string => array_key_exists('text', $this->attributes) ? $this->excerpt(self::LISTING_EXCERPT_LENGTH) : null,
+        );
+    }
+
+    /**
      * The absolute URL of the cover image, if the writing has one.
      */
     public function coverUrl(): ?string
     {
-        $cover = $this->extra_info['cover'] ?? null;
-
-        return $cover === null || $cover === '' ? null : asset('storage/'.$cover);
+        return $this->cover === null || $this->cover === '' ? null : asset('storage/'.$this->cover);
     }
 
     public function incrementViews(): void
@@ -168,11 +211,6 @@ class Writing extends Model
 
         $this->views++;
         $this->syncOriginalAttribute('views');
-    }
-
-    public function updateAura(): void
-    {
-        app(AuraCalculator::class)->updateWritingAura($this);
     }
 
     /**
@@ -184,41 +222,29 @@ class Writing extends Model
     }
 
     /**
-     * Exclude writings authored by any of the given blocked user ids.
-     *
-     * @param  Builder<Writing>  $query
-     * @param  array<int>  $blockedUserIds
-     * @return Builder<Writing>
-     */
-    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
-    {
-        if ($blockedUserIds === []) {
-            return $query;
-        }
-
-        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
-    }
-
-    /**
      * Shared sort used by every writings listing. 'popular' and 'likes'
      * break ties by aura (desc) so that, among writings with an identical
      * views/likes count, the higher-quality (higher-aura) one surfaces
-     * first.
+     * first. The id breaks any remaining tie, so paginated pages never
+     * repeat or skip a writing. 'likes' orders by the `likes_count` that
+     * withListingRelations() adds, so it must be applied first.
      *
      * @param  Builder<Writing>  $query
      * @return Builder<Writing>
      */
     public function scopeSorted(Builder $query, string $sort): Builder
     {
-        return match ($sort) {
+        $sorted = match ($sort) {
             'popular' => $query->orderBy('views', 'desc')->orderBy('aura', 'desc'),
             'likes' => $query->orderBy('likes_count', 'desc')->orderBy('aura', 'desc'),
             default => $query->latest(),
         };
+
+        return $sorted->orderBy($query->getModel()->qualifyColumn('id'), 'desc');
     }
 
     /**
-     * Counts and author summary eager-loaded by every writings listing.
+     * Counts, author summary and the viewer's reactions eager-loaded by every writings listing.
      *
      * @param  Builder<Writing>  $query
      * @return Builder<Writing>
@@ -226,8 +252,34 @@ class Writing extends Model
     public function scopeWithListingRelations(Builder $query): Builder
     {
         return $query->withCount(['likes', 'comments', 'shelf'])
+            ->withExists(self::viewerReactions())
             ->with(['author' => function ($query): void {
                 $query->forAuthorSummary(withKarma: true);
             }]);
+    }
+
+    /**
+     * Whether the signed-in viewer liked (`is_liked`) and shelved
+     * (`is_shelved`) each writing, as `withExists()`/`loadExists()`
+     * relations. Nothing for guests, who have no reactions.
+     *
+     * @return array<string, Closure>
+     */
+    public static function viewerReactions(): array
+    {
+        $viewerId = auth()->guard()->id();
+
+        if ($viewerId === null) {
+            return [];
+        }
+
+        return [
+            'likes as is_liked' => function ($query) use ($viewerId): void {
+                $query->where('user_id', $viewerId);
+            },
+            'shelf as is_shelved' => function ($query) use ($viewerId): void {
+                $query->where('shelves.user_id', $viewerId);
+            },
+        ];
     }
 }

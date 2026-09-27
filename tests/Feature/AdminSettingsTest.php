@@ -35,7 +35,7 @@ describe('updating the site settings', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect()->assertInertiaFlash('message', 'admin.settings-saved');
         expect(Setting::where('name', 'site')->value('data'))->toBe($settings);
         expect(getSiteConfig('name'))->toBe($settings['name']['value']);
         expect(getSiteConfig('pagination'))->toBe($settings['pagination']['value']);

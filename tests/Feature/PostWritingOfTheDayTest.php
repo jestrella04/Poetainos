@@ -100,3 +100,17 @@ describe('posting the writing of the day on the Facebook Page', function (): voi
         expect($post)->toThrow(RequestException::class);
     });
 });
+
+describe('the writing of the day post', function (): void {
+    it('names the site as configured, as a spaceless hashtag too', function (): void {
+        // Given
+        config(['poetainos.name' => 'Casa de Letras']);
+        $writing = Writing::factory()->create();
+
+        // When
+        $message = (new WritingOfTheDayPosted($writing))->toFacebookPage(null)['message'];
+
+        // Then
+        expect($message)->toContain('Casa de Letras')->toContain('#CasadeLetras');
+    });
+});

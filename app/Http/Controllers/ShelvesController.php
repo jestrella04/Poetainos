@@ -11,9 +11,9 @@ class ShelvesController extends Controller
     /**
      * Toggles the shelving: adds the writing to the user's shelf, or takes it off when it is already there.
      *
-     * @return array{method: string, count: int}
+     * @return array{isActive: bool, count: int}
      */
-    public function store(Writing $writing, ReactionToggler $toggler): array
+    public function toggle(Writing $writing, ReactionToggler $toggler): array
     {
         return $toggler->toggle(new ShelfReaction($writing), $this->requireAuthUser());
     }

@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, provide } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import axios from 'axios'
 import PoCommentsForm from './PoCommentsForm.vue'
 import PoCommentsDropdown from './PoCommentsDropdown.vue'
 import { loadingCommentsKey, loginModalKey, replyBoxKey, writingKey } from '@/composables/keys'
@@ -9,13 +7,15 @@ import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormatting } from '@/composables/useFormatting'
-import type { Comment, Paginated } from '@/types/models'
+import { usePaginatedList } from '@/composables/usePaginatedList'
+import { mentionedUsernames } from '@/composables/validationRules'
+import type { Comment } from '@/types/models'
 
-const page = usePage()
 const { isAuthenticated } = useAuth()
-const { isEmpty } = useTypeGuards()
+const { isEmpty, isBlank } = useTypeGuards()
 const { userDisplayName, toLocaleDate, linkify } = useFormatting()
-const comments = ref<Partial<Paginated<Comment>>>({})
+const { items: comments, nextPageUrl, loadFirstPage, loadMore } = usePaginatedList<Comment>()
+const hasLoadError = ref(false)
 const loadingComments = injectStrict(loadingCommentsKey)
 const writing = injectStrict(writingKey)
 const loginModal = injectStrict(loginModalKey)
@@ -27,15 +27,9 @@ onMounted(() => {
   void loadComments()
 })
 
-async function loadComments() {
-  await axios.get<Paginated<Comment>>(route('comments.index', writing.id)).then((response) => {
-    comments.value = response.data
-    loadingComments.value = false
-  })
-}
-
-function isLiked(commentId: number): boolean {
-  return page.props.auth.liked.comments.includes(commentId)
+async function loadComments(): Promise<void> {
+  hasLoadError.value = (await loadFirstPage(route('comments.index', writing.slug))) === false
+  loadingComments.value = false
 }
 
 function toggleReply(commentId: number) {
@@ -50,15 +44,10 @@ function toggleReply(commentId: number) {
   }
 }
 
-function reply(comment: Comment) {
-  const initialText = ['@' + comment.author.username]
-  const mentions = comment.message.matchAll(/(^|\W)@\b([-a-zA-Z0-9._]{3,25})\b/g)
+function reply(comment: Comment): string {
+  const usernames = new Set([comment.author.username, ...mentionedUsernames(comment.message)])
 
-  for (const mention of mentions) {
-    initialText.push(mention[0].trim())
-  }
-
-  return [...new Set(initialText)].join(' ') + ' '
+  return [...usernames].map((username) => `@${username}`).join(' ') + ' '
 }
 </script>
 
@@ -69,10 +58,12 @@ function reply(comment: Comment) {
       <po-comments-form v-else form-id="comment-form" @comment-posted="loadComments" />
     </div>
 
-    <template v-if="!isEmpty(comments.data)">
+    <p v-if="hasLoadError" class="text-error mb-5">{{ $t('main.error-try-again') }}</p>
+
+    <template v-if="!isEmpty(comments)">
       <p class="text-uppercase text-medium-emphasis mb-3">{{ $t('comments.comments') }}</p>
 
-      <template v-for="comment in comments.data" :key="comment.id">
+      <template v-for="comment in comments" :key="comment.id">
         <div class="py-12 border-b">
           <div class="d-flex align-center flex-wrap mb-4 ga-6">
             <po-link :href="route('users.show', comment.author.username)" inertia>
@@ -98,8 +89,8 @@ function reply(comment: Comment) {
             <po-reaction-button
               icon="fa-heart"
               :count="comment.likes_count"
-              :is-active="isLiked(comment.id)"
-              :post-url="route('likes.store', ['comment', comment.id])"
+              :is-active="comment.is_liked === true"
+              :post-url="route('likes.toggle', ['comment', comment.id])"
               :can-react="true"
               :activate-title="$t('comments.like-comment')"
               :deactivate-title="$t('comments.unlike-comment')"
@@ -132,9 +123,11 @@ function reply(comment: Comment) {
           </template>
         </div>
       </template>
+
+      <po-infinite-scroll v-if="!isBlank(nextPageUrl)" @load="loadMore" />
     </template>
 
-    <template v-else>
+    <template v-else-if="!hasLoadError">
       <po-msg-block
         :msg-title="$t('comments.comments-empty')"
         :msg-body="$t('comments.be-first-ask')"

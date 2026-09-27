@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HidesBlockedAuthors;
+use Closure;
 use Database\Factories\CommentFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Comment extends Model
 {
     /** @use HasFactory<CommentFactory> */
-    use HasFactory;
+    use HasFactory, HidesBlockedAuthors;
 
     /**
      * The attributes that are mass assignable.
@@ -53,18 +54,23 @@ class Comment extends Model
     }
 
     /**
-     * Exclude comments authored by any of the given blocked user ids.
+     * Whether the signed-in viewer liked (`is_liked`) each comment, as a
+     * `withExists()` relation. Nothing for guests, who have no reactions.
      *
-     * @param  Builder<Comment>  $query
-     * @param  array<int>  $blockedUserIds
-     * @return Builder<Comment>
+     * @return array<string, Closure>
      */
-    public function scopeVisibleTo(Builder $query, array $blockedUserIds): Builder
+    public static function viewerReactions(): array
     {
-        if ($blockedUserIds === []) {
-            return $query;
+        $viewerId = auth()->guard()->id();
+
+        if ($viewerId === null) {
+            return [];
         }
 
-        return $query->whereNotIn($query->getModel()->qualifyColumn('user_id'), $blockedUserIds);
+        return [
+            'likes as is_liked' => function ($query) use ($viewerId): void {
+                $query->where('user_id', $viewerId);
+            },
+        ];
     }
 }

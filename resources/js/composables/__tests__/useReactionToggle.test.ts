@@ -1,13 +1,19 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { reactive, nextTick } from 'vue'
-import axios from 'axios'
 import { useReactionToggle } from '../useReactionToggle'
+import { queueOutcome, resetFakeRequests, sentRequests } from './support/fakeInertiaRequests'
+
+vi.mock('@inertiajs/vue3', async () => {
+  const { fakeUseHttp } = await import('./support/fakeInertiaRequests')
+
+  return { useHttp: fakeUseHttp, router: { flash: vi.fn() } }
+})
 
 function buildSource(overrides: Partial<Parameters<typeof useReactionToggle>[0]> = {}) {
   return reactive({
     count: 3,
     isActive: false,
-    postUrl: '/likes/writing/1/store',
+    postUrl: '/likes/writing/1/toggle',
     canReact: true,
     ...overrides
   })
@@ -18,27 +24,29 @@ function buildOptions(isAuthenticated = true) {
 }
 
 beforeEach(() => {
-  vi.restoreAllMocks()
+  resetFakeRequests()
 })
 
 describe('useReactionToggle', () => {
-  it('adopts the returned count and becomes active on store', async () => {
+  it('adopts the returned count and becomes active', async () => {
     // Given
-    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { method: 'store', count: 4 } })
+    queueOutcome({ data: { isActive: true, count: 4 } })
     const { count, isActive, toggle } = useReactionToggle(buildSource(), buildOptions())
 
     // When
     await toggle()
 
     // Then
-    expect(post).toHaveBeenCalledWith('/likes/writing/1/store')
+    expect(sentRequests).toEqual([
+      expect.objectContaining({ method: 'post', url: '/likes/writing/1/toggle' })
+    ])
     expect(count.value).toBe(4)
     expect(isActive.value).toBe(true)
   })
 
-  it('adopts the returned count and becomes inactive on destroy', async () => {
+  it('adopts the returned count and becomes inactive', async () => {
     // Given
-    vi.spyOn(axios, 'post').mockResolvedValue({ data: { method: 'destroy', count: 2 } })
+    queueOutcome({ data: { isActive: false, count: 2 } })
     const { count, isActive, toggle } = useReactionToggle(
       buildSource({ isActive: true }),
       buildOptions()
@@ -54,7 +62,6 @@ describe('useReactionToggle', () => {
 
   it('prompts a login instead of posting when logged out', async () => {
     // Given
-    const post = vi.spyOn(axios, 'post')
     const options = buildOptions(false)
     const { toggle } = useReactionToggle(buildSource(), options)
 
@@ -63,12 +70,11 @@ describe('useReactionToggle', () => {
 
     // Then
     expect(options.onUnauthenticated).toHaveBeenCalledOnce()
-    expect(post).not.toHaveBeenCalled()
+    expect(sentRequests).toEqual([])
   })
 
   it('does not post when the viewer cannot react', async () => {
     // Given
-    const post = vi.spyOn(axios, 'post')
     const options = buildOptions()
     const { toggle } = useReactionToggle(buildSource({ canReact: false }), options)
 
@@ -76,13 +82,13 @@ describe('useReactionToggle', () => {
     await toggle()
 
     // Then
-    expect(post).not.toHaveBeenCalled()
+    expect(sentRequests).toEqual([])
     expect(options.onUnauthenticated).not.toHaveBeenCalled()
   })
 
   it('keeps the previous state when the request fails', async () => {
     // Given
-    vi.spyOn(axios, 'post').mockRejectedValue(new Error('boom'))
+    queueOutcome({ failure: 'http' })
     const { count, isActive, isSubmitting, toggle } = useReactionToggle(
       buildSource(),
       buildOptions()
@@ -99,14 +105,14 @@ describe('useReactionToggle', () => {
 
   it('ignores a second toggle while one is in flight', async () => {
     // Given
-    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { method: 'store', count: 4 } })
+    queueOutcome({ data: { isActive: true, count: 4 } })
     const { toggle } = useReactionToggle(buildSource(), buildOptions())
 
     // When
     await Promise.all([toggle(), toggle()])
 
     // Then
-    expect(post).toHaveBeenCalledOnce()
+    expect(sentRequests).toHaveLength(1)
   })
 
   it('re-syncs local state when the source changes', async () => {

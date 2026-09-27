@@ -43,8 +43,7 @@ describe('admin category management', function (): void {
         $updatedDescription = fake()->sentence();
 
         // When
-        $createResponse = actingAs($admin)->put('/admin/categories/edit', [
-            'id' => 0,
+        $createResponse = actingAs($admin)->post(route('admin.categories.store'), [
             'name' => $name,
             'description' => fake()->sentence(),
         ]);
@@ -54,8 +53,7 @@ describe('admin category management', function (): void {
         $category = Category::where('name', $name)->firstOrFail();
 
         // When
-        $updateResponse = actingAs($admin)->put('/admin/categories/edit', [
-            'id' => $category->id,
+        $updateResponse = actingAs($admin)->put(route('admin.categories.update', $category), [
             'name' => $name,
             'description' => $updatedDescription,
         ]);
@@ -63,6 +61,21 @@ describe('admin category management', function (): void {
         // Then
         $updateResponse->assertOk();
         expect($category->refresh()->description)->toBe($updatedDescription);
+    });
+
+    it('does not create a category when updating one that does not exist', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->putJson(route('admin.categories.update', 'missing-category'), [
+            'name' => fakeTitle(),
+            'description' => fake()->sentence(),
+        ]);
+
+        // Then
+        $response->assertNotFound();
+        expect(Category::count())->toBe(0);
     });
 
     it('does not let a category become its own parent or move under a descendant', function (string $newParent): void {
@@ -75,8 +88,7 @@ describe('admin category management', function (): void {
         $target = ['root' => $root, 'child' => $child, 'grandchild' => $grandchild][$newParent];
 
         // When
-        $response = actingAs($admin)->putJson('/admin/categories/edit', [
-            'id' => $root->id,
+        $response = actingAs($admin)->putJson(route('admin.categories.update', $root), [
             'name' => $root->name,
             'parent' => $target->id,
             'description' => fake()->sentence(),
@@ -95,8 +107,7 @@ describe('admin category management', function (): void {
         $other = Category::factory()->create(['parent_id' => null]);
 
         // When
-        $response = actingAs($admin)->putJson('/admin/categories/edit', [
-            'id' => $root->id,
+        $response = actingAs($admin)->putJson(route('admin.categories.update', $root), [
             'name' => $root->name,
             'parent' => $other->id,
             'description' => fake()->sentence(),
@@ -119,6 +130,25 @@ describe('admin category management', function (): void {
         $response->assertOk();
         expect(Category::find($category->id))->toBeNull();
     });
+
+    it('keeps a category that still has writings or subcategories', function (string $dependent): void {
+        // Given
+        $admin = actingAsAdmin();
+        $category = Category::factory()->create(['parent_id' => null]);
+
+        if ($dependent === 'writing') {
+            Writing::factory()->create()->categories()->attach($category->id);
+        } else {
+            Category::factory()->create(['parent_id' => $category->id]);
+        }
+
+        // When
+        $response = actingAs($admin)->deleteJson(route('admin.categories.destroy', $category));
+
+        // Then
+        $response->assertJsonValidationErrors('category');
+        expect(Category::find($category->id))->not->toBeNull();
+    })->with(['writing', 'subcategory']);
 });
 
 describe('authorization for admin category routes', function (): void {

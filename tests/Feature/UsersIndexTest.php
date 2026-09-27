@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserProfile;
 use App\Models\Writing;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +30,7 @@ describe('the authors directory', function (): void {
         // Given
         $author = createUser();
         $location = fake()->city().', '.fake()->country();
-        $author->forceFill(['extra_info' => ['location' => $location]])->save();
+        UserProfile::factory()->for($author)->create(['location' => $location]);
         Writing::factory()->for($author, 'author')->create();
 
         // When

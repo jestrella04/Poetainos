@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Comment;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
 use Illuminate\Support\Facades\DB;
@@ -27,25 +26,20 @@ function queriesDuring(Closure $request): array
 }
 
 describe('the shared auth props', function (): void {
-    it('tell the page what the user has liked, shelved and not yet read', function (): void {
+    it('tell the page how many notifications the user has not read yet', function (): void {
         // Given
         $user = createUser();
-        $writing = Writing::factory()->create();
-        $comment = Comment::factory()->create();
-        $writing->likes()->create(['user_id' => $user->id, 'vote' => 1]);
-        $comment->likes()->create(['user_id' => $user->id, 'vote' => 1]);
-        $user->shelf()->attach($writing);
-        $user->notify(new WritingShelved($writing, createUser()));
+        $user->notify(new WritingShelved(Writing::factory()->create(), createUser()));
 
         // When
         $response = actingAs($user)->get(route('explore'));
 
         // Then
         $response->assertInertia(fn ($page) => $page
-            ->where('auth.liked.writings', [$writing->id])
-            ->where('auth.liked.comments', [$comment->id])
-            ->where('auth.shelved', [$writing->id])
-            ->where('auth.notifications', 1));
+            ->where('auth.user.id', $user->id)
+            ->where('auth.notifications', 1)
+            ->missing('auth.liked')
+            ->missing('auth.shelved'));
     });
 
     it('are empty for guests', function (): void {
@@ -55,8 +49,7 @@ describe('the shared auth props', function (): void {
         // Then
         $response->assertInertia(fn ($page) => $page
             ->where('auth.user', null)
-            ->where('auth.liked.writings', [])
-            ->where('auth.shelved', [])
+            ->where('auth.admin', false)
             ->where('auth.notifications', 0));
     });
 
@@ -84,8 +77,7 @@ describe('the shared auth props', function (): void {
         $queries = queriesDuring(fn () => actingAs($user)->getJson(route('home')));
 
         // Then
-        expect(collect($queries)->filter(fn (string $query): bool => str_contains($query, 'from "notifications"')
-            || str_contains($query, 'select "likeable_id" from "likes"')))->toBeEmpty();
+        expect(collect($queries)->filter(fn (string $query): bool => str_contains($query, 'from "notifications"')))->toBeEmpty();
     });
 
     it('fetch the unread notifications with a count, not by loading them', function (): void {

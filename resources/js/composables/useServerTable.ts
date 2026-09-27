@@ -1,5 +1,6 @@
-import { onMounted, ref, type Ref } from 'vue'
-import axios from 'axios'
+import { computed, onMounted, ref, type Ref } from 'vue'
+import { useHttp } from '@inertiajs/vue3'
+import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { Paginated } from '@/types/models'
 
 interface ServerTableEvent {
@@ -8,27 +9,29 @@ interface ServerTableEvent {
 
 /**
  * Shared load-state for the admin `v-data-table-server` listings (users,
- * categories, tags, pages, writings, complaints). Centralizes error
- * handling so a failed request always resets `isLoading`, which the
- * individual admin components previously didn't do.
+ * categories, tags, pages, writings, complaints), which fetch each page of
+ * rows as JSON.
  */
 export function useServerTable<T>(routeName: string, initialTotal: number) {
   const items: Ref<T[]> = ref([])
   const totalItems = ref(initialTotal)
-  const isLoading = ref(true)
+  const request = useHttp<Record<string, never>, Paginated<T>>()
+  const hasLoaded = ref(false)
+  const isLoading = computed(() => request.processing || hasLoaded.value === false)
+  const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
 
   async function loadItems(event: ServerTableEvent): Promise<void> {
-    await axios
-      .get<Paginated<T>>(route(routeName, { page: event.page }))
-      .then((response) => {
-        items.value = response.data.data
+    await whenSettled(
+      request.get(route(routeName, { page: event.page }), {
+        onHttpException,
+        onNetworkError,
+        onSuccess: (data) => {
+          items.value = data.data
+        }
       })
-      .catch((error: unknown) => {
-        console.error(error)
-      })
-      .finally(() => {
-        isLoading.value = false
-      })
+    )
+
+    hasLoaded.value = true
   }
 
   onMounted(() => {

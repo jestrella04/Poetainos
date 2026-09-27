@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, provide } from 'vue'
+import { ref, onMounted, provide, watch } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import {
-  forceSnackBarKey,
   loginModalKey,
   mobileSiteMenuKey,
   mobileUserMenuKey,
@@ -16,17 +15,22 @@ import { useStaticPages } from '@/composables/useStaticPages'
 
 const page = usePage()
 const { isAuthenticated, authUser, isAdmin } = useAuth()
-const { showFlashMessages } = useFlashMessages()
+useFlashMessages()
 const { faqPath, aboutPath, termsPath, privacyPath } = useStaticPages()
 const mobileUserMenu = ref(false)
 const mobileSiteMenu = ref(false)
-const forceSnackBar = ref(false)
 const unreadCount = ref(page.props.auth.notifications)
+// The layout persists across visits, so it takes the count each new page brings
+watch(
+  () => page.props.auth.notifications,
+  (count) => {
+    unreadCount.value = count
+  }
+)
 const loginModal = ref(false)
 
 const { revealStyle } = useSystemTheme()
 
-provide(forceSnackBarKey, forceSnackBar)
 provide(mobileSiteMenuKey, mobileSiteMenu)
 provide(mobileUserMenuKey, mobileUserMenu)
 provide(unreadCountKey, unreadCount)
@@ -55,13 +59,6 @@ useNotificationsChannel(
     }
   }
 )
-
-watch(forceSnackBar, () => {
-  if (forceSnackBar.value === true) {
-    showFlashMessages()
-    forceSnackBar.value = false
-  }
-})
 </script>
 
 <template>
@@ -72,7 +69,7 @@ watch(forceSnackBar, () => {
     <po-pwa-prompt />
 
     <v-toolbar color="primary" border="b" class="po-navbar d-none d-lg-flex">
-      <v-container class="d-inline-flex ga-12 justify-space--between">
+      <v-container class="d-inline-flex ga-12">
         <div class="align-self-center">
           <po-link
             :href="route('home')"
