@@ -192,14 +192,14 @@ describe('posting the writing of the day on Threads', function (): void {
             'graph.threads.net/v1.0/1789*' => Http::response(['status' => 'FINISHED']),
             "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::response(['id' => '1790', 'crossreshare_to_ig_status' => 'FAILED']),
         ]);
-        Log::spy();
+        $log = Log::spy();
 
         // When
         Notification::route(ThreadsChannel::class, $account->account_id)
             ->notifyNow(new WritingOfTheDayPosted(Writing::factory()->create()));
 
         // Then
-        Log::shouldHaveReceived('warning')->once();
+        $log->shouldHaveReceived('warning')->once();
     });
 
     it('fails when the Threads API rejects the post, so the queued job is retried', function (): void {
