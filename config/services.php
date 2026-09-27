@@ -54,6 +54,11 @@ return [
         'graph_version' => env('FACEBOOK_GRAPH_VERSION', 'v23.0'),
     ],
 
+    'threads' => [
+        'app_secret' => env('THREADS_APP_SECRET'),
+        'api_version' => env('THREADS_API_VERSION', 'v1.0'),
+    ],
+
     'compliance' => [
         'iarc_rating_id' => env('IARC_RATING_ID'),
     ],
