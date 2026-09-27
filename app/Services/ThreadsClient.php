@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
+use RuntimeException;
 
 /**
  * The calls this site makes to the Threads API: checking and renewing the
@@ -15,6 +17,10 @@ class ThreadsClient
     private const BASE_URL = 'https://graph.threads.net';
 
     private const TIMEOUT_SECONDS = 15;
+
+    private const CONTAINER_STATUS_CHECKS = 6;
+
+    private const SECONDS_BETWEEN_STATUS_CHECKS = 5;
 
     /**
      * The id of the Threads account the token belongs to.
@@ -56,7 +62,7 @@ class ThreadsClient
 
     /**
      * Publish a text post with a link preview: Threads first creates a media
-     * container, then publishes it.
+     * container, then publishes it once it has finished processing.
      */
     public function publishText(string $userId, string $accessToken, string $text, string $link): void
     {
@@ -71,6 +77,8 @@ class ThreadsClient
             ->throw()
             ->json('id');
 
+        $this->waitUntilContainerFinished($containerId, $accessToken);
+
         $this->request()
             ->asForm()
             ->post($this->versioned("{$userId}/threads_publish"), [
@@ -78,6 +86,34 @@ class ThreadsClient
                 'access_token' => $accessToken,
             ])
             ->throw();
+    }
+
+    /**
+     * Threads builds a container asynchronously (fetching the link preview
+     * takes a few seconds), and publishing it before it is finished fails
+     * with "The requested resource does not exist".
+     */
+    private function waitUntilContainerFinished(string $containerId, string $accessToken): void
+    {
+        for ($check = 1; $check <= self::CONTAINER_STATUS_CHECKS; $check++) {
+            Sleep::for(self::SECONDS_BETWEEN_STATUS_CHECKS)->seconds();
+
+            $container = $this->request()
+                ->get($this->versioned($containerId), ['fields' => 'status,error_message', 'access_token' => $accessToken])
+                ->throw();
+
+            $status = $container->json('status');
+
+            if ($status === 'FINISHED') {
+                return;
+            }
+
+            if ($status !== 'IN_PROGRESS') {
+                throw new RuntimeException(sprintf('Threads container %s is %s: %s', $containerId, $status, $container->json('error_message')));
+            }
+        }
+
+        throw new RuntimeException(sprintf('Threads container %s is still in progress', $containerId));
     }
 
     /**

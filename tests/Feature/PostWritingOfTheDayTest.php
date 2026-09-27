@@ -14,6 +14,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Sleep;
 
 beforeEach(function (): void {
     config([
@@ -139,12 +140,19 @@ describe('posting the writing of the day on the Facebook Page', function (): voi
 });
 
 describe('posting the writing of the day on Threads', function (): void {
-    it('creates a text container with the message and link, then publishes it', function (): void {
+    beforeEach(function (): void {
+        Sleep::fake();
+    });
+
+    it('creates a text container with the message and link, then publishes it once it is finished', function (): void {
         // Given
         Http::preventStrayRequests();
         $account = PublishingAccount::factory()->create();
         Http::fake([
             "graph.threads.net/v1.0/{$account->account_id}/threads" => Http::response(['id' => '1789']),
+            'graph.threads.net/v1.0/1789*' => Http::sequence()
+                ->push(['status' => 'IN_PROGRESS', 'id' => '1789'])
+                ->push(['status' => 'FINISHED', 'id' => '1789']),
             "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::response(['id' => '1790']),
         ]);
         $author = User::factory()->create();
@@ -163,6 +171,10 @@ describe('posting the writing of the day on Threads', function (): void {
                 && $request['access_token'] === $account->access_token
                 && str_contains($request['text'], $writing->title)
                 && str_contains($request['text'], $author->getName()),
+            fn (Request $request): bool => $request->method() === 'GET'
+                && str_starts_with($request->url(), 'https://graph.threads.net/v1.0/1789?'),
+            fn (Request $request): bool => $request->method() === 'GET'
+                && str_starts_with($request->url(), 'https://graph.threads.net/v1.0/1789?'),
             fn (Request $request): bool => $request->method() === 'POST'
                 && $request->url() === "https://graph.threads.net/v1.0/{$account->account_id}/threads_publish"
                 && $request['creation_id'] === '1789'
@@ -183,6 +195,27 @@ describe('posting the writing of the day on Threads', function (): void {
         // Then
         expect($post)->toThrow(RequestException::class);
     });
+
+    it('fails without publishing when the container is not finished, so the queued job is retried', function (array $containerResponse): void {
+        // Given
+        $account = PublishingAccount::factory()->create();
+        Http::fake([
+            "graph.threads.net/v1.0/{$account->account_id}/threads" => Http::response(['id' => '1789']),
+            'graph.threads.net/v1.0/1789*' => Http::response($containerResponse),
+        ]);
+        $writing = Writing::factory()->create();
+
+        // When
+        $post = fn () => Notification::route(ThreadsChannel::class, $account->account_id)
+            ->notifyNow(new WritingOfTheDayPosted($writing));
+
+        // Then
+        expect($post)->toThrow(RuntimeException::class);
+        Http::assertNotSent(fn (Request $request): bool => str_ends_with($request->url(), '/threads_publish'));
+    })->with([
+        'failed' => [['status' => 'ERROR', 'error_message' => 'LINK_ATTACHMENT_URL_UNAVAILABLE']],
+        'still in progress' => [['status' => 'IN_PROGRESS']],
+    ]);
 });
 
 describe('the writing of the day post', function (): void {
