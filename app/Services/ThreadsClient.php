@@ -62,7 +62,9 @@ class ThreadsClient
 
     /**
      * Publish a text post with a link preview: Threads first creates a media
-     * container, then publishes it once it has finished processing.
+     * container, then publishes it once it has finished processing. Threads
+     * also shares the post to the linked Instagram account's story; that share
+     * failing doesn't stop the post, so it is only logged.
      */
     public function publishText(string $userId, string $accessToken, string $text, string $link): void
     {
@@ -72,6 +74,7 @@ class ThreadsClient
                 'media_type' => 'TEXT',
                 'text' => $text,
                 'link_attachment' => $link,
+                'crossreshare_to_ig' => 'true',
                 'access_token' => $accessToken,
             ])
             ->throw()
@@ -79,13 +82,17 @@ class ThreadsClient
 
         $this->waitUntilContainerFinished($containerId, $accessToken);
 
-        $this->request()
+        $published = $this->request()
             ->asForm()
             ->post($this->versioned("{$userId}/threads_publish"), [
                 'creation_id' => $containerId,
                 'access_token' => $accessToken,
             ])
             ->throw();
+
+        if ($published->json('crossreshare_to_ig_status') !== 'SUCCESS') {
+            logger()->warning('The Threads post could not be shared to the Instagram story.', ['post_id' => $published->json('id')]);
+        }
     }
 
     /**

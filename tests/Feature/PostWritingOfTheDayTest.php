@@ -13,6 +13,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Sleep;
 
@@ -144,7 +145,7 @@ describe('posting the writing of the day on Threads', function (): void {
         Sleep::fake();
     });
 
-    it('creates a text container with the message and link, then publishes it once it is finished', function (): void {
+    it('creates a text container with the message and link, then publishes it once it is finished, sharing it to the Instagram story', function (): void {
         // Given
         Http::preventStrayRequests();
         $account = PublishingAccount::factory()->create();
@@ -153,7 +154,7 @@ describe('posting the writing of the day on Threads', function (): void {
             'graph.threads.net/v1.0/1789*' => Http::sequence()
                 ->push(['status' => 'IN_PROGRESS', 'id' => '1789'])
                 ->push(['status' => 'FINISHED', 'id' => '1789']),
-            "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::response(['id' => '1790']),
+            "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::response(['id' => '1790', 'crossreshare_to_ig_status' => 'SUCCESS']),
         ]);
         $author = User::factory()->create();
         $writing = Writing::factory()->for($author, 'author')->create();
@@ -168,6 +169,7 @@ describe('posting the writing of the day on Threads', function (): void {
                 && $request->url() === "https://graph.threads.net/v1.0/{$account->account_id}/threads"
                 && $request['media_type'] === 'TEXT'
                 && $request['link_attachment'] === $writing->path()
+                && $request['crossreshare_to_ig'] === 'true'
                 && $request['access_token'] === $account->access_token
                 && str_contains($request['text'], $writing->title)
                 && str_contains($request['text'], $author->getName()),
@@ -180,6 +182,24 @@ describe('posting the writing of the day on Threads', function (): void {
                 && $request['creation_id'] === '1789'
                 && $request['access_token'] === $account->access_token,
         ]);
+    });
+
+    it('keeps the Threads post and logs a warning when the Instagram story share fails', function (): void {
+        // Given
+        $account = PublishingAccount::factory()->create();
+        Http::fake([
+            "graph.threads.net/v1.0/{$account->account_id}/threads" => Http::response(['id' => '1789']),
+            'graph.threads.net/v1.0/1789*' => Http::response(['status' => 'FINISHED']),
+            "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::response(['id' => '1790', 'crossreshare_to_ig_status' => 'FAILED']),
+        ]);
+        $log = Log::spy();
+
+        // When
+        Notification::route(ThreadsChannel::class, $account->account_id)
+            ->notifyNow(new WritingOfTheDayPosted(Writing::factory()->create()));
+
+        // Then
+        $log->shouldHaveReceived('warning')->once();
     });
 
     it('fails when the Threads API rejects the post, so the queued job is retried', function (): void {
