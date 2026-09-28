@@ -9,6 +9,7 @@ use App\Notifications\Channels\ThreadsChannel;
 use App\Notifications\WritingOfTheDayPosted;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -222,6 +223,44 @@ describe('posting the writing of the day on Threads', function (): void {
         Http::assertSent(fn (Request $request): bool => str_ends_with($request->url(), '/threads_publish')
             && $request['creation_id'] === '1789');
         $log->shouldHaveReceived('warning')->once();
+    });
+
+    it('succeeds without retrying when the publish request times out but Threads published the post', function (): void {
+        // Given
+        $account = PublishingAccount::factory()->create();
+        Http::fake([
+            "graph.threads.net/v1.0/{$account->account_id}/threads" => Http::response(['id' => '1789']),
+            'graph.threads.net/v1.0/1789*' => Http::sequence()
+                ->push(['status' => 'FINISHED'])
+                ->push(['status' => 'PUBLISHED']),
+            "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::failedConnection(),
+        ]);
+
+        $log = Log::spy();
+
+        // When
+        Notification::route(ThreadsChannel::class, $account->account_id)
+            ->notifyNow(new WritingOfTheDayPosted(Writing::factory()->create()));
+
+        // Then
+        $log->shouldHaveReceived('warning')->once();
+    });
+
+    it('fails when the publish request times out and Threads did not publish the post, so the queued job is retried', function (): void {
+        // Given
+        $account = PublishingAccount::factory()->create();
+        Http::fake([
+            "graph.threads.net/v1.0/{$account->account_id}/threads" => Http::response(['id' => '1789']),
+            'graph.threads.net/v1.0/1789*' => Http::response(['status' => 'FINISHED']),
+            "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::failedConnection(),
+        ]);
+
+        // When
+        $post = fn () => Notification::route(ThreadsChannel::class, $account->account_id)
+            ->notifyNow(new WritingOfTheDayPosted(Writing::factory()->create()));
+
+        // Then
+        expect($post)->toThrow(ConnectionException::class);
     });
 
     it('fails when the Threads API rejects the post, so the queued job is retried', function (): void {

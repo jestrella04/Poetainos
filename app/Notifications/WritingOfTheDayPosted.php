@@ -25,6 +25,13 @@ class WritingOfTheDayPosted extends Notification implements ShouldQueue
 
     public int $tries = 3;
 
+    /**
+     * Room for a Threads post (container, status checks and a slow publish),
+     * kept under the queue's retry_after (90) so a running post is never
+     * picked up by a second worker.
+     */
+    public int $timeout = 85;
+
     public function __construct(protected Writing $writing) {}
 
     /**

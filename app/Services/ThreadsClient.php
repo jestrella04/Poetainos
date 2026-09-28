@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
 use RuntimeException;
@@ -18,6 +20,12 @@ class ThreadsClient
     private const BASE_URL = 'https://graph.threads.net';
 
     private const TIMEOUT_SECONDS = 15;
+
+    /**
+     * Publishing takes longer than the other calls: Threads shares the post to
+     * the Instagram story before answering.
+     */
+    private const PUBLISH_TIMEOUT_SECONDS = 45;
 
     private const CONTAINER_STATUS_CHECKS = 6;
 
@@ -82,13 +90,24 @@ class ThreadsClient
 
         $this->waitUntilContainerFinished($containerId, $accessToken);
 
-        $published = $this->request()
-            ->asForm()
-            ->post($this->versioned("{$userId}/threads_publish"), [
-                'creation_id' => $containerId,
-                'access_token' => $accessToken,
-            ])
-            ->throw();
+        try {
+            $published = $this->request(self::PUBLISH_TIMEOUT_SECONDS)
+                ->asForm()
+                ->post($this->versioned("{$userId}/threads_publish"), [
+                    'creation_id' => $containerId,
+                    'access_token' => $accessToken,
+                ])
+                ->throw();
+        } catch (ConnectionException $exception) {
+            // Failing here would retry the job, and post the writing twice, when Threads published it without answering in time
+            if ($this->isContainerPublished($containerId, $accessToken) === true) {
+                logger()->warning('Threads published the post without answering in time; its Instagram story share is unknown.', ['container_id' => $containerId]);
+
+                return;
+            }
+
+            throw $exception;
+        }
 
         if ($isSharedToInstagram === true && $published->json('crossreshare_to_ig_status') !== 'SUCCESS') {
             logger()->warning('The Threads post could not be shared to the Instagram story.', ['post_id' => $published->json('id')]);
@@ -125,10 +144,7 @@ class ThreadsClient
         for ($check = 1; $check <= self::CONTAINER_STATUS_CHECKS; $check++) {
             Sleep::for(self::SECONDS_BETWEEN_STATUS_CHECKS)->seconds();
 
-            $container = $this->request()
-                ->get($this->versioned($containerId), ['fields' => 'status,error_message', 'access_token' => $accessToken])
-                ->throw();
-
+            $container = $this->fetchContainer($containerId, $accessToken);
             $status = $container->json('status');
 
             if ($status === 'FINISHED') {
@@ -141,6 +157,24 @@ class ThreadsClient
         }
 
         throw new RuntimeException(sprintf('Threads container %s is still in progress', $containerId));
+    }
+
+    /**
+     * Whether a publish request that got no answer went through anyway,
+     * checked after giving Threads a few more seconds to finish it.
+     */
+    private function isContainerPublished(string $containerId, string $accessToken): bool
+    {
+        Sleep::for(self::SECONDS_BETWEEN_STATUS_CHECKS)->seconds();
+
+        return $this->fetchContainer($containerId, $accessToken)->json('status') === 'PUBLISHED';
+    }
+
+    private function fetchContainer(string $containerId, string $accessToken): Response
+    {
+        return $this->request()
+            ->get($this->versioned($containerId), ['fields' => 'status,error_message', 'access_token' => $accessToken])
+            ->throw();
     }
 
     /**
@@ -162,8 +196,8 @@ class ThreadsClient
         return sprintf('%s/%s/%s', self::BASE_URL, config('services.threads.api_version'), $path);
     }
 
-    private function request(): PendingRequest
+    private function request(int $timeoutSeconds = self::TIMEOUT_SECONDS): PendingRequest
     {
-        return Http::timeout(self::TIMEOUT_SECONDS);
+        return Http::timeout($timeoutSeconds);
     }
 }
