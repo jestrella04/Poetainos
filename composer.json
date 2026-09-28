@@ -95,7 +95,7 @@
       "npm run types:check",
       "npm run test"
     ],
-    "analyse": [
+    "analyze": [
       "phpstan analyse --memory-limit=1G"
     ],
     "ci:format": [

@@ -8,7 +8,7 @@ use Tests\Browser\Pages\WritingPage;
 
 use function Pest\Laravel\actingAs;
 
-describe('admin moderation of another user\'s writing', function () {
+describe('admin moderation of another user\'s writing', function (): void {
     // Skipped: the writing form always submits multipart/form-data (it has an
     // optional cover-image file field), and pest-plugin-browser's embedded
     // LaravelHttpServer driver doesn't parse multipart bodies yet (see
@@ -16,7 +16,7 @@ describe('admin moderation of another user\'s writing', function () {
     // `[], // @TODO files...`). The `_method: PUT` spoof field never reaches
     // Laravel, so every submit hits the PUT-only update route as a plain POST
     // and gets a 405. Re-enable once that upstream gap is fixed.
-    it('lets an admin edit another user\'s writing', function () {
+    it('lets an admin edit another user\'s writing', function (): void {
         $admin = actingAsAdmin([
             'terms_accepted_at' => now(),
             'privacy_accepted_at' => now(),
@@ -44,7 +44,7 @@ describe('admin moderation of another user\'s writing', function () {
         expect($writing->refresh()->title)->toBe($title);
     })->skip('pest-plugin-browser does not parse multipart form bodies yet, so the writing form\'s PUT submit is received as a 405');
 
-    it('lets an admin delete another user\'s writing', function () {
+    it('lets an admin delete another user\'s writing', function (): void {
         $admin = actingAsAdmin([
             'terms_accepted_at' => now(),
             'privacy_accepted_at' => now(),
@@ -67,7 +67,7 @@ describe('admin moderation of another user\'s writing', function () {
     // that is not wired to any handler (href="#", no confirmation, no request).
     // Admin deletion currently only works through the writing's own edit page
     // (tested above), which `canEdit()` grants admins the same as owners.
-    it('lists writings on the admin moderation page', function () {
+    it('lists writings on the admin moderation page', function (): void {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create();
         $admin = actingAsAdmin();

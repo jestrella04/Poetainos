@@ -202,6 +202,28 @@ describe('posting the writing of the day on Threads', function (): void {
         $log->shouldHaveReceived('warning')->once();
     });
 
+    it('publishes the post without the Instagram story share, logging a warning, when Threads rejects the container with it', function (): void {
+        // Given
+        $account = PublishingAccount::factory()->create();
+        Http::fake([
+            "graph.threads.net/v1.0/{$account->account_id}/threads" => fn (Request $request) => isset($request['crossreshare_to_ig'])
+                ? Http::response(['error' => ['code' => 1, 'message' => 'An unknown error occurred']], 500)
+                : Http::response(['id' => '1789']),
+            'graph.threads.net/v1.0/1789*' => Http::response(['status' => 'FINISHED']),
+            "graph.threads.net/v1.0/{$account->account_id}/threads_publish" => Http::response(['id' => '1790']),
+        ]);
+        $log = Log::spy();
+
+        // When
+        Notification::route(ThreadsChannel::class, $account->account_id)
+            ->notifyNow(new WritingOfTheDayPosted(Writing::factory()->create()));
+
+        // Then
+        Http::assertSent(fn (Request $request): bool => str_ends_with($request->url(), '/threads_publish')
+            && $request['creation_id'] === '1789');
+        $log->shouldHaveReceived('warning')->once();
+    });
+
     it('fails when the Threads API rejects the post, so the queued job is retried', function (): void {
         // Given
         $account = PublishingAccount::factory()->create();

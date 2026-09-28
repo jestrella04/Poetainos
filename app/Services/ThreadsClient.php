@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
 use RuntimeException;
@@ -68,17 +69,16 @@ class ThreadsClient
      */
     public function publishText(string $userId, string $accessToken, string $text, string $link): void
     {
-        $containerId = $this->request()
-            ->asForm()
-            ->post($this->versioned("{$userId}/threads"), [
-                'media_type' => 'TEXT',
-                'text' => $text,
-                'link_attachment' => $link,
-                'crossreshare_to_ig' => 'true',
-                'access_token' => $accessToken,
-            ])
-            ->throw()
-            ->json('id');
+        $isSharedToInstagram = true;
+
+        try {
+            $containerId = $this->createTextContainer($userId, $accessToken, $text, $link, $isSharedToInstagram);
+        } catch (RequestException $exception) {
+            // Threads rejects the whole container, with an unknown error, when the Instagram account can't take the share
+            logger()->warning('Threads rejected the post with the Instagram story share, so it is posted without it.', ['error' => $exception->response->json('error')]);
+            $isSharedToInstagram = false;
+            $containerId = $this->createTextContainer($userId, $accessToken, $text, $link, $isSharedToInstagram);
+        }
 
         $this->waitUntilContainerFinished($containerId, $accessToken);
 
@@ -90,9 +90,29 @@ class ThreadsClient
             ])
             ->throw();
 
-        if ($published->json('crossreshare_to_ig_status') !== 'SUCCESS') {
+        if ($isSharedToInstagram === true && $published->json('crossreshare_to_ig_status') !== 'SUCCESS') {
             logger()->warning('The Threads post could not be shared to the Instagram story.', ['post_id' => $published->json('id')]);
         }
+    }
+
+    /**
+     * The id of a new text container with a link preview.
+     */
+    private function createTextContainer(string $userId, string $accessToken, string $text, string $link, bool $isSharedToInstagram): string
+    {
+        $instagramShare = $isSharedToInstagram === true ? ['crossreshare_to_ig' => 'true'] : [];
+
+        return (string) $this->request()
+            ->asForm()
+            ->post($this->versioned("{$userId}/threads"), [
+                'media_type' => 'TEXT',
+                'text' => $text,
+                'link_attachment' => $link,
+                'access_token' => $accessToken,
+                ...$instagramShare,
+            ])
+            ->throw()
+            ->json('id');
     }
 
     /**
