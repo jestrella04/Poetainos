@@ -20,7 +20,6 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
 
 /**
  * @property-read UserProfile $profile Never null: an empty profile stands in until the user fills one in.
- *
  * @mixin IdeHelperUser
  */
 class User extends Authenticatable implements MustVerifyEmail
