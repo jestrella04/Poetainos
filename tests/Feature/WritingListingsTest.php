@@ -3,6 +3,7 @@
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\Writing;
 use Carbon\Carbon;
 
@@ -77,6 +78,32 @@ describe('listing fields', function (): void {
 
         // Then
         expect($response->json('data.0.author.karma'))->toBe($karma);
+    });
+
+    it('includes the URLs of the cover and of the author avatar', function (): void {
+        // Given
+        $author = createUser();
+        UserProfile::factory()->for($author)->create(['avatar' => 'avatars/'.fake()->uuid().'.png']);
+        $writing = Writing::factory()->for($author, 'author')->create(['cover' => 'covers/'.fake()->uuid().'.jpg']);
+
+        // When
+        $response = getJson('/?sort=latest');
+
+        // Then
+        expect($response->json('data.0.cover_url'))->toBe(asset('storage/'.$writing->cover));
+        expect($response->json('data.0.author.avatar_url'))->toBe(asset('storage/'.$author->profile->avatar));
+    });
+
+    it('has no cover or avatar URL when there is none', function (): void {
+        // Given
+        Writing::factory()->for(createUser(), 'author')->create(['cover' => null]);
+
+        // When
+        $response = getJson('/?sort=latest');
+
+        // Then
+        expect($response->json('data.0.cover_url'))->toBeNull();
+        expect($response->json('data.0.author.avatar_url'))->toBeNull();
     });
 });
 

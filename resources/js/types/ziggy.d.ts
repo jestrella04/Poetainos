@@ -17,6 +17,8 @@ type RouteFn = (
 
 declare global {
   const route: RouteFn
+  // The route table the `@routes` script declares, which the global `route()` reads
+  const Ziggy: Record<string, unknown>
 }
 
 declare module 'vue' {

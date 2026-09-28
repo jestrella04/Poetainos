@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Comment;
+use App\Models\Complaint;
 use App\Models\Like;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -24,7 +25,7 @@ describe('deleting a writing', function (): void {
         createDatabaseNotification($author, ['writing_id' => $otherWriting->id]);
 
         // When
-        $response = actingAs($author)->delete('/writings/delete/'.$writing->slug);
+        $response = actingAs($author)->delete('/writings/'.$writing->slug);
 
         // Then
         $response->assertRedirect();
@@ -46,7 +47,7 @@ describe('deleting a comment', function (): void {
         createDatabaseNotification($writingAuthor, ['writing_id' => $writing->id, 'comment_id' => $comment->id]);
 
         // When
-        $response = actingAs($commenter)->delete("/comments/delete/{$comment->id}");
+        $response = actingAs($commenter)->delete("/comments/{$comment->id}");
 
         // Then
         $response->assertRedirect();
@@ -66,7 +67,7 @@ describe('deleting a user', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->delete('/admin/users/delete/'.$user->username);
+        $response = actingAs($admin)->withSession(['auth.password_confirmed_at' => time()])->delete('/admin/users/'.$user->username);
 
         // Then
         $response->assertRedirect();
@@ -86,7 +87,7 @@ describe('deleting a writing with comments', function (): void {
         createDatabaseNotification($comment->author()->firstOrFail(), ['comment_id' => $comment->id]);
 
         // When
-        actingAs($author)->delete('/writings/delete/'.$writing->slug)->assertRedirect();
+        actingAs($author)->delete('/writings/'.$writing->slug)->assertRedirect();
 
         // Then
         assertDatabaseCount('likes', 0);
@@ -113,7 +114,7 @@ describe('deleting a user with content', function (): void {
         createDatabaseNotification($reader, ['comment_id' => $theirComment->id]);
 
         // When
-        actingAs(actingAsAdmin())->delete('/admin/users/delete/'.$user->username)->assertRedirect();
+        actingAs(actingAsAdmin())->withSession(['auth.password_confirmed_at' => time()])->delete('/admin/users/'.$user->username)->assertRedirect();
 
         // Then
         assertDatabaseCount('likes', 0);
@@ -122,8 +123,41 @@ describe('deleting a user with content', function (): void {
     });
 });
 
+describe('deleting reported content', function (): void {
+    it('also deletes the complaints about the writing, its comments and the user, but keeps unrelated ones', function (): void {
+        // Given
+        $user = createUser();
+        $writing = Writing::factory()->for($user, 'author')->create();
+        $comment = Comment::factory()->for($writing)->create();
+        $unrelatedWriting = Writing::factory()->create();
+        Complaint::factory()->for($writing, 'complainable')->create();
+        Complaint::factory()->for($comment, 'complainable')->create();
+        Complaint::factory()->for($user, 'complainable')->create();
+        $unrelatedComplaint = Complaint::factory()->for($unrelatedWriting, 'complainable')->create();
+
+        // When
+        actingAs(actingAsAdmin())->withSession(['auth.password_confirmed_at' => time()])->delete('/admin/users/'.$user->username)->assertRedirect();
+
+        // Then
+        expect(Complaint::sole()->is($unrelatedComplaint))->toBeTrue();
+    });
+
+    it('deletes the complaints about a deleted comment', function (): void {
+        // Given
+        $commenter = createUser();
+        $comment = Comment::factory()->for($commenter, 'author')->create();
+        Complaint::factory()->for($comment, 'complainable')->create();
+
+        // When
+        actingAs($commenter)->delete("/comments/{$comment->id}")->assertRedirect();
+
+        // Then
+        assertDatabaseCount('complaints', 0);
+    });
+});
+
 describe('the content:prune-orphans command', function (): void {
-    it('deletes likes and notifications about missing content but keeps the rest', function (): void {
+    it('deletes likes, complaints and notifications about missing content but keeps the rest', function (): void {
         // Given
         $recipient = createUser();
         $writing = Writing::factory()->create();
@@ -140,12 +174,17 @@ describe('the content:prune-orphans command', function (): void {
         createDatabaseNotification($recipient, ['writing_id' => $missingId]);
         createDatabaseNotification($recipient, ['comment_id' => $missingId]);
         createDatabaseNotification($recipient, ['user_id' => $missingId]);
+        $keptComplaint = Complaint::factory()->for($writing, 'complainable')->create();
+        foreach ([Writing::class, Comment::class, User::class] as $complainableType) {
+            Complaint::factory()->create(['complainable_type' => $complainableType, 'complainable_id' => $missingId]);
+        }
 
         // When
         pendingArtisan('content:prune-orphans')->assertSuccessful();
 
         // Then
         expect(Like::sole()->likeable_id)->toBe($writing->id);
+        expect(Complaint::sole()->is($keptComplaint))->toBeTrue();
         expect(json_decode((string) DB::table('notifications')->sole()->data, true))
             ->toBe(['writing_id' => $writing->id, 'user_id' => $recipient->id]);
     });

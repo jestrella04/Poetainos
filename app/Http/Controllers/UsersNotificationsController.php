@@ -59,7 +59,7 @@ class UsersNotificationsController extends Controller
         $writing = Writing::whereKey($notification->data['writing_id'] ?? null)->first();
 
         if ($writing === null) {
-            Inertia::flash('message', 'main.content-no-longer-available');
+            Inertia::flash(['message' => 'main.content-no-longer-available', 'color' => 'warning']);
 
             return to_route('notifications.index');
         }
@@ -67,9 +67,11 @@ class UsersNotificationsController extends Controller
         return redirect($writing->path());
     }
 
-    public function setEmailPreference(string $enable): \Illuminate\Http\Response
+    public function setEmailPreference(): \Illuminate\Http\Response
     {
-        $this->requireAuthUser()->setEmailNotifications(isTruthy($enable));
+        request()->validate(['enabled' => 'required|boolean']);
+
+        $this->requireAuthUser()->setEmailNotifications(isTruthy(request('enabled')));
 
         return response()->noContent();
     }

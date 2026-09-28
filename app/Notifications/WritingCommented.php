@@ -11,12 +11,14 @@ class WritingCommented extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(protected Writing $writing, protected User $user)
+    public function __construct(protected Writing $writing, protected User $user) {}
+
+    protected function content(mixed $notifiable): NotificationContent
     {
-        $this->content = $this->actorContent(
+        return $this->actorContent(
             $this->user,
             __('We love sharing the good news with you, :name just commented on your writing at :site.', $this->actorPlaceholders($this->user)),
-            route('writings.show', $this->writing),
+            $this->writing->path(),
             __('View writing'),
         );
     }

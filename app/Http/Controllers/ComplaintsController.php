@@ -7,13 +7,18 @@ use App\Models\Complaint;
 use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
+use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class ComplaintsController extends Controller
 {
+    private const NOTIFY_ONCE_PER_MINUTES = 60;
+
     /**
      * Show the form for creating a new resource.
      *
@@ -53,17 +58,42 @@ class ComplaintsController extends Controller
             abort(404);
         }
 
+        // One email per reported item and hour is enough to bring admins in;
+        // later complaints are still recorded for them to review
+        $isFirstRecentComplaint = Complaint::whereMorphedTo('complainable', $complainable)
+            ->where('created_at', '>', Carbon::now()->subMinutes(self::NOTIFY_ONCE_PER_MINUTES))
+            ->doesntExist();
+
         $complaint = new Complaint;
         $complaint->complainable()->associate($complainable);
         $complaint->reasons = $request->input('reasons');
         $complaint->comment = $request->input('comment');
         $complaint->save();
 
-        // Schedule email notification
-        $recipients = getSiteConfig('emails.admin');
-        Notification::route('mail', $recipients)->notify(new ComplaintSubmitted);
+        if ($isFirstRecentComplaint === true) {
+            $recipients = getSiteConfig('emails.admin');
+            Notification::route('mail', $recipients)->notify(new ComplaintSubmitted);
+        }
 
         return response()->noContent();
+    }
+
+    /**
+     * Mark a complaint as dealt with, noting what was done, then return to the admin table.
+     */
+    public function close(Complaint $complaint): RedirectResponse
+    {
+        request()->validate([
+            'closed_comment' => 'nullable|string|max:255',
+        ]);
+
+        $complaint->closed_at = Carbon::now();
+        $complaint->closed_comment = request('closed_comment');
+        $complaint->save();
+
+        Inertia::flash(['message' => 'complaints.complaint-closed', 'color' => 'success']);
+
+        return back();
     }
 
     /**

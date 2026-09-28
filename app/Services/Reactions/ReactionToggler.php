@@ -35,7 +35,8 @@ class ReactionToggler
 
         $author = $reaction->author();
 
-        if ($author !== null && $author->isNot($actor)) {
+        // Authors aren't told about reactions from the users they blocked
+        if ($author !== null && $author->isNot($actor) && $author->isAuthorBlocked($actor) === false) {
             $author->notify($reaction->notification($actor));
         }
 

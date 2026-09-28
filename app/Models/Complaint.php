@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ComplaintFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -32,6 +33,15 @@ class Complaint extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'reported_url',
+    ];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @return array<string, string>
@@ -51,5 +61,28 @@ class Complaint extends Model
     public function complainable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Where the reported content can be seen: the writing, the commented
+     * writing or the user's profile. Null when the complainable relation
+     * wasn't loaded, so serializing a complaint never queries it.
+     *
+     * @return Attribute<?string, never>
+     */
+    protected function reportedUrl(): Attribute
+    {
+        return Attribute::get(function (): ?string {
+            if ($this->relationLoaded('complainable') === false) {
+                return null;
+            }
+
+            return match (true) {
+                $this->complainable instanceof Writing => $this->complainable->path(),
+                $this->complainable instanceof Comment => $this->complainable->writing?->path(),
+                $this->complainable instanceof User => $this->complainable->path(),
+                default => null,
+            };
+        });
     }
 }

@@ -108,6 +108,26 @@ describe('verifying an email', function (): void {
         expect($user->refresh()->hasVerifiedEmail())->toBeFalse();
     });
 
+    it('stops issuing codes once a user was sent ten in a day', function (): void {
+        // Given
+        Notification::fake();
+        $user = createUser(['email_verified_at' => null]);
+        // Isolate the daily cap from the per-minute route throttle
+        withoutMiddleware(ThrottleRequests::class);
+        foreach (range(1, 10) as $attempt) {
+            actingAs($user)->postJson(route('verification.send'))->assertNoContent();
+        }
+
+        // When
+        $response = actingAs($user)->postJson(route('verification.send'));
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors([
+            'code' => __('Too many codes were requested today. Please try again tomorrow.'),
+        ]);
+        Notification::assertSentToTimes($user, VerifyEmailCode::class, 10);
+    });
+
     it('invalidates the code when the email address changes', function (): void {
         // Given
         $user = createUser(['email_verified_at' => null]);

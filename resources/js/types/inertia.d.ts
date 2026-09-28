@@ -8,7 +8,7 @@ interface SharedAuthUser {
   id: number
   username: string
   name: string
-  avatar: string | null
+  avatar_url: string | null
 }
 
 interface SharedSiteLink {
@@ -25,6 +25,10 @@ interface SharedSiteConfig {
   pagination: number
   social: Record<string, SharedSiteLink>
   stores: Record<string, SharedSiteLink>
+  // The social networks a profile links to, each with its handle's max length
+  socialNetworks: Record<string, number>
+  // The providers people can sign in with (e.g. google)
+  authProviders: string[]
 }
 
 interface SharedPageProps {

@@ -89,6 +89,31 @@ describe('the admin activity page', function (): void {
         ]);
     });
 
+    it('pages deep into a source that holds most of the activity without skipping or repeating a row', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+        travel(1)->minutes();
+        $author = createUser();
+        $writingIds = [];
+        foreach (range(1, fake()->numberBetween(21, 35)) as $ignored) {
+            travel(1)->minutes();
+            $writingIds[] = Writing::factory()->for($author, 'author')->create()->id;
+        }
+
+        // When
+        $rows = [];
+        foreach (range(1, (int) ceil((count($writingIds) + 2) / 10)) as $page) {
+            $rows = [...$rows, ...(array) actingAs($admin)->getJson(route('admin.activity', ['page' => $page]))->json('data')];
+        }
+
+        // Then
+        expect(array_map(fn (array $row): string => $row['kind'].':'.$row['subject_id'], $rows))->toBe([
+            ...array_map(fn (int $id): string => 'published:'.$id, array_reverse($writingIds)),
+            'joined:'.$author->id,
+            'joined:'.$admin->id,
+        ]);
+    });
+
     it('attaches who acted and the writing involved', function (): void {
         // Given
         ['admin' => $admin, 'author' => $author, 'reader' => $reader, 'writing' => $writing] = seedEveryActivity();

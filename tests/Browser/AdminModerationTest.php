@@ -63,10 +63,6 @@ describe('admin moderation of another user\'s writing', function (): void {
         expect(Writing::find($writing->id))->toBeNull();
     });
 
-    // NOTE: the admin writings table (PoAdminWritings.vue) has a delete button
-    // that is not wired to any handler (href="#", no confirmation, no request).
-    // Admin deletion currently only works through the writing's own edit page
-    // (tested above), which `canEdit()` grants admins the same as owners.
     it('lists writings on the admin moderation page', function (): void {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create();

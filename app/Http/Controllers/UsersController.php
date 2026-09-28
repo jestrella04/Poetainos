@@ -6,17 +6,23 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\Writing;
+use App\Services\AgreementRecorder;
 use App\Services\ContentDeleter;
+use App\Services\EmailChanger;
 use App\Services\ImageStorage;
+use App\Services\SecurityLog;
 use App\Services\ViewCounter;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class UsersController extends Controller
 {
@@ -63,6 +69,8 @@ class UsersController extends Controller
      */
     public function suggest(): Collection
     {
+        request()->validate(['query' => 'required|string|min:2|max:50']);
+
         $wildcard = '%'.escapeLike((string) request('query')).'%';
 
         return User::where('name', 'like', $wildcard)
@@ -78,8 +86,6 @@ class UsersController extends Controller
     public function show(User $user, ViewCounter $viewCounter): Response
     {
         $viewCounter->count($user);
-
-        $authUser = Auth::user();
 
         return Inertia::render('users/PoUsersShow', [
             'meta' => [
@@ -104,7 +110,7 @@ class UsersController extends Controller
                     Writing::visibleTo($this->blockedAuthorIds())->whereIn('id', $user->likedWritingIds())
                 ),
             ],
-            'isAuthorBlocked' => $authUser !== null ? $authUser->isAuthorBlocked($user) : false,
+            'isAuthorBlocked' => in_array($user->id, $this->blockedAuthorIds(), true),
         ]);
     }
 
@@ -129,7 +135,7 @@ class UsersController extends Controller
      * Update the specified resource in storage, then open the user's account,
      * or the edited profile when someone else (an admin) made the change.
      */
-    public function update(Request $request, User $user, ImageStorage $images): RedirectResponse
+    public function update(Request $request, User $user, ImageStorage $images, EmailChanger $emailChanger, SecurityLog $securityLog, AgreementRecorder $agreements): RedirectResponse
     {
         $this->authorize('update', $user);
 
@@ -148,49 +154,92 @@ class UsersController extends Controller
             'interests' => 'nullable|string|min:3|max:250',
             'website' => 'nullable|url|max:250',
             ...array_map(fn (int $maxLength): string => 'nullable|string|min:3|max:'.$maxLength, UserProfile::SOCIAL_NETWORKS),
-            'avatar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
-            'avatar-remove' => 'nullable|boolean',
-            ...$this->agreementRules($agreeingUser),
+            'avatar' => $this->imageUploadRule(),
+            'avatar_remove' => 'nullable|boolean',
+            ...$agreements->rules($agreeingUser),
         ]);
 
         $profile = $user->editableProfile();
-        $profile->fill([
-            ...$request->only(['bio', 'website', 'location', 'interests', 'occupation', ...array_keys(UserProfile::SOCIAL_NETWORKS)]),
-            'avatar' => $this->resolveAvatar($request, $profile, $images),
-        ])->save();
+        $currentAvatar = $profile->avatar;
+        $isAvatarRemoved = isTruthy($request->input('avatar_remove'));
+        $uploadedAvatar = $isAvatarRemoved ? null : $this->storeUploadedAvatar($request, $images);
+        $avatar = $isAvatarRemoved ? null : ($uploadedAvatar ?? $currentAvatar);
 
         // Only an admin may change a user's role
-        if ($request->input('role') !== null && $request->user()?->isAllowed('admin') === true) {
-            $user->role_id = $request->input('role');
+        $fromRoleId = $user->role_id;
+        $isRoleChanged = $request->input('role') !== null && $request->user()?->isAllowed('admin') === true && (int) $request->input('role') !== (int) $user->role_id;
+
+        $newEmail = (string) $request->input('email');
+        $isEmailChanged = $user->email !== $newEmail;
+
+        // A user's own new address waits until they prove it receives mail, so a
+        // hijacked session can't move the account away. An admin's change is
+        // trusted and applied at once, unverified until the user proves it.
+        $isEmailChangePending = $isEmailChanged === true && $isOwnProfile === true;
+        $isEmailReplaced = $isEmailChanged === true && $isOwnProfile === false;
+
+        try {
+            DB::transaction(function () use ($request, $user, $profile, $avatar, $isRoleChanged, $isEmailReplaced, $newEmail): void {
+                $profile->fill([
+                    ...$request->only(['bio', 'website', 'location', 'interests', 'occupation', ...array_keys(UserProfile::SOCIAL_NETWORKS)]),
+                    'avatar' => $avatar,
+                ])->save();
+
+                if ($isRoleChanged === true) {
+                    $user->role_id = $request->input('role');
+                }
+
+                $user->name = $request->input('name');
+
+                if ($isEmailReplaced === true) {
+                    $user->email = $newEmail;
+                    $user->email_verified_at = null;
+                }
+
+                $user->save();
+            });
+        } catch (Throwable $exception) {
+            // Nothing refers to the new upload once the rows are rolled back
+            $images->delete($uploadedAvatar);
+
+            throw $exception;
         }
 
-        // A changed email is unverified until the user proves they own it again
-        $emailChanged = $user->email !== $request->input('email');
-
-        // Persist to database
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-
-        if ($emailChanged === true) {
-            $user->email_verified_at = null;
+        // The replaced or removed avatar goes only once no row refers to it
+        if ($avatar !== $currentAvatar) {
+            $images->delete($currentAvatar);
         }
 
-        $user->save();
+        if ($isRoleChanged === true) {
+            $securityLog->record('Role changed', $request->user(), [
+                'user_id' => $user->id,
+                'from_role_id' => $fromRoleId,
+                'to_role_id' => $request->input('role'),
+            ]);
+        }
 
-        if ($emailChanged === true) {
+        if ($isEmailChangePending === true) {
+            $emailChanger->request($user, $newEmail);
+        }
+
+        if ($isEmailReplaced === true) {
             $user->sendEmailVerificationNotification();
         }
 
-        $this->rememberAgreements($request, $agreeingUser);
+        $agreements->remember($request, $agreeingUser);
 
-        Inertia::flash(['message' => 'accounts.profile-updated', 'color' => 'success']);
+        Inertia::flash([
+            'message' => $isEmailChangePending === true ? 'accounts.email-change-pending' : 'accounts.profile-updated',
+            'color' => 'success',
+        ]);
 
         return redirect($isOwnProfile ? route('users.account') : $user->path());
     }
 
     /**
      * Remove the specified resource from storage. Users deleting their own
-     * account are logged out; either way the home page follows.
+     * account are logged out and go home; an admin deleting someone else goes
+     * back to the admin table when deleting from there, else home.
      */
     public function destroy(Request $request, User $user, ContentDeleter $deleter): RedirectResponse
     {
@@ -211,7 +260,7 @@ class UsersController extends Controller
             'color' => 'success',
         ]);
 
-        return to_route('home');
+        return $isOwnAccount === false && $request->routeIs('admin.*') ? back() : to_route('home');
     }
 
     /**
@@ -230,6 +279,7 @@ class UsersController extends Controller
             ],
             'account' => $user->only([
                 'created_at',
+                'pending_email',
                 'writings_count',
                 'shelf_count',
                 'given_likes_count',
@@ -242,23 +292,16 @@ class UsersController extends Controller
     }
 
     /**
-     * The avatar path to store: the current one, a freshly uploaded one, or none when the user removed it.
+     * Store the uploaded avatar, returning its path, or null when none was uploaded.
      */
-    private function resolveAvatar(Request $request, UserProfile $profile, ImageStorage $images): ?string
+    private function storeUploadedAvatar(Request $request, ImageStorage $images): ?string
     {
-        if (isTruthy($request->input('avatar-remove'))) {
-            $images->delete($profile->avatar);
+        $upload = $request->file('avatar');
 
-            return null;
+        if ($upload instanceof UploadedFile && $upload->isValid()) {
+            return $images->storeUpload($upload, 'avatars', self::AVATAR_SIZE, self::AVATAR_SIZE);
         }
 
-        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
-            $avatar = $images->storeUpload($request->file('avatar'), 'avatars', self::AVATAR_SIZE, self::AVATAR_SIZE);
-            $images->delete($profile->avatar);
-
-            return $avatar;
-        }
-
-        return $profile->avatar;
+        return null;
     }
 }

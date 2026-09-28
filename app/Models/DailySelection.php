@@ -62,9 +62,14 @@ class DailySelection extends Model
 
     /**
      * Today's pick, created on first call and returned as-is afterwards.
+     * None while there is no writing to pick.
      */
-    public static function pickForToday(): self
+    public static function pickForToday(): ?self
     {
+        if (Writing::query()->doesntExist()) {
+            return null;
+        }
+
         return self::firstOrCreate(
             ['selected_on' => Carbon::today()],
             fn (): array => ['writing_id' => self::randomEligibleWriting()->id],

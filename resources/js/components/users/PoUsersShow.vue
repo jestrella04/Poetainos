@@ -3,6 +3,8 @@ import { usePage } from '@inertiajs/vue3'
 import PoUsersEntry from './PoUsersEntry.vue'
 import PoWritingsEntry from '../writings/PoWritingsEntry.vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useDates } from '@/composables/useDates'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useFormatting } from '@/composables/useFormatting'
 import { useInfiniteList } from '@/composables/useInfiniteList'
 import type { InertiaPageProps } from '@/types/inertia'
@@ -26,7 +28,9 @@ interface UsersShowProps {
 }
 
 const { isEmpty, isBlank } = useTypeGuards()
-const { userDisplayName, relativeDate, formatCount } = useFormatting()
+const { relativeDate } = useDates()
+const { userDisplayName } = useUserDisplay()
+const { formatCount } = useFormatting()
 const page = usePage<InertiaPageProps<UsersShowProps>>()
 
 const {

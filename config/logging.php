@@ -70,6 +70,15 @@ return [
             'days' => 14,
         ],
 
+        // What admins did, kept apart from the application log and a year long:
+        // the admin panel can read these files but not clear them
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/security.log'),
+            'level' => 'info',
+            'days' => 365,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\SocialAuthController;
+use App\Models\UserProfile;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\actingAs;
@@ -58,11 +61,12 @@ describe('the shared auth props', function (): void {
         $user = createUser();
         $writings = Writing::factory()->count(30)->create();
         $writings->firstOrFail()->likes()->create(['user_id' => $user->id, 'vote' => 1]);
-        $withOneLike = count(queriesDuring(fn () => actingAs($user)->get(route('explore'))));
+        // A fresh instance per request, as a real request loads the user anew
+        $withOneLike = count(queriesDuring(fn () => actingAs($user->fresh() ?? $user)->get(route('explore'))));
 
         // When
         $writings->skip(1)->each(fn (Writing $writing) => $writing->likes()->create(['user_id' => $user->id, 'vote' => 1]));
-        $withManyLikes = count(queriesDuring(fn () => actingAs($user)->get(route('explore'))));
+        $withManyLikes = count(queriesDuring(fn () => actingAs($user->fresh() ?? $user)->get(route('explore'))));
 
         // Then
         expect($withManyLikes)->toBe($withOneLike);
@@ -109,5 +113,31 @@ describe('the ziggy route table', function (): void {
 
         // Then
         $response->assertInertia(fn ($page) => $page->has('ziggy.routes'));
+    });
+
+    it('leaves the admin panel routes out for everyone but admins', function (): void {
+        // When
+        $asGuest = get(route('explore'));
+        $asUser = actingAs(createUser())->get(route('explore'));
+        $asAdmin = actingAs(actingAsAdmin())->get(route('explore'));
+
+        // Then
+        // Route names contain dots, so they're looked up as keys rather than prop paths
+        $hasRoute = fn (string $name): Closure => fn (Collection $routes): bool => $routes->has($name);
+        $asGuest->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('explore'))->whereNot('ziggy.routes', $hasRoute('admin.index')));
+        $asUser->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('explore'))->whereNot('ziggy.routes', $hasRoute('admin.index')));
+        $asAdmin->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('admin.index')));
+    });
+});
+
+describe('the shared site props', function (): void {
+    it('list the social networks a profile links to and the providers people sign in with', function (): void {
+        // When
+        $response = get(route('explore'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page
+            ->where('site.socialNetworks', UserProfile::SOCIAL_NETWORKS)
+            ->where('site.authProviders', SocialAuthController::PROVIDERS));
     });
 });

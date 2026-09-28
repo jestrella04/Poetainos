@@ -10,18 +10,18 @@ use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
 /**
- * Base for notifications that build their content once, in the
- * constructor, into $this->content (title/greeting/body/footer/url/
- * action/icon/tag) and deliver it identically across mail and web push,
- * while the broadcast only refreshes the recipient's unread badge.
- * Subclasses keep their own constructor, via(), and toArray().
+ * Base for notifications whose content() is delivered identically across
+ * mail and web push, while the broadcast only refreshes the recipient's
+ * unread badge. The content is built when the notification is sent, in the
+ * queue worker, not when it is dispatched. Subclasses keep their own
+ * constructor, via(), and toArray().
  */
 abstract class PoetainosNotification extends Notification
 {
     /**
-     * @var array<string, mixed>
+     * What the notification says to the given recipient.
      */
-    protected array $content = [];
+    abstract protected function content(mixed $notifiable): NotificationContent;
 
     /**
      * The values every "someone did something on your content" message interpolates.
@@ -36,21 +36,28 @@ abstract class PoetainosNotification extends Notification
     /**
      * The content of a "someone did something on your content" notification;
      * only the body, the link and the action label differ between them.
-     *
-     * @return array<string, mixed>
      */
-    protected function actorContent(User $actor, string $body, string $url, string $action): array
+    protected function actorContent(User $actor, string $body, string $url, string $action): NotificationContent
     {
-        return [
-            'title' => __('Updates from :name at :site', $this->actorPlaceholders($actor)),
-            'greeting' => __('Hello!'),
-            'body' => $body,
-            'footer' => __('Thank you for being part of the hood!'),
-            'url' => $url,
-            'action' => $action,
-            'icon' => asset('images/logo-192.png'),
-            'tag' => getSiteConfig('name'),
-        ];
+        return $this->siteContent(__('Updates from :name at :site', $this->actorPlaceholders($actor)), $body, $url, $action);
+    }
+
+    /**
+     * The content of a notification from the site, with its greeting,
+     * footer, icon and tag.
+     */
+    protected function siteContent(string $title, string $body, string $url, string $action): NotificationContent
+    {
+        return new NotificationContent(
+            title: $title,
+            greeting: __('Hello!'),
+            body: $body,
+            footer: __('Thank you for being part of the hood!'),
+            url: $url,
+            action: $action,
+            icon: asset('images/logo-192.png'),
+            tag: (string) getSiteConfig('name'),
+        );
     }
 
     /**
@@ -82,12 +89,14 @@ abstract class PoetainosNotification extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
+        $content = $this->content($notifiable);
+
         return (new MailMessage)
-            ->subject($this->content['title'])
-            ->greeting($this->content['greeting'])
-            ->line($this->content['body'])
-            ->action($this->content['action'], $this->content['url'])
-            ->line($this->content['footer']);
+            ->subject($content->title)
+            ->greeting($content->greeting)
+            ->line($content->body)
+            ->action($content->action, $content->url)
+            ->line($content->footer);
     }
 
     /**
@@ -98,15 +107,17 @@ abstract class PoetainosNotification extends Notification
      */
     public function toWebPush($notifiable, $notification): WebPushMessage
     {
+        $content = $this->content($notifiable);
+
         return (new WebPushMessage)
-            ->title($this->content['title'])
-            ->icon($this->content['icon'])
-            ->body($this->content['body'])
-            ->action($this->content['action'], $this->content['url'])
+            ->title($content->title)
+            ->icon($content->icon)
+            ->body($content->body)
+            ->action($content->action, $content->url)
             ->options(['TTL' => 1000])
             ->renotify()
             ->requireInteraction()
-            ->tag($this->content['tag']);
+            ->tag($content->tag);
     }
 
     /**

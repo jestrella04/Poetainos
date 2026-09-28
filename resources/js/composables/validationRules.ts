@@ -1,6 +1,7 @@
 // Username and password patterns shared by the forms that create or sign in
-// accounts, and the @mention rule comments use. They mirror User::USERNAME_PATTERN
-// and User::MENTION_PATTERN, which stay the authority: change both together.
+// accounts, and the @mention rule comments use. They mirror User::USERNAME_PATTERN,
+// User::PASSWORD_PATTERN and User::MENTION_PATTERN, which stay the authority:
+// change both together.
 
 export const USERNAME_PATTERN = '^(?!.*\\.\\.)(?!.*\\.$)[^\\W][\\w.]{0,44}$'
 

@@ -19,6 +19,17 @@ describe('searching users by name or username', function (): void {
         $response->assertOk()->assertJsonCount(2);
     });
 
+    it('refuses a query too short to narrow the users down', function (string $query): void {
+        // Given
+        $searcher = createUser();
+
+        // When
+        $response = actingAs($searcher)->getJson(route('users.query', ['query' => $query]));
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors('query');
+    })->with(['empty' => [''], 'one letter' => ['a']]);
+
     it('is only available to signed in users', function (): void {
         // When
         $response = getJson(route('users.query', ['query' => fake()->randomLetter()]));

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -40,6 +41,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public const MENTION_PATTERN = '/\B@(\w[\w.]{0,44})/';
 
     /**
+     * 8+ characters with an upper and a lower case letter, plus a digit or a
+     * symbol. Mirrored by PASSWORD_PATTERN in resources/js/composables/validationRules.ts.
+     */
+    public const PASSWORD_PATTERN = '/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -62,6 +69,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
         // Superseded by the profile and account columns; kept only until its data is verified and dropped
         'extra_info',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'avatar_url',
     ];
 
     /**
@@ -94,28 +110,24 @@ class User extends Authenticatable implements MustVerifyEmail
         return route('users.writings.index', $this->username);
     }
 
+    /**
+     * The URL of the avatar that withProfileFields('avatar') selects; null
+     * when there is none or it wasn't selected.
+     *
+     * @return Attribute<?string, never>
+     */
+    protected function avatarUrl(): Attribute
+    {
+        return Attribute::get(
+            fn (): ?string => array_key_exists('avatar', $this->attributes) ? storageUrl($this->attributes['avatar']) : null,
+        );
+    }
+
     public function getName(): string
     {
         $name = $this->name ?? '';
 
         return $name !== '' ? $name : $this->username;
-    }
-
-    public function initials(): string
-    {
-        $nameParts = preg_split('/\s+/', trim((string) $this->name), -1, PREG_SPLIT_NO_EMPTY);
-
-        if ($nameParts === false || count($nameParts) === 0) {
-            return mb_strtoupper(mb_substr($this->username, 0, 1));
-        }
-
-        $initials = mb_substr($nameParts[0], 0, 1);
-
-        if (count($nameParts) > 1) {
-            $initials .= mb_substr(end($nameParts), 0, 1);
-        }
-
-        return mb_strtoupper($initials);
     }
 
     /**
@@ -261,13 +273,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isAllowed(string $task): bool
     {
-        if ($this->role === null) {
-            return false;
-        }
-
-        $permission = collect($this->role->permissions())->firstWhere('name', $task);
-
-        return (bool) ($permission['enabled'] ?? false);
+        return $this->role?->grants($task) === true;
     }
 
     public function isInAgreement(): bool

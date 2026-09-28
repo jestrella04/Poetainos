@@ -2,8 +2,12 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
+import PoAdminDeleteDialog from './partials/PoAdminDeleteDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
-import { useFormatting } from '@/composables/useFormatting'
+import { useRowDialog } from '@/composables/useRowDialog'
+import { useDates } from '@/composables/useDates'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { UserLike } from '@/types/models'
@@ -22,7 +26,8 @@ interface WritingAdmin {
 }
 
 const { t } = useI18n()
-const { userDisplayName, toLocaleDate } = useFormatting()
+const { toLocaleDate } = useDates()
+const { userDisplayName } = useUserDisplay()
 const page = usePage<InertiaPageProps<{ total: number }>>()
 const headers: DataTableHeader[] = [
   { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
@@ -32,15 +37,16 @@ const headers: DataTableHeader[] = [
   { title: t('main.created-at'), align: 'start', sortable: false, key: 'created_at' },
   { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
 ]
-const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>(
+const { items, totalItems, isLoading, loadItems, reload } = useServerTable<WritingAdmin>(
   'admin.writings',
-  page.props.total
+  () => page.props.total
 )
+const deleteDialog = useRowDialog<WritingAdmin>()
 </script>
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('writings.writings') }}</v-card-title>
+    <po-admin-title :title="$t('writings.writings')" />
 
     <v-data-table-server
       v-model:items-per-page="page.props.site.pagination"
@@ -82,11 +88,26 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<WritingAdmin>
             <v-icon icon="fas fa-edit" />
           </po-button>
 
-          <po-button href="#" size="x-small" color="secondary" icon inertia>
+          <po-button
+            :id="`admin-delete-${item.id}`"
+            size="x-small"
+            color="secondary"
+            icon
+            :aria-label="$t('main.delete')"
+            @click="deleteDialog.open(item)"
+          >
             <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>
     </v-data-table-server>
+
+    <po-admin-delete-dialog
+      v-if="deleteDialog.isOpen.value && deleteDialog.row.value !== null"
+      v-model="deleteDialog.isOpen.value"
+      :url="route('admin.writings.destroy', deleteDialog.row.value.slug)"
+      warning-key="writings.delete-writing-warning"
+      @deleted="reload"
+    />
   </po-wrapper>
 </template>

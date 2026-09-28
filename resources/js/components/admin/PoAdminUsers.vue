@@ -2,8 +2,11 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
+import PoAdminDeleteDialog from './partials/PoAdminDeleteDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
-import { useFormatting } from '@/composables/useFormatting'
+import { useRowDialog } from '@/composables/useRowDialog'
+import { useDates } from '@/composables/useDates'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -22,7 +25,7 @@ interface UserAdmin {
 }
 
 const { t } = useI18n()
-const { toLocaleDate } = useFormatting()
+const { toLocaleDate } = useDates()
 const page = usePage<InertiaPageProps<{ total: number }>>()
 const headers: DataTableHeader[] = [
   { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
@@ -34,15 +37,16 @@ const headers: DataTableHeader[] = [
   { title: t('main.karma'), align: 'start', sortable: false, key: 'karma' },
   { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
 ]
-const { items, totalItems, isLoading, loadItems } = useServerTable<UserAdmin>(
+const { items, totalItems, isLoading, loadItems, reload } = useServerTable<UserAdmin>(
   'admin.users',
-  page.props.total
+  () => page.props.total
 )
+const deleteDialog = useRowDialog<UserAdmin>()
 </script>
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('users.users') }}</v-card-title>
+    <po-admin-title :title="$t('users.users')" />
 
     <v-data-table-server
       v-model:items-per-page="page.props.site.pagination"
@@ -99,11 +103,27 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<UserAdmin>(
             <v-icon icon="fas fa-edit" />
           </po-button>
 
-          <po-button href="#" size="x-small" color="secondary" icon inertia>
+          <po-button
+            :id="`admin-delete-${item.id}`"
+            size="x-small"
+            color="secondary"
+            icon
+            :aria-label="$t('main.delete')"
+            @click="deleteDialog.open(item)"
+          >
             <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>
     </v-data-table-server>
+
+    <po-admin-delete-dialog
+      v-if="deleteDialog.isOpen.value && deleteDialog.row.value !== null"
+      v-model="deleteDialog.isOpen.value"
+      :url="route('admin.users.destroy', deleteDialog.row.value.username)"
+      warning-key="users.delete-user-warning-1"
+      requires-password
+      @deleted="reload"
+    />
   </po-wrapper>
 </template>

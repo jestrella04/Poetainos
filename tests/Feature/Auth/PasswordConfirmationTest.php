@@ -33,4 +33,19 @@ describe('confirming a password', function (): void {
         // Then
         $response->assertUnprocessable()->assertJsonValidationErrors('password');
     });
+
+    it('is throttled so the password cannot be brute-forced from a signed-in session', function (): void {
+        // Given
+        $password = fake()->password();
+        $user = createUserWithPassword($password);
+        foreach (range(1, 5) as $attempt) {
+            actingAs($user)->postJson('/confirm-password', ['password' => strrev($password).fake()->password()]);
+        }
+
+        // When
+        $response = actingAs($user)->postJson('/confirm-password', ['password' => $password]);
+
+        // Then
+        $response->assertTooManyRequests();
+    });
 });

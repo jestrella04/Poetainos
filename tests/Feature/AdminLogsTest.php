@@ -25,6 +25,7 @@ describe('the admin logs page', function (): void {
             ->assertInertia(fn ($page) => $page->component('admin/PoAdminLogs')
                 ->where('files.0.name', 'laravel.log')
                 ->where('files.0.size', 3)
+                ->where('files.0.clearable', true)
                 ->where('files.1.name', 'ssr.log'));
     });
 });
@@ -117,6 +118,22 @@ describe('clearing a log', function (): void {
         $response->assertRedirect(route('admin.logs'))
             ->assertInertiaFlash('message', 'admin.log-cleared');
         expect(file_get_contents(storage_path('logs/laravel.log')))->toBe('');
+    });
+
+    it('refuses to empty the security audit log', function (): void {
+        // Given
+        $admin = actingAsAdmin();
+        $auditEntry = logLine('info', 'Admin action')."\n";
+        useTemporaryLogs(['security-2026-09-28.log' => $auditEntry]);
+
+        // When
+        $listing = actingAs($admin)->get(route('admin.logs'));
+        $response = actingAs($admin)->delete(route('admin.logs.clear', 'security-2026-09-28.log'));
+
+        // Then
+        $listing->assertInertia(fn ($page) => $page->where('files.0.clearable', false));
+        $response->assertForbidden();
+        expect(file_get_contents(storage_path('logs/security-2026-09-28.log')))->toBe($auditEntry);
     });
 
     it('is not found for a file that is not a listed log', function (): void {

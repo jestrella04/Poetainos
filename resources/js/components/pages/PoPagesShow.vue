@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
-import { useFormatting } from '@/composables/useFormatting'
+import { useRichText } from '@/composables/useRichText'
 import type { InertiaPageProps } from '@/types/inertia'
 
 interface StaticPage {
@@ -8,7 +8,7 @@ interface StaticPage {
   text: string
 }
 
-const { markdown } = useFormatting()
+const { markdown } = useRichText()
 const page = usePage<InertiaPageProps<{ page: StaticPage }>>()
 const data = page.props.page
 </script>

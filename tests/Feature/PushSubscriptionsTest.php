@@ -87,7 +87,7 @@ describe('unsubscribing from push notifications', function (): void {
         $user->updatePushSubscription($keptEndpoint);
 
         // When
-        $response = actingAs($user)->postJson(route('push.delete'), ['endpoint' => $removedEndpoint]);
+        $response = actingAs($user)->deleteJson(route('push.delete'), ['endpoint' => $removedEndpoint]);
 
         // Then
         $response->assertNoContent();
@@ -96,7 +96,7 @@ describe('unsubscribing from push notifications', function (): void {
 
     it('requires an endpoint', function (): void {
         // When
-        $response = actingAs(createUser())->postJson(route('push.delete'));
+        $response = actingAs(createUser())->deleteJson(route('push.delete'));
 
         // Then
         $response->assertUnprocessable()->assertJsonValidationErrors('endpoint');

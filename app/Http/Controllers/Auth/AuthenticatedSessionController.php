@@ -28,6 +28,10 @@ class AuthenticatedSessionController extends Controller
                 'canonical' => route('login'),
             ],
             'status' => session('status'),
+            // The address a password was just reset for, to sign in with
+            'email' => session('email'),
+            'startsWithEmail' => isTruthy(request('isEmail')),
+            'isAfterPasswordReset' => isTruthy(request('isReset')),
         ]);
     }
 
@@ -54,7 +58,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        Inertia::flash('message', 'accounts.welcome-back');
+        Inertia::flash(['message' => 'accounts.welcome-back', 'color' => 'success']);
 
         return redirect()->intended(route('home'));
     }
@@ -67,7 +71,7 @@ class AuthenticatedSessionController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        Inertia::flash('message', 'accounts.logged-out-goodbye');
+        Inertia::flash(['message' => 'accounts.logged-out-goodbye', 'color' => 'primary']);
 
         return redirect('/');
     }

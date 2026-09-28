@@ -24,7 +24,7 @@ class PruneOrphanedContent extends Command
      *
      * @var string
      */
-    protected $description = 'Delete likes and notifications that refer to deleted content';
+    protected $description = 'Delete likes, complaints and notifications that refer to deleted content';
 
     /**
      * Execute the console command.
@@ -33,7 +33,7 @@ class PruneOrphanedContent extends Command
     {
         $pruned = $deleter->deleteOrphans();
 
-        $this->info(sprintf('Pruned %d orphaned likes and %d orphaned notifications.', $pruned['likes'], $pruned['notifications']));
+        $this->info(sprintf('Pruned %d orphaned likes, %d orphaned complaints and %d orphaned notifications.', $pruned['likes'], $pruned['complaints'], $pruned['notifications']));
 
         return self::SUCCESS;
     }

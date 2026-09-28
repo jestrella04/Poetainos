@@ -1,5 +1,5 @@
 import type { ComposerTranslation } from 'vue-i18n'
-import { useFormatting } from './useFormatting'
+import { useUserDisplay } from './useUserDisplay'
 import type { UserLike } from '@/types/models'
 
 export interface NotificationLike {
@@ -17,7 +17,7 @@ export interface NotificationLike {
  * dozen-case list shared across two languages.
  */
 export function useNotificationMessage() {
-  const { userDisplayName } = useFormatting()
+  const { userDisplayName } = useUserDisplay()
 
   function notificationMessage(
     notification: NotificationLike,

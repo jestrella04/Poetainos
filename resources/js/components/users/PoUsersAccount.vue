@@ -2,12 +2,14 @@
 import { ref, provide, reactive, computed } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
 import PoUsersAccountRow from './partials/PoUsersAccountRow.vue'
+import PoUsersPendingEmail from './partials/PoUsersPendingEmail.vue'
 import { useHttp, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
 import { isDeleteKey, pushKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useFormatting } from '@/composables/useFormatting'
 import { useMembership } from '@/composables/useMembership'
 import { useRequestFailure } from '@/composables/useRequestFailure'
@@ -15,6 +17,7 @@ import type { InertiaPageProps } from '@/types/inertia'
 
 interface AccountSummary {
   created_at: string
+  pending_email: string | null
   writings_count: number
   shelf_count: number
   given_likes_count: number
@@ -24,12 +27,13 @@ interface AccountSummary {
 const page =
   usePage<InertiaPageProps<{ notifications?: { email: boolean }; account: AccountSummary }>>()
 const { authUser } = useAuth()
-const { userDisplayName, formatCount } = useFormatting()
+const { userDisplayName } = useUserDisplay()
+const { formatCount } = useFormatting()
 const { membershipDuration, membershipMessage } = useMembership()
 const { t } = useI18n()
 const push = injectStrict(pushKey)
 const { mdAndUp } = useDisplay()
-const emailPreference = useHttp()
+const emailPreference = useHttp({ enabled: false })
 const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
 
 // This page is behind the `verified` auth middleware (routes/web.php), so
@@ -63,9 +67,10 @@ void push.isSubscribed().then((isSubscribed) => {
 
 async function toggleEmailNotifications(value: boolean | null): Promise<void> {
   notifications.email = value === true
+  emailPreference.enabled = notifications.email
 
   await whenSettled(
-    emailPreference.post(route('notifications.email', [String(notifications.email)]), {
+    emailPreference.put(route('notifications.email'), {
       onHttpException,
       onNetworkError
     })
@@ -100,6 +105,11 @@ function togglePushNotifications(value: boolean | null): void {
         {{ $t('accounts.view-public-profile') }}
       </po-link>
     </div>
+
+    <po-users-pending-email
+      v-if="account.pending_email !== null"
+      :pending-email="account.pending_email"
+    />
 
     <v-divider />
 

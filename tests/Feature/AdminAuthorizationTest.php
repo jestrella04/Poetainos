@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Permission;
 use App\Models\Role;
 
 use function Pest\Laravel\actingAs;
@@ -77,15 +78,6 @@ describe('isAllowed', function (): void {
         expect($plainRoleUser->isAllowed('admin'))->toBeFalse();
 
         // Given
-        $disabledAdminRole = Role::factory()->create([
-            'extra_info' => ['permissions' => [['name' => 'admin', 'enabled' => false]]],
-        ]);
-        $disabledAdminUser = createUser(['role_id' => $disabledAdminRole->id]);
-
-        // Then
-        expect($disabledAdminUser->isAllowed('admin'))->toBeFalse();
-
-        // Given
         $admin = actingAsAdmin();
 
         // Then
@@ -94,9 +86,8 @@ describe('isAllowed', function (): void {
 
     it('returns false when the role has permissions but none match the requested task', function (): void {
         // Given
-        $role = Role::factory()->create([
-            'extra_info' => ['permissions' => [['name' => fake()->lexify('task-????'), 'enabled' => true]]],
-        ]);
+        $role = Role::factory()->create();
+        $role->permissions()->attach(Permission::factory()->create());
         $user = createUser(['role_id' => $role->id]);
 
         // Then

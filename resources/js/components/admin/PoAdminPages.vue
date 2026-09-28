@@ -2,8 +2,12 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
+import PoAdminDeleteDialog from './partials/PoAdminDeleteDialog.vue'
+import PoAdminPageDialog from './partials/PoAdminPageDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
-import { useFormatting } from '@/composables/useFormatting'
+import { useRowDialog } from '@/composables/useRowDialog'
+import { useDates } from '@/composables/useDates'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -15,11 +19,12 @@ interface PageAdmin {
   id: number
   title: string
   slug: string
+  text: string
   created_at: string
 }
 
 const { t } = useI18n()
-const { toLocaleDate } = useFormatting()
+const { toLocaleDate } = useDates()
 const page = usePage<InertiaPageProps<{ total: number }>>()
 const headers: DataTableHeader[] = [
   { title: t('main.id'), align: 'start', sortable: false, key: 'id' },
@@ -27,15 +32,28 @@ const headers: DataTableHeader[] = [
   { title: t('main.created-at'), align: 'start', sortable: false, key: 'created_at' },
   { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
 ]
-const { items, totalItems, isLoading, loadItems } = useServerTable<PageAdmin>(
+const { items, totalItems, isLoading, loadItems, reload } = useServerTable<PageAdmin>(
   'admin.pages',
-  page.props.total
+  () => page.props.total
 )
+const pageDialog = useRowDialog<PageAdmin>()
+const deleteDialog = useRowDialog<PageAdmin>()
 </script>
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('pages.pages') }}</v-card-title>
+    <div class="d-flex align-center justify-space-between">
+      <po-admin-title :title="$t('pages.pages')" />
+
+      <po-button
+        id="admin-page-create"
+        color="primary"
+        prepend-icon="fas fa-plus"
+        @click="pageDialog.open()"
+      >
+        {{ $t('pages.create-page') }}
+      </po-button>
+    </div>
 
     <v-data-table-server
       v-model:items-per-page="page.props.site.pagination"
@@ -62,15 +80,44 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<PageAdmin>(
             <v-icon icon="fas fa-eye" />
           </po-button>
 
-          <po-button href="#" size="x-small" color="secondary" icon inertia>
+          <po-button
+            size="x-small"
+            color="secondary"
+            icon
+            :id="`admin-edit-${item.id}`"
+            :aria-label="$t('pages.edit-page')"
+            @click="pageDialog.open(item)"
+          >
             <v-icon icon="fas fa-edit" />
           </po-button>
 
-          <po-button href="#" size="x-small" color="secondary" icon inertia>
+          <po-button
+            :id="`admin-delete-${item.id}`"
+            size="x-small"
+            color="secondary"
+            icon
+            :aria-label="$t('main.delete')"
+            @click="deleteDialog.open(item)"
+          >
             <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>
     </v-data-table-server>
+
+    <po-admin-page-dialog
+      v-if="pageDialog.isOpen.value"
+      v-model="pageDialog.isOpen.value"
+      :page="pageDialog.row.value"
+      @saved="reload"
+    />
+
+    <po-admin-delete-dialog
+      v-if="deleteDialog.isOpen.value && deleteDialog.row.value !== null"
+      v-model="deleteDialog.isOpen.value"
+      :url="route('admin.pages.destroy', deleteDialog.row.value.slug)"
+      warning-key="pages.delete-page-warning"
+      @deleted="reload"
+    />
   </po-wrapper>
 </template>

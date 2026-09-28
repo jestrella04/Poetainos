@@ -5,27 +5,24 @@ namespace App\Notifications;
 use App\Models\Writing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use NotificationChannels\WebPush\WebPushChannel;
 
 class WritingFeatured extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(protected Writing $writing)
+    public function __construct(protected Writing $writing) {}
+
+    protected function content(mixed $notifiable): NotificationContent
     {
-        $this->content = [
-            'title' => __('Your writing has been awarded with a Golden Flower'),
-            'greeting' => __('Hello!'),
-            'body' => __('Congratulations, your writing ":title" has been awarded with a Golden Flower at :site', [
+        return $this->siteContent(
+            __('Your writing has been awarded with a Golden Flower'),
+            __('Congratulations, your writing ":title" has been awarded with a Golden Flower at :site', [
                 'title' => $this->writing->title,
                 'site' => getSiteConfig('name'),
             ]),
-            'footer' => __('Thank you for being part of the hood!'),
-            'url' => $this->writing->path(),
-            'action' => __('View writing'),
-            'icon' => asset('images/logo-192.png'),
-            'tag' => getSiteConfig('name'),
-        ];
+            $this->writing->path(),
+            __('View writing'),
+        );
     }
 
     /**
@@ -36,7 +33,7 @@ class WritingFeatured extends PoetainosNotification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        return [...$this->mailChannelIfWanted($notifiable), 'database', 'broadcast', WebPushChannel::class];
+        return [...$this->mailChannelIfWanted($notifiable), ...parent::via($notifiable)];
     }
 
     /**

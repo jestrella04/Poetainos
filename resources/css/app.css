@@ -90,3 +90,9 @@ body,
     top: 0 !important;
   }
 }
+
+iframe {
+  border: 0 !important;
+  border-radius: 5px !important;
+  overflow: hidden;
+}

@@ -12,7 +12,7 @@ class WritingPolicy
      */
     public function update(User $user, Writing $writing): bool
     {
-        return $writing->author?->is($user) === true || $user->isAllowed('admin');
+        return $writing->user_id === $user->id || $user->isAllowed('admin');
     }
 
     /**

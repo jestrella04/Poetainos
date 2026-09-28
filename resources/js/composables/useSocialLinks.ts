@@ -76,6 +76,23 @@ export function useSocialLinks() {
     ]
   }
 
+  /**
+   * The brand name of a network a profile links to.
+   */
+  function socialNetworkName(network: string): string {
+    const names: Record<string, string> = {
+      twitter: 'X (Twitter)',
+      threads: 'Threads',
+      instagram: 'Instagram',
+      facebook: 'Facebook',
+      youtube: 'YouTube',
+      goodreads: 'Goodreads',
+      telegram: 'Telegram'
+    }
+
+    return names[network] ?? network
+  }
+
   function socialIcon(): Record<string, string | undefined> {
     return {
       twitter: 'fab fa-x-twitter',
@@ -87,5 +104,5 @@ export function useSocialLinks() {
     }
   }
 
-  return { socialLink, shareLinks, socialIcon }
+  return { socialLink, shareLinks, socialNetworkName, socialIcon }
 }

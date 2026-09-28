@@ -49,6 +49,7 @@ class Writing extends Model
      */
     protected $appends = [
         'listing_excerpt',
+        'cover_url',
     ];
 
     /**
@@ -198,11 +199,15 @@ class Writing extends Model
     }
 
     /**
-     * The absolute URL of the cover image, if the writing has one.
+     * The absolute URL of the cover image; null when there is none or the cover wasn't selected.
+     *
+     * @return Attribute<?string, never>
      */
-    public function coverUrl(): ?string
+    protected function coverUrl(): Attribute
     {
-        return $this->cover === null || $this->cover === '' ? null : asset('storage/'.$this->cover);
+        return Attribute::get(
+            fn (): ?string => array_key_exists('cover', $this->attributes) ? storageUrl($this->cover) : null,
+        );
     }
 
     public function incrementViews(): void

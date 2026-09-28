@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\SocialAuthController;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Middleware;
@@ -25,12 +27,13 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $routeGroup = ziggyRouteGroup();
+
         return array_merge(parent::share($request), [
-            'ziggy' => Inertia::once(fn (): array => (new Ziggy)->toArray()),
+            // Keyed by group, so signing in or out as an admin sends the other route table
+            'ziggy' => Inertia::once(fn (): array => (new Ziggy($routeGroup))->toArray())->as('ziggy-'.$routeGroup),
             'auth' => [
-                'user' => fn (): ?User => $request->user() === null
-                    ? null
-                    : User::forAuthorSummary()->find($request->user()->id),
+                'user' => fn (): ?array => $this->authUserSummary($request->user()),
                 'admin' => fn (): bool => $request->user()?->isAllowed('admin') === true,
                 'notifications' => fn (): int => $request->user()?->unreadNotifications()->count() ?? 0,
             ],
@@ -44,7 +47,29 @@ class HandleInertiaRequests extends Middleware
                 'pagination' => getSiteConfig('pagination'),
                 'social' => getSiteConfig('social'),
                 'stores' => getSiteConfig('stores'),
+                'socialNetworks' => UserProfile::SOCIAL_NETWORKS,
+                'authProviders' => SocialAuthController::PROVIDERS,
             ],
         ]);
+    }
+
+    /**
+     * Who is signed in, in the author summary shape listings use, from the
+     * already loaded user.
+     *
+     * @return array{id: int, username: string, name: string|null, avatar_url: string|null}|null
+     */
+    private function authUserSummary(?User $user): ?array
+    {
+        if ($user === null) {
+            return null;
+        }
+
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'name' => $user->name,
+            'avatar_url' => $user->profile->avatar_url,
+        ];
     }
 }

@@ -5,6 +5,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\freezeTime;
 use function Pest\Laravel\travel;
@@ -141,6 +142,23 @@ describe('the threads:refresh-token command', function (): void {
         pendingArtisan('threads:refresh-token')->assertFailed();
 
         // Then
+        expect(PublishingAccount::threads()?->access_token)->toBe('old-token');
+    });
+
+    it('fails without logging the token when Threads cannot be reached', function (): void {
+        // Given
+        PublishingAccount::factory()->create(['access_token' => 'old-token']);
+        travel(2)->days();
+        Http::fake(['graph.threads.net/refresh_access_token*' => Http::failedConnection()]);
+        $log = Log::spy();
+
+        // When
+        pendingArtisan('threads:refresh-token')->assertFailed();
+
+        // Then
+        $log->shouldHaveReceived('error')->withArgs(
+            fn (string $message, array $context): bool => str_contains(json_encode($context, JSON_THROW_ON_ERROR), 'old-token') === false
+        )->once();
         expect(PublishingAccount::threads()?->access_token)->toBe('old-token');
     });
 

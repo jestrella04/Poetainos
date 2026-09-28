@@ -24,9 +24,9 @@ describe('picking the writing of the day', function (): void {
         $second = DailySelection::pickForToday();
 
         // Then
-        expect($second->is($first))->toBeTrue();
+        expect($second?->is($first))->toBeTrue();
         expect(DailySelection::count())->toBe(1);
-        expect($first->selected_on->isToday())->toBeTrue();
+        expect($first?->selected_on->isToday())->toBeTrue();
     });
 
     it('skips writings featured within the last 30 days', function (): void {
@@ -42,7 +42,7 @@ describe('picking the writing of the day', function (): void {
         $pick = DailySelection::pickForToday();
 
         // Then
-        expect($pick->writing_id)->toBe($fresh->id);
+        expect($pick?->writing_id)->toBe($fresh->id);
     });
 
     it('allows writings featured more than 30 days ago', function (): void {
@@ -57,7 +57,7 @@ describe('picking the writing of the day', function (): void {
         $pick = DailySelection::pickForToday();
 
         // Then
-        expect($pick->writing_id)->toBe($writing->id);
+        expect($pick?->writing_id)->toBe($writing->id);
     });
 
     it('falls back to every writing when all were featured recently', function (): void {
@@ -72,7 +72,24 @@ describe('picking the writing of the day', function (): void {
         $pick = DailySelection::pickForToday();
 
         // Then
-        expect($pick->writing_id)->toBe($writing->id);
+        expect($pick?->writing_id)->toBe($writing->id);
+    });
+
+    it('picks nothing while there are no writings', function (): void {
+        // When
+        $pick = DailySelection::pickForToday();
+
+        // Then
+        expect($pick)->toBeNull();
+        expect(DailySelection::count())->toBe(0);
+    });
+
+    it('lets the scheduled command succeed while there are no writings', function (): void {
+        // When
+        $command = pendingArtisan('writing:pick-of-the-day');
+
+        // Then
+        $command->expectsOutputToContain('nothing was picked')->assertSuccessful();
     });
 });
 

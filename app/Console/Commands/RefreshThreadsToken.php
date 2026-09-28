@@ -6,6 +6,7 @@ use App\Models\PublishingAccount;
 use App\Services\ThreadsClient;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 
 class RefreshThreadsToken extends Command
@@ -46,7 +47,7 @@ class RefreshThreadsToken extends Command
 
         try {
             $refreshed = $threads->refresh($account->access_token);
-        } catch (RequestException $exception) {
+        } catch (RequestException|ConnectionException $exception) {
             logger()->error('The Threads access token could not be refreshed.', ['error' => $exception->getMessage()]);
             $this->error('The Threads access token could not be refreshed. Run threads:connect with a new token before it expires.');
 

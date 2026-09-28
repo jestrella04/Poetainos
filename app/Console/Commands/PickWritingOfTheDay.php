@@ -26,7 +26,9 @@ class PickWritingOfTheDay extends Command
      */
     public function handle(): int
     {
-        DailySelection::pickForToday();
+        if (DailySelection::pickForToday() === null) {
+            $this->warn('There are no writings yet, nothing was picked.');
+        }
 
         return self::SUCCESS;
     }
