@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Something a role allows its users to do, such as `admin`.
+ *
+ * @mixin IdeHelperPermission
  */
 class Permission extends Model
 {
