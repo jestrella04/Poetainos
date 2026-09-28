@@ -256,7 +256,7 @@ class WritingsController extends Controller
             'tags' => 'nullable|array|max:'.WritingPublisher::MAX_TAGS,
             'tags.*' => 'string|min:1|max:'.WritingPublisher::MAX_TAG_LENGTH,
             'link' => 'nullable|url|max:250',
-            'cover' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
+            'cover' => $this->imageUploadRule(),
             ...$this->agreementRules($agreeingUser),
         ];
     }

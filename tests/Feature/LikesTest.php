@@ -45,6 +45,22 @@ describe('liking a writing', function (): void {
         Notification::assertNothingSent();
     });
 
+    it('does not notify an author who blocked the liker', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+        $liker = createUser();
+        $author->block($liker);
+
+        // When
+        $response = actingAs($liker)->post("/likes/writing/{$writing->id}/toggle");
+
+        // Then
+        $response->assertJson(['isActive' => true, 'count' => 1]);
+        Notification::assertNothingSent();
+    });
+
     it('only removes the acting user\'s own like when they unlike', function (): void {
         // Given
         $writing = Writing::factory()->create();

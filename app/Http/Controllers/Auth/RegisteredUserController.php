@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class RegisteredUserController extends Controller
@@ -24,7 +25,7 @@ class RegisteredUserController extends Controller
         $request->validate([
             'username' => ['required', 'string', 'min:3', 'max:45', 'unique:users', 'regex:'.User::USERNAME_PATTERN],
             'email' => ['required', 'string', 'email', 'max:250', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/'],
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
             'service_agreement' => ['required', 'accepted'],
             'privacy_agreement' => ['required', 'accepted'],
         ]);

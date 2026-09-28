@@ -36,8 +36,8 @@ class ThreadsClient
      */
     public function fetchUserId(string $accessToken): string
     {
-        return (string) $this->request()
-            ->get($this->versioned('me'), ['fields' => 'id', 'access_token' => $accessToken])
+        return (string) $this->request($accessToken)
+            ->get($this->versioned('me'), ['fields' => 'id'])
             ->throw()
             ->json('id');
     }
@@ -91,11 +91,10 @@ class ThreadsClient
         $this->waitUntilContainerFinished($containerId, $accessToken);
 
         try {
-            $published = $this->request(self::PUBLISH_TIMEOUT_SECONDS)
+            $published = $this->request($accessToken, self::PUBLISH_TIMEOUT_SECONDS)
                 ->asForm()
                 ->post($this->versioned("{$userId}/threads_publish"), [
                     'creation_id' => $containerId,
-                    'access_token' => $accessToken,
                 ])
                 ->throw();
         } catch (ConnectionException $exception) {
@@ -121,13 +120,12 @@ class ThreadsClient
     {
         $instagramShare = $isSharedToInstagram === true ? ['crossreshare_to_ig' => 'true'] : [];
 
-        return (string) $this->request()
+        return (string) $this->request($accessToken)
             ->asForm()
             ->post($this->versioned("{$userId}/threads"), [
                 'media_type' => 'TEXT',
                 'text' => $text,
                 'link_attachment' => $link,
-                'access_token' => $accessToken,
                 ...$instagramShare,
             ])
             ->throw()
@@ -172,18 +170,28 @@ class ThreadsClient
 
     private function fetchContainer(string $containerId, string $accessToken): Response
     {
-        return $this->request()
-            ->get($this->versioned($containerId), ['fields' => 'status,error_message', 'access_token' => $accessToken])
+        return $this->request($accessToken)
+            ->get($this->versioned($containerId), ['fields' => 'status,error_message'])
             ->throw();
     }
 
     /**
+     * The token endpoints only take the token (and the app secret) in the
+     * query string. A connection error quotes the full URL, so it is replaced
+     * by one naming only the endpoint, keeping the secrets out of the logs.
+     *
      * @param  array<string, mixed>  $query
      * @return array{access_token: string, expires_in: int}
+     *
+     * @throws ConnectionException
      */
     private function tokenResponse(string $path, array $query): array
     {
-        $response = $this->request()->get(self::BASE_URL.'/'.$path, $query)->throw();
+        try {
+            $response = Http::timeout(self::TIMEOUT_SECONDS)->get(self::BASE_URL.'/'.$path, $query)->throw();
+        } catch (ConnectionException) {
+            throw new ConnectionException(sprintf('Threads could not be reached at %s/%s.', self::BASE_URL, $path));
+        }
 
         return [
             'access_token' => (string) $response->json('access_token'),
@@ -196,8 +204,12 @@ class ThreadsClient
         return sprintf('%s/%s/%s', self::BASE_URL, config('services.threads.api_version'), $path);
     }
 
-    private function request(int $timeoutSeconds = self::TIMEOUT_SECONDS): PendingRequest
+    /**
+     * A request authorized with the token in its header, where it stays out of
+     * the URL that connection errors quote and logs record.
+     */
+    private function request(string $accessToken, int $timeoutSeconds = self::TIMEOUT_SECONDS): PendingRequest
     {
-        return Http::timeout($timeoutSeconds);
+        return Http::timeout($timeoutSeconds)->withToken($accessToken);
     }
 }

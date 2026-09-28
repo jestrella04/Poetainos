@@ -58,7 +58,7 @@
     @endif
 
     <!-- Ziggy/Laravel Routes -->
-    @routes(nonce: Vite::cspNonce())
+    @routes(ziggyRouteGroup(), nonce: Vite::cspNonce())
 
     <!-- Vite -->
     @vite('resources/js/app.ts')

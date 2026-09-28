@@ -2,6 +2,7 @@
 import { ref, provide, reactive, computed } from 'vue'
 import PoUserDelete from './partials/PoUserDelete.vue'
 import PoUsersAccountRow from './partials/PoUsersAccountRow.vue'
+import PoUsersPendingEmail from './partials/PoUsersPendingEmail.vue'
 import { useHttp, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
@@ -15,6 +16,7 @@ import type { InertiaPageProps } from '@/types/inertia'
 
 interface AccountSummary {
   created_at: string
+  pending_email: string | null
   writings_count: number
   shelf_count: number
   given_likes_count: number
@@ -100,6 +102,11 @@ function togglePushNotifications(value: boolean | null): void {
         {{ $t('accounts.view-public-profile') }}
       </po-link>
     </div>
+
+    <po-users-pending-email
+      v-if="account.pending_email !== null"
+      :pending-email="account.pending_email"
+    />
 
     <v-divider />
 

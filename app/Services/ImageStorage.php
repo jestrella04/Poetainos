@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,13 @@ use Spatie\ImageOptimizer\OptimizerChain;
 class ImageStorage
 {
     private const DISK = 'local';
+
+    /**
+     * The widest or tallest image accepted, in pixels. Images are decoded in
+     * full to be cropped, so a small file of huge dimensions (a decompression
+     * bomb) would otherwise exhaust the memory of the request decoding it.
+     */
+    public const MAX_DIMENSION = 6000;
 
     private const REMOTE_MAX_BYTES = 2 * 1024 * 1024;
 
@@ -71,17 +79,20 @@ class ImageStorage
     public function storeRemote(string $url, string $directory, int $width, int $height): ?string
     {
         try {
-            $response = Http::timeout(self::REMOTE_TIMEOUT_SECONDS)->get($url);
+            $response = Http::timeout(self::REMOTE_TIMEOUT_SECONDS)
+                ->withoutRedirecting()
+                ->withOptions(['stream' => true])
+                ->get($url);
         } catch (ConnectionException) {
             return null;
         }
 
-        $contents = $response->body();
-        $imageInfo = $response->successful() && strlen($contents) <= self::REMOTE_MAX_BYTES
+        $contents = $response->successful() ? $this->readAtMost($response, self::REMOTE_MAX_BYTES + 1) : '';
+        $imageInfo = $contents !== '' && strlen($contents) <= self::REMOTE_MAX_BYTES
             ? getimagesizefromstring($contents)
             : false;
 
-        if ($imageInfo === false || isset(self::REMOTE_EXTENSIONS[$imageInfo[2]]) === false) {
+        if ($imageInfo === false || isset(self::REMOTE_EXTENSIONS[$imageInfo[2]]) === false || $this->isWithinMaxDimension($imageInfo[0], $imageInfo[1]) === false) {
             return null;
         }
 
@@ -98,6 +109,27 @@ class ImageStorage
         }
 
         Storage::disk(self::DISK)->delete($path);
+    }
+
+    /**
+     * Up to `$maxBytes` of a streamed response body, so a huge download stops
+     * being read once it is known to be too large.
+     */
+    private function readAtMost(Response $response, int $maxBytes): string
+    {
+        $body = $response->toPsrResponse()->getBody();
+        $contents = '';
+
+        while ($body->eof() === false && strlen($contents) < $maxBytes) {
+            $contents .= $body->read($maxBytes - strlen($contents));
+        }
+
+        return $contents;
+    }
+
+    private function isWithinMaxDimension(int $width, int $height): bool
+    {
+        return $width <= self::MAX_DIMENSION && $height <= self::MAX_DIMENSION;
     }
 
     private function crop(string $path, int $width, int $height): string

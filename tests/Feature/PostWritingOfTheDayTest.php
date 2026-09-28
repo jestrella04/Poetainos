@@ -27,6 +27,17 @@ beforeEach(function (): void {
     ]);
 });
 
+/**
+ * Whether the request carries the token in its Authorization header and
+ * nowhere in its URL or body, where logs and error messages could quote it.
+ */
+function isAuthorizedByHeader(Request $request, string $accessToken): bool
+{
+    return $request->hasHeader('Authorization', 'Bearer '.$accessToken)
+        && str_contains($request->url(), $accessToken) === false
+        && str_contains($request->body(), $accessToken) === false;
+}
+
 describe('the writing:post-of-the-day command', function (): void {
     it('sends today\'s pick to the Facebook Page', function (): void {
         // Given
@@ -171,17 +182,19 @@ describe('posting the writing of the day on Threads', function (): void {
                 && $request['media_type'] === 'TEXT'
                 && $request['link_attachment'] === $writing->path()
                 && $request['crossreshare_to_ig'] === 'true'
-                && $request['access_token'] === $account->access_token
+                && isAuthorizedByHeader($request, $account->access_token)
                 && str_contains($request['text'], $writing->title)
                 && str_contains($request['text'], $author->getName()),
             fn (Request $request): bool => $request->method() === 'GET'
-                && str_starts_with($request->url(), 'https://graph.threads.net/v1.0/1789?'),
+                && str_starts_with($request->url(), 'https://graph.threads.net/v1.0/1789?')
+                && isAuthorizedByHeader($request, $account->access_token),
             fn (Request $request): bool => $request->method() === 'GET'
-                && str_starts_with($request->url(), 'https://graph.threads.net/v1.0/1789?'),
+                && str_starts_with($request->url(), 'https://graph.threads.net/v1.0/1789?')
+                && isAuthorizedByHeader($request, $account->access_token),
             fn (Request $request): bool => $request->method() === 'POST'
                 && $request->url() === "https://graph.threads.net/v1.0/{$account->account_id}/threads_publish"
                 && $request['creation_id'] === '1789'
-                && $request['access_token'] === $account->access_token,
+                && isAuthorizedByHeader($request, $account->access_token),
         ]);
     });
 

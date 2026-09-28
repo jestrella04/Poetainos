@@ -62,6 +62,10 @@ export function useVerificationCode() {
           showResendOutcome('success')
           startResendCountdown()
         },
+        // Refused once the day's maximum of codes was sent
+        onError: () => {
+          showResendOutcome('error')
+        },
         onHttpException: () => {
           showResendOutcome('error')
         },

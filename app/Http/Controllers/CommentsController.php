@@ -60,8 +60,8 @@ class CommentsController extends Controller
 
         RecalculateAura::dispatch($user, $writing);
 
-        // Notify author
-        if ($writing->author !== null && $writing->author->isNot($user)) {
+        // Notify the author, unless they blocked the commenter
+        if ($writing->author !== null && $writing->author->isNot($user) && $writing->author->isAuthorBlocked($user) === false) {
             $writing->author->notify(new WritingCommented($writing, $user));
         }
 

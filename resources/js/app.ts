@@ -1,4 +1,4 @@
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import type { DefineComponent } from 'vue'
 import { ZiggyVue, route } from 'ziggy-js'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -46,6 +46,15 @@ void createInertiaApp({
       // Composables call the global `route()`, which the browser gets from the
       // `@routes` script; the SSR process has no such script.
       Object.assign(globalThis, { route, Ziggy: page.props.ziggy })
+    } else {
+      // Admins get a larger route table than visitors, and signing in or out
+      // swaps it without a reload: update the tables both route() helpers read
+      const pluginRouteTable = page.props.ziggy
+
+      router.on('navigate', (event) => {
+        Object.assign(pluginRouteTable, event.detail.page.props.ziggy)
+        Object.assign(Ziggy, event.detail.page.props.ziggy)
+      })
     }
 
     app

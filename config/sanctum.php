@@ -49,7 +49,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Thirty days, so a leaked token stops working on its own
+    'expiration' => 60 * 24 * 30,
 
     /*
     |--------------------------------------------------------------------------

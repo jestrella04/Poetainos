@@ -9,6 +9,7 @@ use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\PendingEmailController;
 use App\Http\Controllers\PushNotificationsController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\SettingsController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\UserListingsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersNotificationsController;
 use App\Http\Controllers\WritingsController;
+use App\Http\Middleware\RecordAdminActions;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,7 +33,7 @@ use Illuminate\Support\Facades\Route;
 require __DIR__.'/auth.php';
 
 /* Administration */
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
+Route::middleware(['auth', 'admin', RecordAdminActions::class])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('settings', [AdminController::class, 'settings'])->name('settings');
     Route::get('categories', [AdminController::class, 'categories'])->name('categories');
@@ -78,6 +80,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('/users/block/{user}', [BlockedUsersController::class, 'destroy'])->name('users.unblock');
     Route::get('/account', [UsersController::class, 'account'])->name('users.account');
     Route::get('/account/blocked', [BlockedUsersController::class, 'index'])->name('users.blocked.index');
+    Route::post('/account/email/verify', [PendingEmailController::class, 'confirm'])->middleware('throttle:6,1')->name('users.email.verify');
+    Route::post('/account/email/resend', [PendingEmailController::class, 'resend'])->middleware('throttle:6,1')->name('users.email.resend');
+    Route::delete('/account/email/pending', [PendingEmailController::class, 'destroy'])->name('users.email.cancel');
 
     // Comments
     Route::post('/comments/create', [CommentsController::class, 'store'])->middleware('throttle:20,1')->name('comments.store');
@@ -140,7 +145,7 @@ Route::post('/contact', [ContactsController::class, 'store'])->middleware('throt
 
 // Complaints
 Route::get('/complaints/reasons', [ComplaintsController::class, 'reasons'])->name('complaints.reasons');
-Route::post('/complaints/store', [ComplaintsController::class, 'store'])->middleware('throttle:10,1')->name('complaints.store');
+Route::post('/complaints/store', [ComplaintsController::class, 'store'])->middleware('throttle:complaints')->name('complaints.store');
 
 // Redirects, keep on the bottom
 Route::redirect('/socialite', '/login', 301);

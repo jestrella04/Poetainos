@@ -26,7 +26,8 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            'ziggy' => Inertia::once(fn (): array => (new Ziggy)->toArray()),
+            // Keyed by group, so signing in or out as an admin sends the other route table
+            'ziggy' => Inertia::once(fn (): array => (new Ziggy(ziggyRouteGroup()))->toArray())->as('ziggy-'.ziggyRouteGroup()),
             'auth' => [
                 'user' => fn (): ?User => $request->user() === null
                     ? null

@@ -4,7 +4,10 @@ use App\Models\Role;
 use App\Models\SocialAccount;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Notifications\VerifyEmailCode;
+use App\Services\ImageStorage;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
@@ -22,7 +25,7 @@ describe('viewing and updating a profile', function (): void {
         $viewResponse = actingAs($user)->get('/users/edit/'.$user->username);
         $updateResponse = actingAs($user)->put('/users/edit/'.$user->username, [
             'name' => $name,
-            'email' => fake()->unique()->safeEmail(),
+            'email' => $user->email,
             'bio' => $bio,
         ]);
 
@@ -34,19 +37,24 @@ describe('viewing and updating a profile', function (): void {
         expect($user->profile->bio)->toBe($bio);
     });
 
-    it('requires re-verification when a user changes their email address', function (): void {
+    it('requires re-verification when an admin changes a user\'s email address', function (): void {
         // Given
+        Notification::fake();
         $user = createUser(['email_verified_at' => now()]);
+        $newEmail = fake()->unique()->safeEmail();
 
         // When
-        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+        $response = actingAs(actingAsAdmin())->put('/users/edit/'.$user->username, [
             'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'email' => $newEmail,
         ]);
 
         // Then
-        $response->assertRedirect();
-        expect($user->refresh()->email_verified_at)->toBeNull();
+        $response->assertRedirect($user->path());
+        $user->refresh();
+        expect($user->email)->toBe($newEmail);
+        expect($user->email_verified_at)->toBeNull();
+        Notification::assertSentTo($user, VerifyEmailCode::class);
     });
 
     it('keeps the account verified when the email is left unchanged', function (): void {
@@ -372,6 +380,23 @@ describe('a profile avatar', function (): void {
         Storage::disk('local')->assertExists($avatar);
         Storage::disk('local')->assertMissing($oldAvatar);
         expect(storedImageWidth($avatar))->toBe(512);
+    });
+
+    it('is refused when it is too large to decode safely', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->postJson('/users/edit/'.$user->username, [
+            '_method' => 'PUT',
+            'name' => fake()->name(),
+            'email' => $user->email,
+            'avatar' => UploadedFile::fake()->image(fake()->word().'.png', ImageStorage::MAX_DIMENSION + 1, 1),
+        ]);
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors('avatar');
+        expect(Storage::disk('local')->allFiles())->toBe([]);
     });
 
     it('is removed on request', function (): void {

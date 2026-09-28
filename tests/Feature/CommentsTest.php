@@ -97,6 +97,25 @@ describe('commenting', function (): void {
         Notification::assertNotSentTo($author, WritingCommented::class);
     });
 
+    it('does not notify an author who blocked the commenter', function (): void {
+        // Given
+        Notification::fake();
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create();
+        $commenter = createUser();
+        $author->block($commenter);
+
+        // When
+        $response = actingAs($commenter)->post('/comments/create', [
+            'comment' => fake()->sentence(),
+            'writing_id' => $writing->id,
+        ]);
+
+        // Then
+        $response->assertCreated();
+        Notification::assertNotSentTo($author, WritingCommented::class);
+    });
+
     it('notifies a mentioned user unless they are the author or the commenter', function (): void {
         // Given
         Notification::fake();

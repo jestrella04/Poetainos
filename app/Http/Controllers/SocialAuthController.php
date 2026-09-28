@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -218,6 +219,7 @@ class SocialAuthController extends Controller
         // object has no portable "email verified" flag across providers, so
         // check our own record instead.
         if ($user->email_verified_at === null) {
+            $this->revokeUnprovenCredentials($user);
             $user->email_verified_at = Carbon::now();
         }
 
@@ -227,6 +229,21 @@ class SocialAuthController extends Controller
         Auth::login($user);
 
         Inertia::flash('message', $isReturning === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
+    }
+
+    /**
+     * An unverified account may have been registered by someone who never
+     * owned its address, waiting for the real owner to claim it. Once the
+     * owner proves the address, the password and "remember me" cookies set
+     * by whoever registered it stop working, and AuthenticateSession ends
+     * their open sessions on their next request.
+     */
+    private function revokeUnprovenCredentials(User $user): void
+    {
+        $user->forceFill([
+            'password' => Hash::make(Str::random(40)),
+            'remember_token' => Str::random(60),
+        ]);
     }
 
     /**

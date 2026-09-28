@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
                 'canonical' => route('login'),
             ],
             'status' => session('status'),
+            // The address a password was just reset for, to sign in with
+            'email' => session('email'),
         ]);
     }
 

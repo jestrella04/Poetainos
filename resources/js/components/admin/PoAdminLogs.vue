@@ -16,6 +16,8 @@ interface LogFile {
   name: string
   size: number
   modified_at: string
+  // False for the security audit logs, which the admin panel can't erase
+  clearable: boolean
 }
 
 const DEFAULT_FILE = 'laravel.log'
@@ -54,6 +56,9 @@ const levelFilter = computed({
   }
 })
 const hasFiles = computed(() => files.value.length > 0)
+const isFileClearable = computed(
+  () => files.value.find((listedFile) => listedFile.name === file.value)?.clearable === true
+)
 const isEmpty = computed(() => entries.value.length === 0 && isLoading.value === false)
 
 const isConfirmingClear = ref(false)
@@ -127,6 +132,7 @@ function clearLog(): void {
             <v-icon icon="fas fa-download" />
           </po-button>
           <po-button
+            v-if="isFileClearable"
             color="error"
             size="small"
             icon

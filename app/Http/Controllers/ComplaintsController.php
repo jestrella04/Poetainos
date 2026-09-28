@@ -7,6 +7,7 @@ use App\Models\Complaint;
 use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
@@ -14,6 +15,8 @@ use Illuminate\Validation\Rule;
 
 class ComplaintsController extends Controller
 {
+    private const NOTIFY_ONCE_PER_MINUTES = 60;
+
     /**
      * Show the form for creating a new resource.
      *
@@ -53,15 +56,22 @@ class ComplaintsController extends Controller
             abort(404);
         }
 
+        // One email per reported item and hour is enough to bring admins in;
+        // later complaints are still recorded for them to review
+        $isFirstRecentComplaint = Complaint::whereMorphedTo('complainable', $complainable)
+            ->where('created_at', '>', Carbon::now()->subMinutes(self::NOTIFY_ONCE_PER_MINUTES))
+            ->doesntExist();
+
         $complaint = new Complaint;
         $complaint->complainable()->associate($complainable);
         $complaint->reasons = $request->input('reasons');
         $complaint->comment = $request->input('comment');
         $complaint->save();
 
-        // Schedule email notification
-        $recipients = getSiteConfig('emails.admin');
-        Notification::route('mail', $recipients)->notify(new ComplaintSubmitted);
+        if ($isFirstRecentComplaint === true) {
+            $recipients = getSiteConfig('emails.admin');
+            Notification::route('mail', $recipients)->notify(new ComplaintSubmitted);
+        }
 
         return response()->noContent();
     }

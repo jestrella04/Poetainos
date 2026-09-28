@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Comment;
+use App\Models\Complaint;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Illuminate\Support\Facades\Notification;
@@ -8,6 +9,7 @@ use Illuminate\Support\Facades\Notification;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\travel;
 
 describe('the reasons endpoint', function (): void {
     it('returns the configured complaint reasons', function (): void {
@@ -44,6 +46,41 @@ describe('submitting a complaint', function (): void {
         'a comment' => ['comments', fn () => Comment::factory()->create()],
         'a user' => ['users', fn () => createUser()],
     ]);
+
+    it('emails the admins once per reported item and hour', function (): void {
+        // Given
+        Notification::fake();
+        $writing = Writing::factory()->create();
+        $complaint = ['complainable_type' => 'writings', 'complainable_id' => $writing->id, 'reasons' => ['spam']];
+
+        // When
+        postJson('/complaints/store', $complaint)->assertNoContent();
+        postJson('/complaints/store', $complaint)->assertNoContent();
+        travel(61)->minutes();
+        postJson('/complaints/store', $complaint)->assertNoContent();
+
+        // Then
+        expect(Complaint::count())->toBe(3);
+        Notification::assertSentOnDemandTimes(ComplaintSubmitted::class, 2);
+    });
+
+    it('caps how many complaints one visitor can file in a day', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        $complaint = ['complainable_type' => 'writings', 'complainable_id' => $writing->id, 'reasons' => ['spam']];
+        foreach (range(1, 3) as $window) {
+            foreach (range(1, 10) as $attempt) {
+                postJson('/complaints/store', $complaint);
+            }
+            travel(1)->minutes();
+        }
+
+        // When
+        $response = postJson('/complaints/store', $complaint);
+
+        // Then
+        $response->assertTooManyRequests();
+    });
 
     it('requires at least one reason', function (): void {
         // Given

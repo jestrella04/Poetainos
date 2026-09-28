@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\Writing;
 use App\Services\ContentDeleter;
+use App\Services\EmailChanger;
 use App\Services\ImageStorage;
+use App\Services\SecurityLog;
 use App\Services\ViewCounter;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -129,7 +131,7 @@ class UsersController extends Controller
      * Update the specified resource in storage, then open the user's account,
      * or the edited profile when someone else (an admin) made the change.
      */
-    public function update(Request $request, User $user, ImageStorage $images): RedirectResponse
+    public function update(Request $request, User $user, ImageStorage $images, EmailChanger $emailChanger, SecurityLog $securityLog): RedirectResponse
     {
         $this->authorize('update', $user);
 
@@ -148,7 +150,7 @@ class UsersController extends Controller
             'interests' => 'nullable|string|min:3|max:250',
             'website' => 'nullable|url|max:250',
             ...array_map(fn (int $maxLength): string => 'nullable|string|min:3|max:'.$maxLength, UserProfile::SOCIAL_NETWORKS),
-            'avatar' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size'),
+            'avatar' => $this->imageUploadRule(),
             'avatar-remove' => 'nullable|boolean',
             ...$this->agreementRules($agreeingUser),
         ]);
@@ -160,30 +162,48 @@ class UsersController extends Controller
         ])->save();
 
         // Only an admin may change a user's role
-        if ($request->input('role') !== null && $request->user()?->isAllowed('admin') === true) {
+        if ($request->input('role') !== null && $request->user()?->isAllowed('admin') === true && (int) $request->input('role') !== (int) $user->role_id) {
+            $securityLog->record('Role changed', $request->user(), [
+                'user_id' => $user->id,
+                'from_role_id' => $user->role_id,
+                'to_role_id' => $request->input('role'),
+            ]);
             $user->role_id = $request->input('role');
         }
 
-        // A changed email is unverified until the user proves they own it again
-        $emailChanged = $user->email !== $request->input('email');
+        $newEmail = (string) $request->input('email');
+        $isEmailChanged = $user->email !== $newEmail;
+
+        // A user's own new address waits until they prove it receives mail, so a
+        // hijacked session can't move the account away. An admin's change is
+        // trusted and applied at once, unverified until the user proves it.
+        $isEmailChangePending = $isEmailChanged === true && $isOwnProfile === true;
+        $isEmailReplaced = $isEmailChanged === true && $isOwnProfile === false;
 
         // Persist to database
         $user->name = $request->input('name');
-        $user->email = $request->input('email');
 
-        if ($emailChanged === true) {
+        if ($isEmailReplaced === true) {
+            $user->email = $newEmail;
             $user->email_verified_at = null;
         }
 
         $user->save();
 
-        if ($emailChanged === true) {
+        if ($isEmailChangePending === true) {
+            $emailChanger->request($user, $newEmail);
+        }
+
+        if ($isEmailReplaced === true) {
             $user->sendEmailVerificationNotification();
         }
 
         $this->rememberAgreements($request, $agreeingUser);
 
-        Inertia::flash(['message' => 'accounts.profile-updated', 'color' => 'success']);
+        Inertia::flash([
+            'message' => $isEmailChangePending === true ? 'accounts.email-change-pending' : 'accounts.profile-updated',
+            'color' => 'success',
+        ]);
 
         return redirect($isOwnProfile ? route('users.account') : $user->path());
     }
@@ -230,6 +250,7 @@ class UsersController extends Controller
             ],
             'account' => $user->only([
                 'created_at',
+                'pending_email',
                 'writings_count',
                 'shelf_count',
                 'given_likes_count',

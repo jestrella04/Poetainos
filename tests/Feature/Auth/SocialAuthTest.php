@@ -4,7 +4,9 @@ use App\Models\SocialAccount;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Notifications\SocialLoginCode;
+use App\Services\ImageStorage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -68,6 +70,18 @@ function sentLinkCode(User $user): string
     });
 
     return $code;
+}
+
+/**
+ * @param  int<1, max>  $width
+ * @param  int<1, max>  $height
+ */
+function pngOfSize(int $width, int $height): string
+{
+    ob_start();
+    imagepng(imagecreatetruecolor($width, $height));
+
+    return (string) ob_get_clean();
 }
 
 describe('social login', function (): void {
@@ -174,6 +188,35 @@ describe('social login', function (): void {
         $user->refresh();
         expect($user->socialAccounts()->pluck('provider')->all())->toBe(['google']);
         expect($user->email_verified_at)->not->toBeNull();
+    });
+
+    it('locks out whoever registered an unverified account once its owner claims it through a provider', function (): void {
+        // Given
+        $registrationPassword = fakeStrongPassword();
+        $user = createSocialUser(['email_verified_at' => null, 'password' => Hash::make($registrationPassword)], ['avatar' => fakeAvatarPath()]);
+        $registrationRememberToken = $user->remember_token;
+        $code = startProviderLink($user);
+
+        // When
+        postJson(route('social.confirm.verify', 'google'), ['code' => $code])->assertRedirect();
+
+        // Then
+        $user->refresh();
+        expect(Hash::check($registrationPassword, $user->password))->toBeFalse();
+        expect($user->remember_token)->not->toBe($registrationRememberToken);
+    });
+
+    it('keeps the password of a verified account that links a provider', function (): void {
+        // Given
+        $password = fakeStrongPassword();
+        $user = createSocialUser(['password' => Hash::make($password)], ['avatar' => fakeAvatarPath()]);
+        $code = startProviderLink($user);
+
+        // When
+        postJson(route('social.confirm.verify', 'google'), ['code' => $code])->assertRedirect();
+
+        // Then
+        expect(Hash::check($password, $user->refresh()->password))->toBeTrue();
     });
 
     it('returns to the page the user started from once the code is entered', function (): void {
@@ -363,7 +406,31 @@ describe('social login', function (): void {
     })->with([
         'a web page' => [fn (): string => '<html>'.fake()->sentence().'</html>'],
         'a gif' => ['GIF89a'.str_repeat("\0", 32)],
+        'an image too large to decode safely' => [fn (): string => pngOfSize(ImageStorage::MAX_DIMENSION + 1, 1)],
+        'a file over the download limit' => [fn (): string => pngOfSize(1, 1).str_repeat("\0", 2 * 1024 * 1024)],
     ]);
+
+    it('does not follow a provider avatar that redirects elsewhere', function (): void {
+        // Given
+        Storage::fake('local');
+        Http::fake([
+            'avatars.example/*' => Http::response('', 302, ['Location' => 'http://169.254.169.254/latest/meta-data']),
+            '169.254.169.254/*' => Http::response(pngOfSize(600, 600)),
+        ]);
+        $email = fake()->unique()->safeEmail();
+        $user = createSocialUser(['email' => $email], [], ['google']);
+        Socialite::fake('google', SocialiteUser::fake([
+            'email' => $email,
+            'avatar' => 'https://avatars.example/'.fake()->uuid().'.png',
+        ]));
+
+        // When
+        get('/login/google/callback')->assertRedirect();
+
+        // Then
+        Http::assertNotSent(fn ($request): bool => str_contains($request->url(), '169.254.169.254'));
+        expect($user->refresh()->profile->avatar)->toBeNull();
+    });
 
     it('rejects a provider that is not offered', function (string $path): void {
         // When

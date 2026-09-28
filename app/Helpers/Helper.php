@@ -172,3 +172,12 @@ function escapeLike(string $value): string
 {
     return addcslashes($value, '\\%_');
 }
+
+/**
+ * The Ziggy route group (config/ziggy.php) the current user may see: admins
+ * get every route, everyone else all but the admin panel's.
+ */
+function ziggyRouteGroup(): string
+{
+    return auth()->user()?->isAllowed('admin') === true ? 'admin' : 'visitor';
+}

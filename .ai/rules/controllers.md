@@ -1,6 +1,7 @@
 ---
 paths:
   - 'app/Http/Controllers/**'
+  - app/Http/Controllers/AdminController.php
 ---
 
 # Controllers
@@ -37,3 +38,6 @@ Delete writings, comments and users with `App\Services\ContentDeleter`, never `-
 
 ## Writing listings go through Controller::writingsIndex()
 Pass the base writings query to `writingsIndex()`; it resolves the requested sort and applies `visibleTo()` (blocked authors), `withListingRelations()` and `sorted()`. Don't repeat those scopes or `resolveSort()` in a controller.
+
+## counter.dev token in the analytics iframe URL is an accepted risk
+AdminController::analytics() embeds the counter.dev dashboard with its access token in the URL query, because counter.dev offers no other way to authenticate an embedded dashboard. Treat that token as exposed to admins' browser history and counter.dev's logs: it only grants read access to site analytics. Don't reuse the pattern for any credential that grants more.

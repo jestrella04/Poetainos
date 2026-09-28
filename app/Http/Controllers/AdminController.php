@@ -189,7 +189,11 @@ class AdminController extends Controller
 
     public function clearLog(LogReader $reader, string $file): RedirectResponse
     {
-        $reader->clear($this->logPath($reader, $file));
+        $path = $this->logPath($reader, $file);
+
+        abort_if($reader->isClearable($file) === false, 403);
+
+        $reader->clear($path);
 
         Inertia::flash(['message' => 'admin.log-cleared', 'color' => 'success']);
 

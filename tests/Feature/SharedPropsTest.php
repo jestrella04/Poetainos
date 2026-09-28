@@ -2,6 +2,7 @@
 
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\actingAs;
@@ -109,5 +110,19 @@ describe('the ziggy route table', function (): void {
 
         // Then
         $response->assertInertia(fn ($page) => $page->has('ziggy.routes'));
+    });
+
+    it('leaves the admin panel routes out for everyone but admins', function (): void {
+        // When
+        $asGuest = get(route('explore'));
+        $asUser = actingAs(createUser())->get(route('explore'));
+        $asAdmin = actingAs(actingAsAdmin())->get(route('explore'));
+
+        // Then
+        // Route names contain dots, so they're looked up as keys rather than prop paths
+        $hasRoute = fn (string $name): Closure => fn (Collection $routes): bool => $routes->has($name);
+        $asGuest->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('explore'))->whereNot('ziggy.routes', $hasRoute('admin.index')));
+        $asUser->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('explore'))->whereNot('ziggy.routes', $hasRoute('admin.index')));
+        $asAdmin->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('admin.index')));
     });
 });

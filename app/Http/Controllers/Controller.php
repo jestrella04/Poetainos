@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Writing;
+use App\Services\ImageStorage;
 use Closure;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Builder;
@@ -150,6 +151,15 @@ class Controller extends BaseController
      * The currently authenticated user, aborting with a 401 if there is none.
      * Shared by every action that requires a logged-in user to proceed.
      */
+    /**
+     * The validation rule of an uploaded avatar or cover image.
+     */
+    protected function imageUploadRule(): string
+    {
+        return 'nullable|file|mimes:jpg,jpeg,png,webp|max:'.getSiteConfig('uploads_max_file_size')
+            .'|dimensions:max_width='.ImageStorage::MAX_DIMENSION.',max_height='.ImageStorage::MAX_DIMENSION;
+    }
+
     protected function requireAuthUser(): User
     {
         $user = Auth::user();

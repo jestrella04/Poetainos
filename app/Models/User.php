@@ -20,6 +20,7 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
 
 /**
  * @property-read UserProfile $profile Never null: an empty profile stands in until the user fills one in.
+ *
  * @mixin IdeHelperUser
  */
 class User extends Authenticatable implements MustVerifyEmail
@@ -37,6 +38,12 @@ class User extends Authenticatable implements MustVerifyEmail
      * which no username ends with, so callers trim trailing dots.
      */
     public const MENTION_PATTERN = '/\B@(\w[\w.]{0,44})/';
+
+    /**
+     * 8+ characters with an upper and a lower case letter, plus a digit or a
+     * symbol. Mirrored by PASSWORD_PATTERN in resources/js/composables/validationRules.ts.
+     */
+    public const PASSWORD_PATTERN = '/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/';
 
     /**
      * The attributes that are mass assignable.

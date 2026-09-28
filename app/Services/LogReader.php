@@ -18,6 +18,12 @@ class LogReader
      */
     public const LEVELS = ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'];
 
+    /**
+     * Logs whose files the admin panel may not clear, so the audit trail of
+     * what admins did outlives any admin who would rather erase it.
+     */
+    private const PROTECTED_PREFIX = 'security';
+
     private const ENTRIES_PER_PAGE = 50;
 
     private const CHUNK_BYTES = 64 * 1024;
@@ -41,7 +47,7 @@ class LogReader
     private const FORMAT_SAMPLE_BYTES = 8 * 1024;
 
     /**
-     * @return list<array{name: string, size: int, modified_at: Carbon}>
+     * @return list<array{name: string, size: int, modified_at: Carbon, clearable: bool}>
      */
     public function files(): array
     {
@@ -50,6 +56,7 @@ class LogReader
             'name' => basename($path),
             'size' => (int) filesize($path),
             'modified_at' => Carbon::createFromTimestamp((int) filemtime($path)),
+            'clearable' => $this->isClearable(basename($path)),
         ], $paths === false ? [] : array_values(array_filter($paths, is_file(...))));
 
         usort($files, fn (array $first, array $second): int => strcmp($first['name'], $second['name']));
@@ -136,6 +143,14 @@ class LogReader
             'entries' => $entries,
             'before' => $hasReachedStart === true ? null : $oldestConsumedOffset,
         ];
+    }
+
+    /**
+     * Whether the admin panel may empty the named log.
+     */
+    public function isClearable(string $name): bool
+    {
+        return str_starts_with($name, self::PROTECTED_PREFIX) === false;
     }
 
     /**

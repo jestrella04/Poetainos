@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import { useForm, useHttp } from '@inertiajs/vue3'
+import { useForm, useHttp, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormValidation } from '@/composables/useFormValidation'
 import { useRequestFailure } from '@/composables/useRequestFailure'
 import { PASSWORD_PATTERN, USERNAME_PATTERN } from '@/composables/validationRules'
+import type { InertiaPageProps } from '@/types/inertia'
 
 defineOptions({
   layout: PoLayoutLogin
@@ -19,6 +20,8 @@ const socialProviders = [
   { name: 'google', icon: 'fab fa-google', label: 'accounts.continue-with-google' }
 ]
 
+// The address a password was just reset for, when arriving from the reset form
+const page = usePage<InertiaPageProps<{ email?: string | null }>>()
 const { isBlank } = useTypeGuards()
 const { isSubmittedFormValid } = useFormValidation()
 const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
@@ -53,7 +56,7 @@ onMounted(() => {
   if (params.get('isEmail') === '1') {
     step.value = 'checking'
 
-    const email = params.get('email')
+    const email = page.props.email ?? null
 
     if (email !== null && !isBlank(email)) {
       form.email = email
