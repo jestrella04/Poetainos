@@ -22,9 +22,21 @@ use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialAuthController extends Controller
 {
+    /**
+     * The providers people can sign in with.
+     *
+     * @var list<string>
+     */
+    public const PROVIDERS = ['google'];
+
     private const PENDING_LINK_SESSION_KEY = 'social_link';
 
     private const AVATAR_SIZE = 512;
+
+    /**
+     * The longest username User::USERNAME_PATTERN accepts.
+     */
+    private const MAX_USERNAME_LENGTH = 45;
 
     /**
      * Redirect the user to the external authentication page.
@@ -48,7 +60,7 @@ class SocialAuthController extends Controller
         try {
             $social = Socialite::driver($service)->user();
         } catch (InvalidStateException) {
-            Inertia::flash('message', 'accounts.social-link-expired');
+            Inertia::flash(['message' => 'accounts.social-link-expired', 'color' => 'error']);
 
             return redirect(route('login'));
         }
@@ -57,7 +69,7 @@ class SocialAuthController extends Controller
 
         // Without an email we can't tell accounts apart: every such login would share one user
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            Inertia::flash('message', 'accounts.social-email-missing');
+            Inertia::flash(['message' => 'accounts.social-email-missing', 'color' => 'error']);
 
             return redirect(route('login'));
         }
@@ -87,7 +99,7 @@ class SocialAuthController extends Controller
         $user = $this->pendingLinkUser($service);
 
         if ($user === null) {
-            Inertia::flash('message', 'accounts.social-link-expired');
+            Inertia::flash(['message' => 'accounts.social-link-expired', 'color' => 'error']);
 
             return redirect(route('login'));
         }
@@ -141,16 +153,32 @@ class SocialAuthController extends Controller
      */
     private function findOrCreateUser(SocialiteUser $social, string $email): User
     {
-        $nick = $social->getNickname() ?? explode('@', $email)[0];
-
         return User::unguarded(fn (): User => User::firstOrCreate([
             'email' => $email,
         ], [
             'name' => $social->getName(),
-            'username' => slugify('users', $nick, 'username', '_'),
+            'username' => $this->usernameFor($social, $email),
             'password' => Hash::make(bin2hex(random_bytes(10))),
             'role_id' => Role::where('name', 'user')->firstOrFail()->id,
         ]));
+    }
+
+    /**
+     * A free, valid username from the provider's nickname, or else from the
+     * email address. Names that slug to nothing usable (emoji, symbols) get a
+     * random one.
+     */
+    private function usernameFor(SocialiteUser $social, string $email): string
+    {
+        $nickname = trim((string) $social->getNickname());
+        $source = $nickname !== '' ? $nickname : (string) strstr($email, '@', true);
+        $username = mb_substr(slugify('users', $source, 'username', '_'), 0, self::MAX_USERNAME_LENGTH);
+
+        if (preg_match(User::USERNAME_PATTERN, $username) === 1 && User::where('username', $username)->doesntExist()) {
+            return $username;
+        }
+
+        return 'user_'.Str::lower(Str::random(8));
     }
 
     /**
@@ -228,7 +256,7 @@ class SocialAuthController extends Controller
 
         Auth::login($user);
 
-        Inertia::flash('message', $isReturning === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard');
+        Inertia::flash(['message' => $isReturning === true ? 'accounts.welcome-back' : 'accounts.welcome-aboard', 'color' => 'success']);
     }
 
     /**

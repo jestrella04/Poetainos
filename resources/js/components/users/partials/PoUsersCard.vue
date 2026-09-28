@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import type { User } from '@/types/models'
 
@@ -7,7 +7,7 @@ defineProps<{
   data: User
 }>()
 
-const { userDisplayName } = useFormatting()
+const { userDisplayName } = useUserDisplay()
 const { isBlank } = useTypeGuards()
 </script>
 

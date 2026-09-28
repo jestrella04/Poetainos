@@ -9,6 +9,7 @@ import { useDisplay } from 'vuetify'
 import { isDeleteKey, pushKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useFormatting } from '@/composables/useFormatting'
 import { useMembership } from '@/composables/useMembership'
 import { useRequestFailure } from '@/composables/useRequestFailure'
@@ -26,12 +27,13 @@ interface AccountSummary {
 const page =
   usePage<InertiaPageProps<{ notifications?: { email: boolean }; account: AccountSummary }>>()
 const { authUser } = useAuth()
-const { userDisplayName, formatCount } = useFormatting()
+const { userDisplayName } = useUserDisplay()
+const { formatCount } = useFormatting()
 const { membershipDuration, membershipMessage } = useMembership()
 const { t } = useI18n()
 const push = injectStrict(pushKey)
 const { mdAndUp } = useDisplay()
-const emailPreference = useHttp()
+const emailPreference = useHttp({ enabled: false })
 const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
 
 // This page is behind the `verified` auth middleware (routes/web.php), so
@@ -65,9 +67,10 @@ void push.isSubscribed().then((isSubscribed) => {
 
 async function toggleEmailNotifications(value: boolean | null): Promise<void> {
   notifications.email = value === true
+  emailPreference.enabled = notifications.email
 
   await whenSettled(
-    emailPreference.post(route('notifications.email', [String(notifications.email)]), {
+    emailPreference.put(route('notifications.email'), {
       onHttpException,
       onNetworkError
     })

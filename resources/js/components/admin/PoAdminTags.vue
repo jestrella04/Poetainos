@@ -2,7 +2,9 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminDeleteDialog from './partials/PoAdminDeleteDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
+import { useRowDialog } from '@/composables/useRowDialog'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -23,10 +25,11 @@ const headers: DataTableHeader[] = [
   { title: t('main.name'), align: 'start', sortable: false, key: 'name' },
   { title: t('main.actions'), align: 'start', sortable: false, key: 'actions' }
 ]
-const { items, totalItems, isLoading, loadItems } = useServerTable<TagAdmin>(
+const { items, totalItems, isLoading, loadItems, reload } = useServerTable<TagAdmin>(
   'admin.tags',
-  page.props.total
+  () => page.props.total
 )
+const deleteDialog = useRowDialog<TagAdmin>()
 </script>
 
 <template>
@@ -58,15 +61,26 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<TagAdmin>(
             <v-icon icon="fas fa-eye" />
           </po-button>
 
-          <po-button href="#" size="x-small" color="secondary" icon inertia>
-            <v-icon icon="fas fa-edit" />
-          </po-button>
-
-          <po-button href="#" size="x-small" color="secondary" icon inertia>
+          <po-button
+            :id="`admin-delete-${item.id}`"
+            size="x-small"
+            color="secondary"
+            icon
+            :aria-label="$t('main.delete')"
+            @click="deleteDialog.open(item)"
+          >
             <v-icon icon="fas fa-trash" />
           </po-button>
         </div>
       </template>
     </v-data-table-server>
+
+    <po-admin-delete-dialog
+      v-if="deleteDialog.isOpen.value && deleteDialog.row.value !== null"
+      v-model="deleteDialog.isOpen.value"
+      :url="route('admin.tags.destroy', deleteDialog.row.value.slug)"
+      warning-key="tags.delete-tag-warning"
+      @deleted="reload"
+    />
   </po-wrapper>
 </template>

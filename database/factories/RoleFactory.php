@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -33,12 +34,8 @@ class RoleFactory extends Factory
      */
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'extra_info' => [
-                'permissions' => [
-                    ['name' => 'admin', 'enabled' => true],
-                ],
-            ],
-        ]);
+        return $this->afterCreating(function (Role $role): void {
+            $role->permissions()->attach(Permission::firstOrCreate(['name' => Permission::ADMIN]));
+        });
     }
 }

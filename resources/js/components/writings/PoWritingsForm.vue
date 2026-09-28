@@ -27,10 +27,10 @@ interface WritingFormProps {
     }
     main_category: number | null
     categories: number[]
-    tags: string[] | null
+    tags: string[]
   }
-  main_categories: CategoryWithDescendants[]
-  'max-file-size': number
+  mainCategories: CategoryWithDescendants[]
+  maxFileSize: number
   agreement: boolean
   isUpdate: boolean
 }
@@ -50,7 +50,7 @@ const form = useForm({
   title: writing.data.title ?? '',
   main_category: writing.main_category,
   categories: [...writing.categories],
-  tags: [...(writing.tags ?? [])],
+  tags: [...writing.tags],
   text: writing.data.text ?? '',
   link: writing.data.link ?? '',
   cover: null as File | null,
@@ -63,8 +63,8 @@ provide(isDeleteKey, isDelete)
 
 const altCategories = computed<CategoryOption[]>(
   () =>
-    page.props.main_categories.find((category) => category.id === form.main_category)
-      ?.descendants ?? []
+    page.props.mainCategories.find((category) => category.id === form.main_category)?.descendants ??
+    []
 )
 const isAltCategoriesDisabled = computed(() => (form.main_category ?? 0) <= 0)
 
@@ -134,7 +134,7 @@ function categoryOptionProps(idPrefix: string): (category: CategoryOption) => { 
           :error-messages="form.errors.main_category"
           :placeholder="$t('categories.select-main')"
           persistent-placeholder
-          :items="page.props.main_categories"
+          :items="page.props.mainCategories"
           item-title="name"
           item-value="id"
           :item-props="categoryOptionProps('main-category-option')"
@@ -215,7 +215,7 @@ function categoryOptionProps(idPrefix: string): (category: CategoryOption) => { 
           prepend-icon=""
           :placeholder="$t('main.select-cover')"
           persistent-placeholder
-          :hint="$t('main.max-file-size-is', { size: page.props['max-file-size'] })"
+          :hint="$t('main.max-file-size-is', { size: page.props.maxFileSize })"
           persistent-hint
           clearable
         />

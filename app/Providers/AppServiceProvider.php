@@ -53,14 +53,14 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by((string) ($request->user()->id ?? $request->ip()));
         });
 
-        // The email-first login has to say whether an address has an account;
-        // these limits keep that answer from being harvested in bulk
         // Anyone may report content, so cap how much one visitor can file
         RateLimiter::for('complaints', fn (Request $request): array => [
             Limit::perMinute(10)->by($request->ip()),
             Limit::perDay(30)->by('daily|'.$request->ip()),
         ]);
 
+        // The email-first login has to say whether an address has an account;
+        // these limits keep that answer from being harvested in bulk
         RateLimiter::for('email-check', fn (Request $request): array => [
             Limit::perMinute(5)->by($request->ip()),
             Limit::perDay(50)->by('daily|'.$request->ip()),

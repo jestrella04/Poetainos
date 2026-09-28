@@ -39,7 +39,13 @@ class PostWritingOfTheDay extends Command
             return self::SUCCESS;
         }
 
-        $writing = DailySelection::pickForToday()->writing()->firstOrFail();
+        $writing = DailySelection::pickForToday()?->writing;
+
+        if ($writing === null) {
+            $this->warn('There are no writings yet, nothing was posted.');
+
+            return self::SUCCESS;
+        }
 
         $networks->notify(new WritingOfTheDayPosted($writing));
 

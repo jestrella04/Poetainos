@@ -26,9 +26,10 @@ class WritingOfTheDayPosted extends Notification implements ShouldQueue
     public int $tries = 3;
 
     /**
-     * Room for a Threads post (container, status checks and a slow publish),
-     * kept under the queue's retry_after (90) so a running post is never
-     * picked up by a second worker.
+     * Room for the Facebook post, or for the Threads container (created again
+     * without the Instagram share when Threads rejects it), kept under the
+     * queue's retry_after (90) so a running post is never picked up by a
+     * second worker. PublishThreadsContainer publishes the container.
      */
     public int $timeout = 85;
 

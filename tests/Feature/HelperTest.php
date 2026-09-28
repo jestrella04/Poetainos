@@ -36,6 +36,31 @@ describe('escapeLike', function (): void {
     ]);
 });
 
+describe('retryOnSlugCollision', function (): void {
+    it('saves again with a fresh slug when a concurrent request took the first one', function (): void {
+        // Given
+        $title = fakeTitle();
+        $attempts = 0;
+
+        // When
+        $writing = retryOnSlugCollision(function () use ($title, &$attempts): Writing {
+            $attempts++;
+            $slug = slugify('writings', $title);
+
+            if ($attempts === 1) {
+                // Another request saves a writing with the same title between the lookup and the insert
+                Writing::factory()->create(['slug' => $slug]);
+            }
+
+            return Writing::factory()->create(['slug' => $slug]);
+        });
+
+        // Then
+        expect($attempts)->toBe(2);
+        expect($writing->slug)->toBe(Str::slug($title).'-1');
+    });
+});
+
 describe('slugify', function (): void {
     it('appends the first free number when the slug is taken', function (): void {
         // Given
@@ -174,4 +199,19 @@ describe('interpolateSiteSettings', function (): void {
         // Then
         expect($text)->toBe('Welcome to Casa de Letras, find us at {{social}}');
     });
+});
+
+describe('storageUrl', function (): void {
+    it('is the public URL of a stored file', function (): void {
+        // Given
+        $path = 'covers/'.fake()->uuid().'.jpg';
+
+        // Then
+        expect(storageUrl($path))->toBe(asset('storage/'.$path));
+    });
+
+    it('is null without a file', function (?string $path): void {
+        // Then
+        expect(storageUrl($path))->toBeNull();
+    })->with(['null' => [null], 'empty' => ['']]);
 });

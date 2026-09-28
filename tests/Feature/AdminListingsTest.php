@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\Complaint;
 use App\Models\Tag;
 use App\Models\Writing;
@@ -115,5 +116,52 @@ describe('the admin pages', function (): void {
 
         // Then
         $response->assertInertia(fn ($page) => $page->where('counter', "https://counter.dev/dashboard.html?user={$counterUser}&token={$counterToken}"));
+    });
+});
+
+describe('the admin complaints table', function (): void {
+    it('links each complaint to the reported content, open complaints first', function (): void {
+        // Given
+        $writing = Writing::factory()->create();
+        $comment = Comment::factory()->create();
+        $user = createUser();
+        $closed = Complaint::factory()->for($writing, 'complainable')->create(['closed_at' => now()]);
+        Complaint::factory()->for($comment, 'complainable')->create();
+        Complaint::factory()->for($user, 'complainable')->create();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->getJson(route('admin.complaints'));
+
+        // Then
+        $response->assertOk()->assertJsonPath('data.2.id', $closed->id);
+        expect($response->collect('data')->pluck('reported_url')->sort()->values()->all())
+            ->toBe(collect([$writing->path(), $comment->writing()->firstOrFail()->path(), $user->path()])->sort()->values()->all());
+    });
+
+    it('has no link for a complaint whose content is gone', function (): void {
+        // Given
+        Complaint::factory()->create(['complainable_type' => Writing::class, 'complainable_id' => fake()->numberBetween(100000, 999999)]);
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->getJson(route('admin.complaints'));
+
+        // Then
+        $response->assertOk()->assertJsonPath('data.0.reported_url', null);
+    });
+});
+
+describe('the admin categories table', function (): void {
+    it('offers every category as a parent', function (): void {
+        // Given
+        $categories = Category::factory()->count(fake()->numberBetween(2, 5))->create();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->get(route('admin.categories'));
+
+        // Then
+        $response->assertOk()->assertInertia(fn ($page) => $page->has('parentOptions', $categories->count()));
     });
 });

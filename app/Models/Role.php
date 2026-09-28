@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\RoleFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @mixin IdeHelperRole
@@ -22,30 +23,22 @@ class Role extends Model
     protected $fillable = [
         'name',
         'description',
-        'extra_info',
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @return array<string, string>
+     * @return BelongsToMany<Permission, $this>
      */
-    protected function casts(): array
+    public function permissions(): BelongsToMany
     {
-        return [
-            'extra_info' => 'array',
-        ];
+        return $this->belongsToMany(Permission::class);
     }
 
     /**
-     * @return array<array-key, mixed>
+     * Whether the role grants the named permission. The permissions are
+     * loaded once per role instance, however often this is asked.
      */
-    public function permissions(): array
+    public function grants(string $permission): bool
     {
-        if (isset($this->extra_info['permissions'])) {
-            return $this->extra_info['permissions'];
-        }
-
-        return [];
+        return $this->permissions->contains('name', $permission);
     }
 }

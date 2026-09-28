@@ -443,3 +443,44 @@ describe('social login', function (): void {
         'callback' => ['/login/facebook/callback'],
     ]);
 });
+
+describe('the username of an account created through a provider', function (): void {
+    it('comes from the nickname, or else the email address', function (?string $nickname, string $email, string $expectedUsername): void {
+        // Given
+        Socialite::fake('google', SocialiteUser::fake(['email' => $email, 'nickname' => $nickname, 'avatar' => null]));
+
+        // When
+        get('/login/google/callback')->assertRedirect();
+
+        // Then
+        expect(User::where('email', $email)->sole()->username)->toBe($expectedUsername);
+    })->with([
+        'nickname' => ['Poeta Nocturno', 'someone@example.com', 'poeta_nocturno'],
+        'no nickname' => [null, 'poeta.nocturno@example.com', 'poetanocturno'],
+        'blank nickname' => ['', 'versos@example.com', 'versos'],
+    ]);
+
+    it('is a valid random one when the nickname slugs to nothing', function (): void {
+        // Given
+        $email = fake()->unique()->safeEmail();
+        Socialite::fake('google', SocialiteUser::fake(['email' => $email, 'nickname' => '🌙✨', 'avatar' => null]));
+
+        // When
+        get('/login/google/callback')->assertRedirect();
+
+        // Then
+        expect(User::where('email', $email)->sole()->username)->toMatch(User::USERNAME_PATTERN)->toStartWith('user_');
+    });
+
+    it('is cut to the longest username allowed', function (): void {
+        // Given
+        $email = fake()->unique()->safeEmail();
+        Socialite::fake('google', SocialiteUser::fake(['email' => $email, 'nickname' => str_repeat('verso', 20), 'avatar' => null]));
+
+        // When
+        get('/login/google/callback')->assertRedirect();
+
+        // Then
+        expect(User::where('email', $email)->sole()->username)->toMatch(User::USERNAME_PATTERN)->toHaveLength(45);
+    });
+});

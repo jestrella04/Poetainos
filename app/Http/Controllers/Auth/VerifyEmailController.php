@@ -33,7 +33,7 @@ class VerifyEmailController extends Controller
             event(new Verified($user));
         }
 
-        Inertia::flash('message', 'accounts.email-verified');
+        Inertia::flash(['message' => 'accounts.email-verified', 'color' => 'success']);
 
         return to_route('home');
     }

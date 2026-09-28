@@ -87,7 +87,7 @@ describe('creating a writing', function (): void {
         $title = fakeTitle();
 
         // When
-        $response = actingAs($user)->post('/writings/create', [
+        $response = actingAs($user)->post('/writings', [
             'title' => $title,
             'main_category' => $mainCategory->id,
             'categories' => [$subCategory->id],
@@ -110,7 +110,7 @@ describe('creating a writing', function (): void {
         $title = fakeTitle();
 
         // When
-        $response = actingAs($user)->post('/writings/create', writingPayload($mainCategory, [
+        $response = actingAs($user)->post('/writings', writingPayload($mainCategory, [
             'title' => $title,
             'service_agreement' => 'false',
             'privacy_agreement' => 'false',
@@ -127,7 +127,7 @@ describe('creating a writing', function (): void {
         $mainCategory = Category::factory()->create(['parent_id' => null]);
 
         // When
-        $response = actingAs($user)->post('/writings/create', writingPayload($mainCategory, [
+        $response = actingAs($user)->post('/writings', writingPayload($mainCategory, [
             'service_agreement' => 'false',
             'privacy_agreement' => 'false',
         ]));
@@ -143,7 +143,7 @@ describe('creating a writing', function (): void {
         Writing::factory()->for($user, 'author')->count(3)->create(['created_at' => now()]);
 
         // When
-        $response = actingAs($user)->post('/writings/create', writingPayload($mainCategory));
+        $response = actingAs($user)->post('/writings', writingPayload($mainCategory));
 
         // Then
         $response->assertSessionHasErrors('title');
@@ -158,7 +158,7 @@ describe('editing and deleting a writing', function (): void {
 
         // When
         $editResponse = actingAs($author)->get('/writings/edit/'.$writing->slug);
-        $deleteResponse = actingAs($author)->delete('/writings/delete/'.$writing->slug);
+        $deleteResponse = actingAs($author)->delete('/writings/'.$writing->slug);
 
         // Then
         $editResponse->assertOk();
@@ -173,7 +173,7 @@ describe('editing and deleting a writing', function (): void {
 
         // When
         $editResponse = actingAs($other)->get('/writings/edit/'.$writing->slug);
-        $deleteResponse = actingAs($other)->delete('/writings/delete/'.$writing->slug);
+        $deleteResponse = actingAs($other)->delete('/writings/'.$writing->slug);
 
         // Then
         $editResponse->assertForbidden();
@@ -187,7 +187,7 @@ describe('editing and deleting a writing', function (): void {
 
         // When
         $editResponse = actingAs($admin)->get('/writings/edit/'.$writing->slug);
-        $deleteResponse = actingAs($admin)->delete('/writings/delete/'.$writing->slug);
+        $deleteResponse = actingAs($admin)->delete('/writings/'.$writing->slug);
 
         // Then
         $editResponse->assertOk();
@@ -201,10 +201,10 @@ describe('editing and deleting a writing', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->deleteJson(route('admin.writings.destroy', $writing));
+        $response = actingAs($admin)->from(route('admin.writings'))->deleteJson(route('admin.writings.destroy', $writing));
 
         // Then
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('admin.writings'));
         expect(Writing::find($writing->id))->toBeNull();
     });
 
@@ -395,6 +395,27 @@ describe('a writing cover', function (): void {
         Storage::disk('local')->assertMissing($oldCover);
     });
 
+    it('is discarded, keeping the previous one, when the writing cannot be saved', function (): void {
+        // Given
+        $oldCover = 'covers/'.fake()->uuid().'.png';
+        Storage::disk('local')->put($oldCover, fake()->sentence());
+        $author = createUser();
+        $writing = Writing::factory()->for($author, 'author')->create(['cover' => $oldCover]);
+        $mainCategory = Category::factory()->create(['parent_id' => null]);
+        Writing::saved(fn (): never => throw new RuntimeException('The writing could not be saved.'));
+
+        // When
+        $response = actingAs($author)->post(route('writings.update', $writing), writingPayload($mainCategory, [
+            '_method' => 'PUT',
+            'cover' => UploadedFile::fake()->image(fake()->word().'.jpg', 32, 18),
+        ]));
+
+        // Then
+        $response->assertServerError();
+        expect($writing->refresh()->cover)->toBe($oldCover);
+        expect(Storage::disk('local')->allFiles('covers'))->toBe([$oldCover]);
+    });
+
     it('is deleted together with the writing', function (): void {
         // Given
         $cover = 'covers/'.fake()->uuid().'.png';
@@ -407,6 +428,16 @@ describe('a writing cover', function (): void {
 
         // Then
         Storage::disk('local')->assertMissing($cover);
+    });
+});
+
+describe('the writings index', function (): void {
+    it('permanently redirects to the home page, which lists the writings', function (): void {
+        // When
+        $response = get('/writings');
+
+        // Then
+        $response->assertStatus(301)->assertRedirect('/');
     });
 });
 

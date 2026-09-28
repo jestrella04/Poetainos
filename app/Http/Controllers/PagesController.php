@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -38,45 +39,47 @@ class PagesController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @return array{message: string, id: int}
+     * Store a newly created resource in storage, then return to the admin table.
      */
-    public function store(): array
+    public function store(): RedirectResponse
     {
         $page = new Page;
 
         $this->validatePage($page);
 
-        $page->slug = slugify($page->getTable(), request('title'));
+        retryOnSlugCollision(function () use ($page): void {
+            $page->slug = slugify($page->getTable(), request('title'));
+            $this->save($page);
+        });
 
-        return $this->save($page, __('Page created successfully'));
+        Inertia::flash(['message' => 'pages.page-created', 'color' => 'success']);
+
+        return back();
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @return array{message: string, id: int}
+     * Update the specified resource in storage, then return to the admin table.
      */
-    public function update(Page $page): array
+    public function update(Page $page): RedirectResponse
     {
         $this->validatePage($page);
+        $this->save($page);
 
-        return $this->save($page, __('Page updated successfully'));
+        Inertia::flash(['message' => 'pages.page-updated', 'color' => 'success']);
+
+        return back();
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @return array<string, string>
+     * Remove the specified resource from storage, then return to the admin table.
      */
-    public function destroy(Page $page): array
+    public function destroy(Page $page): RedirectResponse
     {
         $page->delete();
 
-        return [
-            'message' => __('Page deleted successfully'),
-        ];
+        Inertia::flash(['message' => 'pages.page-deleted', 'color' => 'success']);
+
+        return back();
     }
 
     private function validatePage(Page $page): void
@@ -87,18 +90,10 @@ class PagesController extends Controller
         ]);
     }
 
-    /**
-     * @return array{message: string, id: int}
-     */
-    private function save(Page $page, string $message): array
+    private function save(Page $page): void
     {
         $page->title = request('title');
         $page->text = request('text');
         $page->save();
-
-        return [
-            'message' => $message,
-            'id' => $page->id,
-        ];
     }
 }

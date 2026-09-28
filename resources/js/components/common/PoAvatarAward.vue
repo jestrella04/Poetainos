@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import type { UserLike } from '@/types/models'
 
 const props = defineProps<{
@@ -10,7 +10,7 @@ const props = defineProps<{
   avatarClass?: string
 }>()
 
-const { karmaMedal } = useFormatting()
+const { karmaMedal } = useUserDisplay()
 
 const isAwardEligible = computed(
   () =>

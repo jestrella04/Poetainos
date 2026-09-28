@@ -174,15 +174,23 @@
     "user-replied": "{name} ha respondido a tu comentario"
   },
   "complaints": {
+    "close-complaint": "Cerrar denuncia",
+    "closing-note": "Nota de cierre",
     "complaint": "Denunciar...",
+    "complaint-closed": "Denuncia cerrada con éxito",
+    "complaint-details": "Detalles de la denuncia",
     "complaint-received": "Hemos recivido tu solicitud de denuncia y la estaremos procesando en breve.",
     "complaints": "Denuncias",
     "post-complaint": "Enviar Denuncia",
+    "reasons": "Motivos",
     "report-comment": "Reportar comentario",
     "report-reason-ask": "¿Por qué quieres reportar este contenido?",
     "report-user": "Reportar usuario",
     "report-writing": "Denunciar texto",
-    "select-all-apply": "Selecciona todo lo que aplique"
+    "reported-content-gone": "El contenido denunciado ya no existe",
+    "reporter-comment": "Comentario del denunciante",
+    "select-all-apply": "Selecciona todo lo que aplique",
+    "view-reported-content": "Ver contenido denunciado"
   },
   "main": {
     "reading": "Leyendo",
@@ -388,6 +396,7 @@
   },
   "pages": {
     "create-page": "Crear página",
+    "delete-page-warning": "Eliminar una página la quitará del sitio y romperá los enlaces que apunten a ella",
     "edit-page": "Editar página",
     "page-created": "Página creada con éxito",
     "page-deleted": "Página eliminada con éxito",

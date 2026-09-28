@@ -6,22 +6,6 @@ use Illuminate\Support\Str;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
-/**
- * @param  array<string, mixed>  $attributes
- */
-function createPage(array $attributes = []): Page
-{
-    $title = fakeTitle();
-    $page = new Page;
-    $page->forceFill(array_merge([
-        'title' => $title,
-        'slug' => Str::slug($title),
-        'text' => fakeText(100),
-    ], $attributes))->save();
-
-    return $page;
-}
-
 beforeEach(function (): void {
     // Components live under resources/js/components, not Inertia's default Pages directory.
     config(['inertia.testing.ensure_pages_exist' => false]);
@@ -51,14 +35,14 @@ describe('saving a page from the admin area', function (): void {
         $title = fakeTitle();
 
         // When
-        $response = actingAs($admin)->postJson(route('admin.pages.store'), [
+        $response = actingAs($admin)->from(route('admin.pages'))->post(route('admin.pages.store'), [
             'title' => $title,
             'text' => fakeText(100),
         ]);
 
         // Then
         $page = Page::where('title', $title)->firstOrFail();
-        $response->assertOk()->assertJson(['id' => $page->id]);
+        $response->assertRedirect(route('admin.pages'))->assertInertiaFlash('message', 'pages.page-created');
         expect($page->slug)->toBe(Str::slug($title));
     });
 
@@ -70,13 +54,13 @@ describe('saving a page from the admin area', function (): void {
         $newTitle = fakeTitle();
 
         // When
-        $response = actingAs($admin)->putJson(route('admin.pages.update', $page), [
+        $response = actingAs($admin)->from(route('admin.pages'))->put(route('admin.pages.update', $page), [
             'title' => $newTitle,
             'text' => fakeText(100),
         ]);
 
         // Then
-        $response->assertOk()->assertJson(['id' => $page->id]);
+        $response->assertRedirect(route('admin.pages'))->assertInertiaFlash('message', 'pages.page-updated');
         $page->refresh();
         expect($page->title)->toBe($newTitle);
         expect($page->slug)->toBe($originalSlug);
@@ -137,10 +121,10 @@ describe('deleting a page from the admin area', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->deleteJson(route('admin.pages.destroy', $page));
+        $response = actingAs($admin)->from(route('admin.pages'))->delete(route('admin.pages.destroy', $page));
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect(route('admin.pages'))->assertInertiaFlash('message', 'pages.page-deleted');
         expect(Page::find($page->id))->toBeNull();
     });
 

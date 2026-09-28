@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\SocialAuthController;
+use App\Models\UserProfile;
 use App\Models\Writing;
 use App\Notifications\WritingShelved;
 use Illuminate\Support\Collection;
@@ -59,11 +61,12 @@ describe('the shared auth props', function (): void {
         $user = createUser();
         $writings = Writing::factory()->count(30)->create();
         $writings->firstOrFail()->likes()->create(['user_id' => $user->id, 'vote' => 1]);
-        $withOneLike = count(queriesDuring(fn () => actingAs($user)->get(route('explore'))));
+        // A fresh instance per request, as a real request loads the user anew
+        $withOneLike = count(queriesDuring(fn () => actingAs($user->fresh() ?? $user)->get(route('explore'))));
 
         // When
         $writings->skip(1)->each(fn (Writing $writing) => $writing->likes()->create(['user_id' => $user->id, 'vote' => 1]));
-        $withManyLikes = count(queriesDuring(fn () => actingAs($user)->get(route('explore'))));
+        $withManyLikes = count(queriesDuring(fn () => actingAs($user->fresh() ?? $user)->get(route('explore'))));
 
         // Then
         expect($withManyLikes)->toBe($withOneLike);
@@ -124,5 +127,17 @@ describe('the ziggy route table', function (): void {
         $asGuest->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('explore'))->whereNot('ziggy.routes', $hasRoute('admin.index')));
         $asUser->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('explore'))->whereNot('ziggy.routes', $hasRoute('admin.index')));
         $asAdmin->assertInertia(fn ($page) => $page->where('ziggy.routes', $hasRoute('admin.index')));
+    });
+});
+
+describe('the shared site props', function (): void {
+    it('list the social networks a profile links to and the providers people sign in with', function (): void {
+        // When
+        $response = get(route('explore'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page
+            ->where('site.socialNetworks', UserProfile::SOCIAL_NETWORKS)
+            ->where('site.authProviders', SocialAuthController::PROVIDERS));
     });
 });

@@ -67,6 +67,21 @@ describe('the comments index', function (): void {
 });
 
 describe('commenting', function (): void {
+    it('answers not found, without storing anything, for a writing that does not exist', function (): void {
+        // Given
+        $commenter = createUser();
+
+        // When
+        $response = actingAs($commenter)->postJson('/comments', [
+            'comment' => fake()->sentence(),
+            'writing_id' => fake()->numberBetween(100000, 999999),
+        ]);
+
+        // Then
+        $response->assertNotFound();
+        expect(Comment::count())->toBe(0);
+    });
+
     it('notifies the writing author unless the commenter is the author', function (): void {
         // Given
         Notification::fake();
@@ -75,7 +90,7 @@ describe('commenting', function (): void {
         $commenter = createUser();
 
         // When
-        $response = actingAs($commenter)->post('/comments/create', [
+        $response = actingAs($commenter)->post('/comments', [
             'comment' => fake()->sentence(),
             'writing_id' => $writing->id,
         ]);
@@ -88,7 +103,7 @@ describe('commenting', function (): void {
         Notification::fake();
 
         // When
-        actingAs($author)->post('/comments/create', [
+        actingAs($author)->post('/comments', [
             'comment' => fake()->sentence(),
             'writing_id' => $writing->id,
         ]);
@@ -106,7 +121,7 @@ describe('commenting', function (): void {
         $author->block($commenter);
 
         // When
-        $response = actingAs($commenter)->post('/comments/create', [
+        $response = actingAs($commenter)->post('/comments', [
             'comment' => fake()->sentence(),
             'writing_id' => $writing->id,
         ]);
@@ -125,7 +140,7 @@ describe('commenting', function (): void {
         $mentioned = createUser(['username' => fakeUsername()]);
 
         // When
-        actingAs($commenter)->post('/comments/create', [
+        actingAs($commenter)->post('/comments', [
             'comment' => fake()->sentence()." @{$mentioned->username}!",
             'writing_id' => $writing->id,
         ]);
@@ -145,8 +160,8 @@ describe('deleting a comment', function (): void {
         $other = createUser();
 
         // When
-        $otherResponse = actingAs($other)->delete('/comments/delete/'.$comment->id);
-        $authorResponse = actingAs($author)->delete('/comments/delete/'.$comment->id);
+        $otherResponse = actingAs($other)->delete('/comments/'.$comment->id);
+        $authorResponse = actingAs($author)->delete('/comments/'.$comment->id);
 
         // Then
         $otherResponse->assertForbidden();
@@ -160,7 +175,7 @@ describe('deleting a comment', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->delete('/comments/delete/'.$comment->id);
+        $response = actingAs($admin)->delete('/comments/'.$comment->id);
 
         // Then
         $response->assertRedirect();
@@ -178,7 +193,7 @@ describe('mentions in a comment', function (): void {
         $message = $mentioned->map(fn (User $user): string => '@'.$user->username)->implode(' ');
 
         // When
-        actingAs($commenter)->post('/comments/create', [
+        actingAs($commenter)->post('/comments', [
             'comment' => $message,
             'writing_id' => $writing->id,
         ])->assertCreated();
@@ -194,7 +209,7 @@ describe('mentions in a comment', function (): void {
         $mentioned = createUser(['username' => fakeUsername().'.'.fakeUsername()]);
 
         // When
-        actingAs(createUser())->post('/comments/create', [
+        actingAs(createUser())->post('/comments', [
             'comment' => fake()->sentence()." @{$mentioned->username}.",
             'writing_id' => $writing->id,
         ])->assertCreated();
@@ -212,7 +227,7 @@ describe('mentions in a comment', function (): void {
         $mentioned->block($commenter);
 
         // When
-        actingAs($commenter)->post('/comments/create', [
+        actingAs($commenter)->post('/comments', [
             'comment' => "@{$mentioned->username} ".fake()->sentence(),
             'writing_id' => $writing->id,
         ])->assertCreated();
@@ -228,7 +243,7 @@ describe('mentions in a comment', function (): void {
         $mentioned = createUser(['username' => fakeUsername()]);
 
         // When
-        actingAs(createUser())->post('/comments/create', [
+        actingAs(createUser())->post('/comments', [
             'comment' => "@{$mentioned->username} @{$mentioned->username} ".fake()->sentence(),
             'writing_id' => $writing->id,
         ])->assertCreated();
@@ -243,7 +258,7 @@ describe('mentions in a comment', function (): void {
         $writing = Writing::factory()->create();
 
         // When
-        actingAs(createUser())->post('/comments/create', [
+        actingAs(createUser())->post('/comments', [
             'comment' => '@'.fakeUsername().' '.fake()->sentence(),
             'writing_id' => $writing->id,
         ])->assertCreated();

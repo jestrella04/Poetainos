@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * Saves a writing together with its cover, categories and tags, and enforces
@@ -72,21 +73,33 @@ class WritingPublisher
             ? $this->images->storeUpload($upload, 'covers', self::COVER_WIDTH, self::COVER_HEIGHT)
             : $currentCover;
 
-        DB::transaction(function () use ($writing, $data, $cover): void {
-            $writing->title = $data['title'];
+        try {
+            DB::transaction(function () use ($writing, $data, $cover): void {
+                $writing->title = $data['title'];
+                $writing->text = $data['text'];
+                $writing->link = $data['link'] ?? null;
+                $writing->cover = $cover;
 
-            if ($writing->exists === false) {
-                $writing->slug = slugify($writing->getTable(), $writing->title);
+                if ($writing->exists === false) {
+                    retryOnSlugCollision(function () use ($writing): void {
+                        $writing->slug = slugify($writing->getTable(), $writing->title);
+                        $writing->save();
+                    });
+                } else {
+                    $writing->save();
+                }
+
+                $writing->categories()->sync([$data['main_category'], ...(array) $data['categories']]);
+                $writing->tags()->sync($this->resolveTagIds((array) ($data['tags'] ?? [])));
+            });
+        } catch (Throwable $exception) {
+            // Nothing refers to the new upload once the rows are rolled back
+            if ($cover !== $currentCover) {
+                $this->images->delete($cover);
             }
 
-            $writing->text = $data['text'];
-            $writing->link = $data['link'] ?? null;
-            $writing->cover = $cover;
-            $writing->save();
-
-            $writing->categories()->sync([$data['main_category'], ...(array) $data['categories']]);
-            $writing->tags()->sync($this->resolveTagIds((array) ($data['tags'] ?? [])));
-        });
+            throw $exception;
+        }
 
         if ($cover !== $currentCover) {
             $this->images->delete($currentCover);

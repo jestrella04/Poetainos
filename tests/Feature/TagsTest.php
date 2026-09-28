@@ -24,6 +24,17 @@ describe('the query endpoint', function (): void {
         $response->assertJsonFragment(['value' => $matching->name, 'label' => $matching->name]);
         $response->assertJsonMissing(['value' => $otherName]);
     });
+
+    it('refuses a query too short to narrow the tags down', function (string $query): void {
+        // Given
+        Tag::factory()->create();
+
+        // When
+        $response = getJson('/tags/query?query='.urlencode($query));
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors('query');
+    })->with(['empty' => [''], 'one letter' => ['a']]);
 });
 
 describe('the show page', function (): void {
@@ -46,10 +57,10 @@ describe('admin tag management', function (): void {
         $tag = Tag::factory()->create();
 
         // When
-        $response = actingAs($admin)->delete('/admin/tags/delete/'.$tag->slug);
+        $response = actingAs($admin)->from(route('admin.tags'))->delete('/admin/tags/'.$tag->slug);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect(route('admin.tags'))->assertInertiaFlash('message', 'tags.tag-deleted');
         expect(Tag::find($tag->id))->toBeNull();
     });
 
@@ -59,7 +70,7 @@ describe('admin tag management', function (): void {
         $tag = Tag::factory()->create();
 
         // When
-        $response = actingAs($user)->delete('/admin/tags/delete/'.$tag->slug);
+        $response = actingAs($user)->delete('/admin/tags/'.$tag->slug);
 
         // Then
         $response->assertForbidden();

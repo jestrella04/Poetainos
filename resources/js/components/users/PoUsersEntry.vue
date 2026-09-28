@@ -4,6 +4,8 @@ import { useI18n } from 'vue-i18n'
 import PoUserDropdown from './partials/PoUserDropdown.vue'
 import { userKey } from '@/composables/keys'
 import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useDates } from '@/composables/useDates'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useFormatting } from '@/composables/useFormatting'
 import { useSocialLinks } from '@/composables/useSocialLinks'
 import type { User } from '@/types/models'
@@ -14,7 +16,9 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { isEmpty, isBlank } = useTypeGuards()
-const { userDisplayName, relativeDate, abbreviateNumber, cropUrl } = useFormatting()
+const { relativeDate } = useDates()
+const { userDisplayName } = useUserDisplay()
+const { abbreviateNumber, cropUrl } = useFormatting()
 const { socialLink } = useSocialLinks()
 
 provide(userKey, props.data)

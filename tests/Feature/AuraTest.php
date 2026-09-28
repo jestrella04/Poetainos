@@ -111,7 +111,7 @@ describe('a writing\'s aura', function (): void {
         $withComment = (float) $writing->refresh()->aura;
 
         // When
-        actingAs($commenter)->delete("/comments/delete/{$comment->id}")->assertRedirect();
+        actingAs($commenter)->delete("/comments/{$comment->id}")->assertRedirect();
 
         // Then
         expect($withComment)->toBeGreaterThan(0.0);
@@ -263,7 +263,7 @@ describe('recalculating aura after an interaction', function (): void {
         $commenter = createUser();
 
         // When
-        actingAs($commenter)->post('/comments/create', ['writing_id' => $writing->id, 'comment' => fake()->sentence()]);
+        actingAs($commenter)->post('/comments', ['writing_id' => $writing->id, 'comment' => fake()->sentence()]);
 
         // Then
         Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->user?->is($commenter) === true
@@ -276,7 +276,7 @@ describe('recalculating aura after an interaction', function (): void {
         $comment = Comment::factory()->create();
 
         // When
-        actingAs($comment->author()->firstOrFail())->delete("/comments/delete/{$comment->id}");
+        actingAs($comment->author()->firstOrFail())->delete("/comments/{$comment->id}");
 
         // Then
         Queue::assertPushed(RecalculateAura::class, fn (RecalculateAura $job): bool => $job->writing?->is($comment->writing) === true);

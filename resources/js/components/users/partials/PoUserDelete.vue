@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useForm, useHttp } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import { isDeleteKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useFormValidation } from '@/composables/useFormValidation'
+import { usePasswordConfirmation } from '@/composables/usePasswordConfirmation'
 import { useRequestFailure } from '@/composables/useRequestFailure'
 
 const props = defineProps<{
@@ -12,8 +13,8 @@ const props = defineProps<{
 
 const isDelete = injectStrict(isDeleteKey)
 const { isSubmittedFormValid } = useFormValidation()
-const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
-const passwordConfirmation = useHttp({ password: '' })
+const { passwordConfirmation, confirmThen } = usePasswordConfirmation()
+const { onHttpException, onNetworkError } = useRequestFailure()
 const form = useForm({})
 const isProcessing = computed(() => passwordConfirmation.processing || form.processing)
 
@@ -24,21 +25,15 @@ async function submit(event: Event): Promise<void> {
     return
   }
 
-  await whenSettled(
-    passwordConfirmation.post(route('password.confirmer'), {
+  await confirmThen(() => {
+    form.delete(route('users.destroy', props.username), {
       onHttpException,
       onNetworkError,
       onSuccess: () => {
-        form.delete(route('users.destroy', props.username), {
-          onHttpException,
-          onNetworkError,
-          onSuccess: () => {
-            isDelete.value = false
-          }
-        })
+        isDelete.value = false
       }
     })
-  )
+  })
 }
 </script>
 

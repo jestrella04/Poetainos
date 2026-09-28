@@ -4,6 +4,7 @@ import { useForm, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import { useLogEntries } from '@/composables/useLogEntries'
+import { useDates } from '@/composables/useDates'
 import { useFormatting } from '@/composables/useFormatting'
 import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { InertiaPageProps } from '@/types/inertia'
@@ -34,7 +35,8 @@ const LEVEL_COLORS: Record<string, string> = {
 }
 
 const { t } = useI18n()
-const { fileSize, relativeDate, toLocaleDateTime } = useFormatting()
+const { relativeDate, toLocaleDateTime } = useDates()
+const { fileSize } = useFormatting()
 const page = usePage<InertiaPageProps<{ files: LogFile[] }>>()
 const files = computed(() => page.props.files)
 const fileOptions = computed(() =>

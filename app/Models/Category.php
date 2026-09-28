@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 /**
@@ -36,12 +37,17 @@ class Category extends Model
     }
 
     /**
+     * The writings in this category or any of its descendants.
+     *
      * @return Builder<Writing>
      */
     public function writingsRecursive(): Builder
     {
-        return Writing::with('categories')->whereHas('categories', function ($q): void {
-            $q->whereIn('category_id', $this->descendantsAndSelf()->pluck('id'));
-        });
+        return Writing::whereIn(
+            'id',
+            DB::table('category_writing')
+                ->select('writing_id')
+                ->whereIn('category_id', $this->descendantsAndSelf()->select('id')),
+        );
     }
 }

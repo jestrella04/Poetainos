@@ -3,7 +3,7 @@ import { usePage } from '@inertiajs/vue3'
 import { unreadCountKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useFormatting } from '@/composables/useFormatting'
+import { useDates } from '@/composables/useDates'
 import { useNotificationMessage } from '@/composables/useNotificationMessage'
 import { useInfiniteList } from '@/composables/useInfiniteList'
 import { useSwipeTabs } from '@/composables/useSwipeTabs'
@@ -12,7 +12,7 @@ import type { AppNotification } from '@/types/models'
 
 const page = usePage<InertiaPageProps<{ tab: string }>>()
 const { isEmpty } = useTypeGuards()
-const { relativeDate } = useFormatting()
+const { relativeDate } = useDates()
 const { notificationMessage } = useNotificationMessage()
 const unreadCount = injectStrict(unreadCountKey)
 

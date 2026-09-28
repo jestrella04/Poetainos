@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import type { UserLike } from '@/types/models'
 
 const props = defineProps<{
@@ -9,14 +9,14 @@ const props = defineProps<{
 }>()
 
 const { isBlank } = useTypeGuards()
-const { storage, userDisplayName, userInitials } = useFormatting()
+const { userDisplayName, userInitials } = useUserDisplay()
 
-const avatar = computed(() => props.user.avatar?.trim() ?? '')
+const avatarUrl = computed(() => props.user.avatar_url ?? '')
 </script>
 
 <template>
   <v-avatar>
-    <v-img v-if="!isBlank(avatar)" :src="storage(avatar)" :alt="userDisplayName(user)" />
+    <v-img v-if="!isBlank(avatarUrl)" :src="avatarUrl" :alt="userDisplayName(user)" />
     <span v-else>{{ userInitials(user) }}</span>
   </v-avatar>
 </template>

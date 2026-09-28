@@ -20,7 +20,7 @@ import { useAuth } from '../useAuth'
 const { isAuthenticated, canEdit } = useAuth()
 
 function signInAs(username: string, isAdmin = false): void {
-  page.props.auth.user = { id: 1, username, name: username, avatar: null }
+  page.props.auth.user = { id: 1, username, name: username, avatar_url: null }
   page.props.auth.admin = isAdmin
 }
 

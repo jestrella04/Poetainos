@@ -10,7 +10,7 @@ export interface UserLike {
   id?: number
   username: string
   name?: string | null
-  avatar?: string | null
+  avatar_url?: string | null
   karma?: 'A' | 'B' | 'C' | 'D' | 'F' | null
   writings_count?: number
 }
@@ -96,7 +96,7 @@ export interface Writing {
   views: number
   aura: string
   home_posted_at?: string | null
-  cover?: string | null
+  cover_url?: string | null
   link?: string | null
   author: UserLike
   categories?: CategoryLike[]

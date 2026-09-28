@@ -20,6 +20,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersNotificationsController;
 use App\Http\Controllers\WritingsController;
 use App\Http\Middleware\RecordAdminActions;
+use Illuminate\Routing\RedirectController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,17 +49,18 @@ Route::middleware(['auth', 'admin', RecordAdminActions::class])->prefix('admin')
     Route::get('activity', [AdminController::class, 'activity'])->name('activity');
     Route::get('analytics', [AdminController::class, 'analytics'])->name('analytics');
 
-    Route::put('settings/edit', [SettingsController::class, 'update'])->name('settings.edit');
+    Route::put('settings', [SettingsController::class, 'update'])->name('settings.edit');
     Route::post('categories', [CategoriesController::class, 'store'])->name('categories.store');
     Route::put('categories/{category}', [CategoriesController::class, 'update'])->name('categories.update');
     Route::post('pages', [PagesController::class, 'store'])->name('pages.store');
     Route::put('pages/{page}', [PagesController::class, 'update'])->name('pages.update');
+    Route::put('complaints/{complaint}/close', [ComplaintsController::class, 'close'])->name('complaints.close');
 
-    Route::delete('categories/delete/{category}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
-    Route::delete('tags/delete/{tag}', [TagsController::class, 'destroy'])->name('tags.destroy');
-    Route::delete('pages/delete/{page}', [PagesController::class, 'destroy'])->name('pages.destroy');
-    Route::delete('users/delete/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
-    Route::delete('writings/delete/{writing}', [WritingsController::class, 'destroy'])->name('writings.destroy');
+    Route::delete('categories/{category}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
+    Route::delete('tags/{tag}', [TagsController::class, 'destroy'])->name('tags.destroy');
+    Route::delete('pages/{page}', [PagesController::class, 'destroy'])->name('pages.destroy');
+    Route::delete('users/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
+    Route::delete('writings/{writing}', [WritingsController::class, 'destroy'])->name('writings.destroy');
     Route::delete('logs/{file}', [AdminController::class, 'clearLog'])->where('file', '[\w.\-]+\.log')->name('logs.clear');
 });
 
@@ -66,15 +68,15 @@ Route::middleware(['auth', 'admin', RecordAdminActions::class])->prefix('admin')
 Route::middleware(['auth', 'verified'])->group(function (): void {
     // Writings
     Route::get('/writings/create', [WritingsController::class, 'create'])->name('writings.create');
-    Route::post('/writings/create', [WritingsController::class, 'store'])->name('writings.store');
+    Route::post('/writings', [WritingsController::class, 'store'])->name('writings.store');
     Route::get('/writings/edit/{writing}', [WritingsController::class, 'edit'])->name('writings.edit');
-    Route::put('/writings/edit/{writing}', [WritingsController::class, 'update'])->name('writings.update');
-    Route::delete('/writings/delete/{writing}', [WritingsController::class, 'destroy'])->name('writings.destroy');
+    Route::put('/writings/{writing}', [WritingsController::class, 'update'])->name('writings.update');
+    Route::delete('/writings/{writing}', [WritingsController::class, 'destroy'])->name('writings.destroy');
 
     // Users
     Route::get('/users/edit/{user}', [UsersController::class, 'edit'])->name('users.edit');
-    Route::put('/users/edit/{user}', [UsersController::class, 'update'])->name('users.update');
-    Route::delete('/users/delete/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
+    Route::put('/users/{user}', [UsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UsersController::class, 'destroy'])->middleware('password.confirm')->name('users.destroy');
     Route::get('/users/query', [UsersController::class, 'suggest'])->name('users.query');
     Route::post('/users/block/{user}', [BlockedUsersController::class, 'store'])->name('users.block');
     Route::delete('/users/block/{user}', [BlockedUsersController::class, 'destroy'])->name('users.unblock');
@@ -85,8 +87,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('/account/email/pending', [PendingEmailController::class, 'destroy'])->name('users.email.cancel');
 
     // Comments
-    Route::post('/comments/create', [CommentsController::class, 'store'])->middleware('throttle:20,1')->name('comments.store');
-    Route::delete('/comments/delete/{comment}', [CommentsController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/comments', [CommentsController::class, 'store'])->middleware('throttle:20,1')->name('comments.store');
+    Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])->name('comments.destroy');
 
     // Likes
     Route::post('/likes/{likeable}/{likeableId}/toggle', [LikesController::class, 'toggle'])->middleware('throttle:60,1')->name('likes.toggle');
@@ -98,11 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/notifications', [UsersNotificationsController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/show/{notification}', [UsersNotificationsController::class, 'show'])->name('notifications.show');
     Route::post('/notifications/clear/read', [UsersNotificationsController::class, 'clear'])->name('notifications.clear');
-    Route::post('/notifications/email/{enable}', [UsersNotificationsController::class, 'setEmailPreference'])->name('notifications.email');
+    Route::put('/notifications/email', [UsersNotificationsController::class, 'setEmailPreference'])->name('notifications.email');
 
     // Push Subscriptions
     Route::post('subscriptions', [PushNotificationsController::class, 'update'])->name('push.update');
-    Route::post('subscriptions/delete', [PushNotificationsController::class, 'destroy'])->name('push.delete');
+    Route::delete('subscriptions', [PushNotificationsController::class, 'destroy'])->name('push.delete');
 });
 
 /* Public routes */
@@ -145,9 +147,10 @@ Route::post('/contact', [ContactsController::class, 'store'])->middleware('throt
 
 // Complaints
 Route::get('/complaints/reasons', [ComplaintsController::class, 'reasons'])->name('complaints.reasons');
-Route::post('/complaints/store', [ComplaintsController::class, 'store'])->middleware('throttle:complaints')->name('complaints.store');
+Route::post('/complaints', [ComplaintsController::class, 'store'])->middleware('throttle:complaints')->name('complaints.store');
 
 // Redirects, keep on the bottom
 Route::redirect('/socialite', '/login', 301);
 Route::redirect('/home', '/', 301);
-Route::redirect('/writings', '/', 301);
+// GET only: Route::redirect() answers every method, which would take POST /writings from writings.store
+Route::get('/writings', RedirectController::class)->defaults('destination', '/')->defaults('status', 301);

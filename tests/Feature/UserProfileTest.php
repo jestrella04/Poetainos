@@ -23,7 +23,7 @@ describe('viewing and updating a profile', function (): void {
 
         // When
         $viewResponse = actingAs($user)->get('/users/edit/'.$user->username);
-        $updateResponse = actingAs($user)->put('/users/edit/'.$user->username, [
+        $updateResponse = actingAs($user)->put('/users/'.$user->username, [
             'name' => $name,
             'email' => $user->email,
             'bio' => $bio,
@@ -44,7 +44,7 @@ describe('viewing and updating a profile', function (): void {
         $newEmail = fake()->unique()->safeEmail();
 
         // When
-        $response = actingAs(actingAsAdmin())->put('/users/edit/'.$user->username, [
+        $response = actingAs(actingAsAdmin())->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $newEmail,
         ]);
@@ -62,7 +62,7 @@ describe('viewing and updating a profile', function (): void {
         $user = createUser(['email_verified_at' => now()]);
 
         // When
-        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+        $response = actingAs($user)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
         ]);
@@ -79,7 +79,7 @@ describe('viewing and updating a profile', function (): void {
 
         // When
         $viewResponse = actingAs($other)->get('/users/edit/'.$user->username);
-        $updateResponse = actingAs($other)->put('/users/edit/'.$user->username, [
+        $updateResponse = actingAs($other)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
         ]);
@@ -97,7 +97,7 @@ describe('viewing and updating a profile', function (): void {
 
         // When
         $viewResponse = actingAs($admin)->get('/users/edit/'.$user->username);
-        $updateResponse = actingAs($admin)->put('/users/edit/'.$user->username, [
+        $updateResponse = actingAs($admin)->put('/users/'.$user->username, [
             'name' => $name,
             'email' => $user->email,
         ]);
@@ -116,7 +116,7 @@ describe('changing a user\'s role', function (): void {
         $user = createUser();
 
         // When
-        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+        $response = actingAs($user)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
             'role' => $adminRole->id,
@@ -134,7 +134,7 @@ describe('changing a user\'s role', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->put('/users/edit/'.$user->username, [
+        $response = actingAs($admin)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
             'role' => $adminRole->id,
@@ -147,18 +147,34 @@ describe('changing a user\'s role', function (): void {
 });
 
 describe('deleting an account', function (): void {
-    it('allows an admin to delete a different user without confirming a password and stay logged in', function (): void {
+    it('allows an admin who confirmed their password to delete a different user from the admin table and stay logged in', function (): void {
         // Given
         $user = createUser();
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->delete('/admin/users/delete/'.$user->username);
+        $response = actingAs($admin)
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->from(route('admin.users'))
+            ->delete('/admin/users/'.$user->username);
 
         // Then
-        $response->assertRedirect(route('home'))->assertInertiaFlash('message', 'users.user-deleted');
+        $response->assertRedirect(route('admin.users'))->assertInertiaFlash('message', 'users.user-deleted');
         expect(User::find($user->id))->toBeNull();
         assertAuthenticatedAs($admin);
+    });
+
+    it('keeps the user when the admin has not confirmed their password', function (): void {
+        // Given
+        $user = createUser();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->deleteJson('/admin/users/'.$user->username);
+
+        // Then
+        $response->assertStatus(423);
+        expect(User::find($user->id))->not->toBeNull();
     });
 
     it('deletes the account, logs the user out and clears their avatar once they confirm their password', function (): void {
@@ -172,7 +188,7 @@ describe('deleting an account', function (): void {
         // When
         $response = actingAs($user)
             ->withSession(['auth.password_confirmed_at' => time()])
-            ->delete('/users/delete/'.$user->username);
+            ->delete('/users/'.$user->username);
 
         // Then
         $response->assertRedirect(route('home'));
@@ -242,7 +258,7 @@ describe('what a profile update keeps and rejects', function (): void {
         SocialAccount::factory()->for($user)->create(['provider' => 'google']);
 
         // When
-        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+        $response = actingAs($user)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
             'bio' => $newBio,
@@ -264,7 +280,7 @@ describe('what a profile update keeps and rejects', function (): void {
         $user->acceptAgreements();
 
         // When
-        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+        $response = actingAs($user)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
             'service_agreement' => 'false',
@@ -280,7 +296,7 @@ describe('what a profile update keeps and rejects', function (): void {
         $user = createUser();
 
         // When
-        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+        $response = actingAs($user)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
             'service_agreement' => 'false',
@@ -297,7 +313,7 @@ describe('what a profile update keeps and rejects', function (): void {
         $admin = actingAsAdmin();
 
         // When
-        $response = actingAs($admin)->put('/users/edit/'.$user->username, [
+        $response = actingAs($admin)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
             'service_agreement' => 'on',
@@ -315,7 +331,7 @@ describe('what a profile update keeps and rejects', function (): void {
         $user = createUser();
 
         // When
-        $response = actingAs($user)->putJson('/users/edit/'.$user->username, [
+        $response = actingAs($user)->putJson('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $taken->email,
         ]);
@@ -329,7 +345,7 @@ describe('what a profile update keeps and rejects', function (): void {
         $user = createUser();
 
         // When
-        $response = actingAs($user)->putJson('/users/edit/'.$user->username, [
+        $response = actingAs($user)->putJson('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
         ]);
@@ -366,7 +382,7 @@ describe('a profile avatar', function (): void {
         UserProfile::factory()->for($user)->create(['avatar' => $oldAvatar, 'bio' => fake()->sentence()]);
 
         // When
-        $response = actingAs($user)->post('/users/edit/'.$user->username, [
+        $response = actingAs($user)->post('/users/'.$user->username, [
             '_method' => 'PUT',
             'name' => fake()->name(),
             'email' => $user->email,
@@ -382,12 +398,34 @@ describe('a profile avatar', function (): void {
         expect(storedImageWidth($avatar))->toBe(512);
     });
 
+    it('is discarded, keeping the previous one, when the profile cannot be saved', function (): void {
+        // Given
+        $oldAvatar = 'avatars/'.fake()->uuid().'.png';
+        Storage::disk('local')->put($oldAvatar, fake()->sentence());
+        $user = createUser();
+        UserProfile::factory()->for($user)->create(['avatar' => $oldAvatar]);
+        User::saving(fn (): never => throw new RuntimeException('The user could not be saved.'));
+
+        // When
+        $response = actingAs($user)->post('/users/'.$user->username, [
+            '_method' => 'PUT',
+            'name' => fake()->name(),
+            'email' => $user->email,
+            'avatar' => UploadedFile::fake()->image(fake()->word().'.png', 32, 32),
+        ]);
+
+        // Then
+        $response->assertServerError();
+        expect($user->refresh()->profile->avatar)->toBe($oldAvatar);
+        expect(Storage::disk('local')->allFiles('avatars'))->toBe([$oldAvatar]);
+    });
+
     it('is refused when it is too large to decode safely', function (): void {
         // Given
         $user = createUser();
 
         // When
-        $response = actingAs($user)->postJson('/users/edit/'.$user->username, [
+        $response = actingAs($user)->postJson('/users/'.$user->username, [
             '_method' => 'PUT',
             'name' => fake()->name(),
             'email' => $user->email,
@@ -407,10 +445,10 @@ describe('a profile avatar', function (): void {
         UserProfile::factory()->for($user)->create(['avatar' => $oldAvatar]);
 
         // When
-        $response = actingAs($user)->put('/users/edit/'.$user->username, [
+        $response = actingAs($user)->put('/users/'.$user->username, [
             'name' => fake()->name(),
             'email' => $user->email,
-            'avatar-remove' => 1,
+            'avatar_remove' => 1,
         ]);
 
         // Then
@@ -438,9 +476,21 @@ describe('the email notification preference', function (): void {
         $user = createUser();
 
         // When
-        actingAs($user)->post(route('notifications.email', ['false']))->assertNoContent();
+        actingAs($user)->put(route('notifications.email'), ['enabled' => false])->assertNoContent();
 
         // Then
         expect($user->refresh()->wantsEmailNotifications())->toBeFalse();
+    });
+
+    it('requires a choice', function (): void {
+        // Given
+        $user = createUser();
+
+        // When
+        $response = actingAs($user)->putJson(route('notifications.email'));
+
+        // Then
+        $response->assertUnprocessable()->assertJsonValidationErrors('enabled');
+        expect($user->refresh()->wantsEmailNotifications())->toBeTrue();
     });
 });

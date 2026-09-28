@@ -12,7 +12,7 @@ use App\Http\Controllers\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
-    Route::whereIn('service', ['google'])->group(function (): void {
+    Route::whereIn('service', SocialAuthController::PROVIDERS)->group(function (): void {
         Route::get('/login/{service}', [SocialAuthController::class, 'redirectToProvider'])->name('social.login');
         Route::get('/login/{service}/callback', [SocialAuthController::class, 'handleProviderCallback']);
 

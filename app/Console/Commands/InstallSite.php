@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
@@ -101,20 +102,18 @@ class InstallSite extends Command
 
     private function createMasterRole(): Role
     {
-        $permissions = json_decode((string) file_get_contents(base_path('resources/json/roles_permissions.json')));
-        $extraInfo = ['permissions' => []];
+        $known = json_decode((string) file_get_contents(resource_path('json/roles_permissions.json')), true);
+        $permissionNames = array_filter(is_array($known) && is_array($known['permissions'] ?? null) ? $known['permissions'] : [], is_string(...));
 
-        foreach ($permissions->permissions as $permission) {
-            $extraInfo['permissions'][] = [
-                'name' => $permission,
-                'enabled' => true,
-            ];
-        }
-
-        return Role::create([
+        $role = Role::create([
             'name' => 'master',
             'description' => 'Master role with all privileges enabled by default',
-            'extra_info' => $extraInfo,
         ]);
+
+        $role->permissions()->sync(
+            array_map(fn (string $name): int => Permission::firstOrCreate(['name' => $name])->id, $permissionNames)
+        );
+
+        return $role;
     }
 }

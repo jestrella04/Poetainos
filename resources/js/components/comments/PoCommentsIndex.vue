@@ -6,14 +6,18 @@ import { loadingCommentsKey, loginModalKey, replyBoxKey, writingKey } from '@/co
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useFormatting } from '@/composables/useFormatting'
+import { useDates } from '@/composables/useDates'
+import { useRichText } from '@/composables/useRichText'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { usePaginatedList } from '@/composables/usePaginatedList'
 import { mentionedUsernames } from '@/composables/validationRules'
 import type { Comment } from '@/types/models'
 
 const { isAuthenticated } = useAuth()
 const { isEmpty, isBlank } = useTypeGuards()
-const { userDisplayName, toLocaleDate, linkify } = useFormatting()
+const { toLocaleDate } = useDates()
+const { linkify } = useRichText()
+const { userDisplayName } = useUserDisplay()
 const { items: comments, nextPageUrl, loadFirstPage, loadMore } = usePaginatedList<Comment>()
 const hasLoadError = ref(false)
 const loadingComments = injectStrict(loadingCommentsKey)

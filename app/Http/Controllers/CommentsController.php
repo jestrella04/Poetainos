@@ -47,7 +47,7 @@ class CommentsController extends Controller
     {
         $request->validate([
             'comment' => 'required|string|max:300',
-            'writing_id' => 'required|exists:writings,id',
+            'writing_id' => 'required|integer',
         ]);
 
         $user = $this->requireAuthUser();

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { useForm, useHttp, usePage } from '@inertiajs/vue3'
 import PoLayoutLogin from '../layouts/PoLayoutLogin.vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
@@ -12,25 +12,34 @@ defineOptions({
   layout: PoLayoutLogin
 })
 
-type LoginStep = 'guest' | 'checking' | 'login' | 'register'
+type LoginStep = 'guest' | 'email' | 'login' | 'register'
 
 const RESET_DELAY_MS = 500
 
-const socialProviders = [
-  { name: 'google', icon: 'fab fa-google', label: 'accounts.continue-with-google' }
-]
-
 // The address a password was just reset for, when arriving from the reset form
-const page = usePage<InertiaPageProps<{ email?: string | null }>>()
+const page = usePage<
+  InertiaPageProps<{
+    email?: string | null
+    startsWithEmail: boolean
+    isAfterPasswordReset: boolean
+  }>
+>()
+// The providers come from SocialAuthController::PROVIDERS
+const socialProviders = page.props.site.authProviders.map((name) => ({
+  name,
+  icon: `fab fa-${name}`,
+  label: `accounts.continue-with-${name}`
+}))
 const { isBlank } = useTypeGuards()
 const { isSubmittedFormValid } = useFormValidation()
 const { onHttpException, onNetworkError, whenSettled } = useRequestFailure()
-const step = ref<LoginStep>('guest')
-const arrivedFromPasswordReset = ref(false)
+const resetEmail = page.props.email ?? ''
+const step = ref<LoginStep>(initialStep())
+const arrivedFromPasswordReset = page.props.isAfterPasswordReset
 const resetEmailSent = ref(false)
 
 const form = useForm({
-  email: '',
+  email: step.value === 'login' ? resetEmail : '',
   username: '',
   password: '',
   password_confirmation: '',
@@ -50,24 +59,14 @@ const passwordError = computed(() =>
   step.value === 'login' ? (form.errors.email ?? form.errors.password) : form.errors.password
 )
 
-onMounted(() => {
-  const params = new URLSearchParams(window.location.search)
-
-  if (params.get('isEmail') === '1') {
-    step.value = 'checking'
-
-    const email = page.props.email ?? null
-
-    if (email !== null && !isBlank(email)) {
-      form.email = email
-      step.value = 'login'
-    }
+// Arriving from the password reset form goes straight to signing in with that address
+function initialStep(): LoginStep {
+  if (page.props.startsWithEmail === false) {
+    return 'guest'
   }
 
-  if (params.get('isReset') === '1') {
-    arrivedFromPasswordReset.value = true
-  }
-})
+  return isBlank(resetEmail) ? 'email' : 'login'
+}
 
 function resetForm(): void {
   setTimeout(() => {
@@ -98,7 +97,7 @@ function submitForm(event: Event): void {
   }
 
   switch (step.value) {
-    case 'checking':
+    case 'email':
       void checkEmail()
       break
 
@@ -151,7 +150,7 @@ function resetPassword(): void {
           :error-messages="emailError"
           :readonly="step === 'login' || step === 'register'"
           persistent-placeholder
-          :clearable="step === 'checking'"
+          :clearable="step === 'email'"
           required
           hide-details="auto"
         />
@@ -280,7 +279,7 @@ function resetPassword(): void {
             block
             color="primary"
             prepend-icon="fas fa-at"
-            @click.prevent="step = 'checking'"
+            @click.prevent="step = 'email'"
           >
             {{ $t('accounts.continue-with-email') }}
           </po-button>

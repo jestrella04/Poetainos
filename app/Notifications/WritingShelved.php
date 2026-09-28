@@ -13,6 +13,16 @@ class WritingShelved extends PoetainosNotification implements ShouldQueue
 
     public function __construct(protected Writing $writing, protected User $user) {}
 
+    protected function content(mixed $notifiable): NotificationContent
+    {
+        return $this->actorContent(
+            $this->user,
+            __(':name has added your writing to his shelf', ['name' => $this->user->getName()]),
+            $this->writing->path(),
+            __('View writing'),
+        );
+    }
+
     /**
      * Get the notification's delivery channels.
      *

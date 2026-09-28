@@ -6,6 +6,7 @@ use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Illuminate\Support\Facades\Notification;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -28,7 +29,7 @@ describe('submitting a complaint', function (): void {
         $subject = $makeSubject();
 
         // When
-        $response = postJson('/complaints/store', [
+        $response = postJson('/complaints', [
             'complainable_type' => $type,
             'complainable_id' => $subject->id,
             'reasons' => ['spam'],
@@ -54,10 +55,10 @@ describe('submitting a complaint', function (): void {
         $complaint = ['complainable_type' => 'writings', 'complainable_id' => $writing->id, 'reasons' => ['spam']];
 
         // When
-        postJson('/complaints/store', $complaint)->assertNoContent();
-        postJson('/complaints/store', $complaint)->assertNoContent();
+        postJson('/complaints', $complaint)->assertNoContent();
+        postJson('/complaints', $complaint)->assertNoContent();
         travel(61)->minutes();
-        postJson('/complaints/store', $complaint)->assertNoContent();
+        postJson('/complaints', $complaint)->assertNoContent();
 
         // Then
         expect(Complaint::count())->toBe(3);
@@ -70,13 +71,13 @@ describe('submitting a complaint', function (): void {
         $complaint = ['complainable_type' => 'writings', 'complainable_id' => $writing->id, 'reasons' => ['spam']];
         foreach (range(1, 3) as $window) {
             foreach (range(1, 10) as $attempt) {
-                postJson('/complaints/store', $complaint);
+                postJson('/complaints', $complaint);
             }
             travel(1)->minutes();
         }
 
         // When
-        $response = postJson('/complaints/store', $complaint);
+        $response = postJson('/complaints', $complaint);
 
         // Then
         $response->assertTooManyRequests();
@@ -87,7 +88,7 @@ describe('submitting a complaint', function (): void {
         $writing = Writing::factory()->create();
 
         // When
-        $response = postJson('/complaints/store', [
+        $response = postJson('/complaints', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
             'reasons' => [],
@@ -99,7 +100,7 @@ describe('submitting a complaint', function (): void {
 
     it('404s instead of crashing for a nonexistent subject', function (): void {
         // When
-        $response = postJson('/complaints/store', [
+        $response = postJson('/complaints', [
             'complainable_type' => 'writings',
             'complainable_id' => fake()->numberBetween(100000, 999999),
             'reasons' => ['spam'],
@@ -116,7 +117,7 @@ describe('validating a complaint', function (): void {
         $writing = Writing::factory()->create();
 
         // When
-        $response = postJson('/complaints/store', [
+        $response = postJson('/complaints', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
             'reasons' => [fake()->lexify('reason-????')],
@@ -134,7 +135,7 @@ describe('validating a complaint', function (): void {
         $writing = Writing::factory()->create();
 
         // When
-        $response = postJson('/complaints/store', [
+        $response = postJson('/complaints', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
             'reasons' => [$reasons[0]],
@@ -149,7 +150,7 @@ describe('validating a complaint', function (): void {
         $writing = Writing::factory()->create();
 
         // When
-        $response = postJson('/complaints/store', [
+        $response = postJson('/complaints', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
             'reasons' => array_fill(0, 11, 'spam'),
@@ -166,7 +167,7 @@ describe('validating a complaint', function (): void {
         $comment = fake()->sentence();
 
         // When
-        postJson('/complaints/store', [
+        postJson('/complaints', [
             'complainable_type' => 'writings',
             'complainable_id' => $writing->id,
             'reasons' => ['spam'],
@@ -175,5 +176,37 @@ describe('validating a complaint', function (): void {
 
         // Then
         assertDatabaseHas('complaints', ['comment' => $comment]);
+    });
+});
+
+describe('closing a complaint', function (): void {
+    it('lets an admin close a complaint with a note and return to the table', function (): void {
+        // Given
+        $complaint = Complaint::factory()->for(Writing::factory(), 'complainable')->create();
+        $note = fake()->sentence();
+        $admin = actingAsAdmin();
+
+        // When
+        $response = actingAs($admin)->from(route('admin.complaints'))->put(route('admin.complaints.close', $complaint), [
+            'closed_comment' => $note,
+        ]);
+
+        // Then
+        $response->assertRedirect(route('admin.complaints'))->assertInertiaFlash('message', 'complaints.complaint-closed');
+        $complaint->refresh();
+        expect($complaint->closed_at)->not->toBeNull();
+        expect($complaint->closed_comment)->toBe($note);
+    });
+
+    it('is forbidden for non-admins', function (): void {
+        // Given
+        $complaint = Complaint::factory()->for(Writing::factory(), 'complainable')->create();
+
+        // When
+        $response = actingAs(createUser())->putJson(route('admin.complaints.close', $complaint));
+
+        // Then
+        $response->assertForbidden();
+        expect($complaint->refresh()->closed_at)->toBeNull();
     });
 });

@@ -2,7 +2,8 @@
 import { usePage } from '@inertiajs/vue3'
 import PoWritingsEntry from './PoWritingsEntry.vue'
 import { useTypeGuards } from '@/composables/useTypeGuards'
-import { useFormatting } from '@/composables/useFormatting'
+import { useDates } from '@/composables/useDates'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { UserLike, Writing } from '@/types/models'
 
@@ -17,7 +18,8 @@ interface WritingsShowProps {
 }
 
 const { isEmpty } = useTypeGuards()
-const { userDisplayName, relativeDate } = useFormatting()
+const { relativeDate } = useDates()
+const { userDisplayName } = useUserDisplay()
 const page = usePage<InertiaPageProps<WritingsShowProps>>()
 </script>
 

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Tag;
 use App\Models\Writing;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
+use Inertia\Inertia;
 use Inertia\Response;
 
 class TagsController extends Controller
@@ -17,6 +19,8 @@ class TagsController extends Controller
      */
     public function search(): Collection
     {
+        request()->validate(['query' => 'required|string|min:2|max:50']);
+
         $wildcard = '%'.escapeLike((string) request('query')).'%';
 
         return Tag::where('name', 'like', $wildcard)
@@ -43,16 +47,14 @@ class TagsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @return array<string, string>
+     * Remove the specified resource from storage, then return to the admin table.
      */
-    public function destroy(Tag $tag): array
+    public function destroy(Tag $tag): RedirectResponse
     {
         $tag->delete();
 
-        return [
-            'message' => __('Tag deleted successfully'),
-        ];
+        Inertia::flash(['message' => 'tags.tag-deleted', 'color' => 'success']);
+
+        return back();
     }
 }

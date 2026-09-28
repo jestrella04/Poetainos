@@ -11,6 +11,7 @@
 |
 */
 
+use App\Models\Page;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
@@ -296,4 +297,20 @@ function pendingArtisan(string $command, array $parameters = []): PendingCommand
     }
 
     throw new LogicException('Console output must be mocked to assert on artisan commands.');
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createPage(array $attributes = []): Page
+{
+    $title = fakeTitle();
+    $page = new Page;
+    $page->forceFill(array_merge([
+        'title' => $title,
+        'slug' => Str::slug($title),
+        'text' => fakeText(100),
+    ], $attributes))->save();
+
+    return $page;
 }

@@ -11,12 +11,14 @@ class WritingCommentMentioned extends PoetainosNotification implements ShouldQue
 {
     use Queueable;
 
-    public function __construct(protected Comment $comment, protected User $user)
+    public function __construct(protected Comment $comment, protected User $user) {}
+
+    protected function content(mixed $notifiable): NotificationContent
     {
-        $this->content = $this->actorContent(
+        return $this->actorContent(
             $this->user,
             __('We knew it from the very beginning: you are such a magnetic person. :name just mentioned you in a comment at :site.', $this->actorPlaceholders($this->user)),
-            route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id,
+            $this->commentUrl(),
             __('View comment'),
         );
     }
@@ -43,7 +45,15 @@ class WritingCommentMentioned extends PoetainosNotification implements ShouldQue
         return [
             'writing_id' => $this->comment->writing?->id,
             'user_id' => $this->user->id,
-            'url' => $this->content['url'],
+            'url' => $this->commentUrl(),
         ];
+    }
+
+    /**
+     * Where the comment shows, on its writing's page.
+     */
+    private function commentUrl(): string
+    {
+        return route('writings.show', $this->comment->writing).'#comment-'.$this->comment->id;
     }
 }

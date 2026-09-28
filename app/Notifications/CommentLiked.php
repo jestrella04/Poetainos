@@ -11,9 +11,11 @@ class CommentLiked extends PoetainosNotification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(protected Comment $comment, protected User $user)
+    public function __construct(protected Comment $comment, protected User $user) {}
+
+    protected function content(mixed $notifiable): NotificationContent
     {
-        $this->content = $this->actorContent(
+        return $this->actorContent(
             $this->user,
             __('Isn\'t it amazing, :name likes your comment at :site.', $this->actorPlaceholders($this->user)),
             $this->comment->writing?->path() ?? url('/'),

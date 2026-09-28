@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Comment;
+use App\Models\Complaint;
 use App\Models\Like;
 use App\Models\User;
 use App\Models\Writing;
@@ -10,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Deletes a writing, comment or user together with everything that refers to
- * it and the database can't cascade to: polymorphic likes, notifications and
- * stored images. Database rows go all or nothing; image files are removed
+ * it and the database can't cascade to: polymorphic likes and complaints,
+ * notifications and stored images. Database rows go all or nothing; image files are removed
  * once the rows are gone, so a rollback never leaves a record without its image.
  */
 class ContentDeleter
@@ -61,6 +62,7 @@ class ContentDeleter
             $user->notifications()->delete();
             DB::table('notifications')->where('data->user_id', $user->id)->delete();
             $user->givenLikes()->delete();
+            Complaint::where('complainable_type', User::class)->where('complainable_id', $user->id)->delete();
             $this->deleteTraces($writings->modelKeys(), $commentIds);
         });
 
@@ -68,16 +70,19 @@ class ContentDeleter
     }
 
     /**
-     * Remove the likes and notifications left pointing at content that no
-     * longer exists, as deletions made before this cleanup existed left them.
+     * Remove the likes, complaints and notifications left pointing at content
+     * that no longer exists, as deletions made before this cleanup existed left them.
      *
-     * @return array{likes: int, notifications: int}
+     * @return array{likes: int, complaints: int, notifications: int}
      */
     public function deleteOrphans(): array
     {
         return DB::transaction(fn (): array => [
             'likes' => $this->deleteOrphanedLikes(Writing::class, 'writings')
                 + $this->deleteOrphanedLikes(Comment::class, 'comments'),
+            'complaints' => $this->deleteOrphanedComplaints(Writing::class, 'writings')
+                + $this->deleteOrphanedComplaints(Comment::class, 'comments')
+                + $this->deleteOrphanedComplaints(User::class, 'users'),
             'notifications' => $this->deleteOrphanedNotifications('writing_id', 'writings')
                 + $this->deleteOrphanedNotifications('comment_id', 'comments')
                 + $this->deleteOrphanedNotifications('user_id', 'users'),
@@ -85,16 +90,18 @@ class ContentDeleter
     }
 
     /**
-     * Delete the likes of, and the notifications about, the given writings and comments.
+     * Delete the likes of, the complaints about and the notifications about
+     * the given writings and comments.
      *
      * @param  array<int, int>  $writingIds
      * @param  array<int, int>  $commentIds
      */
     private function deleteTraces(array $writingIds, array $commentIds): void
     {
-        foreach ([Writing::class => $writingIds, Comment::class => $commentIds] as $likeableType => $likeableIds) {
-            if ($likeableIds !== []) {
-                Like::where('likeable_type', $likeableType)->whereIn('likeable_id', $likeableIds)->delete();
+        foreach ([Writing::class => $writingIds, Comment::class => $commentIds] as $contentType => $contentIds) {
+            if ($contentIds !== []) {
+                Like::where('likeable_type', $contentType)->whereIn('likeable_id', $contentIds)->delete();
+                Complaint::where('complainable_type', $contentType)->whereIn('complainable_id', $contentIds)->delete();
             }
         }
 
@@ -112,6 +119,16 @@ class ContentDeleter
     {
         return Like::where('likeable_type', $likeableType)
             ->whereNotIn('likeable_id', DB::table($table)->select('id'))
+            ->delete();
+    }
+
+    /**
+     * @param  class-string  $complainableType
+     */
+    private function deleteOrphanedComplaints(string $complainableType, string $table): int
+    {
+        return Complaint::where('complainable_type', $complainableType)
+            ->whereNotIn('complainable_id', DB::table($table)->select('id'))
             ->delete();
     }
 

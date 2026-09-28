@@ -35,14 +35,11 @@ class ActivityFeed
     public function page(int $perPage): Paginator
     {
         $currentPage = Paginator::resolveCurrentPage();
+        $offset = ($currentPage - 1) * $perPage;
 
         // One row past the page tells the paginator whether another page follows
-        $rows = DB::query()
-            ->fromSub($this->activity(), 'activity')
-            ->orderByDesc('created_at')
-            ->orderBy('kind')
-            ->orderByDesc('subject_id')
-            ->offset(($currentPage - 1) * $perPage)
+        $rows = $this->newestFirst(DB::query()->fromSub($this->activity($offset + $perPage + 1), 'activity'))
+            ->offset($offset)
             ->limit($perPage + 1)
             ->get();
 
@@ -68,20 +65,54 @@ class ActivityFeed
             ->withQueryString();
     }
 
+    /**
+     * Every source counted on its own, which its indexes answer, instead of counting the union.
+     */
     public function count(): int
     {
-        return DB::query()->fromSub($this->activity(), 'activity')->count();
+        return array_sum(array_map(fn (Builder $source): int => $source->count(), $this->sources()));
     }
 
-    private function activity(): Builder
+    /**
+     * The newest `$limit` rows of every source, unioned: no page up to the
+     * one being read can hold a row that isn't among its source's newest,
+     * so the union never reads a source in full.
+     */
+    private function activity(int $limit): Builder
     {
-        return $this->signUps()
-            ->unionAll($this->writings())
-            ->unionAll($this->comments())
-            ->unionAll($this->likes())
-            ->unionAll($this->bookmarks())
-            ->unionAll($this->writingsOfTheDay())
-            ->unionAll($this->complaints());
+        $sources = array_map(fn (Builder $source): Builder => $this->newestFirst($source)->limit($limit), $this->sources());
+
+        return array_reduce(
+            array_slice($sources, 1),
+            fn (Builder $union, Builder $source): Builder => $union->unionAll($source),
+            $sources[0],
+        );
+    }
+
+    /**
+     * The feed's order, by the columns every source selects under the same
+     * names. A source joining another table aliases its `created_at`, so the
+     * order reads the selected column rather than an ambiguous one.
+     */
+    private function newestFirst(Builder $query): Builder
+    {
+        return $query->orderByDesc('created_at')->orderBy('kind')->orderByDesc('subject_id');
+    }
+
+    /**
+     * @return list<Builder>
+     */
+    private function sources(): array
+    {
+        return [
+            $this->signUps(),
+            $this->writings(),
+            $this->comments(),
+            $this->likes(),
+            $this->bookmarks(),
+            $this->writingsOfTheDay(),
+            $this->complaints(),
+        ];
     }
 
     private function signUps(): Builder
@@ -117,7 +148,7 @@ class ActivityFeed
             })
             ->selectRaw(
                 'case when likes.likeable_type = ? then ? else ? end as kind, likes.id as subject_id, likes.user_id, '
-                .'case when likes.likeable_type = ? then likes.likeable_id else comments.writing_id end as writing_id, likes.created_at',
+                .'case when likes.likeable_type = ? then likes.likeable_id else comments.writing_id end as writing_id, likes.created_at as created_at',
                 [(new Writing)->getMorphClass(), 'liked_writing', 'liked_comment', (new Writing)->getMorphClass()],
             )
             ->whereNotNull('likes.created_at');
@@ -156,7 +187,7 @@ class ActivityFeed
                 'case complaints.complainable_type when ? then ? when ? then ? else ? end as kind, complaints.id as subject_id, '
                 .'case when complaints.complainable_type = ? then complaints.complainable_id end as user_id, '
                 .'case when complaints.complainable_type = ? then complaints.complainable_id else comments.writing_id end as writing_id, '
-                .'complaints.created_at',
+                .'complaints.created_at as created_at',
                 [$writingType, 'reported_writing', $commentType, 'reported_comment', 'reported_user', $userType, $writingType],
             )
             ->whereNotNull('complaints.created_at');

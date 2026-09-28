@@ -3,12 +3,12 @@ import { ref, provide } from 'vue'
 import { blockerKey, complainerKey, sharerKey, userKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
 import { useAuth } from '@/composables/useAuth'
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useNativeShare } from '@/composables/useNativeShare'
 
 const user = injectStrict(userKey)
 const { isAuthenticated, authUser } = useAuth()
-const { userDisplayName } = useFormatting()
+const { userDisplayName } = useUserDisplay()
 const { share: nativeShare } = useNativeShare()
 const sharer = ref(false)
 const complainer = ref(false)

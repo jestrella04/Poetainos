@@ -43,23 +43,23 @@ describe('admin category management', function (): void {
         $updatedDescription = fake()->sentence();
 
         // When
-        $createResponse = actingAs($admin)->post(route('admin.categories.store'), [
+        $createResponse = actingAs($admin)->from(route('admin.categories'))->post(route('admin.categories.store'), [
             'name' => $name,
             'description' => fake()->sentence(),
         ]);
 
         // Then
-        $createResponse->assertOk();
+        $createResponse->assertRedirect(route('admin.categories'))->assertInertiaFlash('message', 'categories.category-created');
         $category = Category::where('name', $name)->firstOrFail();
 
         // When
-        $updateResponse = actingAs($admin)->put(route('admin.categories.update', $category), [
+        $updateResponse = actingAs($admin)->from(route('admin.categories'))->put(route('admin.categories.update', $category), [
             'name' => $name,
             'description' => $updatedDescription,
         ]);
 
         // Then
-        $updateResponse->assertOk();
+        $updateResponse->assertRedirect(route('admin.categories'))->assertInertiaFlash('message', 'categories.category-updated');
         expect($category->refresh()->description)->toBe($updatedDescription);
     });
 
@@ -114,7 +114,7 @@ describe('admin category management', function (): void {
         ]);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect();
         expect($root->refresh()->parent_id)->toBe($other->id);
     });
 
@@ -124,10 +124,10 @@ describe('admin category management', function (): void {
         $category = Category::factory()->create();
 
         // When
-        $response = actingAs($admin)->delete('/admin/categories/delete/'.$category->slug);
+        $response = actingAs($admin)->from(route('admin.categories'))->delete('/admin/categories/'.$category->slug);
 
         // Then
-        $response->assertOk();
+        $response->assertRedirect(route('admin.categories'))->assertInertiaFlash('message', 'categories.category-deleted');
         expect(Category::find($category->id))->toBeNull();
     });
 
@@ -158,7 +158,7 @@ describe('authorization for admin category routes', function (): void {
         $category = Category::factory()->create();
 
         // When
-        $response = actingAs($user)->delete('/admin/categories/delete/'.$category->slug);
+        $response = actingAs($user)->delete('/admin/categories/'.$category->slug);
 
         // Then
         $response->assertForbidden();

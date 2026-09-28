@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3'
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import type { UserLike } from '@/types/models'
 
 defineProps<{
@@ -9,7 +9,7 @@ defineProps<{
   color: string
 }>()
 
-const { userDisplayName } = useFormatting()
+const { userDisplayName } = useUserDisplay()
 </script>
 
 <template>

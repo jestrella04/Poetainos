@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import PoUsersAccountRow from './partials/PoUsersAccountRow.vue'
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useInfiniteList } from '@/composables/useInfiniteList'
 import type { User } from '@/types/models'
 
 const { isEmpty } = useTypeGuards()
-const { userDisplayName } = useFormatting()
+const { userDisplayName } = useUserDisplay()
 
 const { items: blockedUsers, isFetched, loadMore } = useInfiniteList<User>('blockedUsers')
 </script>

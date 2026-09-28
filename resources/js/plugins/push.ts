@@ -97,7 +97,7 @@ export class Push {
    */
   async deleteSubscription(subscription: PushSubscription): Promise<void> {
     await http.getClient().request({
-      method: 'post',
+      method: 'delete',
       url: route('push.delete'),
       data: { endpoint: subscription.endpoint }
     })

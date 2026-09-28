@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { reactive, useTemplateRef } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
 import { useFormValidation } from '@/composables/useFormValidation'
 import { useRequestFailure } from '@/composables/useRequestFailure'
+import { useSocialLinks } from '@/composables/useSocialLinks'
 import type { InertiaPageProps } from '@/types/inertia'
-
-type SocialNetworkKey = 'twitter' | 'threads' | 'instagram' | 'facebook' | 'youtube' | 'goodreads'
 
 // UsersController::edit()'s user with its profile loaded (null until the user fills one in)
 interface EditableUser {
@@ -17,8 +16,8 @@ interface EditableUser {
   email: string
   role_id?: number | null
   profile:
-    | (Partial<Record<SocialNetworkKey, string | null>> & {
-        avatar?: string | null
+    | (Partial<Record<string, string | null>> & {
+        avatar_url?: string | null
         bio?: string | null
         location?: string | null
         occupation?: string | null
@@ -34,21 +33,17 @@ interface Role {
 }
 
 interface SocialLinkField {
-  key: SocialNetworkKey
+  key: string
   label: string
   maxlength: number
 }
 
-const socialLinkFields: SocialLinkField[] = [
-  { key: 'twitter', label: 'X (Twitter)', maxlength: 250 },
-  { key: 'threads', label: 'Threads', maxlength: 250 },
-  { key: 'instagram', label: 'Instagram', maxlength: 100 },
-  { key: 'facebook', label: 'Facebook', maxlength: 250 },
-  { key: 'youtube', label: 'Youtube', maxlength: 100 },
-  { key: 'goodreads', label: 'Goodreads', maxlength: 250 }
-]
-
 const page = usePage<InertiaPageProps<{ user: EditableUser; roles: Role[]; agreement: boolean }>>()
+const { socialNetworkName } = useSocialLinks()
+// The networks and their handles' max lengths come from UserProfile::SOCIAL_NETWORKS
+const socialLinkFields: SocialLinkField[] = Object.entries(page.props.site.socialNetworks).map(
+  ([key, maxlength]) => ({ key, label: socialNetworkName(key), maxlength })
+)
 const { authUser, isAdmin } = useAuth()
 const { isBlank } = useTypeGuards()
 const { isSubmittedFormValid } = useFormValidation()
@@ -58,7 +53,7 @@ const avatarInput = useTemplateRef<{ click: () => void }>('avatarInput')
 const user = page.props.user
 const form = useForm({
   avatar: null as File | null,
-  'avatar-remove': false,
+  avatar_remove: false,
   role: user.role_id ?? null,
   name: user.name ?? '',
   email: user.email,
@@ -67,20 +62,28 @@ const form = useForm({
   occupation: user.profile?.occupation ?? '',
   interests: user.profile?.interests ?? '',
   website: user.profile?.website ?? '',
-  ...(Object.fromEntries(
-    socialLinkFields.map((field) => [field.key, user.profile?.[field.key] ?? ''])
-  ) as Record<SocialNetworkKey, string>),
   service_agreement: false,
   privacy_agreement: false
 })
+// Handles are keyed by network, which the form's field types can't list, so
+// they're kept apart and sent along with the form
+const socialHandles = reactive<Record<string, string>>(
+  Object.fromEntries(socialLinkFields.map((field) => [field.key, user.profile?.[field.key] ?? '']))
+)
+
+function socialHandleError(network: string): string | undefined {
+  const errors: Partial<Record<string, string>> = form.errors
+
+  return errors[network]
+}
 
 // PoAvatar reads a flat `avatar`, as every listing sends it
 const avatarUser = {
   username: user.username,
   name: user.name,
-  avatar: user.profile?.avatar ?? null
+  avatar_url: user.profile?.avatar_url ?? null
 }
-const hasAvatar = !isBlank(avatarUser.avatar)
+const hasAvatar = !isBlank(avatarUser.avatar_url)
 
 // The server opens the profile once saved, confirming with a flash message. The
 // avatar upload makes this multipart, which PHP only parses on POST, hence the
@@ -91,7 +94,7 @@ function submitForm(event: Event): void {
   }
 
   form
-    .transform((data) => ({ ...data, _method: 'put' }))
+    .transform((data) => ({ ...data, ...socialHandles, _method: 'put' }))
     .post(route('users.update', user.username), {
       forceFormData: true,
       onHttpException,
@@ -129,7 +132,7 @@ function openAvatarPicker(): void {
 
         <v-checkbox
           v-if="hasAvatar"
-          v-model="form['avatar-remove']"
+          v-model="form.avatar_remove"
           :label="$t('accounts.remove-current-avatar')"
           hide-details
         />
@@ -239,11 +242,11 @@ function openAvatarPicker(): void {
         <v-text-field
           v-for="field in socialLinkFields"
           :key="field.key"
-          v-model="form[field.key]"
+          v-model="socialHandles[field.key]"
           type="text"
           :label="field.label"
           hide-details="auto"
-          :error-messages="form.errors[field.key]"
+          :error-messages="socialHandleError(field.key)"
           minlength="3"
           :maxlength="field.maxlength"
           clearable

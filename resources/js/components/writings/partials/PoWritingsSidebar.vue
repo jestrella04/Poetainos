@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import type { TagLike, UserLike } from '@/types/models'
 
 defineProps<{
@@ -7,7 +7,7 @@ defineProps<{
   tags: TagLike[]
 }>()
 
-const { userDisplayName } = useFormatting()
+const { userDisplayName } = useUserDisplay()
 </script>
 
 <template>

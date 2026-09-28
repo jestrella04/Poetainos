@@ -91,6 +91,32 @@ describe('the content of "someone did something on your writing" notifications',
         // Then
         expect($mail->actionUrl)->toBe($writing->path().'#comment-'.$comment->id);
     });
+
+    it('is written when the notification is sent, not when it is dispatched', function (): void {
+        // Given
+        $actor = createUser(['name' => fake()->firstName()]);
+        $notification = new WritingLiked(Writing::factory()->create(), $actor);
+        $renamed = fake()->unique()->firstName().' '.fake()->lastName();
+        $actor->forceFill(['name' => $renamed])->save();
+
+        // When
+        $message = $notification->toWebPush(createUser(), null)->toArray();
+
+        // Then
+        expect($message['body'])->toContain($renamed);
+    });
+
+    it('names who shelved the writing', function (): void {
+        // Given
+        $actor = createUser(['name' => fake()->firstName().' '.fake()->lastName()]);
+        $writing = Writing::factory()->create();
+
+        // When
+        $message = (new WritingShelved($writing, $actor))->toWebPush(createUser(), null)->toArray();
+
+        // Then
+        expect($message['body'])->toContain($actor->getName());
+    });
 });
 
 describe('live notification broadcasts', function (): void {

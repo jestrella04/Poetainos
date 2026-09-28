@@ -6,6 +6,8 @@ import PoWritingDropdown from './partials/PoWritingDropdown.vue'
 import { loadingCommentsKey, writingKey } from '@/composables/keys'
 import { useAuth } from '@/composables/useAuth'
 import { useTypeGuards } from '@/composables/useTypeGuards'
+import { useDates } from '@/composables/useDates'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useFormatting } from '@/composables/useFormatting'
 import type { UserLike, Writing } from '@/types/models'
 
@@ -26,9 +28,12 @@ const props = withDefaults(
 
 const { authUser } = useAuth()
 const { isBlank } = useTypeGuards()
-const { storage, toLocaleDate, userDisplayName, abbreviateNumber } = useFormatting()
+const { toLocaleDate } = useDates()
+const { userDisplayName } = useUserDisplay()
+const { abbreviateNumber } = useFormatting()
 const loadingComments = ref(true)
-const hasCover = computed(() => !isBlank(props.data.cover))
+const coverUrl = computed(() => props.data.cover_url ?? '')
+const hasCover = computed(() => !isBlank(coverUrl.value))
 const isLiked = computed(() => props.data.is_liked === true)
 const isShelved = computed(() => props.data.is_shelved === true)
 const canReactToWriting = computed(() => authUser()?.username !== props.data.author.username)
@@ -50,7 +55,7 @@ provide(writingKey, props.data)
       <v-img
         v-if="hasCover && alone"
         height="320"
-        :src="storage(data.cover ?? '')"
+        :src="coverUrl"
         alt=""
         class="mb-6"
         rounded
@@ -59,7 +64,7 @@ provide(writingKey, props.data)
 
       <v-row>
         <v-col v-if="hasSideCover" cols="12" md="3" order="1" order-md="2">
-          <v-img height="200" :src="storage(data.cover ?? '')" alt="" rounded cover />
+          <v-img height="200" :src="coverUrl" alt="" rounded cover />
         </v-col>
 
         <v-col cols="12" :md="hasSideCover ? 9 : 12" order="2" order-md="1">

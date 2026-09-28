@@ -8,6 +8,7 @@ use App\Models\DailySelection;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Writing;
+use App\Services\AgreementRecorder;
 use App\Services\ContentDeleter;
 use App\Services\ViewCounter;
 use App\Services\WritingPublisher;
@@ -16,7 +17,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -83,17 +83,17 @@ class WritingsController extends Controller
     /**
      * Store a newly created resource in storage, then open it.
      */
-    public function store(Request $request, WritingPublisher $publisher): RedirectResponse
+    public function store(Request $request, WritingPublisher $publisher, AgreementRecorder $agreements): RedirectResponse
     {
         $user = $this->requireAuthUser();
 
         $publisher->ensureBelowDailyPostLimit($user);
-        $request->validate($this->rules($user));
+        $request->validate($this->rules($user, $agreements));
 
         $writing = $publisher->create($user, $this->formInput($request), $this->uploadedCover($request));
 
         RecalculateAura::dispatch($user);
-        $this->rememberAgreements($request, $user);
+        $agreements->remember($request, $user);
 
         Inertia::flash(['message' => 'writings.writing-published', 'color' => 'success']);
 
@@ -113,8 +113,6 @@ class WritingsController extends Controller
             'tags:id,name,slug',
         ]);
 
-        $user = Auth::user();
-
         return Inertia::render('writings/PoWritingsShow', [
             'meta' => [
                 'title' => getPageTitle([
@@ -123,7 +121,7 @@ class WritingsController extends Controller
                 ]),
                 'canonical' => $writing->path(),
                 'description' => $writing->excerpt(),
-                'image' => $writing->coverUrl(),
+                'image' => $writing->cover_url,
             ],
             'writing' => $writing,
             'likers' => $writing->likers(self::LIKERS_SHOWN),
@@ -144,7 +142,7 @@ class WritingsController extends Controller
                     self::RELATED_SHOWN,
                 ),
             ],
-            'isAuthorBlocked' => $user !== null && $writing->author !== null ? $user->isAuthorBlocked($writing->author) : false,
+            'isAuthorBlocked' => in_array($writing->user_id, $this->blockedAuthorIds(), true),
         ]);
     }
 
@@ -169,17 +167,17 @@ class WritingsController extends Controller
     /**
      * Update the specified resource in storage, then open it.
      */
-    public function update(Request $request, Writing $writing, WritingPublisher $publisher): RedirectResponse
+    public function update(Request $request, Writing $writing, WritingPublisher $publisher, AgreementRecorder $agreements): RedirectResponse
     {
         $this->authorize('update', $writing);
 
         $agreeingUser = $this->agreeingUser($writing);
-        $request->validate($this->rules($agreeingUser));
+        $request->validate($this->rules($agreeingUser, $agreements));
 
         $publisher->update($writing, $this->formInput($request), $this->uploadedCover($request));
 
         RecalculateAura::dispatch($writing->author);
-        $this->rememberAgreements($request, $agreeingUser);
+        $agreements->remember($request, $agreeingUser);
 
         Inertia::flash(['message' => 'writings.writing-updated', 'color' => 'success']);
 
@@ -187,7 +185,8 @@ class WritingsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage, then go home.
+     * Remove the specified resource from storage, then go home, or back to
+     * the admin table when deleted from there.
      */
     public function destroy(Writing $writing, ContentDeleter $deleter): RedirectResponse
     {
@@ -197,7 +196,7 @@ class WritingsController extends Controller
 
         Inertia::flash(['message' => 'writings.writing-deleted', 'color' => 'success']);
 
-        return to_route('home');
+        return request()->routeIs('admin.*') ? back() : to_route('home');
     }
 
     /**
@@ -218,12 +217,11 @@ class WritingsController extends Controller
                 'data' => $writing,
                 'main_category' => $writing->exists ? $writing->mainCategory()->value('id') : null,
                 'categories' => $writing->exists ? $writing->altCategories()->pluck('id') : [],
-                'tags' => $writing->exists ? $writing->tags()->pluck('name') : null,
-
+                'tags' => $writing->exists ? $writing->tags()->pluck('name') : [],
             ],
             'isUpdate' => $writing->exists,
-            'main_categories' => $mainCategories,
-            'max-file-size' => getSiteConfig('uploads_max_file_size'),
+            'mainCategories' => $mainCategories,
+            'maxFileSize' => getSiteConfig('uploads_max_file_size'),
             // Nobody else can accept the agreements for the author, so the form only asks the author
             'agreement' => $this->agreeingUser($writing)?->isInAgreement() ?? true,
         ]);
@@ -246,7 +244,7 @@ class WritingsController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function rules(?User $agreeingUser): array
+    private function rules(?User $agreeingUser, AgreementRecorder $agreements): array
     {
         return [
             'title' => 'required|string|min:3|max:100',
@@ -257,7 +255,7 @@ class WritingsController extends Controller
             'tags.*' => 'string|min:1|max:'.WritingPublisher::MAX_TAG_LENGTH,
             'link' => 'nullable|url|max:250',
             'cover' => $this->imageUploadRule(),
-            ...$this->agreementRules($agreeingUser),
+            ...$agreements->rules($agreeingUser),
         ];
     }
 

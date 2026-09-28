@@ -30,6 +30,26 @@ describe('the login screen', function (): void {
         // Then
         $response->assertInertia(fn ($page) => $page->where('email', $email));
     });
+
+    it('opens on the email step after a password reset', function (): void {
+        // When
+        $response = get(route('login', ['isReset' => 1, 'isEmail' => 1]));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page
+            ->where('startsWithEmail', true)
+            ->where('isAfterPasswordReset', true));
+    });
+
+    it('opens on the sign-in choices otherwise', function (): void {
+        // When
+        $response = get(route('login'));
+
+        // Then
+        $response->assertInertia(fn ($page) => $page
+            ->where('startsWithEmail', false)
+            ->where('isAfterPasswordReset', false));
+    });
 });
 
 describe('authenticating', function (): void {

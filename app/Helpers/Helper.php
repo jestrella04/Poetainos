@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -15,17 +16,9 @@ use Illuminate\Support\Str;
  */
 function getSiteConfig(string $path = ''): mixed
 {
-    if ($path !== '') {
-        $path = config('poetainos.'.$path);
-    } else {
-        $path = config('poetainos');
-    }
+    $setting = config($path === '' ? 'poetainos' : 'poetainos.'.$path);
 
-    if (is_array($path) && Arr::exists($path, 'value')) {
-        return $path['value'];
-    } else {
-        return $path;
-    }
+    return is_array($setting) && Arr::exists($setting, 'value') ? $setting['value'] : $setting;
 }
 
 function slugify(string $table, string $title, string $column = 'slug', string $separator = '-'): string
@@ -56,6 +49,25 @@ function slugify(string $table, string $title, string $column = 'slug', string $
     }
 
     return $slug.$separator.$suffix;
+}
+
+/**
+ * Run a save that generates a slug with slugify(), running it once more when
+ * a concurrent request took the same slug between the lookup and the insert.
+ * The save must generate the slug itself, so the retry picks a fresh one.
+ *
+ * @template TResult
+ *
+ * @param  Closure(): TResult  $save
+ * @return TResult
+ */
+function retryOnSlugCollision(Closure $save): mixed
+{
+    try {
+        return $save();
+    } catch (UniqueConstraintViolationException) {
+        return $save();
+    }
 }
 
 /**
@@ -99,6 +111,15 @@ function interpolateSiteSettings(string $text): string
         },
         $text
     );
+}
+
+/**
+ * The URL of a file stored on the local disk (an avatar, a cover), served
+ * through the public/storage symlink; null when there is none.
+ */
+function storageUrl(?string $path): ?string
+{
+    return $path === null || $path === '' ? null : asset('storage/'.$path);
 }
 
 /**

@@ -8,10 +8,12 @@ use App\Models\User;
 use App\Models\Writing;
 use App\Notifications\ComplaintSubmitted;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class ComplaintsController extends Controller
 {
@@ -74,6 +76,24 @@ class ComplaintsController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    /**
+     * Mark a complaint as dealt with, noting what was done, then return to the admin table.
+     */
+    public function close(Complaint $complaint): RedirectResponse
+    {
+        request()->validate([
+            'closed_comment' => 'nullable|string|max:255',
+        ]);
+
+        $complaint->closed_at = Carbon::now();
+        $complaint->closed_comment = request('closed_comment');
+        $complaint->save();
+
+        Inertia::flash(['message' => 'complaints.complaint-closed', 'color' => 'success']);
+
+        return back();
     }
 
     /**

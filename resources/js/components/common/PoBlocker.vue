@@ -2,7 +2,7 @@
 import { useForm } from '@inertiajs/vue3'
 import { blockerKey } from '@/composables/keys'
 import { injectStrict } from '@/composables/injectStrict'
-import { useFormatting } from '@/composables/useFormatting'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { UserLike } from '@/types/models'
 
@@ -10,7 +10,7 @@ const props = defineProps<{
   user: UserLike
 }>()
 
-const { userDisplayName } = useFormatting()
+const { userDisplayName } = useUserDisplay()
 const { onHttpException, onNetworkError } = useRequestFailure()
 const blocker = injectStrict(blockerKey)
 const form = useForm({})

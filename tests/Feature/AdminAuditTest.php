@@ -29,14 +29,16 @@ describe('the admin audit trail', function (): void {
         $tag = Tag::factory()->create();
 
         // When
-        actingAs($admin)->deleteJson(route('admin.tags.destroy', $tag))->assertOk();
+        actingAs($admin)->from(route('admin.tags'))->delete(route('admin.tags.destroy', $tag))
+            ->assertRedirect(route('admin.tags'))
+            ->assertInertiaFlash('message', 'tags.tag-deleted');
 
         // Then
         expect(securityLogContents())
             ->toContain('Admin action')
             ->toContain('"actor_id":'.$admin->id)
             ->toContain('"action":"admin.tags.destroy"')
-            ->toContain('"status":200');
+            ->toContain('"status":302');
     });
 
     it('does not record admin pages that are only read', function (): void {

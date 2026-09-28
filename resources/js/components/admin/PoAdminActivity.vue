@@ -3,7 +3,8 @@ import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
 import { useServerTable } from '@/composables/useServerTable'
-import { useFormatting } from '@/composables/useFormatting'
+import { useDates } from '@/composables/useDates'
+import { useUserDisplay } from '@/composables/useUserDisplay'
 import type { DataTableHeader } from 'vuetify'
 import type { InertiaPageProps } from '@/types/inertia'
 import type { UserLike } from '@/types/models'
@@ -39,7 +40,8 @@ interface ActivityPresentation {
 }
 
 const { t } = useI18n()
-const { userDisplayName, relativeDate, toLocaleDate } = useFormatting()
+const { relativeDate, toLocaleDate } = useDates()
+const { userDisplayName } = useUserDisplay()
 const page = usePage<InertiaPageProps<{ total: number }>>()
 const headers: DataTableHeader[] = [
   { title: t('admin.event'), align: 'start', sortable: false, key: 'kind' },
@@ -81,7 +83,7 @@ const presentations: Record<ActivityKind, ActivityPresentation> = {
 }
 const { items, totalItems, isLoading, loadItems } = useServerTable<ActivityRow>(
   'admin.activity',
-  page.props.total
+  () => page.props.total
 )
 </script>
 

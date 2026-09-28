@@ -5,10 +5,7 @@ namespace App\Services;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Sleep;
-use RuntimeException;
 
 /**
  * The calls this site makes to the Threads API: checking and renewing the
@@ -26,10 +23,6 @@ class ThreadsClient
      * the Instagram story before answering.
      */
     private const PUBLISH_TIMEOUT_SECONDS = 45;
-
-    private const CONTAINER_STATUS_CHECKS = 6;
-
-    private const SECONDS_BETWEEN_STATUS_CHECKS = 5;
 
     /**
      * The id of the Threads account the token belongs to.
@@ -70,53 +63,67 @@ class ThreadsClient
     }
 
     /**
-     * Publish a text post with a link preview: Threads first creates a media
-     * container, then publishes it once it has finished processing. Threads
-     * also shares the post to the linked Instagram account's story; that share
-     * failing doesn't stop the post, so it is only logged.
+     * The id of a new text container with a link preview, which Threads builds
+     * asynchronously and publishContainer() posts once it is finished. Threads
+     * also shares the post to the linked Instagram account's story; when it
+     * rejects the container for that (with an unknown error), the container is
+     * created again without the share, which is then only logged.
+     *
+     * @return array{id: string, isSharedToInstagram: bool}
      */
-    public function publishText(string $userId, string $accessToken, string $text, string $link): void
+    public function createTextContainer(string $userId, string $accessToken, string $text, string $link): array
     {
-        $isSharedToInstagram = true;
-
         try {
-            $containerId = $this->createTextContainer($userId, $accessToken, $text, $link, $isSharedToInstagram);
+            return ['id' => $this->requestTextContainer($userId, $accessToken, $text, $link, true), 'isSharedToInstagram' => true];
         } catch (RequestException $exception) {
-            // Threads rejects the whole container, with an unknown error, when the Instagram account can't take the share
             logger()->warning('Threads rejected the post with the Instagram story share, so it is posted without it.', ['error' => $exception->response->json('error')]);
-            $isSharedToInstagram = false;
-            $containerId = $this->createTextContainer($userId, $accessToken, $text, $link, $isSharedToInstagram);
-        }
 
-        $this->waitUntilContainerFinished($containerId, $accessToken);
-
-        try {
-            $published = $this->request($accessToken, self::PUBLISH_TIMEOUT_SECONDS)
-                ->asForm()
-                ->post($this->versioned("{$userId}/threads_publish"), [
-                    'creation_id' => $containerId,
-                ])
-                ->throw();
-        } catch (ConnectionException $exception) {
-            // Failing here would retry the job, and post the writing twice, when Threads published it without answering in time
-            if ($this->isContainerPublished($containerId, $accessToken) === true) {
-                logger()->warning('Threads published the post without answering in time; its Instagram story share is unknown.', ['container_id' => $containerId]);
-
-                return;
-            }
-
-            throw $exception;
-        }
-
-        if ($isSharedToInstagram === true && $published->json('crossreshare_to_ig_status') !== 'SUCCESS') {
-            logger()->warning('The Threads post could not be shared to the Instagram story.', ['post_id' => $published->json('id')]);
+            return ['id' => $this->requestTextContainer($userId, $accessToken, $text, $link, false), 'isSharedToInstagram' => false];
         }
     }
 
     /**
-     * The id of a new text container with a link preview.
+     * The status of a container (IN_PROGRESS, FINISHED, PUBLISHED, ERROR or
+     * EXPIRED) and, when it failed, why.
+     *
+     * @return array{status: string|null, error_message: string|null}
      */
-    private function createTextContainer(string $userId, string $accessToken, string $text, string $link, bool $isSharedToInstagram): string
+    public function containerStatus(string $containerId, string $accessToken): array
+    {
+        $container = $this->request($accessToken)
+            ->get($this->versioned($containerId), ['fields' => 'status,error_message'])
+            ->throw();
+
+        return [
+            'status' => $container->json('status'),
+            'error_message' => $container->json('error_message'),
+        ];
+    }
+
+    /**
+     * Publish a finished container, returning the post id and the status of
+     * its Instagram story share.
+     *
+     * @return array{id: string, crossreshare_to_ig_status: string|null}
+     *
+     * @throws ConnectionException when Threads doesn't answer in time, which doesn't tell whether it published.
+     */
+    public function publishContainer(string $userId, string $containerId, string $accessToken): array
+    {
+        $published = $this->request($accessToken, self::PUBLISH_TIMEOUT_SECONDS)
+            ->asForm()
+            ->post($this->versioned("{$userId}/threads_publish"), [
+                'creation_id' => $containerId,
+            ])
+            ->throw();
+
+        return [
+            'id' => (string) $published->json('id'),
+            'crossreshare_to_ig_status' => $published->json('crossreshare_to_ig_status'),
+        ];
+    }
+
+    private function requestTextContainer(string $userId, string $accessToken, string $text, string $link, bool $isSharedToInstagram): string
     {
         $instagramShare = $isSharedToInstagram === true ? ['crossreshare_to_ig' => 'true'] : [];
 
@@ -130,49 +137,6 @@ class ThreadsClient
             ])
             ->throw()
             ->json('id');
-    }
-
-    /**
-     * Threads builds a container asynchronously (fetching the link preview
-     * takes a few seconds), and publishing it before it is finished fails
-     * with "The requested resource does not exist".
-     */
-    private function waitUntilContainerFinished(string $containerId, string $accessToken): void
-    {
-        for ($check = 1; $check <= self::CONTAINER_STATUS_CHECKS; $check++) {
-            Sleep::for(self::SECONDS_BETWEEN_STATUS_CHECKS)->seconds();
-
-            $container = $this->fetchContainer($containerId, $accessToken);
-            $status = $container->json('status');
-
-            if ($status === 'FINISHED') {
-                return;
-            }
-
-            if ($status !== 'IN_PROGRESS') {
-                throw new RuntimeException(sprintf('Threads container %s is %s: %s', $containerId, $status, $container->json('error_message')));
-            }
-        }
-
-        throw new RuntimeException(sprintf('Threads container %s is still in progress', $containerId));
-    }
-
-    /**
-     * Whether a publish request that got no answer went through anyway,
-     * checked after giving Threads a few more seconds to finish it.
-     */
-    private function isContainerPublished(string $containerId, string $accessToken): bool
-    {
-        Sleep::for(self::SECONDS_BETWEEN_STATUS_CHECKS)->seconds();
-
-        return $this->fetchContainer($containerId, $accessToken)->json('status') === 'PUBLISHED';
-    }
-
-    private function fetchContainer(string $containerId, string $accessToken): Response
-    {
-        return $this->request($accessToken)
-            ->get($this->versioned($containerId), ['fields' => 'status,error_message'])
-            ->throw();
     }
 
     /**

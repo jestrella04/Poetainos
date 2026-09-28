@@ -17,6 +17,7 @@ use App\Services\LogReader;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Validation\Rule;
@@ -85,7 +86,9 @@ class AdminController extends Controller
      */
     public function categories(): Response|Paginator
     {
-        return $this->listing('admin/PoAdminCategories', __('Categories'), Category::query());
+        return $this->listing('admin/PoAdminCategories', __('Categories'), Category::query(), [
+            'parentOptions' => fn () => Category::select('id', 'name')->orderBy('name')->get(),
+        ]);
     }
 
     /**
@@ -205,7 +208,21 @@ class AdminController extends Controller
      */
     public function complaints(): Response|Paginator
     {
-        return $this->listing('admin/PoAdminComplaints', __('Complaints'), Complaint::query());
+        return $this->listing(
+            'admin/PoAdminComplaints',
+            __('Complaints'),
+            Complaint::with(['complainable' => function (MorphTo $morphTo): void {
+                $morphTo->constrain([
+                    Writing::class => fn ($query) => $query->select('id', 'slug', 'title'),
+                    Comment::class => fn ($query) => $query->select('id', 'writing_id', 'message')->with('writing:id,slug,title'),
+                    User::class => fn ($query) => $query->select('id', 'username', 'name'),
+                ]);
+            }])
+                // Open complaints first, newest first
+                ->orderByRaw('CASE WHEN closed_at IS NULL THEN 0 ELSE 1 END')
+                ->latest()
+                ->orderByDesc('id'),
+        );
     }
 
     public function analytics(): Response
@@ -233,9 +250,10 @@ class AdminController extends Controller
      * @template TModel of Model
      *
      * @param  Builder<TModel>  $rows
+     * @param  array<string, mixed>  $extraProps
      * @return Response|Paginator<int, TModel>
      */
-    private function listing(string $component, string $title, Builder $rows): Response|Paginator
+    private function listing(string $component, string $title, Builder $rows, array $extraProps = []): Response|Paginator
     {
         return $this->paginatedPage(
             fn (): Paginator => $rows->simplePaginate($this->perPage)->withQueryString(),
@@ -245,6 +263,7 @@ class AdminController extends Controller
                     'title' => getPageTitle([$title, __('Administration')]),
                 ],
                 'total' => fn (): int => $rows->count(),
+                ...$extraProps,
             ],
             recordsProp: null,
         );
