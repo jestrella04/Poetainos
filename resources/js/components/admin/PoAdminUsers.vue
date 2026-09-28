@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import PoAdminDeleteDialog from './partials/PoAdminDeleteDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
 import { useRowDialog } from '@/composables/useRowDialog'
@@ -45,7 +46,7 @@ const deleteDialog = useRowDialog<UserAdmin>()
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('users.users') }}</v-card-title>
+    <po-admin-title :title="$t('users.users')" />
 
     <v-data-table-server
       v-model:items-per-page="page.props.site.pagination"

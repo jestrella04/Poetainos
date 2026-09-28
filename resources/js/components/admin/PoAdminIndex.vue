@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import { useFormatting } from '@/composables/useFormatting'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -28,12 +29,14 @@ const counters = page.props.counters
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('admin.summary') }}</v-card-title>
+    <po-admin-title :title="$t('admin.summary')" />
 
     <div class="d-flex flex-wrap ga-5">
       <template v-for="counter in counters" :key="counter.title">
-        <v-card color="primary" class="counter pa-5" rounded>
-          <p>{{ abbreviateNumber(counter.count) }}</p>
+        <v-card color="primary" class="counter text-center pa-5" rounded>
+          <p class="po-prose text-display-medium ma-0 mb-2">
+            {{ abbreviateNumber(counter.count) }}
+          </p>
           <span>{{ counter.title }}</span>
         </v-card>
       </template>

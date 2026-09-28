@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import { useServerTable } from '@/composables/useServerTable'
 import { useDates } from '@/composables/useDates'
 import { useUserDisplay } from '@/composables/useUserDisplay'
@@ -89,7 +90,7 @@ const { items, totalItems, isLoading, loadItems } = useServerTable<ActivityRow>(
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('admin.activity') }}</v-card-title>
+    <po-admin-title :title="$t('admin.activity')" />
 
     <v-data-table-server
       v-model:items-per-page="page.props.site.pagination"

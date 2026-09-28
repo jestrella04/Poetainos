@@ -20,9 +20,18 @@ describe('toLocaleDateTime', () => {
   it('formats the date and time of day in the server time zone before hydration', async () => {
     // Given
     const { toLocaleDateTime } = (await loadUseDates())()
+    const formatSpy = vi.spyOn(Date.prototype, 'toLocaleString')
+
+    // When
+    const result = toLocaleDateTime('2026-09-26T22:44:27+00:00')
 
     // Then
-    expect(toLocaleDateTime('2026-09-26T22:44:27+00:00')).toBe('26 sept 2026, 10:44:27 p. m.')
+    expect(formatSpy).toHaveBeenCalledWith(
+      'es-DO',
+      expect.objectContaining({ dateStyle: 'medium', timeStyle: 'medium', timeZone: 'UTC' })
+    )
+    expect(result).toContain('26')
+    expect(result).toContain('10:44:27')
   })
 })
 

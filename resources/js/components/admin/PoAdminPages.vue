@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import PoAdminDeleteDialog from './partials/PoAdminDeleteDialog.vue'
 import PoAdminPageDialog from './partials/PoAdminPageDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
@@ -42,7 +43,7 @@ const deleteDialog = useRowDialog<PageAdmin>()
 <template>
   <po-wrapper>
     <div class="d-flex align-center justify-space-between">
-      <v-card-title>{{ $t('pages.pages') }}</v-card-title>
+      <po-admin-title :title="$t('pages.pages')" />
 
       <po-button
         id="admin-page-create"

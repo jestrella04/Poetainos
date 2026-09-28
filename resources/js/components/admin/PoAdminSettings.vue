@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm, usePage } from '@inertiajs/vue3'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import { useRequestFailure } from '@/composables/useRequestFailure'
 import type { InertiaPageProps } from '@/types/inertia'
 
@@ -20,7 +21,7 @@ function submitForm(): void {
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('admin.settings') }}</v-card-title>
+    <po-admin-title :title="$t('admin.settings')" />
 
     <v-form id="settings-form" class="mb-5" @submit.prevent="submitForm">
       <v-textarea

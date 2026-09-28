@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import PoAdminComplaintDialog from './partials/PoAdminComplaintDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
 import { useRowDialog } from '@/composables/useRowDialog'
@@ -43,7 +44,7 @@ const complaintDialog = useRowDialog<ComplaintAdmin>()
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('complaints.complaints') }}</v-card-title>
+    <po-admin-title :title="$t('complaints.complaints')" />
 
     <v-data-table-server
       v-model:items-per-page="page.props.site.pagination"

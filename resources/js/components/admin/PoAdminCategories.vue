@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import PoAdminCategoryDialog from './partials/PoAdminCategoryDialog.vue'
 import PoAdminDeleteDialog from './partials/PoAdminDeleteDialog.vue'
 import { useServerTable } from '@/composables/useServerTable'
@@ -47,7 +48,7 @@ const deleteDialog = useRowDialog<CategoryAdmin>()
 <template>
   <po-wrapper>
     <div class="d-flex align-center justify-space-between">
-      <v-card-title>{{ $t('categories.category') }}</v-card-title>
+      <po-admin-title :title="$t('categories.category')" />
 
       <po-button
         id="admin-category-create"

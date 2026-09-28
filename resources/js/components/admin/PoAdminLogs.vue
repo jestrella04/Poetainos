@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import PoLayoutAdmin from '../layouts/PoLayoutAdmin.vue'
+import PoAdminTitle from './partials/PoAdminTitle.vue'
 import { useLogEntries } from '@/composables/useLogEntries'
 import { useDates } from '@/composables/useDates'
 import { useFormatting } from '@/composables/useFormatting'
@@ -88,7 +89,7 @@ function clearLog(): void {
 
 <template>
   <po-wrapper>
-    <v-card-title>{{ $t('admin.logs') }}</v-card-title>
+    <po-admin-title :title="$t('admin.logs')" />
 
     <v-card-text v-if="hasFiles === false">{{ $t('admin.no-log-files') }}</v-card-text>
 
