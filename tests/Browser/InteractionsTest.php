@@ -8,8 +8,8 @@ use Tests\Browser\Pages\WritingPage;
 
 use function Pest\Laravel\actingAs;
 
-describe('interacting with a writing', function () {
-    it('lets another user like a writing', function () {
+describe('interacting with a writing', function (): void {
+    it('lets another user like a writing', function (): void {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create();
         $reader = createUser();
@@ -28,7 +28,7 @@ describe('interacting with a writing', function () {
             ->exists())->toBeTrue();
     });
 
-    it('lets another user shelve a writing', function () {
+    it('lets another user shelve a writing', function (): void {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create();
         $reader = createUser();
@@ -46,7 +46,7 @@ describe('interacting with a writing', function () {
             ->exists())->toBeTrue();
     });
 
-    it('lets another user post a comment', function () {
+    it('lets another user post a comment', function (): void {
         $author = createUser();
         $writing = Writing::factory()->for($author, 'author')->create();
         $reader = createUser();

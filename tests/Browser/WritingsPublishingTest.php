@@ -6,7 +6,7 @@ use Tests\Browser\Pages\WritingFormPage;
 
 use function Pest\Laravel\actingAs;
 
-describe('publishing a writing', function () {
+describe('publishing a writing', function (): void {
     // Skipped: two upstream pest-plugin-browser gaps block this end-to-end flow.
     // 1) click() on an <input> element (the category selects) hangs indefinitely
     //    in this Playwright 1.63.0 + pest-plugin-browser 4.3.1 + headless-shell
@@ -21,7 +21,7 @@ describe('publishing a writing', function () {
     //    `[], // @TODO files...`), so `_method: PUT` never reaches Laravel and
     //    the edit submit 405s.
     // Re-enable once both upstream gaps are fixed.
-    it('creates, edits, and deletes a writing end-to-end', function () {
+    it('creates, edits, and deletes a writing end-to-end', function (): void {
         $author = createUser();
         $parentCategory = Category::factory()->create(['parent_id' => null]);
         $childCategory = Category::factory()->create(['parent_id' => $parentCategory->id]);

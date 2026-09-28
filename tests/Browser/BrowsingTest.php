@@ -9,8 +9,8 @@ use Tests\Browser\Pages\UserProfilePage;
 use Tests\Browser\Pages\WritingEntry;
 use Tests\Browser\Pages\WritingPage;
 
-describe('browsing main sections', function () {
-    it('shows the home page with published writings', function () {
+describe('browsing main sections', function (): void {
+    it('shows the home page with published writings', function (): void {
         $writings = Writing::factory()->count(fake()->numberBetween(1, 5))->create();
 
         $browser = HomePage::open()->browser();
@@ -22,7 +22,7 @@ describe('browsing main sections', function () {
         $browser->assertNoJavaScriptErrors();
     });
 
-    it('shows the explore page', function () {
+    it('shows the explore page', function (): void {
         $category = Category::factory()->create(['parent_id' => null]);
         Writing::factory()->create()->categories()->attach($category);
 
@@ -33,7 +33,7 @@ describe('browsing main sections', function () {
             ->assertNoJavaScriptErrors();
     });
 
-    it('shows a single writing page with its title and author', function () {
+    it('shows a single writing page with its title and author', function (): void {
         $name = fake()->firstName().' '.fake()->lastName();
         $author = User::factory()->create(['name' => $name]);
         $writing = Writing::factory()->for($author, 'author')->create();
@@ -46,7 +46,7 @@ describe('browsing main sections', function () {
             ->assertNoJavaScriptErrors();
     });
 
-    it('shows a user profile page', function () {
+    it('shows a user profile page', function (): void {
         $name = fake()->firstName().' '.fake()->lastName();
         $user = User::factory()->create(['name' => $name]);
 
