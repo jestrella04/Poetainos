@@ -22,7 +22,7 @@ class UserProfile extends Model
     /**
      * The social networks a profile can link to, each with the longest handle it accepts.
      *
-     * @var array<string, int>
+     * @var array<model-property<UserProfile>, int>
      */
     public const SOCIAL_NETWORKS = [
         'twitter' => 250,

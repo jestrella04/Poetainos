@@ -300,7 +300,7 @@ function pendingArtisan(string $command, array $parameters = []): PendingCommand
 }
 
 /**
- * @param  array<string, mixed>  $attributes
+ * @param  array<model-property<Page>, mixed>  $attributes
  */
 function createPage(array $attributes = []): Page
 {

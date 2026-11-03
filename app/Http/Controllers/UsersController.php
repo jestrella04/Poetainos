@@ -178,10 +178,13 @@ class UsersController extends Controller
         $isEmailChangePending = $isEmailChanged === true && $isOwnProfile === true;
         $isEmailReplaced = $isEmailChanged === true && $isOwnProfile === false;
 
+        $profileFields = ['bio', 'website', 'location', 'interests', 'occupation', ...array_keys(UserProfile::SOCIAL_NETWORKS)];
+        $submittedProfileFields = array_filter($profileFields, fn (string $field): bool => $request->has($field));
+
         try {
-            DB::transaction(function () use ($request, $user, $profile, $avatar, $isRoleChanged, $isEmailReplaced, $newEmail): void {
+            DB::transaction(function () use ($request, $user, $profile, $submittedProfileFields, $avatar, $isRoleChanged, $isEmailReplaced, $newEmail): void {
                 $profile->fill([
-                    ...$request->only(['bio', 'website', 'location', 'interests', 'occupation', ...array_keys(UserProfile::SOCIAL_NETWORKS)]),
+                    ...array_combine($submittedProfileFields, array_map($request->input(...), $submittedProfileFields)),
                     'avatar' => $avatar,
                 ])->save();
 
