@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Writing;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -173,10 +174,8 @@ function randomSample(Builder|Relation $query, int $take): EloquentCollection
  * Random writings for a "related content" widget, with each one's author
  * summary eager-loaded (the shape every such widget needs).
  *
- * @template TModel of \Illuminate\Database\Eloquent\Model
- *
- * @param  Builder<TModel>|Relation<TModel, *, *>  $query  A query builder, or a relation (e.g. $user->writings()).
- * @return EloquentCollection<int, TModel>
+ * @param  Builder<Writing>|Relation<Writing, *, *>  $query  A query builder, or a relation (e.g. $user->writings()).
+ * @return EloquentCollection<int, Writing>
  */
 function randomWritingsWithAuthor(Builder|Relation $query, int $take = 5): EloquentCollection
 {
