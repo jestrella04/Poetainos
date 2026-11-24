@@ -74,9 +74,7 @@ class DatabaseSeeder extends Seeder
      */
     private function randomViewsCount(): int
     {
-        [$min, $max] = self::VIEWS_RANGES[array_rand(self::VIEWS_RANGES)];
-
-        return random_int($min, $max);
+        return random_int(...self::VIEWS_RANGES[array_rand(self::VIEWS_RANGES)]);
     }
 
     /**
